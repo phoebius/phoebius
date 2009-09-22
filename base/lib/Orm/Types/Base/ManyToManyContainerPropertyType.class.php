@@ -69,6 +69,14 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	{
 		$this->encapsulant;
 	}
+
+	/**
+	 * @return string
+	 */
+	function getImplClass()
+	{
+		return null;
+	}
 }
 
 ?>

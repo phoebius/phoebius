@@ -38,6 +38,14 @@ class OneToManyContainerPropertyType extends ContainerPropertyType
 	{
 		return $this->encapsulantProperty;
 	}
+
+	/**
+	 * @return string
+	 */
+	function getImplClass()
+	{
+		return null;
+	}
 }
 
 ?>
