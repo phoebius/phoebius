@@ -14,15 +14,16 @@
  */
 abstract class OneToManyWorker extends ContainerWorker
 {
-	private $fk;
+	/**
+	 * @var OrmProperty
+	 */
+	protected $referentialProperty;
 
-	final function __construct(OrmEntity $parent, OrmMap $children, $fkFieldName)
+	final function __construct(OrmEntity $parent, OrmClass $children, OrmProperty $referentialProperty)
 	{
-		Assert::isScalar($fkFieldName);
+		$this->referentialProperty = $referentialProperty;
 
 		parent::__construct($parent, $children);
-
-		$this->fk = $fkFieldName;
 	}
 
 	/**
@@ -30,7 +31,7 @@ abstract class OneToManyWorker extends ContainerWorker
 	 */
 	function dropList()
 	{
-		return $this->childrenDao->dropByCondition($this->generateLogic());
+		return $this->children->getDao()->dropByCondition($this->generateLogic());
 	}
 
 	/**
@@ -44,7 +45,7 @@ abstract class OneToManyWorker extends ContainerWorker
 					SqlFunction::create('count')->aggregateWithNulls()
 				)
 				->from(
-					$this->childrenMap->getPhysicalSchema()->getDBTableName()
+					$this->children->getPhysicalSchema()->getDBTableName()
 				)
 				->setCondition(
 					$this->generateLogic()
@@ -65,28 +66,25 @@ abstract class OneToManyWorker extends ContainerWorker
 	 */
 	protected function generateLogic()
 	{
-		return Expression::andChain()
-			->add(
-				Expression::eq(
-					$this->getFKColumn(),
-					new ScalarSqlValue($this->parent->getId())
-				)
-			)
-			->add(
-				$this->getCondition()
-			);
-	}
+		$query = $this->children->getOrmQuery();
 
-	/**
-	 * Overridden. Now uses silly algorithm of searching the column
-	 * @return string
-	 */
-	protected function getFKColumn()
-	{
-		return new SqlColumn(
-			$this->fk,
-			$this->childrenMap->getPhysicalSchema()->getDBTableName()
-		);
+		$expression = Expression::andChain();
+		$table = $this->children->getPhysicalSchema()->getDBTableName();
+		$rawValue = $this->referentialProperty->getType()->makeRawValue($this->parent->getId());
+
+		foreach ($query->makeColumnValue($property, $rawValue) as $column => $sqlValue) {
+			$expression->add(
+				Expression::eq(
+					new SqlColumn(
+						$column,
+						$table
+					),
+					$sqlValue
+				)
+			);
+		}
+
+		return $expression;
 	}
 }
 

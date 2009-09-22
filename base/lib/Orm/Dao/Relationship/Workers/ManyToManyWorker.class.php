@@ -30,20 +30,20 @@ abstract class ManyToManyWorker extends ContainerWorker
 	private $childFkColumn;
 
 	final function __construct(
-			$helperTableName,
 			OrmEntity $parent,
 			OrmMap $children,
-			SqlColumn $parentFkColumn,
-			SqlColumn $childFkColumn
+			ManyToManyContainerPropertyType $mtmType
 		)
 	{
 		Assert::isScalar($helperTableName);
 
-		$this->helperTableName = $helperTableName;
 		$this->parent = $parent;
 		$this->childrenMap = $children;
 		$this->childrenDao = $children->getDao();
 
+		Assert::notImplemented('use proxy data here (mtmType)');
+
+		$this->helperTableName = $helperTableName;
 		$this->parentFkColumn = $parentFkColumn;
 		$this->childFkColumn = $childFkColumn;
 	}

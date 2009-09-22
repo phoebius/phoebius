@@ -144,13 +144,38 @@ class OrmGenerator
 		);
 
 		$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . $class->getName() . PHOEBIUS_TYPE_EXTENSION;
-		if (!file_exists($publicFile)) {
+		if (!file_exists($publicFile) || $this->regeneratePublic) {
 			OrmClassCodeConstructor::create($class, $auto)
 				->make(
 					new FileWriteStream(
-						$this->publicClassDir . DIRECTORY_SEPARATOR . $class->getName() . PHOEBIUS_TYPE_EXTENSION
+						$publicFile
 					)
 				);
+		}
+
+		foreach ($class->getProperties() as $property) {
+			if ($property->getType() instanceof OneToManyContainerPropertyType) {
+				$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . ucfirst($property->getName()) . PHOEBIUS_TYPE_EXTENSION;
+				if (!file_exists($publicFile) || $this->regeneratePublic) {
+					OrmOneToManyClassCodeConstructor::create($class, $property)
+						->make(
+							new FileWriteStream(
+								$publicFile
+							)
+						);
+				}
+			}
+			else if ($property->getType() instanceof ManyToManyContainerPropertyType) {
+				$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . ucfirst($property->getName()) . PHOEBIUS_TYPE_EXTENSION;
+				if (!file_exists($publicFile) || $this->regeneratePublic) {
+					OrmManyToManyClassCodeConstructor::create($class, $property)
+						->make(
+							new FileWriteStream(
+								$publicFile
+							)
+						);
+				}
+			}
 		}
 	}
 }

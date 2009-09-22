@@ -177,14 +177,44 @@ EOT;
 	/**
 	 * @return void
 	 */
+	private function buildContainerGetter(OrmProperty $ormProperty)
+	{
+		$propertyName = $ormProperty->getName();
+		$capitalizedPropertyName = ucfirst($ormProperty->getName());
+
+		// make property itself
+		$this->classProperties[] = <<<EOT
+	/**
+	 * @var {$capitalizedPropertyName}
+	 */
+	private \${$propertyName};
+EOT;
+
+		$this->classMethods[] = <<<EOT
+	/**
+	 * @return {$capitalizedPropertyName}
+	 */
+	function get{$capitalizedPropertyName}(\$partialFetch = false)
+	{
+		if (!\$this->{$propertyName}) {
+			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this, \$partialFetch);
+		}
+
+		return \$this->{$propertyName};
+	}
+EOT;
+	}
+
+	/**
+	 * @return void
+	 */
 	private function fetchClassMembers(OrmProperty $ormProperty)
 	{
 		$visibility = $ormProperty->getVisibility();
 
 		if ($visibility->is(OrmPropertyVisibility::TRANSPARENT)) {
 			if ($ormProperty->getType() instanceof ContainerPropertyType) {
-				// FIXME build a container
-				Assert::notImplemented('container getters are not constructed yet');
+				$this->buildContainerGetter($ormProperty);
 			}
 
 			return;

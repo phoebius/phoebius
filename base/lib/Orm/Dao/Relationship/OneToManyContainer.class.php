@@ -14,6 +14,11 @@
  */
 abstract class OneToManyContainer extends Container
 {
+	/**
+	 * @return OrmProperty
+	 */
+	abstract function getReferentialProperty();
+
 	function __construct(OrmEntity $parent, OrmMap $children, $partialFetch = false)
 	{
 		parent::__construct($parent, $children, $partialFetch);
@@ -23,28 +28,7 @@ abstract class OneToManyContainer extends Container
 				? 'OneToManyPartialWorker'
 				: 'OneToManyFullWorker';
 
-		$this->setWorker(new $worker($parent, $children, $this->getFKFieldName()));
-	}
-
-	/**
-	 * Overridden. Now uses silly algorithm of searching the column
-	 * @return string
-	 */
-	protected function getFKFieldName()
-	{
-		foreach (
-				$this->childrenMap->getLogicalSchema()->getPropertySet()
-				as $propertyPrefix => $property
-		) {
-			if ($property instanceof AssociationPropertyType) {
-				if ($property->getContainerMap() === $this->parent->map()) {
-					$fields = $this->childrenMap->getPropertySqlFields($propertyPrefix);
-					return reset($fields);
-				}
-			}
-		}
-
-		Assert::isUnreachable();
+		$this->setWorker(new $worker($parent, $children, $this->getReferentialProperty()));
 	}
 }
 

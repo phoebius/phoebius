@@ -25,14 +25,9 @@ abstract class ContainerWorker
 	private $condition = null;
 
 	/**
-	 * @var OrmMap
+	 * @var OrmClass
 	 */
-	protected $childrenMap;
-
-	/**
-	 * @var IOrmEntityAccessor
-	 */
-	protected $childrenDao;
+	protected $children;
 
 	/**
 	 * @return void
@@ -49,11 +44,10 @@ abstract class ContainerWorker
 	 */
 	abstract function dropList();
 
-	function __construct(OrmEntity $parent, OrmMap $children)
+	function __construct(OrmEntity $parent, OrmClass $children)
 	{
 		$this->parent = $parent;
-		$this->childrenMap = $children;
-		$this->childrenDao = $children->getDao();
+		$this->children = $children;
 	}
 
 	/**

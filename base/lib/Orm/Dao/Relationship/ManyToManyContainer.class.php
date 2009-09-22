@@ -15,26 +15,16 @@
 abstract class ManyToManyContainer extends Container
 {
 	/**
-	 * @return string
+	 * @var ManyToManyContainerPropertyType
 	 */
-	abstract function getHelperTableName();
-
-	/**
-	 * @return SqlColumn
-	 */
-	abstract protected function getParentFkColumn();
-
-	/**
-	 * @return SqlColumn
-	 */
-	abstract protected function getChildFkColumn();
+	private $proxy;
 
 	/**
 	 * @param OrmEntity $parent
 	 * @param OrmMap $children
 	 * @param boolean $partialFetch
 	 */
-	function __construct(OrmEntity $parent, OrmMap $children, $partialFetch = false)
+	function __construct(OrmEntity $parent, OrmMap $children, ManyToManyContainerPropertyType $mtmType, $partialFetch = false)
 	{
 		parent::__construct($parent, $children);
 
@@ -45,11 +35,9 @@ abstract class ManyToManyContainer extends Container
 
 		$this->setWorker(
 			new $worker(
-				$this->getHelperTableName(),
 				$parent,
 				$children,
-				$this->getParentFkColumn(),
-				$this->getChildFkColumn()
+				$mtmType
 			)
 		);
 	}

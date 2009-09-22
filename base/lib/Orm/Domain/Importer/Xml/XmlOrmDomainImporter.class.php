@@ -196,7 +196,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		// for now we can process containers
 		$this->recorder->putWarningLine('Containers are not generated for now');
 		foreach ($classContainers as $name => $containers) {
-			//$this->obtainClassContainers($classEntities[$name], $containers);
+			$this->obtainClassContainers($classEntities[$name], $containers);
 		}
 	}
 
@@ -226,7 +226,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		if (!empty($containers)) {
 			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' containers:');
 			foreach ($containers as $container) {
-				$container = $this->generateContainer($container);
+				$container = $this->generateContainer($class, $container);
 				$class->addProperty($container);
 			}
 			$this->recorder->putLine();
@@ -306,14 +306,95 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	/**
 	 * @return OrmProperty
 	 */
-	private function generateContainer(SimpleXMLElement $xmlContainer)
+	private function generateContainer(OrmClass $type, SimpleXMLElement $xmlContainer)
 	{
-		$this->recorder->putInfoLine('Generating ' . ((string) $xmlContainer['name']) . ' container...');
-
 		// acceptable types: OneToManyContainerPropertyType, ManyToManyContainerPropertyType
 
+		$this->recorder->putInfoLine('Generating ' . ((string) $xmlContainer['name']) . ' container...');
+
+		try {
+			$referredType = $this->ormDomain->getClass((string)$xmlContainer['type']);
+		}
+		catch (OrmModelIntegrityException $e) {
+			throw new OrmModelIntegrityException('Reference to unknown entity ' . ((string)$xmlContainer['type']));
+		}
+
+		try { // one-to-many
+			$referredProperty = $referredType->getProperty((string)$xmlContainer['refs']);
+
+			$propertyType = new OneToManyContainerPropertyType(
+				$type,
+				$referredType,
+				$referredProperty
+			);
+		}
+		catch (OrmModelIntegrityException $e) { // many to many
+
+			try {
+				$proxy = $this->ormDomain->getClass((string)$xmlContainer['refs']);
+			}
+			catch (OrmModelIntegrityException $e) {
+				$proxy = new OrmClass();
+				$proxy->setHasDao(true);
+				$proxy->setName((string)$xmlContainer['refs']);
+			}
+
+			// FIXME: check whether type and referenced type are identifiable and id property types implement IReferenced
+			// FIXME: check whether those properties are already set
+
+			$type_id_name = '___mtm_' . $type->getDBTableName();
+			try {
+				$type_property = new OrmProperty(
+					$type_id_name,
+					new AssociationPropertyType(
+						$type,
+						AssociationMultiplicity::exactlyOne(),
+						AssociationBreakAction::cascade()
+					)
+				);
+
+				$proxy->addProperty(
+					$type_property
+				);
+			}
+			catch (OrmModelIntegrityException $e) {
+				$type_property = $proxy->getProperty($type_id_name);
+			}
+
+			$referredType_id_name = '___mtm_' . $type->getDBTableName();
+			try {
+				$referredType_property = new OrmProperty(
+					$referredType_id_name,
+					new AssociationPropertyType(
+						$referredType,
+						AssociationMultiplicity::exactlyOne(),
+						AssociationBreakAction::cascade()
+					)
+				);
+
+				$proxy->addProperty(
+					$referredType_property
+				);
+			}
+			catch (OrmModelIntegrityException $e) {
+				$referredType_property = $proxy->getProperty($referredType_id_name);
+			}
+
+			$propertyType = new ManyToManyContainerPropertyType(
+				$proxy,
+				$type_property,
+				$referredType_property
+			);
+		}
 
 		$this->recorder->putMsg(' done.');
+
+		return new OrmProperty(
+			(string) $xmlContainer['name'],
+			$propertyType,
+			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
+			false
+		);
 	}
 
 	/**

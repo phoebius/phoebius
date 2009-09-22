@@ -127,6 +127,18 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	}
 
 	/**
+	 * @return SelectQuery an object itself
+	 */
+	function getFields(array $fields)
+	{
+		foreach ($fields as $field) {
+			$this->get($field);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Sets the expression to be fetched by a query
 	 * @param ISqlValueExpression $expression
 	 * @param scalar $alias

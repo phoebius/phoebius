@@ -21,8 +21,8 @@ class OneToManyPartialWorker extends OneToManyWorker
 	{
 		Assert::isEmpty($update);
 
-		$childrenTableName = $this->childrenMap->getPhysicalSchema()->getDBTableName();
-		$childrenIdName = $this->childrenMap->getPhysicalSchema()->getIdentifierFieldName();
+		$childrenTableName = $this->children->getPhysicalSchema()->getDBTableName();
+		$childrenIdName = $this->children->getLogicalSchema()->getIdentifier()->getName();
 		$parentIdName = $this->parent->map()->getPhysicalSchema()->getIdentifierFieldName();
 
 		foreach ($insert as $id) {
@@ -34,7 +34,7 @@ class OneToManyPartialWorker extends OneToManyWorker
 		}
 
 		if (!empty($delete)) {
-			$this->children->dropByIds($delete);
+			$this->children->getDao()->dropByIds($delete);
 		}
 
 		return $this;
@@ -47,8 +47,8 @@ class OneToManyPartialWorker extends OneToManyWorker
 	{
 		$rows = $this->childrenDao->getCustomRowsByQuery(
 			SelectQuery::create()
-				->get($this->childrenMap->getPhysicalSchema()->getIdentifierFieldName())
-				->from($this->childrenMap->getPhysicalSchema()->getDBTableName())
+				->getFields($this->children->getPhysicalSchema()->getDbColumns($this->referentialProperty))
+				->from($this->children->getPhysicalSchema()->getDBTableName())
 				->setCondition($this->generateLogic())
 		);
 
