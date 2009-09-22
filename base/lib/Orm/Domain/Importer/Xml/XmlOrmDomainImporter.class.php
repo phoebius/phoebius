@@ -71,7 +71,8 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	function import(OrmDomain $ormDomain)
 	{
 		if (!$this->ormDomain) {
-			$this->ormDomain = new OrmDomain();
+			$this->ormDomain = $ormDomain;
+
 			try {
 				$this->load();
 				$this->generateDomain();
