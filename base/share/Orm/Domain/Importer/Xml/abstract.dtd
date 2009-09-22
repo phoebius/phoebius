@@ -1,0 +1,76 @@
+<!--
+ ************************************************************************************************
+ * 
+ * Phoebius Framework
+ * 
+ ************************************************************************************************
+ * 
+ * Copyright notice
+ * 
+ ************************************************************************************************
+-->
+
+<!-- 
+Future releases:
+================
+ + Property type settings
+ 	<property name="counter" type="Integer">
+	 	<typeSettings>
+	 		<typeSetting name="size">11</typeSetting>
+	 	</typeSettings>
+	 </property>
+ 	<property name="money" type="Float">
+	 	<typeSettings>
+	 		<typeSetting name="precition">10</typeSetting>
+	 		<typeSetting name="scale">5</typeSetting>
+	 	</typeSettings>
+	 </property>
+-->
+
+<!ELEMENT domain (entities*)>
+<!ATTLIST domain
+	name			CDATA #IMPLIED
+	db-schema		CDATA #IMPLIED
+>
+
+<!ELEMENT entities (entity*)>
+
+<!ELEMENT entity (properties*)>
+<!ATTLIST entity
+	name			ID #REQUIRED
+	has-dao			(true|false) "true"
+	db-schema		CDATA #IMPLIED
+>
+
+<!ELEMENT properties (identifier?, property*, container*)>
+
+<!-- If entity is identifierless than entity.has-dao should be specified explicitly -->
+<!ELEMENT identifier EMPTY>
+<!ATTLIST identifier
+	name			CDATA "id"
+	type			CDATA "AutoIntPropertyType"
+>
+
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	name			CDATA #REQUIRED
+	type			CDATA #REQUIRED
+	visibility		(full|readonly|transparent) "full"
+	unique			(true|false) "false"
+	multiplicity	(zeroOrOne|exactlyOne) "exactlyOne"
+>
+
+<!-- 
+Container works like a typical property except that:
+ - it does not store a value, it only refers to a bunch of entities
+ - its visibility is readonly
+ - it is always not unique
+ - relation (1:*, *:*) is determined by a referencing property type, e.g.: type=Entity refs=EntityProperty
+ --> 
+<!ELEMENT container EMPTY>
+<!ATTLIST container
+	name			CDATA #REQUIRED
+	type			CDATA #REQUIRED
+	refs			CDATA "id"
+>
+
