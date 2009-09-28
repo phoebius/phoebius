@@ -90,6 +90,16 @@ final class DummyDialect extends LazySingleton implements IDialect
 
 		return $type;
 	}
+
+	/**
+	 * @return array
+	 */
+	function getTableQuerySet(DBTable $table)
+	{
+		return array(
+			CreateTableQuery::create($table)
+		);
+	}
 }
 
 ?>
