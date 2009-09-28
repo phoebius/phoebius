@@ -26,12 +26,9 @@
  *  - set of referenced columns should be defined by {@link DBUniqueConstraint} (RDBMS requirement)
  * @ingroup DB
  */
-class DBForeignKeyConstraint extends DBConstraint
+abstract class DBForeignKeyConstraint extends DBConstraint
 {
-	function __construct(DBTable $referencedTable)
-	{
-		Assert::notImplemented();
-	}
+	// not implemented yet, thus marked as abstract
 }
 
 ?>
