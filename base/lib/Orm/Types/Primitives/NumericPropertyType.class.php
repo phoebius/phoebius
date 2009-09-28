@@ -37,6 +37,14 @@ class NumericPropertyType extends FloatPropertyType
 	}
 
 	/**
+	 * @return string
+	 */
+	function getImplClass()
+	{
+		return 'Numeric';
+	}
+
+	/**
 	 * @return array
 	 */
 	function getDbColumns()

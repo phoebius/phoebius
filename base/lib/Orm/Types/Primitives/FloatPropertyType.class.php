@@ -31,6 +31,14 @@ class FloatPropertyType extends PrimitivePropertyType
 	}
 
 	/**
+	 * @return string
+	 */
+	function getImplClass()
+	{
+		return 'Float';
+	}
+
+	/**
 	 * @return integer|null
 	 */
 	function getPrecision()
