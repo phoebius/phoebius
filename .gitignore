@@ -1,5 +1,6 @@
 .cache
 .settings
 .project
+.buildpath
 app/tmp/*
 base/tmp/*
