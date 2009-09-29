@@ -27,7 +27,7 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 	/**
 	 * @return OrmManyToManyClassCodeConstructor
 	 */
-	static function create(OrmProperty $ormProperty)
+	static function create(OrmClass $ormClass, OrmProperty $ormProperty)
 	{
 		return new self ($ormClass, $ormProperty);
 	}
