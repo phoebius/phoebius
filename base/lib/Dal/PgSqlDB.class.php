@@ -73,7 +73,12 @@ class PgSqlDB extends DB
 				$this->link = pg_pconnect($connectionString);
 			}
 			else {
-				$this->link = pg_connect($connectionString, PGSQL_CONNECT_FORCE_NEW);
+				$this->link = pg_pconnect(
+					$connectionString,
+					$force
+						? PGSQL_CONNECT_FORCE_NEW
+						: null
+				);
 			}
 		}
 		catch (ExecutionContextException $e) {
