@@ -205,7 +205,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getByCondition(ISqlLogicalExpression $condition)
+	function getByCondition(IDalExpression $condition)
 	{
 		return $this->getByQuery(
 			$this->getSelectQuery()->setCondition($condition)
@@ -215,7 +215,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListByCondition(ISqlLogicalExpression $condition)
+	function getListByCondition(IDalExpression $condition)
 	{
 		return $this->getListByQuery(
 			$this->getSelectQuery()->setCondition($condition)
@@ -377,7 +377,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropByCondition(ISqlLogicalExpression $condition)
+	function dropByCondition(IDalExpression $condition)
 	{
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())

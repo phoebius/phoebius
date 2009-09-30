@@ -11,9 +11,9 @@
 
 /**
  * Represents a postfix unary expression
- * @ingroup Condition
+ * @ingroup DalExpression
  */
-final class UnaryPostfixExpression implements ISqlLogicalExpression
+class UnaryPostfixDalExpression implements IDalExpression
 {
 	/**
 	 * @var ISqlCastable
@@ -30,12 +30,10 @@ final class UnaryPostfixExpression implements ISqlLogicalExpression
 	 * 	{@link SelectQuery} or any other sql expression
 	 * @param UnaryPostfixPredicate $logic
 	 */
-	function __construct(ISqlValueExpression $subject, UnaryPostfixPredicate $logic)
+	function __construct(UnaryPostfixExpression $expression)
 	{
-		Assert::isScalar($subject);
-
-		$this->subject = $subject;
-		$this->logic = $logic;
+		$this->subject = $expression->getSubject();
+		$this->logic = $expression->getPredicate();
 	}
 
 	/**

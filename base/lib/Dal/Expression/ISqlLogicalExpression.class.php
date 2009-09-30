@@ -10,16 +10,12 @@
  ************************************************************************************************/
 
 /**
- * Stores the information about physical structure of a property
- * @ingroup OrmModel
+ * Represents the interface for the expression classes, that are used to make query conditions
+ * @ingroup Expression
  */
-interface IPropertyStructurized
+interface IDalExpression extends ISqlValueExpression
 {
-	/**
-	 * Returns an array (or an associative array) of {@link DBType} for the property
-	 * @return array of {@link DBType}
-	 */
-	function getDbColumns();
+	// nothing here, used to separate logic classes only
 }
 
 ?>

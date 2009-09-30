@@ -10,37 +10,30 @@
  ************************************************************************************************/
 
 /**
- * Represents binary expression
- * @ingroup Condition
+ * Represents a unary prefix expression
+ * @ingroup DalExpression
  */
-final class BinaryExpression implements ISqlLogicalExpression
+class PrefixUnaryDalExpression implements IDalExpression
 {
-	/**
-	 * @var SqlColumn
-	 */
-	private $field;
-
 	/**
 	 * @var ISqlCastable
 	 */
-	private $value;
+	private $subject;
 
 	/**
-	 * @var BinaryPredicate
+	 * @var PrefixUnaryPredicate
 	 */
 	private $logic;
 
 	/**
-	 * @param SqlColumn $field
-	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
-	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
-	 * @param BinaryPredicate $logic
+	 * @param PrefixUnaryPredicate $logic
+	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
+	 * 	{@link SelectQuery} or any other sql expression
 	 */
-	function __construct(SqlColumn $field, ISqlValueExpression $value, BinaryPredicate $logic)
+	function __construct(PrefixUnaryExpression $expression)
 	{
-		$this->field = $field;
-		$this->value = $value;
-		$this->logic = $logic;
+		$this->subject = $expression->getSubject();
+		$this->logic = $expression->getPredicate();
 	}
 
 	/**
@@ -51,10 +44,9 @@ final class BinaryExpression implements ISqlLogicalExpression
 	{
 		$compiledSlices = array();
 
-		$compiledSlices[] = $this->field->toDialectString($dialect);
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
 		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->value->toDialectString($dialect);
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);

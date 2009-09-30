@@ -26,7 +26,7 @@ class UpdateQuery implements ISqlQuery
 	private $fields;
 
 	/**
-	 * @var ISqlLogicalExpression
+	 * @var IDalExpression
 	 */
 	private $condition;
 
@@ -79,7 +79,7 @@ class UpdateQuery implements ISqlQuery
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setCondition(ISqlLogicalExpression $logic)
+	function setCondition(IDalExpression $logic)
 	{
 		$this->condition = $logic;
 
@@ -87,8 +87,8 @@ class UpdateQuery implements ISqlQuery
 	}
 
 	/**
-	 * Gets the query condition or null if {@link ISqlLogicalExpression} is not set
-	 * @return ISqlLogicalExpression|null
+	 * Gets the query condition or null if {@link IDalExpression} is not set
+	 * @return IDalExpression|null
 	 */
 	function getCondition()
 	{

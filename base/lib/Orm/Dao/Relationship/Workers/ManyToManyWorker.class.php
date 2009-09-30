@@ -92,7 +92,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	}
 
 	/**
-	 * @return ISqlLogicalExpression
+	 * @return IDalExpression
 	 */
 	private function getJoinLogic()
 	{

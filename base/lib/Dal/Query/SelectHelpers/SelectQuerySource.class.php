@@ -19,7 +19,7 @@ abstract class SelectQuerySource implements ISqlCastable
 	/**
 	 * @var string|null
 	 */
-	private $alias = null;
+	private $dbContainer = null;
 
 	/**
 	 * @var array
@@ -39,7 +39,7 @@ abstract class SelectQuerySource implements ISqlCastable
 	 */
 	function getAlias()
 	{
-		return $this->alias;
+		return $this->dbContainer;
 	}
 
 	/**
@@ -50,7 +50,7 @@ abstract class SelectQuerySource implements ISqlCastable
 	{
 		Assert::isScalarOrNull($alias);
 
-		$this->alias = $alias;
+		$this->dbContainer = $alias;
 
 		return $this;
 	}

@@ -11,9 +11,9 @@
 
 /**
  * Represents an expression chain
- * @ingroup Condition
+ * @ingroup DalExpression
  */
-final class ExpressionChain implements ISqlLogicalExpression
+class DalExpressionChain implements IDalExpression
 {
 	/**
 	 * @var ExpressionChainPredicate
@@ -34,7 +34,7 @@ final class ExpressionChain implements ISqlLogicalExpression
 	 * Adds the expression to the expression chain
 	 * @return ExpressionChain
 	 */
-	function add(ISqlLogicalExpression $expression)
+	function add(IDalExpression $expression)
 	{
 		$this->chain[] = $expression;
 

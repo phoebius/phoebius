@@ -10,16 +10,14 @@
  ************************************************************************************************/
 
 /**
- * Stores the information about physical structure of a property
- * @ingroup OrmModel
+ * @ingroup BaseExpression
  */
-interface IPropertyStructurized
+interface IExpression
 {
 	/**
-	 * Returns an array (or an associative array) of {@link DBType} for the property
-	 * @return array of {@link DBType}
+	 * @return ExpressionType
 	 */
-	function getDbColumns();
+	function getExpressionType();
 }
 
 ?>

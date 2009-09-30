@@ -11,9 +11,9 @@
 
 /**
  * Represents the IN expression used in query logic
- * @ingroup Condition
+ * @ingroup DalExpression
  */
-final class InSetExpression implements ISqlLogicalExpression
+class InSetDalExpression implements IDalExpression
 {
 	/**
 	 * @var SqlColumn
@@ -30,17 +30,11 @@ final class InSetExpression implements ISqlLogicalExpression
 	 */
 	private $logic;
 
-	/**
-	 * @param SqlColumn $field field which value to be searched inside set
-	 * @param ISqlValueExpression $set representing a set of values, In most cases,
-	 * 	{@link SqlValueList} is needed here, but can also be used other Sql-compatible
-	 * 	expressions, like {@link SelectQuery}
-	 */
-	function __construct(SqlColumn $field, ISqlValueExpression $set, InSetPredicate $logic)
+	function __construct(SqlColumn $field, InSetExpression $expression)
 	{
 		$this->field = $field;
-		$this->set = $set;
-		$this->logic = $logic;
+		$this->set = $expression->getSet();
+		$this->logic = $expression->getPredicate();
 	}
 
 	/**

@@ -78,7 +78,7 @@ final class DirectoryLocker extends Locker
 
 	private function getDirectoryByKey($key)
 	{
-		return $this->directory . DIRECTORY_SEPARATOR . FSUtils::sanitizeName($key);
+		return $this->directory . DIRECTORY_SEPARATOR . sha1($key);
 	}
 
 }

@@ -126,6 +126,12 @@ class OrmProperty
 	{
 		return $this->visibility;
 	}
+
+	/**
+	 * @return array of columnName => DbType
+	 */
+	function getDbColumns()
+	{}
 }
 
 ?>

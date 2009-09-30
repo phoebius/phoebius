@@ -20,7 +20,7 @@ abstract class Container implements IteratorAggregate
 	private $worker;
 
 	/**
-	 * @var ISqlLogicalExpression|null
+	 * @var IDalExpression|null
 	 */
 	private $condition = null;
 
@@ -137,7 +137,7 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @return Container an object itself
 	 */
-	function setCondition(ISqlLogicalExpression $condition = null)
+	function setCondition(IDalExpression $condition = null)
 	{
 		$this->condition = $condition;
 
@@ -145,7 +145,7 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
-	 * @return ISqlLogicalExpression|null
+	 * @return IDalExpression|null
 	 */
 	function getCondition()
 	{

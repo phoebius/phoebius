@@ -10,16 +10,19 @@
  ************************************************************************************************/
 
 /**
- * Stores the information about physical structure of a property
- * @ingroup OrmModel
+ * Represents a dummy expression
+ * @ingroup DalExpression
  */
-interface IPropertyStructurized
+class NullDalExpression implements IDalExpression
 {
 	/**
-	 * Returns an array (or an associative array) of {@link DBType} for the property
-	 * @return array of {@link DBType}
+	 * Casts an object to the SQL dialect string
+	 * @return string
 	 */
-	function getDbColumns();
+	function toDialectString(IDialect $dialect)
+	{
+		return '';
+	}
 }
 
 ?>

@@ -46,12 +46,12 @@ interface IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getByCondition(ISqlLogicalExpression $condition);
+	function getByCondition(IDalExpression $condition);
 
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListByCondition(ISqlLogicalExpression $condition);
+	function getListByCondition(IDalExpression $condition);
 
 	/**
 	 * @throws OrmEntityNotFoundException
@@ -93,7 +93,7 @@ interface IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropByCondition(ISqlLogicalExpression $condition);
+	function dropByCondition(IDalExpression $condition);
 
 	/**
 	 * @return boolean

@@ -16,90 +16,11 @@
 final class FSUtils extends StaticClass
 {
 	/**
-	 * Replaces unsafe characters from the name to make the name a valid filesystem identifier
-	 * @param string $name
-	 * @param string $replacement unsafe characters to be replced with this one
-	 * @param string $defaultIfNull default name of the identifier is the sanitized name becomes
-	 * 	an empty string
-	 * @return string
-	 */
-	static function sanitizeName($name, $replacement = '_', $defaultIfNull = null)
-	{
-		Assert::isScalar($name);
-		Assert::isScalar($replacement);
-		Assert::isScalarOrNull($defaultIfNull);
-
-
-		$name = str_replace(
-			array('~', '`', '#', '$', '%', '^', '*', ':', '"', '|', '\\', '/', '<', '>', '?'),
-			$replacement,
-			$name
-		);
-
-		if (empty($name)) {
-			$name = $defaultIfNull;
-		}
-
-		return $name;
-	}
-
-	/**
-	 * Clears the path unwinding "." and ".." links
-	 * @param string $path
-	 * @param string $separator
-	 * @return string
-	 */
-	static function clearPath($path, $separator = DIRECTORY_SEPARATOR)
-	{
-		Assert::isScalar($path);
-		Assert::isScalar($separator);
-
-		$path = str_replace(array("/","\\"), $separator, $path);
-		$elts = explode($separator, $path);
-		$elts2 = array();
-		foreach($elts as $elt) {
-			switch( $elt ) {
-				case "":
-					{
-						if ( sizeof($elts2) == 0 )
-						{
-							//this portion of code is needed when
-							//we received  a path that begins from the OS root
-							//(e.g., "/usr/local")
-							$elts2[] = '';
-						}
-						break;
-					}
-				case ".":
-					{
-						//do nothin
-						break;
-					}
-				case "..":
-					{
-						array_pop($elts2);
-						break;
-					}
-				default:
-					{
-						$elts2[] = $elt;
-						break;
-					}
-			}
-		}
-
-		$path = implode($separator, $elts2);
-		return $path;
-	}
-
-	/**
-	 * Removes a directory recursively
-	 * @param string $dir
-	 * @return string
+	 * Cleans the directory contents completely
 	 * @throws FSOperationException
-	 * @throws FSAccessException
+	 * @return void
 	 */
-	static function removeDirectory($dir)
+	static function cleanDirectory($dir)
 	{
 		Assert::isScalar($dir);
 
@@ -111,7 +32,7 @@ final class FSUtils extends StaticClass
 						self::removeDirectory($path);
 					}
 					else {
-						self::cleanDirectory($path);
+						unlink($path);
 					}
 				}
 			}
@@ -119,6 +40,18 @@ final class FSUtils extends StaticClass
 		catch (ExecutionContextException $e) {
 			throw new FSOperationException("Cannot read {$dir}: {$e->getMessage()}");
 		}
+	}
+
+	/**
+	 * Removes a directory recursively
+	 * @param string $dir
+	 * @return string
+	 * @throws FSOperationException
+	 * @throws FSAccessException
+	 */
+	static function removeDirectory($dir)
+	{
+		self::cleanDirectory($dir);
 
 		try {
 			rmdir($dir);
@@ -161,10 +94,11 @@ final class FSUtils extends StaticClass
 		$directory = PathResolver::getInstance()->getTmpDir(__CLASS__);
 
 		$attempts = 5;
+		$path = null;
 
 		do {
 			--$attempts;
-			$path = $directory . DIRECTORY_SEPARATOR . $prefix . stopwatch() . mt_rand();
+			$path = $directory . DIRECTORY_SEPARATOR . $prefix . microtime(true) . mt_rand();
 		} while (
 			!mkdir($path, 0700, true)
 			&& $attempts > 0

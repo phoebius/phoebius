@@ -62,7 +62,7 @@ abstract class OneToManyWorker extends ContainerWorker
 	}
 
 	/**
-	 * @return ISqlLogicalExpression
+	 * @return IDalExpression
 	 */
 	protected function generateLogic()
 	{

@@ -17,7 +17,7 @@
 class ComplexSelectQuerySource extends SelectQuerySource
 {
 	/**
-	 * @var ISqlLogicalExpression
+	 * @var IDalExpression
 	 */
 	private $source;
 

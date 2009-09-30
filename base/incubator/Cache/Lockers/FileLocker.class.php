@@ -67,7 +67,7 @@ final class FileLocker extends Locker
 
 	private function getFilenameByKey($key)
 	{
-		return $this->directory . '/' . FSUtils::sanitizeName($key);
+		return $this->directory . '/' . sha1($key);
 	}
 
 }

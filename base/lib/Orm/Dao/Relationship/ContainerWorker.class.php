@@ -20,7 +20,7 @@ abstract class ContainerWorker
 	protected $parent;
 
 	/**
-	 * @var ISqlLogicalExpression|null
+	 * @var IDalExpression|null
 	 */
 	private $condition = null;
 
@@ -53,7 +53,7 @@ abstract class ContainerWorker
 	/**
 	 * @return ContainerWorker an object itself
 	 */
-	function setCondition(ISqlLogicalExpression $condition = null)
+	function setCondition(IDalExpression $condition = null)
 	{
 		$this->condition = $condition;
 
@@ -61,7 +61,7 @@ abstract class ContainerWorker
 	}
 
 	/**
-	 * @return ISqlLogicalExpression
+	 * @return IDalExpression
 	 */
 	function getCondition()
 	{

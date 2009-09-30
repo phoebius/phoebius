@@ -26,7 +26,7 @@ final class ShellCommand implements IFactory
 	function __construct($executable, $optionalWindowsPath = null)
 	{
 		$this->executable = trim($executable);
-		$chunks = explode(DIRECTORY_SEPARATOR, FSUtils::clearPath($this->executable));
+		$chunks = explode(DIRECTORY_SEPARATOR, realpath($this->executable));
 		if ( sizeof($chunks) > 1 )
 		{
 			$this->executable = array_pop($chunks);
@@ -77,7 +77,7 @@ final class ShellCommand implements IFactory
 	 */
 	function setPath($path)
 	{
-		$this->path = FSUtils::clearPath($path);
+		$this->path = realpath($path);
 		if ( $this->path != DIRECTORY_SEPARATOR )
 		{
 			$this->path = ($this->path) . DIRECTORY_SEPARATOR;

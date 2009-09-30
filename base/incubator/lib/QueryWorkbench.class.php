@@ -27,7 +27,7 @@ class QueryWorkbench extends ResultWorkbench
 	function select(
 			SqlSelectiveFieldSet $fields,
 			$table,
-			ISqlLogicalExpression $condition = null,
+			IDalExpression $condition = null,
 			SqlOrderChain $orderBy = null,
 			$limit = 0,
 			$offset = 0
@@ -47,7 +47,7 @@ class QueryWorkbench extends ResultWorkbench
 	function selectJoin(
 			SqlSelectiveFieldSet $fields,
 			array $tables,
-			ISqlLogicalExpression $condition = null,
+			IDalExpression $condition = null,
 			SqlOrderChain $orderBy = null,
 			$limit = 0,
 			$offset = 0
@@ -64,7 +64,7 @@ class QueryWorkbench extends ResultWorkbench
 		return $this->getDB()->rawGetRowSet($query);
 	}
 
-	function selectRow(SqlSelectiveFieldSet $fields, $table, ISqlLogicalExpression $condition = null)
+	function selectRow(SqlSelectiveFieldSet $fields, $table, IDalExpression $condition = null)
 	{
 		$query = $this->makeSelectQuery(
 			$fields,
@@ -77,7 +77,7 @@ class QueryWorkbench extends ResultWorkbench
 	function selectColumn(
 			ISelectiveField $field,
 			$table,
-			ISqlLogicalExpression $condition = null,
+			IDalExpression $condition = null,
 			SqlOrderChain $orderBy = null,
 			$limit = 0,
 			$offset = 0
@@ -95,7 +95,7 @@ class QueryWorkbench extends ResultWorkbench
 		return $this->getDB()->rawGetColumn($query);
 	}
 
-	function selectCell(ISelectiveField $field, $table, ISqlLogicalExpression $condition = null)
+	function selectCell(ISelectiveField $field, $table, IDalExpression $condition = null)
 	{
 		$query = $this->makeSelectQuery(
 			SqlSelectiveFieldSet::create()->add($field),
@@ -109,7 +109,7 @@ class QueryWorkbench extends ResultWorkbench
 	private function makeSelectQuery(
 			SqlSelectiveFieldSet $fields,
 			$source,
-			ISqlLogicalExpression $condition = null,
+			IDalExpression $condition = null,
 			SqlOrderChain $orderBy = null,
 			$limit = 0,
 			$offset = 0
@@ -179,7 +179,7 @@ class QueryWorkbench extends ResultWorkbench
 		return $this->getDB()->rawQuery($query);
 	}
 
-	function update($table, SqlColumnValueSet $fieldHash, ISqlLogicalExpression $condition)
+	function update($table, SqlColumnValueSet $fieldHash, IDalExpression $condition)
 	{
 		$query = array();
 		$dialect = $this->getDB()->getDialect();
@@ -193,7 +193,7 @@ class QueryWorkbench extends ResultWorkbench
 		return $this->getDB()->rawQuery($query);
 	}
 
-	function delete($table, ISqlLogicalExpression $condition)
+	function delete($table, IDalExpression $condition)
 	{
 		$query = array();
 		$dialect = $this->getDB()->getDialect();

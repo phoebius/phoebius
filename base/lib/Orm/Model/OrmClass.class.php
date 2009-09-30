@@ -50,6 +50,11 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 	private $dbSchema;
 
 	/**
+	 * @var string
+	 */
+	private $dbTableName;
+
+	/**
 	 * @return OrmEntity
 	 */
 	function getNewEntity()
@@ -150,6 +155,18 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 		Assert::isScalar($name);
 
 		$this->name = $name;
+
+		if (!$this->dbTableName) {
+			$this->setDBTableName(
+				strtolower(
+					preg_replace(
+						'/([a-z])([A-Z])/',
+						'$1_$2',
+						$this->name
+					)
+				)
+			);
+		}
 
 		return $this;
 	}
@@ -313,19 +330,24 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 	}
 
 	/**
+	 * @return OrmClass
+	 */
+	function setDBTableName($dbTableName)
+	{
+		Assert::isScalar($dbTableName);
+
+		$this->dbTableName = $dbTableName;
+
+		return $this;
+	}
+
+	/**
 	 * Gets the name of the DB table where entities are stored
 	 * @return string
 	 */
 	function getDBTableName()
 	{
-		return
-			strtolower(
-				preg_replace(
-					'/([a-z])([A-Z])/',
-					'$1_$2',
-					$this->name
-				)
-			);
+		return $this->dbTableName;
 	}
 
 	/**

@@ -11,9 +11,9 @@
 
 /**
  * Represents an range expression
- * @ingroup Condition
+ * @ingroup DalExpression
  */
-final class BetweenRangeExpression implements ISqlLogicalExpression
+class BetweenRangeDalExpression implements IDalExpression
 {
 	/**
 	 * @var SqlColumn
@@ -30,18 +30,11 @@ final class BetweenRangeExpression implements ISqlLogicalExpression
 	 */
 	private $to;
 
-	/**
-	 * @param SqlColumn $field
-	 * @param ISqlValueExpression $from starting value in range. In most cases, {@link SqlValue} is
-	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
-	 * @param ISqlValueExpression $to ending value in range. In most cases, {@link SqlValue} is
-	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
-	 */
-	function __construct(SqlColumn $field, ISqlValueExpression $from, ISqlValueExpression $to)
+	function __construct(SqlColumn $field, BetweenRangeExpression $expression)
 	{
-		$this->from = $from;
-		$this->to = $to;
 		$this->field = $field;
+		$this->to = $expression->getTo();
+		$this->from= $expression->getFrom();
 	}
 
 	/**

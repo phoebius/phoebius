@@ -32,7 +32,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	private $sources = array();
 
 	/**
-	 * @var ISqlLogicalExpression|null
+	 * @var IDalExpression|null
 	 */
 	private $condition;
 
@@ -47,7 +47,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	private $groupByExpressions = array();
 
 	/**
-	 * @var ISqlLogicalExpression
+	 * @var IDalExpression
 	 */
 	private $having;
 
@@ -94,7 +94,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Sets the query condition (for "WHERE" clause)
 	 * @return SelectQuery
 	 */
-	function setCondition(ISqlLogicalExpression $logic)
+	function setCondition(IDalExpression $logic)
 	{
 		$this->condition = $logic;
 
@@ -103,7 +103,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 
 	/**
 	 * Gets the query condition (i.e. "WHERE" clause) or NULL if not yet set
-	 * @return ISqlLogicalExpression|null
+	 * @return IDalExpression|null
 	 */
 	function getCondition()
 	{
@@ -184,10 +184,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * applied. Be sure that you added at least one target. The join is applied using the
 	 * logical expression.
 	 * @param string $tableName
-	 * @param ISqlLogicalExpression $condition
+	 * @param IDalExpression $condition
 	 * @return SelectQuery
 	 */
-	function leftJoin($tableName, ISqlLogicalExpression $condition)
+	function leftJoin($tableName, IDalExpression $condition)
 	{
 		Assert::isNotEmpty($this->sources, 'set any target before joining');
 
@@ -207,7 +207,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * applied. Be sure that you added at least one target. THe join is applied on the table
 	 * columns that have identical names in joining tables
 	 * @param string $tableName
-	 * @param ISqlLogicalExpression $condition
+	 * @param IDalExpression $condition
 	 * @return SelectQuery
 	 */
 	function leftJoinSame($tableName, SqlFieldList $identicalColumns)
@@ -252,7 +252,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Adds a having for logical expression
 	 * @return SelectQuery an object itself
 	 */
-	function having(ISqlLogicalExpression $expression)
+	function having(IDalExpression $expression)
 	{
 		$this->having = $expression;
 

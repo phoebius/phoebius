@@ -21,7 +21,7 @@ class DeleteQuery implements ISqlQuery
 	private $tableName;
 
 	/**
-	 * @var ISqlLogicalExpression
+	 * @var IDalExpression
 	 */
 	private $condition;
 
@@ -49,7 +49,7 @@ class DeleteQuery implements ISqlQuery
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setCondition(ISqlLogicalExpression $logic = null)
+	function setCondition(IDalExpression $logic = null)
 	{
 		$this->condition = $logic;
 
@@ -57,8 +57,8 @@ class DeleteQuery implements ISqlQuery
 	}
 
 	/**
-	 * Gets the query condition or null if {@link ISqlLogicalExpression} is not set
-	 * @return ISqlLogicalExpression|null
+	 * Gets the query condition or null if {@link IDalExpression} is not set
+	 * @return IDalExpression|null
 	 */
 	function getCondition()
 	{

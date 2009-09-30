@@ -45,6 +45,15 @@ interface IPropertyMappable
 	 * @return mixed
 	 */
 	function getDefaultValue();
+
+	/**
+	 * @return IEntityExpression
+	 */
+	function getEntityExpression(
+			EntityQuery $entityQuery,
+			OrmProperty $ormProperty,
+			IExpression $expression
+	);
 }
 
 ?>

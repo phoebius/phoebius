@@ -10,12 +10,14 @@
  ************************************************************************************************/
 
 /**
- * Represents the interface for the expression classes, that are used to make query conditions
- * @ingroup Condition
+ * @ingroup OrmExpression
  */
-interface ISqlLogicalExpression extends ISqlValueExpression
+interface IEntityExpression
 {
-	// nothing here, used to separate logic classes only
+	/**
+	 * @return IDalExpression
+	 */
+	function toDalExpression();
 }
 
 ?>

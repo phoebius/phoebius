@@ -15,6 +15,7 @@
 interface IIdentifierMappable extends IBoxed
 {
 	function toScalarId();
+	function __toString();
 }
 
 ?>

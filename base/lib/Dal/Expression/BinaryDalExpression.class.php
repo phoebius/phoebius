@@ -10,30 +10,31 @@
  ************************************************************************************************/
 
 /**
- * Represents a unary prefix expression
- * @ingroup Condition
+ * Represents binary expression
+ * @ingroup DalExpression
  */
-final class PrefixUnaryExpression implements ISqlLogicalExpression
+class BinaryDalExpression implements IDalExpression
 {
+	/**
+	 * @var SqlColumn
+	 */
+	private $field;
+
 	/**
 	 * @var ISqlCastable
 	 */
-	private $subject;
+	private $value;
 
 	/**
-	 * @var PrefixUnaryPredicate
+	 * @var BinaryPredicate
 	 */
 	private $logic;
 
-	/**
-	 * @param PrefixUnaryPredicate $logic
-	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
-	 * 	{@link SelectQuery} or any other sql expression
-	 */
-	function __construct(PrefixUnaryPredicate $logic, ISqlValueExpression $subject)
+	function __construct(SqlColumn $field, BinaryExpression $expression)
 	{
-		$this->subject = $subject;
-		$this->logic = $logic;
+		$this->field = $field;
+		$this->value = $expression->getValue();
+		$this->logic = $expression->getPredicate();
 	}
 
 	/**
@@ -44,9 +45,10 @@ final class PrefixUnaryExpression implements ISqlLogicalExpression
 	{
 		$compiledSlices = array();
 
+		$compiledSlices[] = $this->field->toDialectString($dialect);
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
 		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = $this->value->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);
