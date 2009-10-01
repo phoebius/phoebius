@@ -35,20 +35,34 @@ class UpdateQuery implements ISqlQuery
 	 * @param string $tableName
 	 * @return UpdateQuery
 	 */
-	static function create($tableName)
+	static function create(
+			$tableName,
+			SqlFieldValueCollection $fvc = null,
+			IDalExpression $expression = null
+		)
 	{
-		return new self ($tableName);
+		return new self ($tableName, $fvc, $expression);
 	}
 
 	/**
 	 * @param string $table
 	 */
-	function __construct($tableName)
+	function __construct(
+			$tableName,
+			SqlFieldValueCollection $fvc = null,
+			IDalExpression $expression = null
+		)
 	{
 		Assert::isScalar($tableName);
 
 		$this->tableName = $tableName;
-		$this->fields = new SqlFieldValueCollection();
+		$this->fields =
+			$fvc
+				? $fvc
+				: new SqlFieldValueCollection();
+		if ($expression) {
+			$this->setCondition($expression);
+		}
 	}
 
 	/**

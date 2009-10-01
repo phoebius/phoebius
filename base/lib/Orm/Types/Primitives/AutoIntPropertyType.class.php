@@ -12,7 +12,7 @@
 /**
  * @ingroup PrimitiveOrmTypes
  */
-final class AutoIntPropertyType extends IntegerPropertyType implements IHandled, IReferenced
+final class AutoIntPropertyType extends IntegerPropertyType implements IHandled, IReferenced, IGenerated
 {
 	/**
 	 * @return AutoIntPropertyType
@@ -51,6 +51,24 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 				->setGenerated(true)
 				->setIsNullable($this->isNullable())
 		);
+	}
+
+	/**
+	 * @return void
+	 */
+	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty)
+	{
+		$columns = reset($ormProperty->getDbColumns());
+		return $db->preGenerate($tableName, key($columns));
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty)
+	{
+		$columns = reset($ormProperty->getDbColumns());
+		return $db->getGeneratedId($tableName, key($columns));
 	}
 }
 

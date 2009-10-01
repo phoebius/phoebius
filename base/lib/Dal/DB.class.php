@@ -11,7 +11,6 @@
 
 /**
  * Default implementation of DAL - database abstraction layer
- * @todo rename incrementSeq() to obtainNewId()
  * @ingroup Dal
  */
 abstract class DB implements IFactory
@@ -344,7 +343,7 @@ abstract class DB implements IFactory
 	abstract function getCell(ISqlSelectQuery $query);
 
 	/**
-	 * Returns next_id uid (for IDialect::getGeneratedValue).
+	 * Returns next_id uid
 	 * For oracle-family databases, obtains the id by incrementing a generator
 	 * For mssql-family database makes nothing (will use LAST_INSERT_ID() and etc later on IDialect::getGeneratedValue())
 	 * MUST BE CALLED before the insert query

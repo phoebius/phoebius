@@ -51,20 +51,24 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	private $identitifier;
 
+	/**
+	 * @var IQueried
+	 */
+	private $entity;
+
 	function __construct(
 			DB $db,
-			IOrmEntityMapper $map,
-			ILogicallySchematic $logicalSchema,
-			IPhysicallySchematic $physicalSchema
+			IQueried $entity
 		)
 	{
 		$this->db = $db;
-		$this->map = $map;
-		$this->logicalSchema = $logicalSchema;
-		$this->physicalSchema = $physicalSchema;
+		$this->entity = $entity;
+		$this->map = $entity->getMap();
+		$this->logicalSchema = $entity->getLogicalSchema();
+		$this->physicalSchema = $entity->getPhysicalSchema();
 
-		if (($this->identitifier = $logicalSchema->getIdentifier())) {
-			$this->identityMap = new OrmIdentityMap($logicalSchema);
+		if (($this->identitifier = $this->logicalSchema->getIdentifier())) {
+			$this->identityMap = new OrmIdentityMap($this->logicalSchema);
 		}
 	}
 
@@ -106,10 +110,11 @@ class RdbmsDao implements IOrmEntityAccessor
 			try {
 				$row = $this->getDB()->getRow(
 					$this->getSelectQuery()->setCondition(
-						$this->getEqExpression(
-							$this->identitifier,
-							$this->identitifier->getType()->makeRawValue($id)
-						)
+						EntityQuery::create($this->entity)
+							->where(
+								$this->identitifier,
+								$id
+							)
 					)
 				);
 			}
@@ -162,14 +167,13 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		if (!empty($toFetch)) {
+			$fetchExpression = new OrmQuery($this->entity, ExpressionChainPredicate::conditionOr());
 
 			$fetchExpression = Expression::orChain();
 			foreach ($toFetchIds as $id) {
 				$fetchExpression->add(
-					$this->getEqExpression(
-						$this->identitifier,
-						$this->identitifier->getType()->makeRawValue($id)
-					)
+					$this->identifier,
+					$id
 				);
 			}
 
@@ -252,9 +256,10 @@ class RdbmsDao implements IOrmEntityAccessor
 	private function buildEntity(OrmEntity $entity, array $dbValues)
 	{
 		$rawValueSet = array();
-		$ormQuery = $this->physicalSchema->getOrmQuery();
 		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-			$rawValueSet[$propertyName] = $ormQuery->makeRawValue($property, $dbValues);
+			foreach ($property->getDbColumns() as $columnName => $dbType) {
+				$rawValueSet[$propertyName][] = $dbValues[$columnName];
+			}
 		}
 
 		if ($this->identitifier) {
@@ -329,10 +334,11 @@ class RdbmsDao implements IOrmEntityAccessor
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
 				->setCondition(
-					$this->getEqExpression(
-						$this->identitifier,
-						$this->identitifier->getType()->makeRawValue($id)
-					)
+					OrmQuery::create($this->entity)
+						->where(
+							$this->identifier,
+							$id
+						)
 				)
 		);
 
@@ -350,17 +356,15 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
 
-		$expression = Expression::orChain();
+		$expression = OrmQuery::create($this->entity, ExpressionChainPredicate::conditionOr());
 
 		foreach ($ids as $id) {
 
 			$this->identityMap->dropFromIdentityMap($id);
 
 			$expression->add(
-				$this->getEqExpression(
-					$this->identitifier,
-					$this->identitifier->getType()->makeRawValue($id)
-				)
+				$this->identitifier,
+				$id
 			);
 		}
 
@@ -402,81 +406,72 @@ class RdbmsDao implements IOrmEntityAccessor
 	}
 
 	/**
+	 * @return SqlFieldValueCollection
+	 */
+	private function getFieldValueCollection(OrmEntity $entity)
+	{
+		$fvc = new SqlFieldValueCollection();
+		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
+			$fvc->addCollection(
+				array_combine(
+					array_keys($this->logicalSchema->getProperty($propertyName)->getDBColumns()),
+					$rawValue
+				)
+			);
+		}
+
+		return $fvc;
+	}
+
+	/**
+	 * @return EntityQuery
+	 */
+	function getExpression($property, IExpression $expression)
+	{
+		return EntityQuery::create($this->entity)
+			->where($property, $expression);
+	}
+
+	/**
 	 * @return OrmEntity
 	 */
 	function save(OrmEntity $entity)
 	{
-		$hasId = false;
 		$fetched = true;
 
 		if ($this->identitifier) {
 			$id = $entity->_getId();
+			$idOrmPropertyType = $this->identitifier->getType();
 
 			// INSERT
 			if (empty($id)) {
-				$fetched = false;
-				$sequencedColumns = $this->physicalSchema->getDbColumns($this->identitifier);
-				foreach ($sequencedColumns as $k => &$v) {
-					$v = $this->getDB()->preGenerate($this->physicalSchema->getDBTableName(), $k);
-					$fetched =
-						$fetched
-							? true
-							: !empty($v);
-				}
-
-				if ($fetched) {
-					$id = $this->identitifier->getType()->makeValue(
-						$this->physicalSchema->getOrmQuery()->makeRawValue(
-							$this->identitifier, $sequencedColumns
-						),
-						$this->getFetchStrategy()
+				if ($idOrmPropertyType instanceof IGenerated) {
+					$fetched = false;
+					$id = $idOrmPropertyType->preGenerate(
+						$this->getDB(),
+						$this->physicalSchema->getDBTableName(),
+						$this->identifier
 					);
-
-					$entity->fetch()->_setId($id);
 				}
 			}
-			// UPDATE, or INSERT
-			else {
-				if ($this->identityMap->isInIdentityMap($id)) {
-					$hasId = true;
-				}
 
-				$entity->_setId(null);
-				$entity->fetch();
-				$entity->_setId($id);
-			}
+			$entity->_setId(null);
+			$entity->fetch();
+			$entity->_setId($id);
 		}
 
+		$fvc = $this->getFieldValueCollection($entity);
 
-		$fvc = new SqlFieldValueCollection();
-		$propertyMap = $this->logicalSchema->getProperties();
-		$identifierRawValue = null;
-		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
-			$property = $propertyMap[$propertyName];
-			foreach ($this->getDBValues($property, $rawValue) as $column => $sqlValue) {
-				$fvc->add(
-					$column,
-					$sqlValue
-				);
-			}
-
-			if ($this->identitifier === $property) {
-				$identifierRawValue = $rawValue;
-			}
-		}
-
-		if ($this->identitifier && $hasId) {
+		if ($this->identitifier && $fetched) {
 			$affected = $this->sendQuery(
-				UpdateQuery::create($this->physicalSchema->getDBTableName())
-					->setFieldValueCollection(
-						$fvc
+				new UpdateQuery(
+					$this->physicalSchema->getDBTableName(),
+					$fvc,
+					$this->getExpression(
+						$this->identifier,
+						Expression::eq($entity->_getId())
 					)
-					->setCondition(
-						$this->getEqExpression(
-							$this->identitifier,
-							$identifierRawValue
-						)
-					)
+				)
 			);
 
 			Assert::isTrue(($affected == 0) || ($affected == 1));
@@ -491,8 +486,10 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		try {
 			$affected = $this->sendQuery(
-				InsertQuery::create($this->physicalSchema->getDBTableName())
-					->setFieldValueCollection($fvc)
+				new InsertQuery(
+					$this->physicalSchema->getDBTableName(),
+					$fvc
+				)
 			);
 		}
 		catch (UniqueViolationException $e) {
@@ -506,15 +503,10 @@ class RdbmsDao implements IOrmEntityAccessor
 		Assert::isTrue($affected == 1);
 
 		if ($this->identitifier && !$fetched) {
-			foreach ($sequencedColumns as $k => &$v) {
-				$v = $this->getDB()->getGeneratedId($this->physicalSchema->getDBTableName(), $k);
-			}
-
-			$id = $this->identitifier->getType()->makeValue(
-				$this->physicalSchema->getOrmQuery()->makeRawValue(
-					$this->identitifier, $sequencedColumns
-				),
-				$this->getFetchStrategy()
+			$id = $idOrmPropertyType->getGeneratedId(
+				$this->getDB(),
+				$this->physicalSchema->getDBTableName(),
+				$this->identifier
 			);
 
 			$entity->_setId($id);
@@ -528,42 +520,9 @@ class RdbmsDao implements IOrmEntityAccessor
 	}
 
 	/**
-	 * @return array
-	 */
-	private function getDBValues(OrmProperty $property, $rawValue)
-	{
-		return $this->physicalSchema->getOrmQuery()->makeColumnValue(
-			$property,
-			$rawValue
-		);
-	}
-
-	/**
-	 * @return ExpressionChain
-	 */
-	private function getEqExpression(OrmProperty $property, array $rawValue)
-	{
-		$expression = Expression::andChain();
-		$table = $this->physicalSchema->getDBTableName();
-		foreach ($this->getDBValues($property, $rawValue) as $column => $sqlValue) {
-			$expression->add(
-				Expression::eq(
-					new SqlColumn(
-						$column,
-						$table
-					),
-					$sqlValue
-				)
-			);
-		}
-
-		return $expression;
-	}
-
-	/**
 	 * @return SelectQuery
 	 */
-	function getSelectQuery($aliasPrefix = null)
+	function getSelectQuery()
 	{
 		$table = $this->physicalSchema->getDBTableName();
 
@@ -574,7 +533,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		foreach ($this->physicalSchema->getDbColumns() as $column => $type) {
 			$selectQuery->get(
 				$column,
-				($aliasPrefix ? $aliasPrefix . $column : null),
+				null,
 				$table
 			);
 		}

@@ -10,6 +10,7 @@
  ************************************************************************************************/
 
 /**
+ * Must be in sync with OrmPropertyType::$entityExpressionWorkers.
  * @ingroup BaseExpression
  */
 class ExpressionType extends Enumeration

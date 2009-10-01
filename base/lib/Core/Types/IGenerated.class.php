@@ -10,23 +10,19 @@
  ************************************************************************************************/
 
 /**
- * Maps property raw values to db values and vice versa
- * @ingroup Orm
+ * @ingroup CoreTypes
  */
-interface IOrmQuery
+interface IGenerated
 {
 	/**
-	 * $rawValue structure:
-	 *  - key is dbColumn name
-	 *  - value is SqlValue
-	 * @return array
+	 * @return mixed
 	 */
-	function makeColumnValue(OrmProperty $property, array $rawValue);
+	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty);
 
 	/**
-	 * @return array
+	 * @return mixed
 	 */
-	function makeRawValue(OrmProperty $property, $dbValues);
+	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty);
 }
 
 ?>

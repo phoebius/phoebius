@@ -30,20 +30,23 @@ class InsertQuery implements ISqlQuery
 	 * @param string $table
 	 * @return InsertQuery
 	 */
-	static function create($table)
+	static function create($table, SqlFieldValueCollection $fvc = null)
 	{
-		return new self($table);
+		return new self($table, $fvc);
 	}
 
 	/**
 	 * @param string $table table name
 	 */
-	function __construct($table)
+	function __construct($table, SqlFieldValueCollection $fvc = null)
 	{
 		Assert::isScalar($table);
 
 		$this->tableName = $table;
-		$this->fields = new SqlFieldValueCollection();
+		$this->fields =
+			$fvc
+				? $fvc
+				: new SqlFieldValueCollection();
 	}
 
 	/**

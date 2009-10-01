@@ -26,12 +26,7 @@ interface IPhysicallySchematic
 	 * Array of columnName => DBType
 	 * @return array
 	 */
-	function getDbColumns(OrmProperty $property = null);
-
-	/**
-	 * @return IOrmQuery
-	 */
-	function getOrmQuery();
+	function getDbColumns();
 }
 
 ?>

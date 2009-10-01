@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmModel
  */
-class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, IQueried
+class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
 {
 	/**
 	 * @var string
@@ -85,8 +85,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 				$this->dbSchema
 					? DBPool::get($this->dbSchema)
 					: DBPool::getDefault(),
-				$this->getMap(),
-				$this,
 				$this
 			);
 		}
@@ -360,46 +358,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 	}
 
 	/**
-	 * @return IOrmQuery
-	 */
-	function getOrmQuery()
-	{
-		return $this;
-	}
-
-	/**
-	 * $rawValue structure:
-	 *  - key is dbColumn name
-	 *  - value is SqlValue
-	 * @return array
-	 */
-	function makeColumnValue(OrmProperty $property, array $rawValue)
-	{
-		$dbValues = array();
-		foreach ($this->getDBColumnNames($property) as $columnName => $innerName) {
-			$dbValues[$columnName] = $rawValue[$innerName];
-		}
-
-		return $dbValues;
-	}
-
-	/**
-	 * @return array
-	 */
-	function makeRawValue(OrmProperty $property, $dbValues)
-	{
-		$rawValue = array();
-
-		foreach ($this->getDBColumnNames($property) as $columnName => $innerName) {
-			if (array_key_exists($columnName, $dbValues)) {
-				$rawValue[$innerName] = $dbValues[$columnName];
-			}
-		}
-
-		return $rawValue;
-	}
-
-	/**
 	 * Array of columnName => fieldName
 	 * @return array
 	 */
@@ -412,8 +370,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 		$columns = array();
 
 		foreach ($properties as $property) {
-
-			// FIXME: cache the following mapping
 
 			$propertyPrefix = strtolower(
 				preg_replace(
@@ -442,13 +398,13 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IOrmQuery, 
 	 * Array of columnName => DBType
 	 * @return array
 	 */
-	function getDbColumns(OrmProperty $property = null)
+	function getDbColumns()
 	{
-		$properties = $property
-			? array($property)
-			: $this->properties;
+		$properties = $this->properties;
 
 		$columns = array();
+
+		// FIXME move column generation code to ctor, save columns in OrmProperty to reject regeneration
 
 		foreach ($properties as $property) {
 			$propertyPrefix = strtolower(

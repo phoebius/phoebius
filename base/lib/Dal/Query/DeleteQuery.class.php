@@ -30,28 +30,29 @@ class DeleteQuery implements ISqlQuery
 	 * @param string $table
 	 * @return DeleteQuery
 	 */
-	static function create($table)
+	static function create($table, IDalExpression $expression = null)
 	{
-		return new self($table);
+		return new self($table, $expression);
 	}
 
 	/**
 	 * @param string $table
 	 */
-	function __construct($tableName)
+	function __construct($tableName, IDalExpression $expression = null)
 	{
 		Assert::isScalar($tableName);
 
 		$this->tableName = $tableName;
+		$this->setCondition($expression);
 	}
 
 	/**
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setCondition(IDalExpression $logic = null)
+	function setCondition(IDalExpression $expression = null)
 	{
-		$this->condition = $logic;
+		$this->condition = $expression;
 
 		return $this;
 	}

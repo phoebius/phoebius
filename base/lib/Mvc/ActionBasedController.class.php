@@ -310,11 +310,16 @@ abstract class ActionBasedController extends Controller
 
 								if (is_array($argument)) {
 									$rawValueSet = array();
-									$ormQuery = $ormClass->getOrmQuery();
-									foreach ($ormClass->getLogicalSchema()->getProperties() as $propertyName => $property) {
-										$propertyRawValue = $ormQuery->makeRawValue($property, $argument);
-										if (!empty($propertyRawValue)) {
-											$rawValueSet[$propertyName] = $propertyRawValue;
+
+									foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
+										foreach ($property->getDbColumns() as $columnName => $dbType) {
+											if (array_key_exists($columnName, $argument)) {
+												$rawValueSet[$propertyName][] = $argument[$columnName];
+											}
+											else {
+												unset ($rawValueSet[$propertyName]);
+												continue(2);
+											}
 										}
 									}
 								}

@@ -26,7 +26,7 @@
  * LINQ to OrmEntity
  * @ingroup OrmExpression
  */
-final class EntityQuery implements IEntityExpression, ISqlValueExpression
+final class EntityQuery implements IEntityExpression, IDalExpression
 {
 	/**
 	 * @var IQueried
@@ -85,29 +85,29 @@ final class EntityQuery implements IEntityExpression, ISqlValueExpression
 	 * Alias for EntityQuery::addExpression()
 	 * @return EntityQuery
 	 */
-	function where($propertyName, IExpression $expression)
+	function where($property, IExpression $expression)
 	{
-		$this->addExpression($propertyName, $expression);
+		$this->addExpression($property, $expression);
 		return $this;
 	}
 
 	/*
 	 * @return EntityQuery
 	 */
-	function addExpression($propertyName, IExpression $expression)
+	function addExpression($property, IExpression $expression)
 	{
-		Assert::isScalar($propertyName);
-
-		try {
-			$property = $this->entity->getLogicalSchema()->getProperty($propertyName);
-		}
-		catch (OrmModelIntegrityException $e){
-			Assert::isUnreachable(
-				'unknown property %s::%s for %s',
-				$this->entity->getLogicalSchema()->getEntityName(),
-				$propertyName,
-				__CLASS__
-			);
+		if (is_scalar($property)) {
+			try {
+				$property = $this->entity->getLogicalSchema()->getProperty($property);
+			}
+			catch (OrmModelIntegrityException $e){
+				Assert::isUnreachable(
+					'unknown property %s::%s for %s',
+					$this->entity->getLogicalSchema()->getEntityName(),
+					$property,
+					__CLASS__
+				);
+			}
 		}
 
 		$this->expressionChain->add(

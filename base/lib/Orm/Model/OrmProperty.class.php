@@ -131,7 +131,9 @@ class OrmProperty
 	 * @return array of columnName => DbType
 	 */
 	function getDbColumns()
-	{}
+	{
+		Assert::notImplemented();
+	}
 }
 
 ?>

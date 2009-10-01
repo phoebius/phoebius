@@ -30,8 +30,15 @@ abstract class SingleRowEntityExpression extends EntityExpression
 		);
 	}
 
+	/**
+	 * @return ISqlValueExpression
+	 */
 	protected function getSqlValue($value)
 	{
+		if ($value instanceof ISqlValueExpression) {
+			return $value;
+		}
+
 		return reset($this->makeRawValue($value));
 	}
 }

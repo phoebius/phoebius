@@ -133,7 +133,6 @@ class OrmIdentityMap
 	}
 
 	/**
-	 * TODO: remove ability to provide both scalar and object ID representation. Introduce IIdentifiableOrmProperty that accepts only IIdentifierMappable as property type
 	 * @return string
 	 */
 	private function getScalarId($id)
