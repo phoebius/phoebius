@@ -252,6 +252,10 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			else {
 				$class->setDbSchema($this->ormDomain->getDbSchema());
 			}
+
+			if (isset($xmlEntity['db-table'])) {
+				$class->setDBTableName((string) $xmlEntity['db-table']);
+			}
 		}
 
 		return $class;
@@ -276,7 +280,30 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			false
 		);
 
+		if (isset($xmlIdentifier['db-columns'])) {
+			$identifier->setDBColumnNames(
+				$this->getDBColumns($xmlIdentifier['db-columns'])
+			);
+		}
+
 		return $identifier;
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getDBColumns($columnsList)
+	{
+		$columns = explode(',', $columnsList);
+		$yield = array();
+		foreach ($columns as $column) {
+			$column = trim($column);
+			if ($column) {
+				$yield[] = $column;
+			}
+		}
+
+		return $yield;
 	}
 
 	/**
@@ -297,6 +324,12 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			$xmlProperty['unique'] == 'true'
 		);
+
+		if (isset($xmlProperty['db-columns'])) {
+			$property->setDBColumnNames(
+				$this->getDBColumns($xmlProperty['db-columns'])
+			);
+		}
 
 		$this->recorder->putMsg(' done.');
 
@@ -389,12 +422,20 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 
 		$this->recorder->putMsg(' done.');
 
-		return new OrmProperty(
+		$property = new OrmProperty(
 			(string) $xmlContainer['name'],
 			$propertyType,
 			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
 			false
 		);
+
+		if (isset($xmlContainer['db-columns'])) {
+			$property->setDBColumnNames(
+				$this->getDBColumns($xmlContainer['db-columns'])
+			);
+		}
+
+		return $property;
 	}
 
 	/**

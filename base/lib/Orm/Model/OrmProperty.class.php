@@ -35,6 +35,11 @@ class OrmProperty
 	private $visibility;
 
 	/**
+	 * @var array
+	 */
+	private $dbColumnNames = array();
+
+	/**
 	 * @return OrmProperty
 	 */
 	static function create(
@@ -69,6 +74,24 @@ class OrmProperty
 			sizeof($this->type->getDbColumns()) < 1
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
+
+		$this->autoFillColumnNames();
+	}
+
+	/**
+	 * @return OrmProperty
+	 */
+	function setDBColumnNames(array $dbColumnNames)
+	{
+		Assert::isTrue(
+			sizeof($dbColumnNames)
+			== sizeof($this->type->getDbColumns()),
+			'wrong DB column count for the specified type'
+		);
+
+		$this->dbColumnNames = $dbColumnNames;
+
+		return $this;
 	}
 
 	/**
@@ -132,7 +155,36 @@ class OrmProperty
 	 */
 	function getDbColumns()
 	{
-		Assert::notImplemented();
+		return array_combine(
+			$this->dbColumnNames,
+			array_values($this->type->getDbColumns())
+		);
+	}
+
+	private function autoFillColumnNames()
+	{
+		$columns = array();
+
+		$propertyPrefix = strtolower(
+			preg_replace(
+				'/([a-z])([A-Z])/',
+				'$1_$2',
+				$this->getName()
+			)
+		);
+
+		foreach (array_keys($this->getType()->getDbColumns()) as $key) {
+			$columns[] = (
+				$propertyPrefix
+				. (
+					(!is_int($key) || $key > 0)
+						? '_' . $key
+						: ''
+				)
+			);
+		}
+
+		$this->setDBColumnNames($columns);
 	}
 }
 

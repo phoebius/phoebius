@@ -358,73 +358,16 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
 	}
 
 	/**
-	 * Array of columnName => fieldName
-	 * @return array
-	 */
-	private function getDBColumnNames(OrmProperty $property = null)
-	{
-		$properties = $property
-			? array($property)
-			: $this->properties;
-
-		$columns = array();
-
-		foreach ($properties as $property) {
-
-			$propertyPrefix = strtolower(
-				preg_replace(
-					'/([a-z])([A-Z])/',
-					'$1_$2',
-					$property->getName()
-				)
-			);
-
-			foreach (array_keys($property->getType()->getDbColumns()) as $key) {
-				$columns[(
-					$propertyPrefix
-					. (
-						(!is_int($key) || $key > 0)
-							? '_' . $key
-							: ''
-					)
-				)] = $key;
-			}
-		}
-
-		return $columns;
-	}
-
-	/**
 	 * Array of columnName => DBType
 	 * @return array
 	 */
 	function getDbColumns()
 	{
-		$properties = $this->properties;
-
 		$columns = array();
 
-		// FIXME move column generation code to ctor, save columns in OrmProperty to reject regeneration
+		foreach ($this->properties as $property) {
 
-		foreach ($properties as $property) {
-			$propertyPrefix = strtolower(
-				preg_replace(
-					'/([a-z])([A-Z])/',
-					'$1_$2',
-					$property->getName()
-				)
-			);
-
-			foreach ($property->getType()->getDbColumns() as $key => $type) {
-				$columns[(
-					$propertyPrefix
-					. (
-						(!is_int($key) || $key > 0)
-							? '_' . $key
-							: ''
-					)
-				)] = $type;
-			}
+			$columns += $property->getDBColumns();
 		}
 
 		return $columns;

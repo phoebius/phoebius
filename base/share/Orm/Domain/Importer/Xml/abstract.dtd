@@ -40,6 +40,7 @@ Future releases:
 	name			ID #REQUIRED
 	has-dao			(true|false) "true"
 	db-schema		CDATA #IMPLIED
+	db-table		CDATA #IMPLIED
 >
 
 <!ELEMENT properties (identifier?, property*, container*)>
@@ -49,6 +50,7 @@ Future releases:
 <!ATTLIST identifier
 	name			CDATA "id"
 	type			CDATA "AutoIntPropertyType"
+	db-columns		CDATA #IMPLIED
 >
 
 <!ELEMENT property EMPTY>
@@ -58,6 +60,7 @@ Future releases:
 	visibility		(full|readonly|transparent) "full"
 	unique			(true|false) "false"
 	multiplicity	(zeroOrOne|exactlyOne) "exactlyOne"
+	db-columns		CDATA #IMPLIED
 >
 
 <!-- 
@@ -72,5 +75,6 @@ Container works like a typical property except that:
 	name			CDATA #REQUIRED
 	type			CDATA #REQUIRED
 	refs			CDATA "id"
+	db-columns		CDATA #IMPLIED
 >
 
