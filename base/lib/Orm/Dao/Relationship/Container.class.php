@@ -41,12 +41,6 @@ abstract class Container implements IteratorAggregate
 	private $childrenDao;
 
 	/**
-	 * Use partial fetching - only the IDs of the childen
-	 * @var boolean
-	 */
-	private $partialFetch = true;
-
-	/**
 	 * Supresses changes in list to avoid useless memory usage
 	 * @var boolean
 	 */
@@ -73,12 +67,10 @@ abstract class Container implements IteratorAggregate
 	function __construct(
 			IdentifiableOrmEntity $parent,
 			IQueried $children,
-			$readOnly = false,
-			$partialFetch = false
+			$readOnly = false
 		)
 	{
 		Assert::isBoolean($readOnly);
-		Assert::isBoolean($partialFetch);
 		Assert::isTrue(
 			!!$parent->getId(),
 			'cannot track unsaved entities (i.e. with empty ids)'
@@ -87,7 +79,6 @@ abstract class Container implements IteratorAggregate
 		$this->parent = $parent;
 		$this->children = $children;
 		$this->childrenDao = $children->getDao();
-		$this->partialFetch = $partialFetch;
 	}
 
 	/**
@@ -155,14 +146,6 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @return boolean
 	 */
-	function isPartialFetch()
-	{
-		return $this->partialFetch;
-	}
-
-	/**
-	 * @return boolean
-	 */
 	function isReadOnly()
 	{
 		return $this->readOnly;
@@ -225,44 +208,26 @@ abstract class Container implements IteratorAggregate
 
 		$ids = $insert = $delete = $update = array();
 
-		if ($this->partialFetch) {
-			foreach ($this->list as $id) {
-				if (!isset($clones[$id])) {
-					$insert[] = $id;
-				}
-				else {
-					$ids[$id] = $id;
-				}
+		foreach ($this->list as $object) {
+			$id = $object->getId();
+			if (!$id || !isset($clones[$id])) {
+				$insert[] = $object;
+			}
+			else if (
+					   isset($clones[$id])
+					&& (($object !== $clones[$id]) || ($object != $clones[$id]))
+			) {
+				$update[] = $object;
 			}
 
-			foreach ($clones as $id) {
-				if (!isset($ids[$id])) {
-					$delete[] = $id;
-				}
+			if ($id) {
+				$ids[$id] = $object;
 			}
 		}
-		else {
-			foreach ($this->list as $object) {
-				$id = $object->getId();
-				if (!$id || !isset($clones[$id])) {
-					$insert[] = $object;
-				}
-				else if (
-						   isset($clones[$id])
-						&& (($object !== $clones[$id]) || ($object != $clones[$id]))
-				) {
-					$update[] = $object;
-				}
 
-				if ($id) {
-					$ids[$id] = $object;
-				}
-			}
-
-			foreach ($clones as $id => $object) {
-				if (!isset($ids[$id])) {
-					$delete[] = $object;
-				}
+		foreach ($clones as $id => $object) {
+			if (!isset($ids[$id])) {
+				$delete[] = $object;
 			}
 		}
 
@@ -345,16 +310,9 @@ abstract class Container implements IteratorAggregate
 			return $this;
 		}
 
-		if ($this->partialFetch) {
-			foreach ($this->list as $id) {
-				$this->fetchedObjectClones[$id] = $id;
-			}
-		}
-		else {
-			foreach ($this->list as $object) {
-				if (($id = $object->getId())) {
-					$this->fetchedObjectClones[$id] = clone $object;
-				}
+		foreach ($this->list as $object) {
+			if (($id = $object->getId())) {
+				$this->fetchedObjectClones[$id] = clone $object;
 			}
 		}
 

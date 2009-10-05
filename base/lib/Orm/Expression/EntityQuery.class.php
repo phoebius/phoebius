@@ -62,6 +62,22 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	}
 
 	/**
+	 * @return string
+	 */
+	function getDbContainer()
+	{
+		return $this->dbContainer;
+	}
+
+	/**
+	 * @return IQueried
+	 */
+	function getEntity()
+	{
+		return $this->entity;
+	}
+
+	/**
 	 * @return EntityQuery
 	 */
 	function setAndBlock()

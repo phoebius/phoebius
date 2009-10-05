@@ -15,53 +15,19 @@
 abstract class ManyToManyWorker extends ContainerWorker
 {
 	/**
-	 * @var string
+	 * @var ManyToManyContainerPropertyType
 	 */
-	private $helperTableName;
-
-	/**
-	 * @var SqlColumn
-	 */
-	private $parentFkColumn;
-
-	/**
-	 * @var SqlColumn
-	 */
-	private $childFkColumn;
+	private $mtm;
 
 	final function __construct(
-			OrmEntity $parent,
-			OrmMap $children,
-			ManyToManyContainerPropertyType $mtmType
+			IdentifiableOrmEntity $parent,
+			IQueried $children,
+			ManyToManyContainerPropertyType $mtm
 		)
 	{
-		Assert::isScalar($helperTableName);
+		$this->mtm = $mtm;
 
-		$this->parent = $parent;
-		$this->childrenMap = $children;
-		$this->childrenDao = $children->getDao();
-
-		Assert::notImplemented('use proxy data here (mtmType)');
-
-		$this->helperTableName = $helperTableName;
-		$this->parentFkColumn = $parentFkColumn;
-		$this->childFkColumn = $childFkColumn;
-	}
-
-	/**
-	 * @return SqlColumn
-	 */
-	protected function getParentFkColumn()
-	{
-		return $this->parentFkColumn;
-	}
-
-	/**
-	 * @return SqlColumn
-	 */
-	protected function getChildFkColumn()
-	{
-		return $this->childFkColumn;
+		parent::__construct($parent, $children);
 	}
 
 	/**
@@ -69,7 +35,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	protected function getHelperTableName()
 	{
-		return $this->helperTableName;
+		return $this->mtm->getProxy()->getDBTableName();
 	}
 
 	/**
@@ -77,16 +43,19 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	function dropList()
 	{
-		$deleteQuery = new DeleteQuery($this->helperTableName);
+		$deleteQuery = new DeleteQuery($this->getHelperTableName());
 
 		$deleteQuery->setExpression(
-			Expression::in(
-				$this->getParentFkColumn(),
-				new ScalarSqlValue($this->parent->getId())
-			)
+			EntityQuery::create($this->mtm->getProxy())
+				->where(
+					$this->mtm->getContainerProxyProperty(),
+					Expression::eq(
+						$this->parent
+					)
+				)
 		);
 
-		$count = $this->childrenDao->sendQuery($deleteQuery);
+		$count = $this->children->getDao()->sendQuery($deleteQuery);
 
 		return (int)$count;
 	}
@@ -96,21 +65,24 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	private function getJoinLogic()
 	{
-		return Expression::andChain()
+		return DalExpression::andChain()
 			->add(
-				Expression::eq(
-					$this->parentFkColumn,
-					new ScalarSqlValue($this->parent->getId())
-				)
+				EntityQuery::create($this->mtm->getProxy())
+					->where(
+						$this->mtm->getContainerProxyProperty(),
+						Expression::eq(
+							$this->parent
+						)
+					)
 			)
 			->add(
-				Expression::eq(
-					$this->childFkColumn,
-					new SqlColumn(
-						$this->childrenMap->getPhysicalSchema()->getIdentifierFieldName(),
-						$this->childrenMap->getPhysicalSchema()->getDBTableName()
+				EntityQuery::create($this->mtm->getProxy())
+					->where(
+						$this->mtm->getEncapsulantProxyProperty(),
+						Expression::eq(
+							$this->children->getIdentifier()
+						)
 					)
-				)
 			)
 			->add(
 				$this->getExpression()

@@ -19,16 +19,11 @@ abstract class OneToManyContainer extends Container
 	 */
 	abstract function getReferentialProperty();
 
-	function __construct(OrmEntity $parent, OrmMap $children, $partialFetch = false)
+	function __construct(OrmEntity $parent, OrmMap $children)
 	{
-		parent::__construct($parent, $children, $partialFetch);
+		parent::__construct($parent, $children);
 
-		$worker =
-			$partialFetch
-				? 'OneToManyPartialWorker'
-				: 'OneToManyFullWorker';
-
-		$this->setWorker(new $worker($parent, $children, $this->getReferentialProperty()));
+		$this->setWorker(new OneToManyFullWorker($parent, $children, $this->getReferentialProperty()));
 	}
 }
 

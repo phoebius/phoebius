@@ -15,7 +15,7 @@
 abstract class ContainerWorker
 {
 	/**
-	 * @var OrmEntity
+	 * @var IdentifiableOrmEntity
 	 */
 	protected $parent;
 
@@ -44,7 +44,7 @@ abstract class ContainerWorker
 	 */
 	abstract function dropList();
 
-	function __construct(OrmEntity $parent, OrmClass $children)
+	function __construct(IdentifiableOrmEntity $parent, IQueried $children)
 	{
 		$this->parent = $parent;
 		$this->children = $children;

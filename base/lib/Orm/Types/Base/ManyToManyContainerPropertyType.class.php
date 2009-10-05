@@ -18,7 +18,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	/**
 	 * @var OrmClass
 	 */
-	private $proxy;
+	private $mtm;
 
 	/**
 	 * @var OrmProperty
@@ -36,7 +36,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 			OrmProperty $encapsulant
 		)
 	{
-		$this->proxy = $proxy;
+		$this->mtm = $proxy;
 		$this->container = $container;
 		$this->encapsulant = $encapsulant;
 
@@ -51,7 +51,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	 */
 	function getProxy()
 	{
-		return $this->proxy;
+		return $this->mtm;
 	}
 
 	/**

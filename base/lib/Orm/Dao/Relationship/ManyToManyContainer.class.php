@@ -17,27 +17,25 @@ abstract class ManyToManyContainer extends Container
 	/**
 	 * @var ManyToManyContainerPropertyType
 	 */
-	private $proxy;
+	private $mtm;
 
 	/**
 	 * @param OrmEntity $parent
 	 * @param OrmMap $children
 	 * @param boolean $partialFetch
 	 */
-	function __construct(OrmEntity $parent, OrmMap $children, ManyToManyContainerPropertyType $mtmType, $partialFetch = false)
+	function __construct(
+			IdentifiableOrmEntity $parent,
+			IQueried $children,
+			ManyToManyContainerPropertyType $proxy
+		)
 	{
 		parent::__construct($parent, $children);
-
-		$worker =
-			$partialFetch
-				? 'ManyToManyPartialWorker'
-				: 'ManyToManyFullWorker';
-
 		$this->setWorker(
-			new $worker(
+			new ManyToManyFullWorker(
 				$parent,
 				$children,
-				$mtmType
+				$proxy
 			)
 		);
 	}

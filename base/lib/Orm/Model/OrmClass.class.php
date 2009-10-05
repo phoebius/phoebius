@@ -366,7 +366,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
 		$columns = array();
 
 		foreach ($this->properties as $property) {
-
 			$columns += $property->getDBColumns();
 		}
 

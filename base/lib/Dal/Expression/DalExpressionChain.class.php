@@ -16,7 +16,7 @@
 class DalExpressionChain implements IDalExpression
 {
 	/**
-	 * @var ExpressionChainPredicate
+	 * @var DalExpressionChainPredicate
 	 */
 	private $predicate;
 
@@ -32,7 +32,7 @@ class DalExpressionChain implements IDalExpression
 
 	/**
 	 * Adds the expression to the expression chain
-	 * @return ExpressionChain
+	 * @return DalExpressionChain
 	 */
 	function add(IDalExpression $expression)
 	{
