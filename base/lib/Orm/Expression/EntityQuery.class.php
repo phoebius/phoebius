@@ -173,7 +173,7 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	 */
 	function select()
 	{
-		return $this->entity->getDao()->getListByCondition($this->toExpression());
+		return $this->entity->getDao()->getCustomBy($this->toExpression());
 	}
 }
 

@@ -109,7 +109,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		if (!OrmUtils::isFetchedEntity($entity)) {
 			try {
 				$row = $this->getDB()->getRow(
-					$this->getSelectQuery()->setCondition(
+					$this->getSelectQuery()->setExpression(
 						EntityQuery::create($this->entity)
 							->where(
 								$this->identitifier,
@@ -177,7 +177,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				);
 			}
 
-			$newFetched = $this->getListByCondition($fetchExpression);
+			$newFetched = $this->getCustomBy($fetchExpression);
 
 			foreach ($newFetched as $entity) {
 				unset ($toFetch[spl_object_hash($entity)]);
@@ -209,20 +209,20 @@ class RdbmsDao implements IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getByCondition(IDalExpression $condition)
+	function getBy(IDalExpression $condition)
 	{
 		return $this->getByQuery(
-			$this->getSelectQuery()->setCondition($condition)
+			$this->getSelectQuery()->setExpression($condition)
 		);
 	}
 
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListByCondition(IDalExpression $condition)
+	function getCustomBy(IDalExpression $condition)
 	{
 		return $this->getListByQuery(
-			$this->getSelectQuery()->setCondition($condition)
+			$this->getSelectQuery()->setExpression($condition)
 		);
 	}
 
@@ -333,7 +333,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
-				->setCondition(
+				->setExpression(
 					OrmQuery::create($this->entity)
 						->where(
 							$this->identifier,
@@ -370,7 +370,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
-				->setCondition(
+				->setExpression(
 					$expression
 				)
 		);
@@ -381,11 +381,11 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropByCondition(IDalExpression $condition)
+	function dropBy(IDalExpression $condition)
 	{
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
-				->setCondition($condition)
+				->setExpression($condition)
 		);
 
 		if ($this->identityMap && $affected > 0) {

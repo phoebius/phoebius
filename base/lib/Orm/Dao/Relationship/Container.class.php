@@ -137,7 +137,7 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @return Container an object itself
 	 */
-	function setCondition(IDalExpression $condition = null)
+	function setExpression(IDalExpression $condition = null)
 	{
 		$this->condition = $condition;
 
@@ -147,7 +147,7 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @return IDalExpression|null
 	 */
-	function getCondition()
+	function getExpression()
 	{
 		return $this->condition;
 	}

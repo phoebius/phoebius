@@ -26,15 +26,15 @@ class OneToManyFullWorker extends OneToManyWorker
 				$ids[] = $id->getId();
 			}
 
-			$this->childrenDao->dropByIds($ids);
+			$this->children->getDao()->dropByIds($ids);
 		}
 
 		foreach ($insert as $object) {
-			$this->childrenDao->save($object);
+			$this->children->getDao()->save($object);
 		}
 
 		foreach ($update as $object) {
-			$this->childrenDao->save($object);
+			$this->children->getDao()->save($object);
 		}
 
 		return $this;
@@ -45,7 +45,7 @@ class OneToManyFullWorker extends OneToManyWorker
 	 */
 	function getList()
 	{
-		return $this->childrenDao->getListByCondition($this->generateLogic());
+		return $this->children->getDao()->getCustomBy($this->getParentsChildrenExpression());
 	}
 }
 

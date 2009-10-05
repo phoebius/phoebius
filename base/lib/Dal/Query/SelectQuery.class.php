@@ -94,7 +94,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Sets the query condition (for "WHERE" clause)
 	 * @return SelectQuery
 	 */
-	function setCondition(IDalExpression $logic)
+	function setExpression(IDalExpression $logic)
 	{
 		$this->condition = $logic;
 
@@ -105,7 +105,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Gets the query condition (i.e. "WHERE" clause) or NULL if not yet set
 	 * @return IDalExpression|null
 	 */
-	function getCondition()
+	function getExpression()
 	{
 		return $this->condition;
 	}

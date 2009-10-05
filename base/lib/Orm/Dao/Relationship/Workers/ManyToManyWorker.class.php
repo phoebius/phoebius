@@ -79,7 +79,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	{
 		$deleteQuery = new DeleteQuery($this->helperTableName);
 
-		$deleteQuery->setCondition(
+		$deleteQuery->setExpression(
 			Expression::in(
 				$this->getParentFkColumn(),
 				new ScalarSqlValue($this->parent->getId())
@@ -113,7 +113,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 				)
 			)
 			->add(
-				$this->getCondition()
+				$this->getExpression()
 			);
 	}
 
@@ -132,7 +132,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 			null,
 			$childrenTableName
 		);
-		$selectQuery->setCondition($this->getJoinLogic());
+		$selectQuery->setExpression($this->getJoinLogic());
 
 		$rows = $this->childrenDao->getCustomRowsByQuery(
 			$selectQuery

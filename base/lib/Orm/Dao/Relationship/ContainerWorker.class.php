@@ -22,7 +22,7 @@ abstract class ContainerWorker
 	/**
 	 * @var IDalExpression|null
 	 */
-	private $condition = null;
+	private $expression = null;
 
 	/**
 	 * @var OrmClass
@@ -53,9 +53,9 @@ abstract class ContainerWorker
 	/**
 	 * @return ContainerWorker an object itself
 	 */
-	function setCondition(IDalExpression $condition = null)
+	function setExpression(IDalExpression $expression = null)
 	{
-		$this->condition = $condition;
+		$this->expression = $expression;
 
 		return $this;
 	}
@@ -63,13 +63,12 @@ abstract class ContainerWorker
 	/**
 	 * @return IDalExpression
 	 */
-	function getCondition()
+	function getExpression()
 	{
-		if (!$this->condition) {
-			$this->condition = new NullExpression();
-		}
-
-		return $this->condition;
+		return
+			$this->expression
+				? $this->expression
+				: new NullExpression;
 	}
 }
 

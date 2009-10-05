@@ -61,7 +61,7 @@ class UpdateQuery implements ISqlQuery
 				? $fvc
 				: new SqlFieldValueCollection();
 		if ($expression) {
-			$this->setCondition($expression);
+			$this->setExpression($expression);
 		}
 	}
 
@@ -93,7 +93,7 @@ class UpdateQuery implements ISqlQuery
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setCondition(IDalExpression $logic)
+	function setExpression(IDalExpression $logic)
 	{
 		$this->condition = $logic;
 
@@ -104,7 +104,7 @@ class UpdateQuery implements ISqlQuery
 	 * Gets the query condition or null if {@link IDalExpression} is not set
 	 * @return IDalExpression|null
 	 */
-	function getCondition()
+	function getExpression()
 	{
 		return $this->condition;
 	}

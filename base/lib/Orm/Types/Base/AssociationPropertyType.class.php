@@ -208,7 +208,11 @@ class AssociationPropertyType extends OrmPropertyType
 			$this->identifierType->makeRawValue(
 				is_null($value)
 					? null
-					: $value->getId()
+					: (
+						$value instanceof IIdentifiable
+							? $value->getId()
+							: $value
+					)
 			);
 	}
 

@@ -19,7 +19,11 @@ abstract class OneToManyWorker extends ContainerWorker
 	 */
 	protected $referentialProperty;
 
-	final function __construct(OrmEntity $parent, OrmClass $children, OrmProperty $referentialProperty)
+	final function __construct(
+			OrmEntity $parent,
+			OrmClass $children,
+			OrmProperty $referentialProperty
+		)
 	{
 		$this->referentialProperty = $referentialProperty;
 
@@ -31,7 +35,7 @@ abstract class OneToManyWorker extends ContainerWorker
 	 */
 	function dropList()
 	{
-		return $this->children->getDao()->dropByCondition($this->generateLogic());
+		return $this->children->getDao()->dropBy($this->getParentsChildrenExpression());
 	}
 
 	/**
@@ -39,7 +43,7 @@ abstract class OneToManyWorker extends ContainerWorker
 	 */
 	function getCount()
 	{
-		$row = $this->childrenDao->getCustomRowByQuery(
+		$row = $this->children->getDao()->getCustomRowByQuery(
 			SelectQuery::create()
 				->getExpression(
 					SqlFunction::create('count')->aggregateWithNulls()
@@ -47,8 +51,8 @@ abstract class OneToManyWorker extends ContainerWorker
 				->from(
 					$this->children->getPhysicalSchema()->getDBTableName()
 				)
-				->setCondition(
-					$this->generateLogic()
+				->setExpression(
+					$this->getParentsChildrenExpression()
 				)
 		);
 
@@ -64,27 +68,16 @@ abstract class OneToManyWorker extends ContainerWorker
 	/**
 	 * @return IDalExpression
 	 */
-	protected function generateLogic()
+	protected function getParentsChildrenExpression()
 	{
-		$query = $this->children->getOrmQuery();
-
-		$expression = Expression::andChain();
-		$table = $this->children->getPhysicalSchema()->getDBTableName();
-		$rawValue = $this->referentialProperty->getType()->makeRawValue($this->parent->getId());
-
-		foreach ($query->makeColumnValue($property, $rawValue) as $column => $sqlValue) {
-			$expression->add(
-				Expression::eq(
-					new SqlColumn(
-						$column,
-						$table
-					),
-					$sqlValue
-				)
-			);
-		}
-
-		return $expression;
+		return
+			EntityQuery::create($this->children)
+				->where(
+					$this->referentialProperty,
+					Expression::eq(
+						$this->parent
+					)
+				);
 	}
 }
 
