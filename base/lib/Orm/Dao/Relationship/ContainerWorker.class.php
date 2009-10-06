@@ -20,9 +20,9 @@ abstract class ContainerWorker
 	protected $parent;
 
 	/**
-	 * @var IDalExpression|null
+	 * @var EntityQuery|null
 	 */
-	private $expression = null;
+	private $entityQuery = null;
 
 	/**
 	 * @var OrmClass
@@ -53,22 +53,26 @@ abstract class ContainerWorker
 	/**
 	 * @return ContainerWorker an object itself
 	 */
-	function setExpression(IDalExpression $expression = null)
+	final function setEntityQuery(EntityQuery $entityQuery = null)
 	{
-		$this->expression = $expression;
+		Assert::isTrue(
+			$entityQuery->getEntity()->getLogicalSchema()->getEntityName()
+			== $this->children->getLogicalSchema()->getEntityName(),
+			'queries against %s are allowed only',
+			$this->children->getLogicalSchema()->getEntityName()
+		);
+
+		$this->entityQuery = $entityQuery;
 
 		return $this;
 	}
 
 	/**
-	 * @return IDalExpression
+	 * @return EntityQuery|null
 	 */
-	function getExpression()
+	function getEntityQuery()
 	{
-		return
-			$this->expression
-				? $this->expression
-				: new NullExpression;
+		return $this->entityQuery;
 	}
 }
 

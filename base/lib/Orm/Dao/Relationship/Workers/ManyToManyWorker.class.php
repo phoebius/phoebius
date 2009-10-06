@@ -17,7 +17,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	/**
 	 * @var ManyToManyContainerPropertyType
 	 */
-	private $mtm;
+	protected $mtm;
 
 	final function __construct(
 			IdentifiableOrmEntity $parent,
@@ -31,66 +31,19 @@ abstract class ManyToManyWorker extends ContainerWorker
 	}
 
 	/**
-	 * @return string
-	 */
-	protected function getHelperTableName()
-	{
-		return $this->mtm->getProxy()->getDBTableName();
-	}
-
-	/**
 	 * @return integer
 	 */
 	function dropList()
 	{
-		$deleteQuery = new DeleteQuery($this->getHelperTableName());
-
-		$deleteQuery->setExpression(
+		$count = $this->mtm->getProxy()->getDao()->dropBy(
 			EntityQuery::create($this->mtm->getProxy())
 				->where(
 					$this->mtm->getContainerProxyProperty(),
-					Expression::eq(
-						$this->parent
-					)
+					Expression::eq($this->parent)
 				)
 		);
 
-		$count = $this->children->getDao()->sendQuery($deleteQuery);
-
 		return (int)$count;
-	}
-
-	/**
-	 * @return IDalExpression
-	 */
-	private function getJoinLogic()
-	{
-		return DalExpression::andChain()
-			->add(
-				// maps proxy.parent_id<->parent.id as value
-				EntityQuery::create($this->mtm->getProxy())
-					->where(
-						$this->mtm->getContainerProxyProperty(),
-						Expression::eq(
-							$this->parent
-						)
-					)
-			)
-			->add(
-				// maps proxy.child_id<->child.id
-				EntityQuery::create($this->mtm->getProxy())
-					->where(
-						$this->mtm->getEncapsulantProxyProperty(),
-						Expression::eq(
-							EntityQuery::create($this->children)
-								->getPropertyClause($this->children->getIdentifier())
-						)
-					)
-			)
-			->add(
-				// additional criterion
-				$this->getExpression()
-			);
 	}
 
 	/**
@@ -100,35 +53,33 @@ abstract class ManyToManyWorker extends ContainerWorker
 	{
 		$query = EntityQuery::create($this->mtm->getProxy())
 			->where(
-
+				// maps proxy.parent_id<->parent.id as value
+				$this->mtm->getContainerProxyProperty(),
+				Expression::eq(
+					$this->parent
+				)
 			)
 			->andWhere(
-
-			)
-			->andWhere(
-
+				// maps proxy.child_id<->child.id
+				$this->mtm->getEncapsulantProxyProperty(),
+				Expression::eq(
+					EntityQuery::create($this->children)
+						->getPropertyClause($this->children->getIdentifier())
+				)
 			);
 
+		if (($entityQuery = $this->getEntityQuery())) {
+			$query
+				->using($this->mtm->getEncapsulantProxyProperty(), $entityQuery->getAlias())
+				->andWhere($entityQuery);
+		}
 
-		$childrenTableName = $this->children->getPhysicalSchema()->getDBTableName();
-
-		$selectQuery = new SelectQuery();
-		$selectQuery->from($this->getHelperTableName());
-		$selectQuery->from($childrenTableName);
-		$selectQuery->get(
-			$this->children->getPhysicalSchema()->getIdentifierFieldName(),
-			null,
-			$childrenTableName
-		);
-		$selectQuery->setExpression($this->getJoinLogic());
-
-		$rows = $this->children->getCustomRowsByQuery(
-			$selectQuery
-		);
+		$childGetter = $this->mtm->getEncapsulantProxyProperty()->getGetter();
 
 		$ids = array();
-		foreach ($rows as $row) {
-			$ids[] = reset($row);
+
+		foreach ($query->getList() as $object) {
+			$ids[] = $object->{$childGetter}();
 		}
 
 		return $ids;

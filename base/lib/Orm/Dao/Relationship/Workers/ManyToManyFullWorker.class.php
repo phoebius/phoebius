@@ -24,7 +24,7 @@ class ManyToManyFullWorker extends ManyToManyWorker
 
 		//update object, not relation
 		foreach ($update as $object) {
-			$object->dao()->save($object);
+			$this->children->getDao()->save($object);
 		}
 
 		//drop
@@ -32,11 +32,11 @@ class ManyToManyFullWorker extends ManyToManyWorker
 	}
 
 	/**
-	 * @return array
+	 * @return array of OrmEntity
 	 */
 	function getList()
 	{
-		return $this->childrenDao->getByIds(
+		return $this->children->getDao()->getByIds(
 			$this->getChildrenIds()
 		);
 	}

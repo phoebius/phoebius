@@ -29,6 +29,11 @@
 final class EntityQuery implements ISqlSelectQuery, IDalExpression
 {
 	/**
+	 * @var array of Property{name,path} => EntityQuery
+	 */
+	private $entityPropertyCache = array();
+
+	/**
 	 * @var IQueried
 	 */
 	private $entity;
@@ -334,6 +339,20 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	}
 
 	/**
+	 * @return EntityQuery
+	 */
+	function using($property, $alias = null)
+	{
+		$ep = $this->guessEntityProperty($property);
+
+		if ($alias) {
+			$ep->getEntityQuery()->alias = $alias;
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @return EntityExpressionChain
 	 */
 	private function resortChain(ExpressionChainPredicate $ecp)
@@ -406,6 +425,14 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	function getCastedParameters(IDialect $dialect)
 	{
 		return array();
+	}
+
+	/**
+	 * @return array
+	 */
+	function getList()
+	{
+		return $this->entity->getDao()->getListByQuery($this->toSelectQuery());
 	}
 
 	/**
@@ -486,8 +513,6 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 			return new EntityProperty($query, $property);
 		}
 	}
-
-	private $entityPropertyCache = array();
 
 	/**
 	 * @return EntityProperty
