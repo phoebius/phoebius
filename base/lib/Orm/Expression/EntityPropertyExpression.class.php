@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmExpression
  */
-abstract class EntityExpression implements IEntityExpression
+abstract class EntityPropertyExpression implements IEntityPropertyExpression
 {
 	/**
 	 * @var string
@@ -74,7 +74,7 @@ abstract class EntityExpression implements IEntityExpression
 	protected function makeRawValue($value)
 	{
 		return array_combine(
-			array_keys($this->property->getDbColumns()),
+			$this->property->getDbColumns(),
 			$this->property->getType()->makeRawValue($value)
 		);
 	}

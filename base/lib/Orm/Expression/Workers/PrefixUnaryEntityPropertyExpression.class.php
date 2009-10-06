@@ -10,12 +10,12 @@
  ************************************************************************************************/
 
 /**
- * Represents the IN expression used in query logic
+ * Represents a unary prefix expression
  * @ingroup OrmExpression
  */
-class InSetEntityExpression extends SingleRowEntityExpression
+class PrefixUnaryEntityPropertyExpression extends SingleRowEntityPropertyExpression
 {
-	function __construct($table, OrmProperty $property, InSetExpression $expression)
+	function __construct($table, OrmProperty $property, PrefixUnaryExpression $expression)
 	{
 		parent::__construct($table, $property, $expression);
 	}
@@ -25,16 +25,10 @@ class InSetEntityExpression extends SingleRowEntityExpression
 	 */
 	function toDalExpression()
 	{
-		$sqlValues = array();
-		foreach ($this->getExpression()->getValue() as $value) {
-			$sqlValues[] = $this->getSqlValue($value);
-		}
-
-		return new InSetDalExpression(
-			$this->getSqlColumn(),
-			new InSetExpression(
-				$sqlValues,
-				$this->getExpression()->getPredicate()
+		return new PrefixUnaryDalExpression(
+			new PrefixUnaryExpression(
+				$this->getExpression()->getPredicate(),
+				$this->getSqlColumn()
 			)
 		);
 	}

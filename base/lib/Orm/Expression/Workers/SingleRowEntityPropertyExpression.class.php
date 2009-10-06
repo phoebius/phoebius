@@ -12,20 +12,19 @@
 /**
  * @ingroup OrmExpression
  */
-abstract class SingleRowEntityExpression extends EntityExpression
+abstract class SingleRowEntityPropertyExpression extends EntityPropertyExpression
 {
 	/**
 	 * @return IDalExpression
 	 */
 	protected function getSqlColumn()
 	{
-		$columns = $this->getProperty()->getDbColumns();
-		reset($columns);
+		$columns = $this->guessEntityProperty()->getDbColumns();
 
 		Assert::isTrue(sizeof($columns) == 1);
 
 		return new SqlColumn(
-			key($columns),
+			reset($columns),
 			$this->getTable()
 		);
 	}
@@ -37,6 +36,10 @@ abstract class SingleRowEntityExpression extends EntityExpression
 	{
 		if ($value instanceof ISqlValueExpression) {
 			return $value;
+		}
+
+		if ($value instanceof EntityProperty) {
+			return reset($value->getSqlColumns());
 		}
 
 		return reset($this->makeRawValue($value));

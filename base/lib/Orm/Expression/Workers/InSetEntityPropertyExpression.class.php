@@ -10,12 +10,12 @@
  ************************************************************************************************/
 
 /**
- * Represents a postfix unary expression
+ * Represents the IN expression used in query logic
  * @ingroup OrmExpression
  */
-class UnaryPostfixEntityExpression extends SingleRowEntityExpression
+class InSetEntityPropertyExpression extends SingleRowEntityPropertyExpression
 {
-	function __construct($table, OrmProperty $property, UnaryPostfixExpression $expression)
+	function __construct($table, OrmProperty $property, InSetExpression $expression)
 	{
 		parent::__construct($table, $property, $expression);
 	}
@@ -25,9 +25,17 @@ class UnaryPostfixEntityExpression extends SingleRowEntityExpression
 	 */
 	function toDalExpression()
 	{
-		return new UnaryPostfixDalExpression(
+		$sqlValues = array();
+		foreach ($this->getExpression()->getValue() as $value) {
+			$sqlValues[] = $this->getSqlValue($value);
+		}
+
+		return new InSetDalExpression(
 			$this->getSqlColumn(),
-			$this->getExpression()
+			new InSetExpression(
+				$sqlValues,
+				$this->getExpression()->getPredicate()
+			)
 		);
 	}
 }

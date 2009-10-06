@@ -144,7 +144,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * @param scalar $alias
 	 * @return SelectQuery an object itself
 	 */
-	function getExpression(ISqlValueExpression $expression, $alias = null)
+	function getExpr(ISqlValueExpression $expression, $alias = null)
 	{
 		Assert::isScalarOrNull($alias);
 
@@ -179,48 +179,23 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		return $this;
 	}
 
-	/**
-	 * Adds a table to be left joined to the last added source to which select query should be
-	 * applied. Be sure that you added at least one target. The join is applied using the
-	 * logical expression.
-	 * @param string $tableName
-	 * @param IDalExpression $condition
-	 * @return SelectQuery
-	 */
-	function leftJoin($tableName, IDalExpression $condition)
+	function join(SqlJoin $join)
 	{
 		Assert::isNotEmpty($this->sources, 'set any target before joining');
 
-		end($this->sources)->join(
-			new SqlConditionalJoin(
-				$tableName,
-				new SqlJoinMethod(SqlJoinMethod::LEFT),
-				$condition
-			)
-		);
+		end($this->sources)->join($join);
 
 		return $this;
 	}
 
 	/**
-	 * Adds a table to be left joined to the last added source to which select query should be
-	 * applied. Be sure that you added at least one target. THe join is applied on the table
-	 * columns that have identical names in joining tables
-	 * @param string $tableName
-	 * @param IDalExpression $condition
-	 * @return SelectQuery
+	 * Drops grouping schema and adds a grouping element
+	 * @param ISqlValueExpression $expression
+	 * @return SelectQuery an object itself
 	 */
-	function leftJoinSame($tableName, SqlFieldList $identicalColumns)
+	function groupBy(ISqlValueExpression $expression)
 	{
-		Assert::isNotEmpty($this->sources, 'set any target before joining');
-
-		end($this->sources)->join(
-			new SqlSimpleJoin(
-				$tableName,
-				new SqlJoinMethod(SqlJoinMethod::LEFT),
-				$identicalColumns
-			)
-		);
+		$this->dropGroupBy()->andGroupBy($expression);
 
 		return $this;
 	}
@@ -230,7 +205,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * @param ISqlValueExpression $expression
 	 * @return SelectQuery an object itself
 	 */
-	function groupBy(ISqlValueExpression $expression)
+	function andGroupBy(ISqlValueExpression $expression)
 	{
 		$this->groupByExpressions[] = $expression;
 
@@ -260,12 +235,13 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	}
 
 	/**
-	 * Adds an order expression
+	 * Drops ORDERBY list and adds an order expression
 	 * @return SelectQuery an object itself
 	 */
 	function orderBy(ISqlValueExpression $expression, SqlOrderDirection $direction = null)
 	{
-		$this->orderByChain->add(new SqlOrderExpression($expression, $direction));
+		$this->dropOrderBy();
+		$this->andOrderBy($expression, $direction);
 
 		return $this;
 	}
@@ -274,9 +250,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Adds an order expression
 	 * @return SelectQuery an object itself
 	 */
-	function addOrderBy(SqlOrderExpression $expression)
+	function andOrderBy(ISqlValueExpression $expression, SqlOrderDirection $direction = null)
 	{
-		$this->orderByChain->add($expression);
+		$this->orderByChain->add(new SqlOrderExpression($expression, $direction));
 
 		return $this;
 	}

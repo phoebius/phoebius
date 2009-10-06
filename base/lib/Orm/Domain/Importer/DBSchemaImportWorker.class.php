@@ -108,7 +108,10 @@ final class DBSchemaImportWorker
 	 */
 	private function importProperty()
 	{
-		$columns = $this->ormProperty->getDbColumns();
+		$columns = array_combine(
+			$this->ormProperty->getDbColumns(),
+			$this->ormProperty->getType()->getDbColumns()
+		);
 		if (empty($columns)) {
 			// columnless properties are skipped
 			return;

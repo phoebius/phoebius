@@ -13,7 +13,7 @@
  * Represents an range expression
  * @ingroup OrmExpression
  */
-class BetweenRangeEntityExpression extends SingleRowEntityExpression
+class BetweenRangeEntityPropertyExpression extends SingleRowEntityPropertyExpression
 {
 	function __construct($table, OrmProperty $property, BetweenRangeExpression $expression)
 	{

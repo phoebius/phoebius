@@ -51,7 +51,7 @@ interface IOrmEntityAccessor
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getCustomBy(IDalExpression $condition);
+	function getListBy(IDalExpression $condition);
 
 	/**
 	 * @throws OrmEntityNotFoundException

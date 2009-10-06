@@ -177,7 +177,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				);
 			}
 
-			$newFetched = $this->getCustomBy($fetchExpression);
+			$newFetched = $this->getListBy($fetchExpression);
 
 			foreach ($newFetched as $entity) {
 				unset ($toFetch[spl_object_hash($entity)]);
@@ -219,7 +219,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getCustomBy(IDalExpression $condition)
+	function getListBy(IDalExpression $condition)
 	{
 		return $this->getListByQuery(
 			$this->getSelectQuery()->setExpression($condition)
@@ -257,7 +257,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		$rawValueSet = array();
 		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-			foreach ($property->getDbColumns() as $columnName => $dbType) {
+			foreach ($property->getDbColumns() as $columnName) {
 				$rawValueSet[$propertyName][] = $dbValues[$columnName];
 			}
 		}
@@ -414,7 +414,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
 			$fvc->addCollection(
 				array_combine(
-					array_keys($this->logicalSchema->getProperty($propertyName)->getDBColumns()),
+					$this->logicalSchema->getProperty($propertyName)->getDBColumns(),
 					$rawValue
 				)
 			);
@@ -530,7 +530,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			SelectQuery::create()
 				->from($table);
 
-		foreach ($this->physicalSchema->getDbColumns() as $column => $type) {
+		foreach ($this->physicalSchema->getDbColumns() as $column) {
 			$selectQuery->get(
 				$column,
 				null,

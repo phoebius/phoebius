@@ -47,10 +47,10 @@ interface IPropertyMappable
 	function getDefaultValue();
 
 	/**
-	 * @return IEntityExpression
+	 * @return IEntityPropertyExpression
 	 */
-	function getEntityExpression(
-			EntityQuery $entityQuery,
+	function getEntityPropertyExpression(
+			$table,
 			OrmProperty $ormProperty,
 			IExpression $expression
 	);

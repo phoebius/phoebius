@@ -14,12 +14,12 @@
  */
 abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructurized
 {
-	private static $entityExpressionWorkers = array(
-		ExpressionType::BETWEEN => 'BetweenEntityExpression',
-		ExpressionType::BINARY => 'BinaryExpression',
-		ExpressionType::IN_SET => 'InSetEntityExpression',
-		ExpressionType::PREFIX_UNARY => 'PrefixUnaryEntityExpression',
-		ExpressionType::UNARY_POSTFIX => 'UnaryPostfixExpression'
+	private static $entityPropertyExpressionWorkers = array(
+		ExpressionType::BETWEEN => 'BetweenEntityPropertyExpression',
+		ExpressionType::BINARY => 'BinaryPropertyExpression',
+		ExpressionType::IN_SET => 'InSetEntityPropertyExpression',
+		ExpressionType::PREFIX_UNARY => 'PrefixUnaryEntityPropertyExpression',
+		ExpressionType::UNARY_POSTFIX => 'UnaryPostfixPropertyExpression'
 	);
 
 	/**
@@ -44,9 +44,9 @@ abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructuriz
 	}
 
 	/**
-	 * @return IEntityExpression
+	 * @return IEntityPropertyExpression
 	 */
-	function getEntityExpression(
+	function getEntityPropertyExpression(
 			$table,
 			OrmProperty $ormProperty,
 			IExpression $expression
@@ -54,11 +54,11 @@ abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructuriz
 	{
 		Assert::isScalar($table);
 
-		$entityExpressionClass = self::$entityExpressionWorkers[
+		$entityPropertyExpressionClass = self::$entityPropertyExpressionWorkers[
 			$expression->getExpressionType()->getValue()
 		];
 
-		return new $entityExpressionClass(
+		return new $entityPropertyExpressionClass(
 			$table,
 			$ormProperty,
 			$expression

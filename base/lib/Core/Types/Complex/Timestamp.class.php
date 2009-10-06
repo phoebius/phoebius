@@ -86,7 +86,7 @@ final class Timestamp extends Date
 	 */
 	function setTime(Time $time)
 	{
-		$this->import(
+		$this->resolveAssocProperty(
 			mktime(
 				$time->getHour(),
 				$time->getMinute(),
@@ -115,7 +115,7 @@ final class Timestamp extends Date
 
 	protected function import($int)
 	{
-		parent::import($int);
+		parent::resolveAssocProperty($int);
 
 		$this->int = $int;
 		$this->time = new Time($int);

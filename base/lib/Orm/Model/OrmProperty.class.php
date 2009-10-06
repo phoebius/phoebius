@@ -151,14 +151,11 @@ class OrmProperty
 	}
 
 	/**
-	 * @return array of columnName => DbType
+	 * @return array of columnName
 	 */
 	function getDbColumns()
 	{
-		return array_combine(
-			$this->dbColumnNames,
-			array_values($this->type->getDbColumns())
-		);
+		return $this->dbColumnNames;
 	}
 
 	private function autoFillColumnNames()

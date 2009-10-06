@@ -67,6 +67,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	{
 		return DalExpression::andChain()
 			->add(
+				// maps proxy.parent_id<->parent.id as value
 				EntityQuery::create($this->mtm->getProxy())
 					->where(
 						$this->mtm->getContainerProxyProperty(),
@@ -76,15 +77,18 @@ abstract class ManyToManyWorker extends ContainerWorker
 					)
 			)
 			->add(
+				// maps proxy.child_id<->child.id
 				EntityQuery::create($this->mtm->getProxy())
 					->where(
 						$this->mtm->getEncapsulantProxyProperty(),
 						Expression::eq(
-							$this->children->getIdentifier()
+							EntityQuery::create($this->children)
+								->getPropertyClause($this->children->getIdentifier())
 						)
 					)
 			)
 			->add(
+				// additional criterion
 				$this->getExpression()
 			);
 	}
@@ -94,19 +98,31 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	protected function getChildrenIds()
 	{
-		$childrenTableName = $this->childrenMap->getPhysicalSchema()->getDBTableName();
+		$query = EntityQuery::create($this->mtm->getProxy())
+			->where(
+
+			)
+			->andWhere(
+
+			)
+			->andWhere(
+
+			);
+
+
+		$childrenTableName = $this->children->getPhysicalSchema()->getDBTableName();
 
 		$selectQuery = new SelectQuery();
-		$selectQuery->from($this->helperTableName);
+		$selectQuery->from($this->getHelperTableName());
 		$selectQuery->from($childrenTableName);
 		$selectQuery->get(
-			$this->childrenMap->getPhysicalSchema()->getIdentifierFieldName(),
+			$this->children->getPhysicalSchema()->getIdentifierFieldName(),
 			null,
 			$childrenTableName
 		);
 		$selectQuery->setExpression($this->getJoinLogic());
 
-		$rows = $this->childrenDao->getCustomRowsByQuery(
+		$rows = $this->children->getCustomRowsByQuery(
 			$selectQuery
 		);
 
@@ -125,32 +141,18 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	protected function createAssocToChildrenIds(array $children)
 	{
-		$childClass = $this->childrenMap->getLogicalSchema()->getEntityClassName();
+		$proxyDao = $this->mtm->getProxy()->getDao();
 
-		// insert
+		$proxyObjProto = $this->mtm->getProxy()->getLogicalSchema()->getNewEntity();
+		$proxyObjProto->{$this->mtm->getContainerProxyProperty()->getSetter()}($this->parent);
+
+		$childSetter = $this->mtm->getEncapsulantProxyProperty()->getSetter();
+
 		foreach ($children as $child) {
-			$childId =
-				($child instanceof $childClass)
-					? $child->getId()
-					: $child;
+			$proxyObj = clone $proxyObjProto;
+			$proxyObj->{$childSetter}($child);
 
-			$insertQuery =
-				InsertQuery::create($this->getHelperTableName())
-				->addFieldAndValue(
-					$this->getParentFkColumn()->getFieldName(),
-					new ScalarSqlValue($this->parent->getId())
-				)
-				->addFieldAndValue(
-					$this->getChildFkColumn()->getFieldName(),
-					new ScalarSqlValue($childId)
-				);
-
-			try {
-				$this->childrenDao->sendQuery($insertQuery);
-			}
-			catch (UniqueViolationException $e) {
-				//nothin'
-			}
+			$proxyDao->save($proxyObj);
 		}
 	}
 
@@ -162,39 +164,19 @@ abstract class ManyToManyWorker extends ContainerWorker
 	protected function dropAssocByChildrenIds(array $children)
 	{
 		if (!empty($children)) {
-			// cut the ids
-			$deleteIdList = new SqlValueList();
-			$childClass = $this->childrenMap->getLogicalSchema()->getEntityClassName();
-			foreach ($children as $child) {
-				$deleteIdList->add(
-					new ScalarSqlValue(
-						($child instanceof $childClass)
-							? $child->getId()
-							: $child
+			$this->mtm->getProxy()->getDao()->dropBy(
+				EntityQuery::create($this->mtm->getProxy())
+					->where(
+						$this->mtm->getContainerProxyProperty(),
+						Expression::eq($this->parent)
 					)
-				);
-			}
-
-			// create a query
-			$deleteQuery = DeleteQuery::create($this->getHelperTableName())
-				->setLogic(
-					Expression::andBlock()
-						->add(
-							Expression::eq(
-								$this->getParentFkColumn(),
-								new ScalarSqlValue($this->parent->getId())
-							)
+					->where(
+						$this->mtm->getEncapsulantProxyProperty(),
+						Expression::in(
+							$children
 						)
-						->add(
-							Expression::in(
-								$this->getChildFkColumn(),
-								$deleteIdList
-							)
-						)
-				);
-
-			// perform a query against children
-			$this->childrenDao->sendQuery($deleteQuery);
+					)
+			);
 		}
 	}
 }

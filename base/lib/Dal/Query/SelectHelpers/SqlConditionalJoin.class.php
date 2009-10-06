@@ -19,17 +19,19 @@ class SqlConditionalJoin extends SqlJoin
 	/**
 	 * @var IDalExpression
 	 */
-	private $condition;
+	private $expression;
 
 	/**
 	 * @param string $tableName
+	 * @param string|null
 	 * @param SqlJoinMethod $joinMethod
 	 * @param IDalExpression $condition
 	 */
-	function __construct($tableName, SqlJoinMethod $joinMethod, IDalExpression $condition)
+	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, IDalExpression $expression)
 	{
-		parent::__construct($tableName, $joinMethod);
-		$this->condition = $condition;
+		parent::__construct($tableName, $alias, $joinMethod);
+
+		$this->expression = $expression;
 	}
 
 	/**
@@ -42,9 +44,12 @@ class SqlConditionalJoin extends SqlJoin
 
 		$compiledSlices[] = $this->getJoinMethod()->toDialectString($dialect);
 		$compiledSlices[] = $dialect->quoteIdentifier($this->getTableName());
+		if (($alias = $this->getTableAlias())) {
+			$compiledSlices[] = $dialect->quoteIdentifier($alias);
+		}
 		$compiledSlices[] = 'ON';
 		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->condition->toDialectString($dialect);
+		$compiledSlices[] = $this->expression->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);

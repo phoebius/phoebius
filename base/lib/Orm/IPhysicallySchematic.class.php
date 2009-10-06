@@ -23,7 +23,7 @@ interface IPhysicallySchematic
 	function getDBTableName();
 
 	/**
-	 * Array of columnName => DBType
+	 * Array of columnName
 	 * @return array
 	 */
 	function getDbColumns();

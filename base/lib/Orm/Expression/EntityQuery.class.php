@@ -10,23 +10,23 @@
  ************************************************************************************************/
 
 /**
- * $oldEntitySet =
+ * $entitySetQuery =
  * 	EntityQuery::create(MyEntity::orm())
  * 		->where(
  *			'time',
- *			Expression::in(
- *				array(
- *					Date::now()
- *					Date::create()->spawn('-1 day')
- *				)
+ *			Expression::between(
+ *				Date::now()->spawn('-1 day'),
+ *				Date::now()->spawn('+1 day')
  *			)
- * 		)
- * 		->select();
+ * 		);
  *
  * LINQ to OrmEntity
+ * TODO:
+ *  * aggregation functions
+ *  * HAVING clause
  * @ingroup OrmExpression
  */
-final class EntityQuery implements IEntityExpression, IDalExpression
+final class EntityQuery implements ISqlSelectQuery, IDalExpression
 {
 	/**
 	 * @var IQueried
@@ -36,12 +36,52 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	/**
 	 * @var string|null
 	 */
-	private $dbContainer;
+	private $alias;
 
 	/**
-	 * @var array of {@link IEntityExpression}
+	 * @var string|null
+	 */
+	private $table;
+
+	/**
+	 * @var array of propertyName => EntityQuery
+	 */
+	private $joined = array();
+
+	/**
+	 * @var array of {@link IEntityPropertyExpression}
 	 */
 	private $expressionChain = array();
+
+	/**
+	 * @var array
+	 */
+	private $orderBy = array();
+
+	/**
+	 * @var array of ISqlValueExpression
+	 */
+	private $groupByExpressions = array();
+
+	/**
+	 * @var IDalExpression
+	 */
+	private $having;
+
+	/**
+	 * @var integer
+	 */
+	private $limit = 0;
+
+	/**
+	 * @var offset
+	 */
+	private $offset = 0;
+
+	/**
+	 * @var boolean
+	 */
+	private $distinct;
 
 	/**
 	 * @return EntityQuery
@@ -54,11 +94,175 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	function __construct(IQueried $entity, $alias = null)
 	{
 		$this->entity = $entity;
-		$this->dbContainer =
+		$this->table = $entity->getPhysicalSchema()->getDBTableName();
+		$this->alias =
 			$alias
 				? $alias
-				: $entity->getPhysicalSchema()->getDBTableName();
-		$this->expressionChain = new EntityExpressionChain();
+				: $this->table;
+
+		$this->expressionChain = new EntityPropertyExpressionChain();
+	}
+
+	/**
+	 * @return string
+	 */
+	function getAlias()
+	{
+		Return $this->alias;
+	}
+
+	/**
+	 * @return EntityQuery
+	 */
+	function setDistinct()
+	{
+		$this->distinct = true;
+
+		return $this;
+	}
+
+	/**
+	 * Drops ORDERBY list and adds an order expression
+	 * @return EntityQuery an object itself
+	 */
+	function orderBy($property, SqlOrderDirection $direction = null)
+	{
+		$this->dropOrderBy()->andOrderBy($property, $direction);
+
+		return $this;
+	}
+
+	/**
+	 * Adds an order expression
+	 * @return EntityQuery an object itself
+	 */
+	function andOrderBy($property, SqlOrderDirection $direction = null)
+	{
+		foreach ($this->guessEntityProperty($property)->getSqlColumns() as $column) {
+			$this->orderBy[] =
+				new SqlOrderExpression(
+					$column,
+					$direction
+				);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Drops the set of order expressions
+	 * @return EntityQuery an object itself
+	 */
+	function dropOrderBy()
+	{
+		$this->orderBy = array();
+
+		return $this;
+	}
+
+	/**
+	 * Drops grouping schema and adds a grouping element
+	 * @return EntityQuery an object itself
+	 */
+	function groupBy($property)
+	{
+		$this->dropGroupBy()->andGroupBy($property);
+
+		return $this;
+	}
+
+	/**
+	 * Adds a grouping element
+	 * @return EntityQuery an object itself
+	 */
+	function andGroupBy($property)
+	{
+		$this->groupByExpressions =
+			array_merge(
+				$this->groupByExpressions,
+				$this->guessEntityProperty($property)->getSqlColumns()
+			);
+
+		return $this;
+	}
+
+	/**
+	 * Drops a grouping list
+	 * @return EntityQuery an object itself
+	 */
+	function dropGroupBy()
+	{
+		$this->groupByExpressions = array();
+
+		return $this;
+	}
+
+	/**
+	 * Sets a limit for row selection
+	 * @param integer $limit positive integer
+	 * @return EntityQuery an object itself
+	 */
+	function setLimit($limit)
+	{
+		Assert::isPositiveInteger($limit);
+
+		$this->limit = $limit;
+
+		return $this;
+	}
+
+	/**
+	 * Gets the limit for the row selection
+	 * @return integer 0 if limit is not set, otherwise a positive integer
+	 */
+	function getLimit()
+	{
+		return $this->limit;
+	}
+
+	/**
+	 * Drops a row selection limit
+	 * @return EntityQuery an object itself
+	 */
+	function dropLimit()
+	{
+		$this->limit = 0;
+
+		return $this;
+	}
+
+	/**
+	 * Sets the offset for row selection
+	 * @param integer $offset positive integer
+	 * @return EntityQuery
+	 */
+	function setOffset($offset)
+	{
+		Assert::isPositiveInteger($offset);
+
+		$this->offset = $offset;
+
+		return $this;
+	}
+
+	/**
+	 * Gets the offset for the row selection
+	 * @return integet 0 if offset is not set, otherwise a positive integer
+	 */
+	function getOffset()
+	{
+		return $this->offset;
+	}
+
+	/**
+	 * Drops a row selection offset
+	 * @return EntityQuery an object itself
+	 */
+	function dropOffset()
+	{
+		$this->offset = 0;
+
+		return $this;
 	}
 
 	/**
@@ -66,7 +270,7 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	 */
 	function getDbContainer()
 	{
-		return $this->dbContainer;
+		return $this->alias;
 	}
 
 	/**
@@ -78,32 +282,37 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	}
 
 	/**
-	 * @return EntityQuery
-	 */
-	function setAndBlock()
-	{
-		$this->expressionChain->setAndBlock();
-
-		return $this;
-	}
-
-	/**
-	 * @return EntityQuery
-	 */
-	function setOrBlock()
-	{
-		$this->expressionChain->setOrBlock();
-
-		return $this;
-	}
-
-	/**
 	 * Alias for EntityQuery::addExpression()
 	 * @return EntityQuery
 	 */
 	function where($property, IExpression $expression)
 	{
 		$this->addExpression($property, $expression);
+
+		return $this;
+	}
+
+	/*
+	 * @return EntityQuery
+	 */
+	function andWhere($property, IExpression $expression)
+	{
+		$this->resortChain(ExpressionChainPredicate::conditionAnd());
+
+		$this->where($property, $expression);
+
+		return $this;
+	}
+
+	/*
+	 * @return EntityQuery
+	 */
+	function orWhere($property, IExpression $expression)
+	{
+		$this->resortChain(ExpressionChainPredicate::conditionOr());
+
+		$this->where($property, $expression);
+
 		return $this;
 	}
 
@@ -112,7 +321,191 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 	 */
 	function addExpression($property, IExpression $expression)
 	{
+		$ep = $this->guessEntityProperty($property);
+
+		$ep
+			->getEntityQuery()
+			->resortChain(ExpressionChainPredicate::conditionAnd())
+			->add(
+				$this->alias,
+				$ep->getProperty(),
+				$ep->getProperty()->getType()->getEntityPropertyExpression($expression)
+			);
+	}
+
+	/**
+	 * @return EntityExpressionChain
+	 */
+	private function resortChain(ExpressionChainPredicate $ecp)
+	{
+		if ($this->expressionChain->getPredicate()->isNot($ecp)) {
+			$this->expressionChain =
+				EntityExpressionChain::create($ecp)
+					->addEntityExpression($this->expressionChain);
+		}
+
+		return $this->expressionChain;
+	}
+
+	/**
+	 * @return IDalExpression
+	 */
+	function toDalExpression()
+	{
+		return $this->expressionChain->toDalExpression();
+	}
+
+	/**
+	 * @return SelectQuery
+	 */
+	function toSelectQuery()
+	{
+		// FROM
+		// fields
+		// WHERE
+		// GROUP BY
+		// - HAVING
+		// ORDER
+		// LIMIT
+		// OFFSET
+
+		$selectQuery = new SelectQuery;
+
+		$selectQuery->from($this->table, $this->alias);
+
+		$this->fillJoins($selectQuery);
+
+		$selectQuery->setExpression($this->toDalExpression());
+
+		foreach ($this->groupByExpressions as $groupBy) {
+			$selectQuery->andGroupBy($groupBy);
+		}
+
+		foreach ($this->orderBy as $orderBy) {
+			$selectQuery->andOrderBy($orderBy);
+		}
+
+		$selectQuery->setLimit($this->limit);
+		$selectQuery->setOffset($this->offset);
+
+		return $selectQuery;
+	}
+
+	/**
+	 * Casts an object to the SQL dialect string
+	 * @return string
+	 */
+	function toDialectString(IDialect $dialect)
+	{
+		return $this->toSelectQuery()->toDialectString($dialect);
+	}
+
+	/**
+	 * @return array
+	 */
+	function getCastedParameters(IDialect $dialect)
+	{
+		return array();
+	}
+
+	/**
+	 * @return void
+	 */
+	private function fill(SelectQuery $selectQuery)
+	{
+		foreach ($this->entity->getPhysicalSchema()->getDBColumns() as $field) {
+			$selectQuery->get($field, $this->alias);
+		}
+
+		foreach ($this->joined as $entityQuery) {
+			$property = $entityQuery->getProperty();
+			$type = $property->getType();
+
+			Assert::isTrue($type instanceof AssociationPropertyType);
+
+			$joinMethod =
+				$type->getAssociationMultiplicity()->is(
+					AssociationMultiplicity::exactlyOne()
+				)
+					? SqlJoinMethod::INNER // exactlyOne association is strict enough
+					: SqlJoinMethod::LEFT;
+
+			$selectQuery->join(
+				new SqlConditionalJoin(
+					$entityQuery->table,
+					$entityQuery->table == $entityQuery->alias
+						? $entityQuery->alias
+						: null,
+					new SqlJoinMethod($joinMethod),
+					$type->getEntityPropertyExpression(
+						$this->alias,
+						$property,
+						Expresssion::eq(
+							new EntityProperty(
+								$entityQuery,
+								$entityQuery->entity->getLogicalSchema()->getIdentifier()
+							)
+						)
+					)
+				)
+			);
+
+			$entityQuery->fill($selectQuery);
+		}
+	}
+
+	/**
+	 * @return EntityProperty
+	 */
+	private function resolveAssocProperty($property)
+	{
+		$propertyPath = explode('.', $property);
+
+		$propertyName = reset($propertyPath);
+		$property = $this->guessEntityProperty(reset($propertyPath))->getProperty();
+
+		Assert::isTrue(
+			$property->getType() instanceof AssociationPropertyType,
+			'%s::%s property should be of AssociationPropertyType',
+			$this->entity->getLogicalSchema()->getName(),
+			$propertyName
+		);
+
+		$query =
+			isset($this->joined[$propertyName])
+				? $this->joined[$propertyName]
+				: new EntityQuery(
+					$property->getType()->getContainer(),
+					$this->alias . '_' . $propertyName
+				);
+
+		if (sizeof($propertyPath) > 1) {
+			return $query->resolveAssocProperty(join('.', array_slice($propertyPath, 1)));
+		}
+		else {
+			return new EntityProperty($query, $property);
+		}
+	}
+
+	private $entityPropertyCache = array();
+
+	/**
+	 * @return EntityProperty
+	 */
+	private function guessEntityProperty($property)
+	{
 		if (is_scalar($property)) {
+			if (isset($this->entityPropertyCache[$property])) {
+				return $this->entityPropertyCache[$property];
+			}
+
+			if (false !== strpos('.', $property)) {
+				$ep = $this->resolveAssocProperty($property);
+				$this->entityPropertyCache[$property] = $ep;
+
+				return $ep;
+			}
+
 			try {
 				$property = $this->entity->getLogicalSchema()->getProperty($property);
 			}
@@ -126,70 +519,15 @@ final class EntityQuery implements IEntityExpression, IDalExpression
 			}
 		}
 
-		$this->expressionChain->add(
-			$this->dbContainer,
-			$property,
-			$property->getType()->getEntityExpression($expression)
-		);
-	}
-
-	/*
-	 * @return EntityQuery
-	 */
-	function addEntityExpression(IEntityExpression $entityExpression)
-	{
-		$this->expressionChain->add(
-			$entityExpression
+		Assert::isTrue(
+			$property instanceof OrmProperty,
+			'unknwown property'
 		);
 
-		return $this;
-	}
+		$name = $property->getName();
+		$this->entityPropertyCache[$name] = new EntityProperty($this, $property);
 
-	/**
-	 * @return EntityExpressionChain
-	 */
-	function spawnOrBlock()
-	{
-		$orBlock = new EntityExpressionChain(ExpressionChainPredicate::conditionOr());
-		$this->expressionChain->add($orBlock);
-
-		return $orBlock;
-	}
-
-	/**
-	 * @return EntityExpressionChain
-	 */
-	function spawnAndBlock()
-	{
-		$andBlock = new EntityExpressionChain(ExpressionChainPredicate::conditionAnd());
-		$this->expressionChain->add($andBlock);
-
-		return $andBlock;
-	}
-
-	/**
-	 * @return IDalExpression
-	 */
-	function toDalExpression()
-	{
-		return $this->expressionChain->toDalExpression();
-	}
-
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
-	function toDialectString(IDialect $dialect)
-	{
-		return $this->toDalExpression()->toDialectString($dialect);
-	}
-
-	/**
-	 * @return array of OrmEntity
-	 */
-	function select()
-	{
-		return $this->entity->getDao()->getCustomBy($this->toExpression());
+		return $this->entityPropertyCache[$name];
 	}
 }
 

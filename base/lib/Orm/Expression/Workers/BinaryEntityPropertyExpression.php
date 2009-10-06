@@ -10,12 +10,13 @@
  ************************************************************************************************/
 
 /**
- * Represents a unary prefix expression
+ * FIXME: reimplement this class to support multi-field properties
+ * Represents binary expression
  * @ingroup OrmExpression
  */
-class PrefixUnaryEntityExpression extends SingleRowEntityExpression
+class BinaryEntityPropertyExpression extends SingleRowEntityPropertyExpression
 {
-	function __construct($table, OrmProperty $property, PrefixUnaryExpression $expression)
+	function __construct($table, OrmProperty $property, BinaryExpression $expression)
 	{
 		parent::__construct($table, $property, $expression);
 	}
@@ -25,10 +26,11 @@ class PrefixUnaryEntityExpression extends SingleRowEntityExpression
 	 */
 	function toDalExpression()
 	{
-		return new PrefixUnaryDalExpression(
-			new PrefixUnaryExpression(
+		return new BinaryDalExpression(
+			$this->getSqlColumn(),
+			new BinaryExpression(
 				$this->getExpression()->getPredicate(),
-				$this->getSqlColumn()
+				$this->getSqlValue($this->getExpression()->getValue())
 			)
 		);
 	}

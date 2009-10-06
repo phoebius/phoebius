@@ -45,7 +45,7 @@ class OneToManyFullWorker extends OneToManyWorker
 	 */
 	function getList()
 	{
-		return $this->children->getDao()->getCustomBy($this->getParentsChildrenExpression());
+		return $this->children->getDao()->getListBy($this->getParentsChildrenExpression());
 	}
 }
 

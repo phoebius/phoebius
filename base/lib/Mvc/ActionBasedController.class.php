@@ -312,7 +312,7 @@ abstract class ActionBasedController extends Controller
 									$rawValueSet = array();
 
 									foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-										foreach ($property->getDbColumns() as $columnName => $dbType) {
+										foreach ($property->getDbColumns() as $columnName) {
 											if (array_key_exists($columnName, $argument)) {
 												$rawValueSet[$propertyName][] = $argument[$columnName];
 											}

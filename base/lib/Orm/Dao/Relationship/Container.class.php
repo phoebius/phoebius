@@ -209,7 +209,7 @@ abstract class Container implements IteratorAggregate
 		$ids = $insert = $delete = $update = array();
 
 		foreach ($this->list as $object) {
-			$id = $object->getId();
+			$id = $object->_getId();
 			if (!$id || !isset($clones[$id])) {
 				$insert[] = $object;
 			}

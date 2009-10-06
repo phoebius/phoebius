@@ -21,7 +21,9 @@ interface ISqlSelectQuery extends ISqlQuery
 	 * @param integer $limit positive integer
 	 * @return SelectQuery an object itself
 	 */
-//	function setLimit($limit);
+	function setLimit($limit);
+	function setOffset($offset);
+
 }
 
 ?>

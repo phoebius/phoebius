@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmExpression
  */
-final class EntityExpressionChain implements IEntityExpression
+final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 {
 	/**
 	 * @var ExpressionChainPredicate
@@ -41,6 +41,14 @@ final class EntityExpressionChain implements IEntityExpression
 	}
 
 	/**
+	 * @return ExpressionChainPredicate
+	 */
+	function getPredicate()
+	{
+		return $this->expressionChainPredicate;
+	}
+
+	/**
 	 * @return EntityExpressionChain
 	 */
 	function setAndBlock()
@@ -60,7 +68,7 @@ final class EntityExpressionChain implements IEntityExpression
 		return $this;
 	}
 
-	function add(IEntityExpression $entityExpression)
+	function add(IEntityPropertyExpression $entityExpression)
 	{
 		$this->children[] = $entityExpression;
 

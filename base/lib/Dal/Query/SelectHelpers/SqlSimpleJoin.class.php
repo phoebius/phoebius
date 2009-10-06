@@ -23,13 +23,15 @@ class SqlSimpleJoin extends SqlJoin
 
 	/**
 	 * @param string $tableName
+	 * @param string|null
 	 * @param SqlJoinMethod $joinMethod
 	 * @param SqlFieldList $identicalColumns set of column names that should be used in joining
 	 */
-	function __construct($tableName, SqlJoinMethod $joinMethod, SqlFieldList $identicalColumns)
+	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, SqlFieldList $identicalColumns)
 	{
-		parent::__construct($tableName, $joinMethod);
 		$this->identicalColumns = $identicalColumns;
+
+		parent::__construct($tableName, $alias, $joinMethod);
 	}
 
 	/**
@@ -42,6 +44,9 @@ class SqlSimpleJoin extends SqlJoin
 
 		$compiledSlices[] = $this->getJoinMethod()->toDialectString($dialect);
 		$compiledSlices[] = $dialect->quoteIdentifier($this->getTableName());
+		if (($alias = $this->getTableAlias())) {
+			$compiledSlices[] = $dialect->quoteIdentifier($alias);
+		}
 		$compiledSlices[] = 'USING';
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->identicalColumns->toDialectString($dialect);

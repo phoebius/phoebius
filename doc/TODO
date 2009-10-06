@@ -3,6 +3,16 @@
 
   Copyright notice
  ================================================================================================
+
+Logging
+=======
+Centralized pool of loggers (system logger, subsystem loggers)
+LoggerPool::setAppLogger(new SysLogWorker());
+LoggerPool::setPackageLogger(new FileLogWorker());
+
+LoggerPool::getAppLogger()->log(...)
+LoggerPool::getPackageLogger('Forms')->log(...)
+
  
 Dao/Cache
 =========

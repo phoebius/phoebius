@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmExpression
  */
-interface IEntityExpression
+interface IEntityPropertyExpression
 {
 	/**
 	 * @return IDalExpression
