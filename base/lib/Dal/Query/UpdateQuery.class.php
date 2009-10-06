@@ -28,7 +28,7 @@ class UpdateQuery implements ISqlQuery
 	/**
 	 * @var IDalExpression
 	 */
-	private $condition;
+	private $entityQuery;
 
 	/**
 	 * Creates an instance of {@link UpdateQuery}
@@ -95,7 +95,7 @@ class UpdateQuery implements ISqlQuery
 	 */
 	function setExpression(IDalExpression $logic)
 	{
-		$this->condition = $logic;
+		$this->entityQuery = $logic;
 
 		return $this;
 	}
@@ -106,7 +106,7 @@ class UpdateQuery implements ISqlQuery
 	 */
 	function getExpression()
 	{
-		return $this->condition;
+		return $this->entityQuery;
 	}
 
 	/**
@@ -123,9 +123,9 @@ class UpdateQuery implements ISqlQuery
 		$querySlices[] = 'SET';
 		$querySlices[] = $this->fields->toDialectString($dialect);
 
-		if ($this->condition) {
+		if ($this->entityQuery) {
 			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->condition->toDialectString($dialect);
+			$querySlices[] = $this->entityQuery->toDialectString($dialect);
 		}
 
 		$compiledQuery = join(' ', $querySlices);

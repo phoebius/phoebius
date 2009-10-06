@@ -23,7 +23,7 @@ class DeleteQuery implements ISqlQuery
 	/**
 	 * @var IDalExpression
 	 */
-	private $condition;
+	private $entityQuery;
 
 	/**
 	 * Creates an instance of {@link DeleteQuery}
@@ -52,7 +52,7 @@ class DeleteQuery implements ISqlQuery
 	 */
 	function setExpression(IDalExpression $expression = null)
 	{
-		$this->condition = $expression;
+		$this->entityQuery = $expression;
 
 		return $this;
 	}
@@ -63,7 +63,7 @@ class DeleteQuery implements ISqlQuery
 	 */
 	function getExpression()
 	{
-		return $this->condition;
+		return $this->entityQuery;
 	}
 
 	/**
@@ -86,9 +86,9 @@ class DeleteQuery implements ISqlQuery
 		$querySlices[] = 'DELETE FROM';
 		$querySlices[] = $dialect->quoteIdentifier($this->tableName);
 
-		if ($this->condition) {
+		if ($this->entityQuery) {
 			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->condition->toDialectString($dialect);
+			$querySlices[] = $this->entityQuery->toDialectString($dialect);
 		}
 
 		$compiledQuery = join(' ', $querySlices);

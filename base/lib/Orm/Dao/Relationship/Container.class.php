@@ -20,11 +20,6 @@ abstract class Container implements IteratorAggregate
 	private $worker;
 
 	/**
-	 * @var IDalExpression|null
-	 */
-	private $condition = null;
-
-	/**
 	 * @var IdentifiableOrmEntity
 	 */
 	private $parent;
@@ -34,11 +29,10 @@ abstract class Container implements IteratorAggregate
 	 */
 	private $children;
 
-
 	/**
-	 * @var IOrmEntityAccessor
+	 * @var EntityQuery|null
 	 */
-	private $childrenDao;
+	private $entityQuery = null;
 
 	/**
 	 * Supresses changes in list to avoid useless memory usage
@@ -57,11 +51,6 @@ abstract class Container implements IteratorAggregate
 	private $list = array();
 
 	/**
-	 * @var array
-	 */
-	private $fetchedObjectClones = array();
-
-	/**
 	 * Readonly affects save() method only
 	 */
 	function __construct(
@@ -78,7 +67,6 @@ abstract class Container implements IteratorAggregate
 
 		$this->parent = $parent;
 		$this->children = $children;
-		$this->childrenDao = $children->getDao();
 	}
 
 	/**
@@ -128,19 +116,19 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @return Container an object itself
 	 */
-	function setExpression(IDalExpression $condition = null)
+	final function setEntityQuery(EntityQuery $entityQuery = null)
 	{
-		$this->condition = $condition;
+		$this->getWorker()->setEntityQuery($entityQuery);
 
 		return $this;
 	}
 
 	/**
-	 * @return IDalExpression|null
+	 * @return EntityQuery|null
 	 */
-	function getExpression()
+	function getEntityQuery()
 	{
-		return $this->condition;
+		return $this->getWorker()->getEntityQuery();
 	}
 
 	/**
@@ -157,7 +145,7 @@ abstract class Container implements IteratorAggregate
 	function getCount()
 	{
 		if (!$this->isFetched()) {
-			return $this->worker->getCount();
+			return $this->getWorker()->getCount();
 		}
 
 		return count($this->list);
@@ -176,13 +164,9 @@ abstract class Container implements IteratorAggregate
 	 */
 	function fetch()
 	{
-		$set = $this->worker->getList();
+		$list = $this->getWorker()->getList();
 
-		$this->mergeList($set);
-
-		if (!$this->readOnly) {
-			$this->makeClones();
-		}
+		$this->mergeList($list);
 
 		$this->isFetched = true;
 
@@ -244,30 +228,30 @@ abstract class Container implements IteratorAggregate
 	function setList(array $list)
 	{
 		$this->list = $list;
-
 		$this->isFetched = true;
 
 		return $this;
 	}
 
 	/**
+	 * Just cleans fetched list
 	 * @return Container an object itself
 	 */
 	function clean()
 	{
-		$this->list = $this->fetchedObjectClones = array();
-
+		$this->list = array();
 		$this->isFetched = false;
 
 		return $this;
 	}
 
 	/**
+	 * Drops the entire set of associations
 	 * @return integer number of deleted rows
 	 */
 	function dropList()
 	{
-		$number = $this->worker->dropList();
+		$number = $this->getWorker()->dropList();
 
 		$this->clean();
 
@@ -285,6 +269,8 @@ abstract class Container implements IteratorAggregate
 
 		$this->isFetched = true;
 
+		$this->list = array_unique($this->list);
+
 		return $this;
 	}
 
@@ -293,30 +279,11 @@ abstract class Container implements IteratorAggregate
 	 */
 	function getList()
 	{
-		if (empty($this->list) && !$this->isFetched()) {
+		if (empty($this->list) && !$this->isFetched) {
 			$this->fetch();
 		}
 
 		return $this->list;
-	}
-
-	/**
-	 * @return Container an object itself
-	 */
-	private function makeClones()
-	{
-		// bogus check
-		if ($this->readOnly) {
-			return $this;
-		}
-
-		foreach ($this->list as $object) {
-			if (($id = $object->getId())) {
-				$this->fetchedObjectClones[$id] = clone $object;
-			}
-		}
-
-		return $this;
 	}
 }
 

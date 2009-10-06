@@ -20,14 +20,14 @@ class OrmIdentityMap
 	private $identityMap = array();
 
 	/**
+	 * @var array of scalarId => id
+	 */
+	private $idList = array();
+
+	/**
 	 * @var OrmProperty
 	 */
 	private $identifier;
-
-	/**
-	 * @var string
-	 */
-	private $identifierSetter;
 
 	/**
 	 * @var IdentifiableOrmEntity
@@ -39,29 +39,32 @@ class OrmIdentityMap
 		$identifier = $logicalSchema->getIdentifier();
 
 		if (!$identifier) {
-			throw new OrmModelIntegrityException('IdentityMapOrmDao is for identifierable entities only');
+			throw new OrmModelIntegrityException(
+				'IdentityMapOrmDao is for identifierable entities only'
+			);
 		}
 
 		if ($identifier->getVisibility()->isNot(OrmPropertyVisibility::FULL)) {
-			throw new OrmModelIntegrityException('identifier property should have FULL access level');
+			throw new OrmModelIntegrityException(
+				'identifier property should have FULL access level'
+			);
 		}
 
 		$this->stubObject = $logicalSchema->getNewEntity();
 
 		Assert::isTrue(
 			$this->stubObject instanceof IdentifiableOrmEntity,
-			'%s should populate entities that extend IdentifiableOrmEntity',
+			'%s should implement IdentifiableOrmEntity',
 			$logicalSchema->getEntityName()
 		);
 
 		$this->identifier = $identifier;
-		$this->identifierSetter = $identifier->getSetter();
 	}
 
 	/**
 	 * @return IdentifiableOrmEntity
 	 */
-	function getLazyFromIdentityMap($id)
+	function getLazy($id)
 	{
 		$scalarId = $this->getScalarId($id);
 
@@ -70,15 +73,16 @@ class OrmIdentityMap
 			$entity->_setId($id);
 
 			$this->identityMap[$scalarId] = $entity;
+			$this->idList[$scalarId] = $id;
 		}
 
-		return $this->identityMap[$this->getScalarId($scalarId)];
+		return $this->identityMap[$scalarId];
 	}
 
 	/**
 	 * @return boolean
 	 */
-	function isInIdentityMap($id)
+	function has($id)
 	{
 		$scalarId = $this->getScalarId($id);
 
@@ -88,11 +92,12 @@ class OrmIdentityMap
 	/**
 	 * @return OrmIdentityMap
 	 */
-	function dropFromIdentityMap($id)
+	function drop($id)
 	{
 		$scalarId = $this->getScalarId($id);
 
 		unset ($this->identityMap[$scalarId]);
+		unset ($this->idList[$scalarId]);
 
 		return $this;
 	}
@@ -100,9 +105,10 @@ class OrmIdentityMap
 	/**
 	 * @return OrmIdentityMap
 	 */
-	function dropIdentityMap()
+	function clean()
 	{
 		$this->identityMap = array();
+		$this->idList = array();
 
 		return $this;
 	}
@@ -110,7 +116,7 @@ class OrmIdentityMap
 	/**
 	 * @return IdentifiableOrmEntity|null
 	 */
-	function getFromIdentityMap($id)
+	function get($id)
 	{
 		$scalarId = $this->getScalarId($id);
 
@@ -123,16 +129,56 @@ class OrmIdentityMap
 	/**
 	 * @return OrmIdentityMap
 	 */
-	function addToIdentityMap(IdentifiableOrmEntity $entity)
+	function add(IdentifiableOrmEntity $entity)
 	{
-		$scalarId = $this->getScalarId($entity->getId());
+		Assert::isTrue(is_subclass_of($entity, get_class($this->stubObject)));
+
+		$id = $entity->_getId();
+
+		$scalarId = $this->getScalarId($id);
 
 		$this->identityMap[$scalarId] = $entity;
+		$this->idList[$scalarId] = $id;
 
 		return $this;
 	}
 
 	/**
+	 * @return array of id => IdentifiableOrmEntity
+	 */
+	function getList()
+	{
+		return $this->identityMap;
+	}
+
+	/**
+	 *
+	 * @return unknown_type
+	 */
+	function getIds()
+	{
+		return $this->idList;
+	}
+
+	/**
+	 * @return OrmIdentityMap
+	 */
+	function addList(array $list)
+	{
+		foreach ($list as $object) {
+			$this->add($object);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Actually, this method is not needed because we can use implicit mapping:
+	 * $this->identityMap[(string)$id] = $entity;
+	 *
+	 * That is because comppsite ids implement IIdentifierMappable::__toString();
+	 *
+	 * But right now this method is used to check this explicitly.
 	 * @return string
 	 */
 	private function getScalarId($id)

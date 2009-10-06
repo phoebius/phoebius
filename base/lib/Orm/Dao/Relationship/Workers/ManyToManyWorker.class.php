@@ -51,7 +51,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 	 */
 	protected function getChildrenIds()
 	{
-		$query = EntityQuery::create($this->mtm->getProxy())
+		$entityQuery = EntityQuery::create($this->mtm->getProxy())
 			->where(
 				// maps proxy.parent_id<->parent.id as value
 				$this->mtm->getContainerProxyProperty(),
@@ -68,17 +68,18 @@ abstract class ManyToManyWorker extends ContainerWorker
 				)
 			);
 
-		if (($entityQuery = $this->getEntityQuery())) {
-			$query
-				->using($this->mtm->getEncapsulantProxyProperty(), $entityQuery->getAlias())
-				->andWhere($entityQuery);
+		if (($limitedEntityQuery = $this->getEntityQuery())) {
+			$entityQuery->merge(
+				$this->mtm->getEncapsulantProxyProperty(),
+				$limitedEntityQuery
+			);
 		}
 
 		$childGetter = $this->mtm->getEncapsulantProxyProperty()->getGetter();
 
 		$ids = array();
 
-		foreach ($query->getList() as $object) {
+		foreach ($entityQuery->getList() as $object) {
 			$ids[] = $object->{$childGetter}();
 		}
 

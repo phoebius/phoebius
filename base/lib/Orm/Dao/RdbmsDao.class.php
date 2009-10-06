@@ -102,7 +102,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
 
-		$entity = $this->identityMap->getLazyFromIdentityMap($id);
+		$entity = $this->identityMap->getLazy($id);
 
 		// Avoid replace this code with $entity->fetch() because IdentifiableOrmEntity::fetch()
 		// calls RdbmsDao::getById() to be filled with data
@@ -138,7 +138,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
 
-		return $this->identityMap->getLazyFromIdentityMap($id);
+		return $this->identityMap->getLazy($id);
 	}
 
 	/**
@@ -155,7 +155,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$toFetchIds = array();
 
 		foreach ($ids as $id) {
-			$entity = $this->identityMap->getLazyFromIdentityMap($id);
+			$entity = $this->identityMap->getLazy($id);
 
 			if (OrmUtils::isFetchedEntity($entity)) {
 				$fetched[] = $entity;
@@ -187,7 +187,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			// if there were some ID collisions - we should remove them from identityMap
 			if (!empty($toFetch)) {
 				foreach ($toFetch as $entity) {
-					$this->identityMap->dropFromIdentityMap($entity->_getId());
+					$this->identityMap->drop($entity->_getId());
 				}
 			}
 		}
@@ -269,7 +269,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$this->map->setRawValues($entity, $rawValueSet, $this->getFetchStrategy());
 
 		if ($this->identityMap) {
-			$this->identityMap->addToIdentityMap($entity);
+			$this->identityMap->add($entity);
 		}
 
 		return $entity;
@@ -342,7 +342,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				)
 		);
 
-		$this->identityMap->dropFromIdentityMap($id);
+		$this->identityMap->drop($id);
 
 		Assert::isTrue(($affected == 0) || ($affected == 1));
 
@@ -360,7 +360,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		foreach ($ids as $id) {
 
-			$this->identityMap->dropFromIdentityMap($id);
+			$this->identityMap->drop($id);
 
 			$expression->add(
 				$this->identitifier,
@@ -389,7 +389,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		);
 
 		if ($this->identityMap && $affected > 0) {
-			$this->identityMap->dropIdentityMap();
+			$this->identityMap->clean();
 		}
 
 		return $affected;
@@ -513,7 +513,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		if ($this->identityMap) {
-			$this->identityMap->addToIdentityMap($entity);
+			$this->identityMap->add($entity);
 		}
 
 		return $entity;

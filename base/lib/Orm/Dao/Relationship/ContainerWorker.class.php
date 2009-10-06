@@ -20,14 +20,14 @@ abstract class ContainerWorker
 	protected $parent;
 
 	/**
+	 * @var IQueried
+	 */
+	protected $children;
+
+	/**
 	 * @var EntityQuery|null
 	 */
 	private $entityQuery = null;
-
-	/**
-	 * @var OrmClass
-	 */
-	protected $children;
 
 	/**
 	 * @return void
@@ -43,6 +43,11 @@ abstract class ContainerWorker
 	 * @return integer
 	 */
 	abstract function dropList();
+
+	/**
+	 * @return integer
+	 */
+	abstract function getCount();
 
 	function __construct(IdentifiableOrmEntity $parent, IQueried $children)
 	{

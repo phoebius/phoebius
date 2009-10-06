@@ -34,7 +34,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	/**
 	 * @var IDalExpression|null
 	 */
-	private $condition;
+	private $entityQuery;
 
 	/**
 	 * @var SqlOrderChain
@@ -96,7 +96,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 */
 	function setExpression(IDalExpression $logic)
 	{
-		$this->condition = $logic;
+		$this->entityQuery = $logic;
 
 		return $this;
 	}
@@ -107,7 +107,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 */
 	function getExpression()
 	{
-		return $this->condition;
+		return $this->entityQuery;
 	}
 
 	/**
@@ -352,9 +352,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		$querySlices[] = $this->compileTargets($dialect);
 
 		// WHERE
-		if ($this->condition && !($this->condition instanceof NullExpression)) {
+		if ($this->entityQuery && !($this->entityQuery instanceof NullExpression)) {
 			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->condition->toDialectString($dialect);
+			$querySlices[] = $this->entityQuery->toDialectString($dialect);
 		}
 
 		// GROUP BY

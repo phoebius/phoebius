@@ -339,6 +339,32 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	}
 
 	/**
+	 * @return EntityPropertyExpressionChain
+	 */
+	function getEntityPropertyExpressionChain()
+	{
+		return $this->expressionChain;
+	}
+
+	/**
+	 * @return EntityQuery
+	 */
+	function merge($property, EntityQuery $entityQuery)
+	{
+		$ep = $this->guessEntityProperty($property);
+
+		if ($entityQuery->alias && $entityQuery->alias != $entityQuery->table) {
+			$ep->getEntityQuery()->alias = $entityQuery;
+		}
+
+		$this
+			->resortChain(ExpressionChainPredicate::conditionAnd())
+			->add($entityQuery->expressionChain);
+
+		return $this;
+	}
+
+	/**
 	 * @return EntityQuery
 	 */
 	function using($property, $alias = null)
