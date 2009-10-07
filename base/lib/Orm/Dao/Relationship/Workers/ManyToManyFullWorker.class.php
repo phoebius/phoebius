@@ -36,9 +36,21 @@ class ManyToManyFullWorker extends ManyToManyWorker
 	 */
 	function getList()
 	{
+		// FIXME: make single JOIN query instead of two
+		// to do this we need to expand EntityQuery with projections and
+		// expliciting setting of entity Type to fetch
 		return $this->children->getDao()->getByIds(
 			$this->getChildrenIds()
 		);
+	}
+
+	/**
+	 * @return int
+	 * @see Dao/Relationship/ContainerWorker#getCount()
+	 */
+	function getCount()
+	{
+		return sizeof($this->getChildrenIds());
 	}
 }
 
