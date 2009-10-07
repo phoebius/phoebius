@@ -45,7 +45,9 @@ class BinaryDalExpression implements IDalExpression
 	{
 		$compiledSlices = array();
 
+		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->field->toDialectString($dialect);
+		$compiledSlices[] = ')';
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->value->toDialectString($dialect);

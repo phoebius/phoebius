@@ -13,7 +13,7 @@
  * Represents a unary prefix expression
  * @ingroup BaseExpression
  */
-final class PrefixUnaryExpression implements IExpression
+class PrefixUnaryExpression implements IExpression
 {
 	/**
 	 * @var mixed
@@ -45,6 +45,25 @@ final class PrefixUnaryExpression implements IExpression
 	function getPredicate()
 	{
 		return $this->logic;
+	}
+
+	/**
+	 * @return PrefixUnaryExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		return new self(
+			$this->logic,
+			$converter->convert($this->subject, $this)
+		);
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new PrefixUnaryDalExpression($this);
 	}
 
 	/**

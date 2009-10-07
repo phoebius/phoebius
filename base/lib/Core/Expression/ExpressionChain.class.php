@@ -1,0 +1,90 @@
+<?php
+/* ***********************************************************************************************
+ *
+ * Phoebius Framework
+ *
+ * **********************************************************************************************
+ *
+ * Copyright notice
+ *
+ ************************************************************************************************/
+
+/**
+ * Represents an expression chain
+ * @ingroup DalExpression
+ */
+class ExpressionChain implements IExpression
+{
+	/**
+	 * @var ExpressionChainPredicate
+	 */
+	private $predicate;
+
+	/**
+	 * @var array
+	 */
+	private $chain = array();
+
+	function __construct(ExpressionChainPredicate $predicate)
+	{
+		$this->predicate = $predicate;
+	}
+
+	/**
+	 * Adds the expression to the expression chain
+	 * @return DalExpressionChain
+	 */
+	function add(IExpression $expression)
+	{
+		$this->chain[] = $expression;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	function isEmpty()
+	{
+		return empty($this->chain);
+	}
+
+	/**
+	 * @return ExpressionChainPredicate
+	 */
+	function getPredicate()
+	{
+		return $this->predicate;
+	}
+
+	/**
+	 * @return array
+	 */
+	function getChain()
+	{
+		return $this->chain;
+	}
+
+	/**
+	 * @return BinaryExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		$newChain = new self;
+		foreach ($this->chain as $item) {
+			$newChain->chain[] = $item->convert($converter);
+		}
+
+		return $newChain;
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new DalExpressionChain($this);
+	}
+}
+
+?>

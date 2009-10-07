@@ -13,7 +13,7 @@
  * Represents a postfix unary expression
  * @ingroup BaseExpression
  */
-final class UnaryPostfixExpression implements IExpression
+class UnaryPostfixExpression implements IExpression
 {
 	/**
 	 * @var mixed
@@ -45,6 +45,25 @@ final class UnaryPostfixExpression implements IExpression
 	function getPredicate()
 	{
 		return $this->logic;
+	}
+
+	/**
+	 * @return UnaryPostfixExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		return new self(
+			$converter->convert($this->subject, $this),
+			$this->logic
+		);
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new UnaryPostfixDalExpression($this);
 	}
 
 	/**

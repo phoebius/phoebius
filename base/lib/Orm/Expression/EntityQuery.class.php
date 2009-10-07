@@ -29,7 +29,7 @@
  *  * distinct
  *  * projections
  *  * abilty to fetch entity of any other type (not only of type specified in ctor)
- *  * guessEntityProperty() should accept aliased in property path
+ *  * geEntityProperty() should accept aliased in property path
  *
  * @ingroup OrmExpression
  */
@@ -150,7 +150,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	function andOrderBy($property, SqlOrderDirection $direction = null)
 	{
-		foreach ($this->guessEntityProperty($property)->getSqlColumns() as $column) {
+		foreach ($this->getEntityProperty($property)->getSqlColumns() as $column) {
 			$this->orderBy[] =
 				new SqlOrderExpression(
 					$column,
@@ -192,7 +192,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 		$this->groupByExpressions =
 			array_merge(
 				$this->groupByExpressions,
-				$this->guessEntityProperty($property)->getSqlColumns()
+				$this->getEntityProperty($property)->getSqlColumns()
 			);
 
 		return $this;
@@ -278,14 +278,6 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	}
 
 	/**
-	 * @return string
-	 */
-	function getDbContainer()
-	{
-		return $this->alias;
-	}
-
-	/**
 	 * @return IQueried
 	 */
 	function getEntity()
@@ -333,7 +325,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	function addExpression($property, IExpression $expression)
 	{
-		$ep = $this->guessEntityProperty($property);
+		$ep = $this->getEntityProperty($property);
 
 		$ep
 			->getEntityQuery()
@@ -358,7 +350,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	function merge($property, EntityQuery $entityQuery)
 	{
-		$ep = $this->guessEntityProperty($property);
+		$ep = $this->getEntityProperty($property);
 
 		if ($entityQuery->alias && $entityQuery->alias != $entityQuery->table) {
 			$ep->getEntityQuery()->alias = $entityQuery;
@@ -376,27 +368,13 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	function using($property, $alias = null)
 	{
-		$ep = $this->guessEntityProperty($property);
+		$ep = $this->getEntityProperty($property);
 
 		if ($alias) {
 			$ep->getEntityQuery()->alias = $alias;
 		}
 
 		return $this;
-	}
-
-	/**
-	 * @return EntityExpressionChain
-	 */
-	private function resortChain(ExpressionChainPredicate $ecp)
-	{
-		if ($this->expressionChain->getPredicate()->isNot($ecp)) {
-			$this->expressionChain =
-				EntityExpressionChain::create($ecp)
-					->addEntityExpression($this->expressionChain);
-		}
-
-		return $this->expressionChain;
 	}
 
 	/**
@@ -413,7 +391,9 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	function toSelectQuery()
 	{
 		// FROM
+		// - distinct
 		// fields
+		// - projections
 		// WHERE
 		// GROUP BY
 		// - HAVING
@@ -473,6 +453,20 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	}
 
 	/**
+	 * @return EntityExpressionChain
+	 */
+	private function resortChain(ExpressionChainPredicate $ecp)
+	{
+		if ($this->expressionChain->getPredicate()->isNot($ecp)) {
+			$this->expressionChain =
+				EntityExpressionChain::create($ecp)
+					->addEntityExpression($this->expressionChain);
+		}
+
+		return $this->expressionChain;
+	}
+
+	/**
 	 * @return void
 	 */
 	private function fill(SelectQuery $selectQuery)
@@ -517,12 +511,12 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	/**
 	 * @return EntityProperty
 	 */
-	private function resolveAssocProperty($property)
+	private function guessEntityProperty($propertyPath)
 	{
-		$propertyPath = explode('.', $property);
+		$propertyPath = explode('.', $propertyPath);
 
 		$propertyName = reset($propertyPath);
-		$property = $this->guessEntityProperty(reset($propertyPath))->getProperty();
+		$property = $this->getEntityProperty(reset($propertyPath))->getProperty();
 
 		Assert::isTrue(
 			$property->getType() instanceof AssociationPropertyType,
@@ -542,17 +536,17 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 				);
 
 		if (sizeof($propertyPath) > 1) {
-			return $query->resolveAssocProperty(join('.', array_slice($propertyPath, 1)));
+			return $query->guessEntityProperty(join('.', array_slice($propertyPath, 1)));
 		}
 		else {
-			return new EntityProperty($query, $property);
+			return $this->getEntityProperty($property);
 		}
 	}
 
 	/**
 	 * @return EntityProperty
 	 */
-	private function guessEntityProperty($property)
+	private function getEntityProperty($property)
 	{
 		if (is_scalar($property)) {
 			if (isset($this->entityPropertyCache[$property])) {
@@ -561,7 +555,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 
 			if (false !== strpos('.', $property)) {
 				$ep = $this->resolveAssocProperty($property);
-				$this->entityPropertyCache[$property] = $ep;
+				$this->guessEntityProperty[$property] = $ep;
 
 				return $ep;
 			}
@@ -580,7 +574,10 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 		}
 
 		Assert::isTrue(
-			$property instanceof OrmProperty,
+			$property instanceof OrmProperty
+			&& $this->entity->getLogicalSchema()->getProperty(
+				$property->getName()
+			),
 			'unknwown property'
 		);
 

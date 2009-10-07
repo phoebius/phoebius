@@ -34,7 +34,7 @@ class BetweenRangeDalExpression implements IDalExpression
 	{
 		$this->field = $expression->getSubject();
 		$this->to = $expression->getTo();
-		$this->from= $expression->getFrom();
+		$this->from = $expression->getFrom();
 	}
 
 	/**

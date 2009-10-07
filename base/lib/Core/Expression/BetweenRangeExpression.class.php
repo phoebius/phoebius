@@ -13,7 +13,7 @@
  * Represents an range expression
  * @ingroup BaseExpression
  */
-final class BetweenRangeExpression implements IExpression
+class BetweenRangeExpression implements IExpression
 {
 	/**
 	 * @var mixed
@@ -59,6 +59,26 @@ final class BetweenRangeExpression implements IExpression
 	function getTo()
 	{
 		return $this->to;
+	}
+
+	/**
+	 * @return BetweenRangeExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		return new self(
+			$converter->convert($this->subject, $this),
+			$converter->convert($this->from, $this),
+			$converter->convert($this->to, $this)
+		);
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new BetweenRangeDalExpression($this);
 	}
 
 	/**

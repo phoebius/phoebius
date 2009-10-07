@@ -16,37 +16,13 @@
 class DalExpressionChain implements IDalExpression
 {
 	/**
-	 * @var DalExpressionChainPredicate
+	 * @var ExpressionChain
 	 */
-	private $predicate;
+	private $expressionChain;
 
-	/**
-	 * @var array
-	 */
-	private $chain = array();
-
-	function __construct(ExpressionChainPredicate $predicate)
+	function __construct(ExpressionChain $expressionChain)
 	{
-		$this->predicate = $predicate;
-	}
-
-	/**
-	 * Adds the expression to the expression chain
-	 * @return DalExpressionChain
-	 */
-	function add(IDalExpression $expression)
-	{
-		$this->chain[] = $expression;
-
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function isEmpty()
-	{
-		return empty($this->chain);
+		$this->expressionChain = $expressionChain;
 	}
 
 	/**
@@ -70,15 +46,11 @@ class DalExpressionChain implements IDalExpression
 
 			$out = join($this->predicate->toDialectString($dialect), $slices);
 
-			if (sizeof($slices) == 1) {
-				return $out;
-			}
-
-			return ' ( ' . $out . ' ) ';
+			return $out;
 		}
 
 		//nothin'
-		return null;
+		return '';
 	}
 }
 

@@ -13,7 +13,7 @@
  * Represents binary expression
  * @ingroup BaseExpression
  */
-final class BinaryExpression implements IExpression
+class BinaryExpression implements IExpression
 {
 	/**
 	 * @var mixed
@@ -59,6 +59,26 @@ final class BinaryExpression implements IExpression
 	function getPredicate()
 	{
 		return $this->logic;
+	}
+
+	/**
+	 * @return BinaryExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		return new self(
+			$converter->convert($this->subject, $this),
+			$this->logic,
+			$converter->convert($this->value, $this)
+		);
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new BinaryDalExpression($this);
 	}
 
 	/**

@@ -12,23 +12,14 @@
 /**
  * @ingroup BaseExpression
  */
-interface IExpression
+interface IExpressionSubjectConverter
 {
 	/**
-	 * @obsolete
-	 * @return ExpressionType
-	 */
-	//function getExpressionType();
-
-	/**
+	 * @param mixed subject to convert
+	 * @param IExpression subject container (for building call tree while resolving)
 	 * @return IExpression
 	 */
-	function toExpression(IExpressionSubjectConverter $converter);
-
-	/**
-	 * @return IDalExpression
-	 */
-	function toDalExpression();
+	function convert($subject, IExpression $object);
 }
 
 ?>

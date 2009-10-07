@@ -19,7 +19,7 @@ abstract class SingleRowEntityPropertyExpression extends EntityPropertyExpressio
 	 */
 	protected function getSqlColumn()
 	{
-		$columns = $this->guessEntityProperty()->getDbColumns();
+		$columns = $this->getEntityProperty()->getDbColumns();
 
 		Assert::isTrue(sizeof($columns) == 1);
 

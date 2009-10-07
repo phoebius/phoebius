@@ -13,7 +13,7 @@
  * Represents the IN expression used in query logic
  * @ingroup BaseExpression
  */
-final class InSetExpression implements IExpression
+class InSetExpression implements IExpression
 {
 	/**
 	 * @var mixed
@@ -62,6 +62,39 @@ final class InSetExpression implements IExpression
 	function getPredicate()
 	{
 		return $this->logic;
+	}
+
+	/**
+	 * @return InSetExpression
+	 */
+	function toExpression(IExpressionSubjectConverter $converter)
+	{
+		return new self(
+			$converter->convert($this->subject, $this),
+			$this->convertSet($converter),
+			$this->logic
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	private function convertSet(IExpressionSubjectConverter $converter)
+	{
+		$set = array();
+		foreach ($this->set as $item) {
+			$set[] = $converter->convert($item);
+		}
+
+		return $set;
+	}
+
+	/**
+	 * @return BinaryDalExpression
+	 */
+	function toDalExpression()
+	{
+		return new InSetDalExpression($this);
 	}
 
 	/**

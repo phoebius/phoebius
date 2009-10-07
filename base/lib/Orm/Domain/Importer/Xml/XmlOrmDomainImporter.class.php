@@ -353,7 +353,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		}
 
 		try { // one-to-many
-			$referredProperty = $referredType->guessEntityProperty((string)$xmlContainer['refs']);
+			$referredProperty = $referredType->getEntityProperty((string)$xmlContainer['refs']);
 
 			$propertyType = new OneToManyContainerPropertyType(
 				$type,
@@ -391,7 +391,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$type_property = $proxy->guessEntityProperty($type_id_name);
+				$type_property = $proxy->getEntityProperty($type_id_name);
 			}
 
 			$referredType_id_name = '___mtm_' . $type->getDBTableName();
@@ -410,7 +410,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$referredType_property = $proxy->guessEntityProperty($referredType_id_name);
+				$referredType_property = $proxy->getEntityProperty($referredType_id_name);
 			}
 
 			$propertyType = new ManyToManyContainerPropertyType(
