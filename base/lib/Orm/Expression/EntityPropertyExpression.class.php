@@ -15,9 +15,9 @@
 abstract class EntityPropertyExpression implements IEntityPropertyExpression
 {
 	/**
-	 * @var string
+	 * @var EntityProperty
 	 */
-	private $table;
+	private $ep;
 
 	/**
 	 * @var OrmProperty
@@ -32,24 +32,23 @@ abstract class EntityPropertyExpression implements IEntityPropertyExpression
 	/**
 	 * @return EntityExpression
 	 */
-	static function create($table, OrmProperty $property, IExpression $expression)
+	static function create(EntityProperty $ep, IExpression $expression)
 	{
-		return new self ($table, $property, $expression);
+		return new self ($ep, $expression);
 	}
 
-	function __construct($table, OrmProperty $property, IExpression $expression)
+	function __construct(EntityProperty $ep, IExpression $expression)
 	{
-		$this->table = $table;
-		$this->property = $property;
+		$this->ep = $ep;
 		$this->expression = $expression;
 	}
 
 	/**
-	 * @return string
+	 * @return EntityProperty
 	 */
-	function getTable()
+	function getEntityProperty()
 	{
-		return $this->table;
+		return $this->ep;
 	}
 
 	/**
@@ -57,7 +56,7 @@ abstract class EntityPropertyExpression implements IEntityPropertyExpression
 	 */
 	function getProperty()
 	{
-		Return $this->property;
+		Return $this->ep->getProperty();
 	}
 
 	/**
@@ -69,13 +68,21 @@ abstract class EntityPropertyExpression implements IEntityPropertyExpression
 	}
 
 	/**
+	 * @return string
+	 */
+	protected function getTableOrAlias()
+	{
+		return $this->ep->getEntityQuery()->getAlias();
+	}
+
+	/**
 	 * @return array
 	 */
 	protected function makeRawValue($value)
 	{
 		return array_combine(
-			$this->property->getDbColumns(),
-			$this->property->getType()->makeRawValue($value)
+			$this->getProperty()->getDbColumns(),
+			$this->getProperty()->getType()->makeRawValue($value)
 		);
 	}
 }

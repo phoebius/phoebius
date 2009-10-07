@@ -25,9 +25,20 @@ class ExpressionChain implements IExpression
 	 */
 	private $chain = array();
 
-	function __construct(ExpressionChainPredicate $predicate)
+	/**
+	 * @return ExpressionChain
+	 */
+	static function create(ExpressionChainPredicate $predicate, array $elements = array())
+	{
+		return new self ($predicate, $elements);
+	}
+
+	function __construct(ExpressionChainPredicate $predicate, array $elements = array())
 	{
 		$this->predicate = $predicate;
+		foreach ($elements as $element) {
+			$this->add($element);
+		}
 	}
 
 	/**

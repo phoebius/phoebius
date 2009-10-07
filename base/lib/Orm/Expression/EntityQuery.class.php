@@ -16,8 +16,8 @@
  * $entitySetQuery =
  * 	EntityQuery::create(MyEntity::orm())
  * 		->where(
- *			'time',
  *			Expression::between(
+ *				'time',
  *				Date::now()->spawn('-1 day'),
  *				Date::now()->spawn('+1 day')
  *			)
@@ -30,10 +30,11 @@
  *  * projections
  *  * abilty to fetch entity of any other type (not only of type specified in ctor)
  *  * geEntityProperty() should accept aliased in property path
+ *  * querying against multi-field properties
  *
  * @ingroup OrmExpression
  */
-final class EntityQuery implements ISqlSelectQuery, IDalExpression
+final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionSubjectConverter
 {
 	/**
 	 * @var array of Property{name,path} => EntityQuery
@@ -95,6 +96,9 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	private $distinct;
 
+	private $expressionObjectStack = array();
+	private $expressionSubjects = array();
+
 	/**
 	 * @return EntityQuery
 	 */
@@ -112,7 +116,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 				? $alias
 				: $this->table;
 
-		$this->expressionChain = new EntityPropertyExpressionChain();
+		$this->expressionChain = new ExpressionChain();
 	}
 
 	/**
@@ -286,12 +290,11 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	}
 
 	/**
-	 * Alias for EntityQuery::addExpression()
 	 * @return EntityQuery
 	 */
-	function where($property, IExpression $expression)
+	function where(IExpression $expression)
 	{
-		$this->addExpression($property, $expression);
+		$this->expressionChain->add($expression);
 
 		return $this;
 	}
@@ -299,11 +302,11 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	/*
 	 * @return EntityQuery
 	 */
-	function andWhere($property, IExpression $expression)
+	function andWhere(IExpression $expression)
 	{
 		$this->resortChain(ExpressionChainPredicate::conditionAnd());
 
-		$this->where($property, $expression);
+		$this->where($expression);
 
 		return $this;
 	}
@@ -311,38 +314,13 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	/*
 	 * @return EntityQuery
 	 */
-	function orWhere($property, IExpression $expression)
+	function orWhere(IExpression $expression)
 	{
 		$this->resortChain(ExpressionChainPredicate::conditionOr());
 
-		$this->where($property, $expression);
+		$this->where($expression);
 
 		return $this;
-	}
-
-	/*
-	 * @return EntityQuery
-	 */
-	function addExpression($property, IExpression $expression)
-	{
-		$ep = $this->getEntityProperty($property);
-
-		$ep
-			->getEntityQuery()
-			->resortChain(ExpressionChainPredicate::conditionAnd())
-			->add(
-				$this->alias,
-				$ep->getProperty(),
-				$ep->getProperty()->getType()->getEntityPropertyExpression($expression)
-			);
-	}
-
-	/**
-	 * @return EntityPropertyExpressionChain
-	 */
-	function getEntityPropertyExpressionChain()
-	{
-		return $this->expressionChain;
 	}
 
 	/**
@@ -358,9 +336,67 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 
 		$this
 			->resortChain(ExpressionChainPredicate::conditionAnd())
-			->add($entityQuery->expressionChain);
+			->add($entityQuery->expressionChain->toExpression($entityQuery));
 
 		return $this;
+	}
+
+	/**
+	 * FIXME: IExpression->IDalExpression now only supports one-field properties
+	 * @see Expression/IExpressionSubjectConverter#convert($subject, $object)
+	 */
+	function convert($subject, IExpression $object)
+	{
+		// bogus check
+		if ($subject instanceof IExpression) {
+			return $subject->convert($this);
+		}
+
+		if (is_scalar($subject)) {
+			try {
+				$subject = $this->getEntityProperty($subject);
+			}
+			catch (OrmModelIntegrityException $e) {
+				// probably, a value, not a property path
+			}
+		}
+
+		if ($subject instanceof EntityProperty) {
+			$objId = spl_object_hash($object);
+
+			if (isset($this->expressionSubjects[$objId])) {
+				$index = array_search($objId, $this->expressionObjectStack);
+				$extracted = array_splice($this->expressionObjectStack, $index + 1);
+				foreach ($extracted as $_) {
+					unset($this->expressionSubjects[$_]);
+				}
+			}
+			else {
+				$this->expressionObjectStack[] = $objId;
+				$this->expressionSubjects[$objId] = $subject;
+			}
+
+			return reset($subject->getSqlColumns());
+
+		}
+
+		if ($subject instanceof ISqlCastable) {
+			return $subject;
+		}
+
+		// else -- a property value
+		$epHashId = reset($this->expressionObjectStack);
+		return reset(
+			$this->expressionSubjects[$epHashId]->getProperty()->getType()->makeRawValue($subject)
+		);
+	}
+
+	/**
+	 * @return ExpressionChain
+	 */
+	function getExpressionChain()
+	{
+		return $this->expressionChain;
 	}
 
 	/**
@@ -459,8 +495,10 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	{
 		if ($this->expressionChain->getPredicate()->isNot($ecp)) {
 			$this->expressionChain =
-				EntityExpressionChain::create($ecp)
-					->addEntityExpression($this->expressionChain);
+				new ExpressionChain(
+					$ecp,
+					$this->expressionChain->getChain()
+				);
 		}
 
 		return $this->expressionChain;
@@ -560,17 +598,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 				return $ep;
 			}
 
-			try {
-				$property = $this->entity->getLogicalSchema()->getProperty($property);
-			}
-			catch (OrmModelIntegrityException $e){
-				Assert::isUnreachable(
-					'unknown property %s::%s for %s',
-					$this->entity->getLogicalSchema()->getEntityName(),
-					$property,
-					__CLASS__
-				);
-			}
+			$property = $this->entity->getLogicalSchema()->getProperty($property);
 		}
 
 		Assert::isTrue(

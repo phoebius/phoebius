@@ -16,9 +16,9 @@
  */
 class BinaryEntityPropertyExpression extends SingleRowEntityPropertyExpression
 {
-	function __construct($table, OrmProperty $property, BinaryExpression $expression)
+	function __construct(EntityProperty $ep, BinaryExpression $expression)
 	{
-		parent::__construct($table, $property, $expression);
+		parent::__construct($ep, $expression);
 	}
 
 	/**
