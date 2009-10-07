@@ -70,31 +70,31 @@
 	}
   
   /*Lists*/
-  ul { 
+  .contents ul { 
     list-style-type: none; 
     margin-left:1em;
     margin-bottom:2em;
     margin-top:1em;
   }
-  ul li {
+  .contents ul li {
     background:url(../images/marker.gif) left 1.3em no-repeat;
     padding-left:1em;
     position:relative;
   } 
   
-  ul ul li {
+  .contents ul ul li {
     background:url(../images/marker.gif) left 0.8em no-repeat;
   } 
   
-  ul li { 
+  .contents ul li { 
     border-top: 1px solid #ccc; 
     padding-bottom:0.5em;
     padding-top:0.5em;
   }
   
-  ul ul { font-size:0.85em; margin-bottom:0; margin-top:0;}
-  ul ul li { border-top: none; padding-top:0; padding-bottom:0;}
-  ul ul ul { font-size:1em; margin-bottom:0em; }
+ .contents ul ul { font-size:0.85em; margin-bottom:0; margin-top:0;}
+ .contents ul ul li { border-top: none; padding-top:0; padding-bottom:0;}
+ .contents ul ul ul { font-size:1em; margin-bottom:0em; }
   
    
   
