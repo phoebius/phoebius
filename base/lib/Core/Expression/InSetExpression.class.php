@@ -16,6 +16,11 @@
 final class InSetExpression implements IExpression
 {
 	/**
+	 * @var mixed
+	 */
+	private $subject;
+
+	/**
 	 * @var array
 	 */
 	private $set;
@@ -25,13 +30,22 @@ final class InSetExpression implements IExpression
 	 */
 	private $logic;
 
-	function __construct(array $set, InSetPredicate $logic = null)
+	function __construct($subject, array $set, InSetPredicate $logic = null)
 	{
+		$this->subject = $subject;
 		$this->set = $set;
 		$this->logic =
 			$logic
 				? $logic
 				: InSetPredicate::in();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getSubject()
+	{
+		return $this->subject;
 	}
 
 	/**

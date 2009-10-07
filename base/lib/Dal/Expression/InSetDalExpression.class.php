@@ -30,9 +30,9 @@ class InSetDalExpression implements IDalExpression
 	 */
 	private $logic;
 
-	function __construct(SqlColumn $field, InSetExpression $expression)
+	function __construct(InSetExpression $expression)
 	{
-		$this->field = $field;
+		$this->field = $expression->getSubject();
 		$this->set = $expression->getSet();
 		$this->logic = $expression->getPredicate();
 	}

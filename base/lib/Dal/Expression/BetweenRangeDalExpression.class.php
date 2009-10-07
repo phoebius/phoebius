@@ -30,9 +30,9 @@ class BetweenRangeDalExpression implements IDalExpression
 	 */
 	private $to;
 
-	function __construct(SqlColumn $field, BetweenRangeExpression $expression)
+	function __construct(BetweenRangeExpression $expression)
 	{
-		$this->field = $field;
+		$this->field = $expression->getSubject();
 		$this->to = $expression->getTo();
 		$this->from= $expression->getFrom();
 	}

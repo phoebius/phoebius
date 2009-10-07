@@ -10,6 +10,9 @@
  ************************************************************************************************/
 
 /**
+ *
+ * LINQ to OrmEntity
+ *
  * $entitySetQuery =
  * 	EntityQuery::create(MyEntity::orm())
  * 		->where(
@@ -20,10 +23,14 @@
  *			)
  * 		);
  *
- * LINQ to OrmEntity
  * TODO:
  *  * aggregation functions
  *  * HAVING clause
+ *  * distinct
+ *  * projections
+ *  * abilty to fetch entity of any other type (not only of type specified in ctor)
+ *  * guessEntityProperty() should accept aliased in property path
+ *
  * @ingroup OrmExpression
  */
 final class EntityQuery implements ISqlSelectQuery, IDalExpression
@@ -119,7 +126,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	/**
 	 * @return EntityQuery
 	 */
-	function setDistinct()
+	private function setDistinct()
 	{
 		$this->distinct = true;
 
@@ -416,7 +423,11 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 
 		$selectQuery = new SelectQuery;
 
-		$selectQuery->from($this->table, $this->alias);
+		$selectQuery->from($this->table, $this->alias != $this->table ? $this->alias : null);
+
+		foreach ($this->entity->getPhysicalSchema()->getDBColumns() as $field) {
+			$selectQuery->get($field, $this->alias);
+		}
 
 		$this->fillJoins($selectQuery);
 
@@ -466,10 +477,6 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 	 */
 	private function fill(SelectQuery $selectQuery)
 	{
-		foreach ($this->entity->getPhysicalSchema()->getDBColumns() as $field) {
-			$selectQuery->get($field, $this->alias);
-		}
-
 		foreach ($this->joined as $entityQuery) {
 			$property = $entityQuery->getProperty();
 			$type = $property->getType();
@@ -529,7 +536,9 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression
 				? $this->joined[$propertyName]
 				: new EntityQuery(
 					$property->getType()->getContainer(),
-					$this->alias . '_' . $propertyName
+					(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
+						? $this->alias . '_' . $propertyName
+						: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
 				);
 
 		if (sizeof($propertyPath) > 1) {

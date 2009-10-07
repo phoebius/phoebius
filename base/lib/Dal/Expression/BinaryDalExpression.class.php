@@ -30,9 +30,9 @@ class BinaryDalExpression implements IDalExpression
 	 */
 	private $logic;
 
-	function __construct(SqlColumn $field, BinaryExpression $expression)
+	function __construct(BinaryExpression $expression)
 	{
-		$this->field = $field;
+		$this->field = $expression->getSubject();
 		$this->value = $expression->getValue();
 		$this->logic = $expression->getPredicate();
 	}

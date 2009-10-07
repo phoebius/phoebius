@@ -18,6 +18,11 @@ final class BinaryExpression implements IExpression
 	/**
 	 * @var mixed
 	 */
+	private $subject;
+
+	/**
+	 * @var mixed
+	 */
 	private $value;
 
 	/**
@@ -25,10 +30,19 @@ final class BinaryExpression implements IExpression
 	 */
 	private $logic;
 
-	function __construct($value, BinaryPredicate $logic)
+	function __construct($subject, BinaryPredicate $logic, $value)
 	{
-		$this->value = $value;
+		$this->subject = $subject;
 		$this->logic = $logic;
+		$this->value = $value;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getSubject()
+	{
+		return $this->subject;
 	}
 
 	/**

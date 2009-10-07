@@ -19,154 +19,144 @@ final class Expression extends StaticClass
 	 * Creates an instance of {@link BinaryExpression} with strict equality
 	 * @return BinaryExpression
 	 */
-	static function eq($value)
+	static function eq($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::equals());
+		return new BinaryExpression($subject, BinaryPredicate::equals(), $value);
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with strict equality between field and
-	 * an identifier
+	 * Creates an instance of {@link BinaryExpression} with strict equality
 	 * @return BinaryExpression
 	 */
-	static function eqId(IIdentifiable $object)
+	static function neq($subject, $value)
 	{
-		return self::eq($object->getId());
-	}
-
-	/**
-	 * Creates an instance of {@link BinaryExpression} with inverted equality
-	 * @return BinaryExpression
-	 */
-	static function notEq(IIdentifiable $value)
-	{
-		return new BinaryExpression($value, BinaryPredicate::notEquals());
+		return new BinaryExpression($subject, BinaryPredicate::notEquals(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with `greater than` predicate
 	 * @return BinaryExpression
 	 */
-	static function gt($value)
+	static function gt($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::greaterThan());
+		return new BinaryExpression($subject, BinaryPredicate::greaterThan(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with `greater than or equals` predicate
 	 * @return BinaryExpression
 	 */
-	static function gtEq($value)
+	static function gtEq($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::greaterOrEquals());
+		return new BinaryExpression($subject, BinaryPredicate::greaterOrEquals(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with `lower than` predicate
 	 * @return BinaryExpression
 	 */
-	static function lt($value)
+	static function lt($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::lowerThan());
+		return new BinaryExpression($subject, BinaryPredicate::lowerThan(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with `lower than or equals` predicate
 	 * @return BinaryExpression
 	 */
-	static function ltEq($value)
+	static function ltEq($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::lowerOrEquals());
+		return new BinaryExpression($subject, BinaryPredicate::lowerOrEquals(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with `like` predicate
 	 * @return BinaryExpression
 	 */
-	static function like($value)
+	static function like($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::like());
+		return new BinaryExpression($subject, BinaryPredicate::like(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with `like` predicate
 	 * @return BinaryExpression
 	 */
-	static function notLike($value)
+	static function notLike($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::notIlike());
+		return new BinaryExpression($subject, BinaryPredicate::notIlike(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `like` predicate
 	 * @return BinaryExpression
 	 */
-	static function ilike($value)
+	static function ilike($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::ilike());
+		return new BinaryExpression($subject, BinaryPredicate::ilike(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `not like` predicate
 	 * @return BinaryExpression
 	 */
-	static function notIlike($value)
+	static function notIlike($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::notIlike());
+		return new BinaryExpression($subject, BinaryPredicate::notIlike(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with `similar to` predicate
 	 * @return BinaryExpression
 	 */
-	static function similar($value)
+	static function similar($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::similarTo());
+		return new BinaryExpression($subject, BinaryPredicate::similarTo(), $value);
 	}
 
 	/**
 	 * Creates an instnace of {@link BinaryExpression} with inverted `similar to` predicate
 	 * @return BinaryExpression
 	 */
-	static function notSimilar($value)
+	static function notSimilar($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::notSimilarTo());
+		return new BinaryExpression($subject, BinaryPredicate::notSimilarTo(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with "plus" operator
 	 * @return BinaryExpression
 	 */
-	static function add($value)
+	static function add($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::add());
+		return new BinaryExpression($subject, BinaryPredicate::add(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with "minus" operator
 	 * @return BinaryExpression
 	 */
-	static function sub($value)
+	static function sub($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::substract());
+		return new BinaryExpression($subject, BinaryPredicate::substract(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with "multiply" operator
 	 * @return BinaryExpression
 	 */
-	static function mul($value)
+	static function mul($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::multiply());
+		return new BinaryExpression($subject, BinaryPredicate::multiply(), $value);
 	}
 
 	/**
 	 * Creates an instance of {@link BinaryExpression} with "division" operator
 	 * @return BinaryExpression
 	 */
-	static function div($value)
+	static function div($subject, $value)
 	{
-		return new BinaryExpression($value, BinaryPredicate::divide());
+		return new BinaryExpression($subject, BinaryPredicate::divide(), $value);
 	}
 
 	/**
@@ -209,9 +199,9 @@ final class Expression extends StaticClass
 	 * Creates an instance of {@link BetweenRangeExpression}
 	 * @return BetweenRangeExpression
 	 */
-	static function between($from, $to)
+	static function between($subject, $from, $to)
 	{
-		return new BetweenRangeExpression($from, $to);
+		return new BetweenRangeExpression($subject, $from, $to);
 	}
 
 	/**
@@ -219,9 +209,9 @@ final class Expression extends StaticClass
 	 * equality is used in comparison
 	 * @return IDalExpression
 	 */
-	static function in($set)
+	static function in($subject, $set)
 	{
-		return new InSetExpression($set, InSetPredicate::in());
+		return new InSetExpression($subject, $set, InSetPredicate::in());
 	}
 
 	/**
@@ -229,9 +219,9 @@ final class Expression extends StaticClass
 	 * equality is used in comparison
 	 * @return IDalExpression
 	 */
-	static function notIn($set)
+	static function notIn($subject, $set)
 	{
-		return new InSetExpression($set, InSetPredicate::notIn());
+		return new InSetExpression($subject, $set, InSetPredicate::notIn());
 	}
 
 	/**

@@ -18,6 +18,11 @@ final class BetweenRangeExpression implements IExpression
 	/**
 	 * @var mixed
 	 */
+	private $subject;
+
+	/**
+	 * @var mixed
+	 */
 	private $from;
 
 	/**
@@ -25,10 +30,19 @@ final class BetweenRangeExpression implements IExpression
 	 */
 	private $to;
 
-	function __construct($from, $to)
+	function __construct($subject, $from, $to)
 	{
+		$this->subject = $subject;
 		$this->from = $from;
 		$this->to = $to;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getSubject()
+	{
+		return $this->subject;
 	}
 
 	/**

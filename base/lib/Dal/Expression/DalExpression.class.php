@@ -24,7 +24,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function expAnd(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::expAnd()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::expAnd(), $value));
 	}
 
 	/**
@@ -36,7 +36,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function expOr(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::expOr()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::expOr(), $value));
 	}
 
 	/**
@@ -48,7 +48,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function eq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::equals()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::equals(), $value));
 	}
 
 	/**
@@ -67,7 +67,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notEq(SqlColumn $field, IIdentifiable $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::notEquals()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notEquals(), $value));
 	}
 
 	/**
@@ -79,7 +79,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function gt(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::greaterThan()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::greaterThan(), $value));
 	}
 
 	/**
@@ -91,7 +91,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function gtEq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::greaterOrEquals()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::greaterOrEquals(), $value));
 	}
 
 	/**
@@ -103,7 +103,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function lt(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::lowerThan()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::lowerThan(), $value));
 	}
 
 	/**
@@ -115,7 +115,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function ltEq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::lowerOrEquals()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::lowerOrEquals(), $value));
 	}
 
 	/**
@@ -127,7 +127,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function like(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::like()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::like(), $value));
 	}
 
 	/**
@@ -139,7 +139,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notLike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::notIlike()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notIlike(), $value));
 	}
 
 	/**
@@ -151,7 +151,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function ilike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::ilike()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::ilike(), $value));
 	}
 
 	/**
@@ -163,7 +163,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notIlike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::notIlike()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notIlike(), $value));
 	}
 
 	/**
@@ -175,7 +175,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function similar(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::similarTo()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::similarTo(), $value));
 	}
 
 	/**
@@ -187,7 +187,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notSimilar(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::notSimilarTo()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notSimilarTo(), $value));
 	}
 
 	/**
@@ -199,7 +199,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function add(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::add()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::add(), $value));
 	}
 
 	/**
@@ -211,7 +211,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function sub(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::substract()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::substract(), $value));
 	}
 
 	/**
@@ -223,7 +223,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function mul(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::multiply()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::multiply(), $value));
 	}
 
 	/**
@@ -235,51 +235,51 @@ final class DalExpression extends StaticClass
 	 */
 	static function div(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression($field, new BinaryExpression($value, BinaryPredicate::divide()));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::divide(), $value));
 	}
 
 	/**
 	 * Creates an instance of `not null` unary postfix expression
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
-	 * @return UnaryDalPostfixExpression
+	 * @return UnaryPostfixDalExpression
 	 */
 	static function notNull(ISqlValueExpression $subject)
 	{
-		return new UnaryDalPostfixExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNotNull()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNotNull()));
 	}
 
 	/**
 	 * Creates an instance of `is null` unary postfix expression
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
-	 * @return UnaryDalPostfixExpression
+	 * @return UnaryPostfixDalExpression
 	 */
 	static function isNull(ISqlValueExpression $subject)
 	{
-		return new UnaryDalPostfixExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNull()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNull()));
 	}
 
 	/**
 	 * Creates an instance of `is true` unary postfix expression
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
-	 * @return UnaryDalPostfixExpression
+	 * @return UnaryPostfixDalExpression
 	 */
 	static function isTrue(ISqlValueExpression $subject)
 	{
-		return new UnaryDalPostfixExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isTrue()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isTrue()));
 	}
 
 	/**
 	 * Creates an instance of `is false` unary postfix expression
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
-	 * @return UnaryDalPostfixExpression
+	 * @return UnaryPostfixDalExpression
 	 */
 	static function isFalse(ISqlValueExpression $subject)
 	{
-		return new UnaryDalPostfixExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isFalse()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isFalse()));
 	}
 
 	/**
@@ -293,7 +293,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function between(SqlColumn $field, ISqlValueExpression $from, ISqlValueExpression $to)
 	{
-		return new BetweenRangeDalExpression($field, new BetweenRangeExpression($from, $to));
+		return new BetweenRangeDalExpression(new BetweenRangeExpression($field, $from, $to));
 	}
 
 	/**
@@ -307,7 +307,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function in(SqlColumn $field, ISqlValueExpression $set)
 	{
-		return new InSetDalExpression($field, new InSetExpression($set, InSetPredicate::in()));
+		return new InSetDalExpression(new InSetExpression($field, $set, InSetPredicate::in()));
 	}
 
 	/**
@@ -321,7 +321,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notIn(SqlColumn $field, ISqlValueExpression $set)
 	{
-		return new InSetDalExpression($field, new InSetExpression($set, InSetPredicate::notIn()));
+		return new InSetDalExpression(new InSetExpression($field, $set, InSetPredicate::notIn()));
 	}
 
 	/**

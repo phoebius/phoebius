@@ -16,13 +16,27 @@
 final class UnaryPostfixExpression implements IExpression
 {
 	/**
+	 * @var mixed
+	 */
+	private $subject;
+
+	/**
 	 * @var UnaryPostfixPredicate
 	 */
 	private $logic;
 
-	function __construct(UnaryPostfixPredicate $logic)
+	function __construct($subject, UnaryPostfixPredicate $logic)
 	{
+		$this->subject = $subject;
 		$this->logic = $logic;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getSubject()
+	{
+		return $this->subject;
 	}
 
 	/**
