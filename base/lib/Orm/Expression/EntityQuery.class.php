@@ -464,6 +464,40 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 	}
 
 	/**
+	 * @return EntityProperty
+	 */
+	function getEntityProperty($property)
+	{
+		if (is_scalar($property)) {
+			if (isset($this->entityPropertyCache[$property])) {
+				return $this->entityPropertyCache[$property];
+			}
+
+			if (false !== strpos('.', $property)) {
+				$ep = $this->resolveAssocProperty($property);
+				$this->guessEntityProperty[$property] = $ep;
+
+				return $ep;
+			}
+
+			$property = $this->entity->getLogicalSchema()->getProperty($property);
+		}
+
+		Assert::isTrue(
+			$property instanceof OrmProperty
+			&& $this->entity->getLogicalSchema()->getProperty(
+				$property->getName()
+			),
+			'unknwown property'
+		);
+
+		$name = $property->getName();
+		$this->entityPropertyCache[$name] = new EntityProperty($this, $property);
+
+		return $this->entityPropertyCache[$name];
+	}
+
+	/**
 	 * Casts an object to the SQL dialect string
 	 * @return string
 	 */
@@ -579,40 +613,6 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 		else {
 			return $this->getEntityProperty($property);
 		}
-	}
-
-	/**
-	 * @return EntityProperty
-	 */
-	private function getEntityProperty($property)
-	{
-		if (is_scalar($property)) {
-			if (isset($this->entityPropertyCache[$property])) {
-				return $this->entityPropertyCache[$property];
-			}
-
-			if (false !== strpos('.', $property)) {
-				$ep = $this->resolveAssocProperty($property);
-				$this->guessEntityProperty[$property] = $ep;
-
-				return $ep;
-			}
-
-			$property = $this->entity->getLogicalSchema()->getProperty($property);
-		}
-
-		Assert::isTrue(
-			$property instanceof OrmProperty
-			&& $this->entity->getLogicalSchema()->getProperty(
-				$property->getName()
-			),
-			'unknwown property'
-		);
-
-		$name = $property->getName();
-		$this->entityPropertyCache[$name] = new EntityProperty($this, $property);
-
-		return $this->entityPropertyCache[$name];
 	}
 }
 
