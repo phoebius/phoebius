@@ -376,7 +376,11 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 				$this->expressionSubjects[$objId] = $subject;
 			}
 
-			return reset($subject->getSqlColumns());
+			$columns = $subject->getSqlColumns();
+
+			Assert::isTrue(sizeof($columns) == 1, 'single-field properties are only supported');
+
+			return reset($columns);
 
 		}
 
