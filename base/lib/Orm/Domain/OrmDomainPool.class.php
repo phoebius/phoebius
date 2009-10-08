@@ -10,6 +10,10 @@
  ************************************************************************************************/
 
 /**
+ * pool
+ * map (name => IOrmDomainImporter)
+ * cacher (default, named => IOrmDomainCacher)
+ *
  * @ingroup Dal
  */
 final class OrmDomainPool extends Pool

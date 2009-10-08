@@ -32,12 +32,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	 */
 	private $ormDomain;
 
-	/**
-	 * @var IExecutionRecorder|null
-	 */
-	private $recorder;
-
-	function __construct(IExecutionRecorder $recorder, $xmlFilename, $dtdFilename = null)
+	function __construct($xmlFilename, $dtdFilename = null)
 	{
 		Assert::isScalar($xmlFilename);
 		Assert::isScalarOrNull($dtdFilename);
@@ -55,7 +50,6 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			$dtdFilename = PHOEBIUS_BASE_ROOT . self::DTD_BASE_PATH;
 		}
 
-		$this->recorder = $recorder;
 		$this->xmlFilename = $xmlFilename;
 		$this->dtdFilename = str_replace(
 			'\\',
@@ -82,7 +76,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 
 				$this->ormDomain = null;
 
-				$this->recorder->putErrorLine($e->getMessage());
+//				$this->recorder->putErrorLine($e->getMessage());
 
 				throw new StateException('Cannot create an orm domain');
 			}
@@ -101,15 +95,15 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		$xmlContents = file_get_contents($this->xmlFilename);
 
 		try {
-			$this->recorder->putInfoLine('Loading XML definition ' . $this->xmlFilename . '...');
+//			$this->recorder->putInfoLine('Loading XML definition ' . $this->xmlFilename . '...');
 			$this->xmlElement = new SimpleXMLElement(
 				$this->fixDtdPath($xmlContents),
 				LIBXML_DTDATTR | LIBXML_DTDLOAD | LIBXML_DTDVALID
 			);
-			$this->recorder->putMsg(' done.');
+//			$this->recorder->putMsg(' done.');
 		}
 		catch (ExecutionContextException $e) {
-			$this->recorder->putError(' failed.');
+//			$this->recorder->putError(' failed.');
 			$xmlError = libxml_get_last_error();
 			throw new OrmModelDefinitionException(
 				$xmlError->message . ' in ' . $this->xmlFilename . ':' . $xmlError->line
@@ -157,13 +151,13 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		}
 
 		foreach ($this->getChildNodeSet($this->xmlElement->entities, 'entity') as $entity) {
-			$this->recorder->putInfoLine('Creating new entity:');
+//			$this->recorder->putInfoLine('Creating new entity:');
 			$class = $this->generateEntity($entity);
 
 			$this->ormDomain->addClass($class);
-			$this->recorder->putMsgLine($class->getName() . ' added to domain.');
+//			$this->recorder->putMsgLine($class->getName() . ' added to domain.');
 
-			$this->recorder->putInfoLine('Resolving ' . $class->getName() . ' identifier...');
+//			$this->recorder->putInfoLine('Resolving ' . $class->getName() . ' identifier...');
 
 			// process an identifier (if specified). However, entity CAN BE identifierless
 			if (isset($entity->properties->identifier)) {
@@ -172,10 +166,10 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 				// because type juggling depends on the identifier availabilty
 				$class->addIdentifier($id);
 
-				$this->recorder->putMsg(' done.');
+//				$this->recorder->putMsg(' done.');
 			}
 			else {
-				$this->recorder->putWarning(' entity is identifierless.');
+//				$this->recorder->putWarning(' entity is identifierless.');
 			}
 
 			// collect props and containers for further processing
@@ -185,7 +179,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			$classProperties[$name] = $this->getChildNodeSet($entity->properties, 'property');
 			$classContainers[$name] = $this->getChildNodeSet($entity->properties, 'container');
 
-			$this->recorder->putLine();
+//			$this->recorder->putLine();
 		}
 
 		// firsly, we process props as they can have one-to-one associations only
@@ -194,7 +188,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		}
 
 		// for now we can process containers
-		$this->recorder->putWarningLine('Containers are not generated for now');
+//		$this->recorder->putWarningLine('Containers are not generated for now');
 		foreach ($classContainers as $name => $containers) {
 			$this->obtainClassContainers($classEntities[$name], $containers);
 		}
@@ -206,15 +200,15 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	private function obtainClassProperties(OrmClass $class, array $properties)
 	{
 		if (!empty($properties)) {
-			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' properties:');
+//			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' properties:');
 			foreach ($properties as $property) {
 				$property = $this->generateProperty($property);
 				$class->addProperty($property);
 			}
-			$this->recorder->putLine();
+//			$this->recorder->putLine();
 		}
 		else {
-			$this->recorder->putInfoLine('No properties for ' . $class->getName());
+//			$this->recorder->putInfoLine('No properties for ' . $class->getName());
 		}
 	}
 
@@ -224,15 +218,15 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	private function obtainClassContainers(OrmClass $class, array $containers)
 	{
 		if (!empty($containers)) {
-			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' containers:');
+//			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' containers:');
 			foreach ($containers as $container) {
 				$container = $this->generateContainer($class, $container);
 				$class->addProperty($container);
 			}
-			$this->recorder->putLine();
+//			$this->recorder->putLine();
 		}
 		else {
-			$this->recorder->putInfoLine('No containers for ' . $class->getName());
+//			$this->recorder->putInfoLine('No containers for ' . $class->getName());
 		}
 	}
 
@@ -311,7 +305,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	 */
 	private function generateProperty(SimpleXMLElement $xmlProperty)
 	{
-		$this->recorder->putInfoLine('Generating ' . ((string) $xmlProperty['name']) . ' property...');
+//		$this->recorder->putInfoLine('Generating ' . ((string) $xmlProperty['name']) . ' property...');
 
 		$type = $this->resolvePropertyType(
 			(string) $xmlProperty['type'],
@@ -331,7 +325,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			);
 		}
 
-		$this->recorder->putMsg(' done.');
+//		$this->recorder->putMsg(' done.');
 
 		return $property;
 	}
@@ -343,7 +337,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	{
 		// acceptable types: OneToManyContainerPropertyType, ManyToManyContainerPropertyType
 
-		$this->recorder->putInfoLine('Generating ' . ((string) $xmlContainer['name']) . ' container...');
+//		$this->recorder->putInfoLine('Generating ' . ((string) $xmlContainer['name']) . ' container...');
 
 		try {
 			$referredType = $this->ormDomain->getClass((string)$xmlContainer['type']);
@@ -420,7 +414,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			);
 		}
 
-		$this->recorder->putMsg(' done.');
+//		$this->recorder->putMsg(' done.');
 
 		$property = new OrmProperty(
 			(string) $xmlContainer['name'],
@@ -500,7 +494,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 				$class = $this->ormDomain->getClass($name);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$this->recorder->putError(' failed.');
+//				$this->recorder->putError(' failed.');
 				throw $e;
 			}
 

@@ -20,11 +20,6 @@ class OrmGenerator
 	private $regeneratePublic = false;
 
 	/**
-	 * @var IExecutionRecorder
-	 */
-	private $executionRecorder;
-
-	/**
 	 * @var string
 	 */
 	private $schemaDir;
