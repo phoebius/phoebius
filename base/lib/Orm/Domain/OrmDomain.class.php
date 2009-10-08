@@ -34,7 +34,7 @@ class OrmDomain
 	 */
 	function getName()
 	{
-		return $this->dbSchema;
+		return $this->name;
 	}
 
 	/**
