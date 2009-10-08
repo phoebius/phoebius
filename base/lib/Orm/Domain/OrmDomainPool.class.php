@@ -33,7 +33,7 @@ final class OrmDomainPool extends Pool
 	}
 
 	/**
-	 * @return OrmDomain
+	 * @return OrmDomain|null
 	 */
 	static function getDefault()
 	{
@@ -41,6 +41,7 @@ final class OrmDomainPool extends Pool
 	}
 
 	/**
+	 * @throws ArgumentException if no OrmDomain under the specified name found
 	 * @return OrmDomain
 	 */
 	static function get($name)
@@ -86,6 +87,7 @@ final class OrmDomainPool extends Pool
 	}
 
 	/**
+	 * @throws ArgumentException if no OrmDomain under the specified name found
 	 * @return OrmDomain
 	 */
 	function getOrmDomain($name)
@@ -100,7 +102,7 @@ final class OrmDomainPool extends Pool
 	}
 
 	/**
-	 * @return OrmDomain
+	 * @return OrmDomain|null
 	 */
 	function getDefaultOrmDomain()
 	{
