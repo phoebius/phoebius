@@ -10,20 +10,19 @@
  ************************************************************************************************/
 
 /**
- * Represents an object that can be casted to a plain string SQL query for selecting data
- * @ingroup Query
+ * @ingroup OrmDomainCache
  */
-interface ISqlSelectQuery extends ISqlQuery
+interface IOrmDomainCacher
 {
 	/**
-	 * FIXME: introduce setLimit/setOffset
-	 * Sets a limit for row selection
-	 * @param integer $limit positive integer
-	 * @return SelectQuery an object itself
+	 * @return void
 	 */
-	function setLimit($limit);
-	function setOffset($offset);
+	function set(OrmDomain $ormDomain);
 
+	/**
+	 * @return OrmDomain
+	 */
+	function get($name);
 }
 
 ?>

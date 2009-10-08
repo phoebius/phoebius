@@ -12,7 +12,7 @@
 /**
  * @ingroup PlainQuery
  */
-class PlainQuery implements ISqlSelectQuery
+class PlainQuery implements ISqlQuery
 {
 	/**
 	 * @var string
