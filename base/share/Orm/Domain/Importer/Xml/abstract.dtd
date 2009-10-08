@@ -45,7 +45,7 @@ Future releases:
 
 <!ELEMENT properties (identifier?, property*, container*)>
 
-<!-- If entity is identifierless than entity.has-dao should be specified explicitly -->
+<!-- If entity is identifierless then entity.has-dao should be specified explicitly -->
 <!ELEMENT identifier EMPTY>
 <!ATTLIST identifier
 	name			CDATA "id"
