@@ -13,6 +13,12 @@ LoggerPool::setPackageLogger(new FileLogWorker());
 LoggerPool::getAppLogger()->log(...)
 LoggerPool::getPackageLogger('Forms')->log(...)
 
+
+Orm/Metainfo
+============
+Think over replacing serialized graph of OrmDomain/OrmClass/OrmProperty set of objects with
+class/property-level attributes using addendum (http://code.google.com/p/addendum/)
+
  
 Dao/Cache
 =========
