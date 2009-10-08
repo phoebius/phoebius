@@ -388,6 +388,10 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 			return $subject;
 		}
 
+		if (is_scalar($subject) || is_null($subject)) {
+			return new ScalarSqlValue($subject);
+		}
+
 		// else -- a property value
 		$epHashId = reset($this->expressionObjectStack);
 		return reset(
