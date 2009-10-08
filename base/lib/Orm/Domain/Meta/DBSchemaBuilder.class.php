@@ -11,9 +11,8 @@
 
 /**
  * @ingroup OrmDomainImporter
- * @internal
  */
-final class DBSchemaImportWorker
+class DBSchemaBuilder
 {
 	/**
 	 * @var OrmDomain
@@ -48,21 +47,24 @@ final class DBSchemaImportWorker
 	/**
 	 * @return DBSchemaImportWorker
 	 */
-	static function create(OrmDomain $ormDomain, DBSchema $dbSchema)
+	static function create(OrmDomain $ormDomain, DBSchema $dbSchema = null)
 	{
 		return new self ($ormDomain, $dbSchema);
 	}
 
-	function __construct(OrmDomain $ormDomain, DBSchema $dbSchema)
+	function __construct(OrmDomain $ormDomain, DBSchema $dbSchema = null)
 	{
 		$this->ormDomain = $ormDomain;
-		$this->dbSchema = $dbSchema;
+		$this->dbSchema =
+			$dbSchema
+				? $dbSchema
+				: new DBSchema();
 	}
 
 	/**
 	 * @return void
 	 */
-	function import()
+	function build()
 	{
 		foreach ($this->ormDomain->getClasses() as $class) {
 			$this->ormClass = $class;
@@ -109,8 +111,8 @@ final class DBSchemaImportWorker
 	private function importProperty()
 	{
 		$columns = array_combine(
-			$this->ormProperty->getDbColumns(),
-			$this->ormProperty->getType()->getDbColumns()
+			$this->ormProperty->getDBFields(),
+			$this->ormProperty->getType()->getDBFields()
 		);
 		if (empty($columns)) {
 			// columnless properties are skipped

@@ -19,7 +19,7 @@ interface IPropertyStructurized
 	 * Returns an array (or an associative array) of {@link DBType} for the property
 	 * @return array of {@link DBType}
 	 */
-	function getDbColumns();
+	function getDBFields();
 }
 
 ?>

@@ -34,7 +34,7 @@ final class TimestampPropertyType extends ObjectPropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::INTEGER)

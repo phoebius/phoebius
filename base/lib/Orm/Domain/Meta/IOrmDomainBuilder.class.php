@@ -10,19 +10,14 @@
  ************************************************************************************************/
 
 /**
- * @ingroup OrmDomainCache
+ * @ingroup OrmDomainImporter
  */
-interface IOrmDomainCacher
+interface IOrmDomainBuilder
 {
-	/**
-	 * @return void
-	 */
-	function set(OrmDomain $ormDomain);
-
 	/**
 	 * @return OrmDomain
 	 */
-	function get($name);
+	function build();
 }
 
 ?>

@@ -49,7 +49,7 @@ class FloatPropertyType extends PrimitivePropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::FLOAT)

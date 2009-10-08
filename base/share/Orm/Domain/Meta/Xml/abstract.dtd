@@ -29,7 +29,6 @@ Future releases:
 
 <!ELEMENT domain (entities*)>
 <!ATTLIST domain
-	name			CDATA "default"
 	db-schema		CDATA #IMPLIED
 >
 

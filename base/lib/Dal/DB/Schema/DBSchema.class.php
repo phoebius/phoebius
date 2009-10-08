@@ -12,7 +12,7 @@
 /**
  * @ingroup DB
  */
-class DBSchema implements ISqlCastable
+final class DBSchema implements ISqlCastable
 {
 	/**
 	 * @var array of {@link DBTable}

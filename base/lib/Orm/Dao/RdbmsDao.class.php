@@ -52,13 +52,13 @@ class RdbmsDao implements IOrmEntityAccessor
 	private $identitifier;
 
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $entity;
 
 	function __construct(
 			DB $db,
-			IQueried $entity
+			IQueryable $entity
 		)
 	{
 		$this->db = $db;
@@ -257,7 +257,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		$rawValueSet = array();
 		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-			foreach ($property->getDbColumns() as $columnName) {
+			foreach ($property->getDBFields() as $columnName) {
 				$rawValueSet[$propertyName][] = $dbValues[$columnName];
 			}
 		}
@@ -414,7 +414,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
 			$fvc->addCollection(
 				array_combine(
-					$this->logicalSchema->getProperty($propertyName)->getDBColumns(),
+					$this->logicalSchema->getProperty($propertyName)->getDBFields(),
 					$rawValue
 				)
 			);
@@ -530,7 +530,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			SelectQuery::create()
 				->from($table);
 
-		foreach ($this->physicalSchema->getDbColumns() as $column) {
+		foreach ($this->physicalSchema->getDBFields() as $column) {
 			$selectQuery->get(
 				$column,
 				null,

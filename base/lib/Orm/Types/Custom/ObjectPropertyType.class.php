@@ -57,7 +57,7 @@ class ObjectPropertyType extends PrimitivePropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::STRING)

@@ -10,14 +10,19 @@
  ************************************************************************************************/
 
 /**
- * @ingroup OrmDomainImporter
+ * @ingroup Orm
  */
-interface IOrmDomainImporter
+interface IMappable
 {
 	/**
-	 * @return OrmDomain
+	 * @return IOrmEntityMapper
 	 */
-	function import(OrmDomain $ormDomain);
+	function getMap();
+
+	/**
+	 * @return ILogicallySchematic
+	 */
+	function getLogicalSchema();
 }
 
 ?>

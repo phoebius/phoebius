@@ -25,7 +25,7 @@ abstract class Container implements IteratorAggregate
 	private $parent;
 
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $children;
 
@@ -55,7 +55,7 @@ abstract class Container implements IteratorAggregate
 	 */
 	function __construct(
 			IdentifiableOrmEntity $parent,
-			IQueried $children,
+			IQueryable $children,
 			$readOnly = false
 		)
 	{
@@ -98,7 +98,7 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
-	 * @return IQueried
+	 * @return IQueryable
 	 */
 	protected function getChildren()
 	{

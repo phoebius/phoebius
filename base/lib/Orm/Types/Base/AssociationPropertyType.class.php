@@ -16,7 +16,7 @@
 class AssociationPropertyType extends OrmPropertyType
 {
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $container;
 
@@ -41,7 +41,7 @@ class AssociationPropertyType extends OrmPropertyType
 	 * @throws OrmModelIntegrityException
 	 */
 	function __construct(
-			IQueried $container,
+			IQueryable $container,
 			AssociationMultiplicity $multiplicity,
 			AssociationBreakAction $action
 		)
@@ -98,7 +98,7 @@ class AssociationPropertyType extends OrmPropertyType
 	}
 
 	/**
-	 * @return IQueried
+	 * @return IQueryable
 	 */
 	function getContainer()
 	{
@@ -108,9 +108,9 @@ class AssociationPropertyType extends OrmPropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
-		return $this->identifierType->getDbColumns();
+		return $this->identifierType->getDBFields();
 	}
 
 	/**

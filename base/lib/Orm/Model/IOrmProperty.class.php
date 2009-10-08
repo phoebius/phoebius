@@ -10,21 +10,42 @@
  ************************************************************************************************/
 
 /**
- * Defines an interface for accessing physical schema information that stores a internal
- * data
- * @ingroup Orm
+ * @ingroup OrmModel
  */
-interface IPhysicallySchematic
+interface IOrmProperty
 {
 	/**
-	 * Gets the name of the DB table where entities are stored
 	 * @return string
 	 */
-	function getDBTableName();
+	function getGetter();
 
 	/**
-	 * Array of columnName
-	 * @return array
+	 * @return string
+	 */
+	function getSetter();
+
+	/**
+	 * @return string
+	 */
+	function getName();
+
+	/**
+	 * @return boolean
+	 */
+	function isUnique();
+
+	/**
+	 * @return OrmPropertyType
+	 */
+	function getType();
+
+	/**
+	 * @return OrmPropertyVisibility
+	 */
+	function getVisibility();
+
+	/**
+	 * @return array of columnName
 	 */
 	function getDBFields();
 }

@@ -15,18 +15,18 @@
 abstract class ContainerPropertyType extends OrmPropertyType
 {
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $container;
 
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $encapsulant;
 
 	function __construct(
-			IQueried $container,
-			IQueried $encapsulant
+			IQueryable $container,
+			IQueryable $encapsulant
 		)
 	{
 		$this->container = $container;
@@ -36,13 +36,13 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array();
 	}
 
 	/**
-	 * @return IQueried
+	 * @return IQueryable
 	 */
 	function getEncapsulant()
 	{
@@ -50,7 +50,7 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	}
 
 	/**
-	 * @return IQueried
+	 * @return IQueryable
 	 */
 	function getContainer()
 	{

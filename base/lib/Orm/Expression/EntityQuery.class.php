@@ -42,7 +42,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 	private $entityPropertyCache = array();
 
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	private $entity;
 
@@ -102,12 +102,12 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 	/**
 	 * @return EntityQuery
 	 */
-	static function create(IQueried $entity, $alias = null)
+	static function create(IQueryable $entity, $alias = null)
 	{
 		return new self ($entity, $alias);
 	}
 
-	function __construct(IQueried $entity, $alias = null)
+	function __construct(IQueryable $entity, $alias = null)
 	{
 		$this->entity = $entity;
 		$this->table = $entity->getPhysicalSchema()->getDBTableName();
@@ -282,7 +282,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 	}
 
 	/**
-	 * @return IQueried
+	 * @return IQueryable
 	 */
 	function getEntity()
 	{
@@ -449,7 +449,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 
 		$selectQuery->from($this->table, $this->alias != $this->table ? $this->alias : null);
 
-		foreach ($this->entity->getPhysicalSchema()->getDBColumns() as $field) {
+		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
 			$selectQuery->get($field, $this->alias);
 		}
 

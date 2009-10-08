@@ -44,7 +44,7 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::INTEGER)
@@ -58,7 +58,7 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	 */
 	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty)
 	{
-		$columns = reset($ormProperty->getDbColumns());
+		$columns = reset($ormProperty->getDBFields());
 		return $db->preGenerate($tableName, key($columns));
 	}
 
@@ -67,7 +67,7 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	 */
 	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty)
 	{
-		$columns = reset($ormProperty->getDbColumns());
+		$columns = reset($ormProperty->getDBFields());
 		return $db->getGeneratedId($tableName, key($columns));
 	}
 }

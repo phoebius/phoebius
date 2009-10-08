@@ -16,14 +16,14 @@
 class OneToManyContainerPropertyType extends ContainerPropertyType
 {
 	/**
-	 * @var OrmProperty
+	 * @var IOrmProperty
 	 */
 	private $encapsulantProperty;
 
 	function __construct(
-			IQueried $container,
-			IQueried $encapsulant,
-			OrmProperty $encapsulantProperty
+			IQueryable $container,
+			IQueryable $encapsulant,
+			IOrmProperty $encapsulantProperty
 		)
 	{
 		$this->encapsulantProperty = $encapsulantProperty;
@@ -32,7 +32,7 @@ class OneToManyContainerPropertyType extends ContainerPropertyType
 	}
 
 	/**
-	 * @return OrmProperty
+	 * @return IOrmProperty
 	 */
 	function getEncapsulantProperty()
 	{

@@ -20,7 +20,7 @@ abstract class ContainerWorker
 	protected $parent;
 
 	/**
-	 * @var IQueried
+	 * @var IQueryable
 	 */
 	protected $children;
 
@@ -49,7 +49,7 @@ abstract class ContainerWorker
 	 */
 	abstract function getCount();
 
-	function __construct(IdentifiableOrmEntity $parent, IQueried $children)
+	function __construct(IdentifiableOrmEntity $parent, IQueryable $children)
 	{
 		$this->parent = $parent;
 		$this->children = $children;

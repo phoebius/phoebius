@@ -12,13 +12,8 @@
 /**
  * @ingroup OrmDomain
  */
-class OrmDomain
+final class OrmDomain
 {
-	/**
-	 * @var string
-	 */
-	private $name;
-
 	/**
 	 * @var string
 	 */
@@ -28,26 +23,6 @@ class OrmDomain
 	 * @var array of {@link OrmClass}
 	 */
 	private $classes = array();
-
-	/**
-	 * @return string|null
-	 */
-	function getName()
-	{
-		return $this->name;
-	}
-
-	/**
-	 * @return OrmDomain
-	 */
-	function setName($name = null)
-	{
-		Assert::isScalarOrNull($name);
-
-		$this->name = $name;
-
-		return $this;
-	}
 
 	/**
 	 * @return string|null

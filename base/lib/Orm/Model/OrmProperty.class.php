@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmModel
  */
-class OrmProperty
+class OrmProperty implements IOrmProperty
 {
 	/**
 	 * @var string
@@ -71,7 +71,7 @@ class OrmProperty
 		$this->type = $type;
 		$this->unique = $isUnique;
 		$this->visibility =
-			sizeof($this->type->getDbColumns()) < 1
+			sizeof($this->type->getDBFields()) < 1
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
 
@@ -85,7 +85,7 @@ class OrmProperty
 	{
 		Assert::isTrue(
 			sizeof($dbColumnNames)
-			== sizeof($this->type->getDbColumns()),
+			== sizeof($this->type->getDBFields()),
 			'wrong DB column count for the specified type'
 		);
 
@@ -153,7 +153,7 @@ class OrmProperty
 	/**
 	 * @return array of columnName
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return $this->dbColumnNames;
 	}
@@ -170,7 +170,7 @@ class OrmProperty
 			)
 		);
 
-		foreach (array_keys($this->getType()->getDbColumns()) as $key) {
+		foreach (array_keys($this->getType()->getDBFields()) as $key) {
 			$columns[] = (
 				$propertyPrefix
 				. (

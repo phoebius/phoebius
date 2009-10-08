@@ -35,7 +35,7 @@ final class DatePropertyType extends ObjectPropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::DATE)

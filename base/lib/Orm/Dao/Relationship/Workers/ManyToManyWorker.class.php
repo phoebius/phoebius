@@ -21,7 +21,7 @@ abstract class ManyToManyWorker extends ContainerWorker
 
 	final function __construct(
 			IdentifiableOrmEntity $parent,
-			IQueried $children,
+			IQueryable $children,
 			ManyToManyContainerPropertyType $mtm
 		)
 	{

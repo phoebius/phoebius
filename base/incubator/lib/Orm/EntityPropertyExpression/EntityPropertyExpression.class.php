@@ -81,7 +81,7 @@ abstract class EntityPropertyExpression implements IEntityPropertyExpression
 	protected function makeRawValue($value)
 	{
 		return array_combine(
-			$this->getProperty()->getDbColumns(),
+			$this->getProperty()->getDBFields(),
 			$this->getProperty()->getType()->makeRawValue($value)
 		);
 	}

@@ -14,7 +14,7 @@ final class CacheTtl
 	const WEEK = 604800;
 	const DAY = 86400;
 	const HOUR = 3600;
-	const NEVER = 1;
+	const NEVER = 0;
 }
 
 ?>

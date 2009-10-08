@@ -26,7 +26,7 @@ abstract class ManyToManyContainer extends Container
 	 */
 	function __construct(
 			IdentifiableOrmEntity $parent,
-			IQueried $children,
+			IQueryable $children,
 			ManyToManyContainerPropertyType $proxy
 		)
 	{

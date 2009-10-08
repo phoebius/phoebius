@@ -10,13 +10,12 @@
  ************************************************************************************************/
 
 /**
- * TODO: cut resolving functionality to a base class
- * $phoebius/share/Orm/Generator/abstract.dtd
+ * FIXME: cut resolving functionality to a base class
  * @ingroup XmlOrmDomainImporter
  */
-class XmlOrmDomainImporter implements IOrmDomainImporter
+class XmlOrmDomainBuilder implements IOrmDomainBuilder
 {
-	const DTD_BASE_PATH = '/share/Orm/Domain/Importer/Xml/abstract.dtd';
+	const DTD_BASE_PATH = '/share/Orm/Domain/Meta/Xml/abstract.dtd';
 	const DTD_ROOT_ELEMENT_NAME = 'domain';
 
 	private $xmlFilename;
@@ -28,11 +27,11 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	private $xmlElement;
 
 	/**
-	 * @var OrmDomain|null
+	 * @var OrmDomain
 	 */
 	private $ormDomain;
 
-	function __construct($xmlFilename, $dtdFilename = null)
+	function __construct(OrmDomain $ormDomain, $xmlFilename, $dtdFilename = null)
 	{
 		Assert::isScalar($xmlFilename);
 		Assert::isScalarOrNull($dtdFilename);
@@ -50,39 +49,34 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			$dtdFilename = PHOEBIUS_BASE_ROOT . self::DTD_BASE_PATH;
 		}
 
+		$this->ormDomain = $ormDomain;
 		$this->xmlFilename = $xmlFilename;
 		$this->dtdFilename = str_replace(
 			'\\',
 			'/',
 			$dtdFilename
 		);
-
 	}
 
 	/**
+	 * @throws OrmModelException
 	 * @return OrmDomain
 	 */
-	function import(OrmDomain $ormDomain)
+	function build()
 	{
-		if (!$this->ormDomain) {
-			$this->ormDomain = $ormDomain;
-
-			try {
-				$this->load();
-				$this->generateDomain();
-			}
-			catch (Exception $e) {
-				$this->dispose();
-
-				$this->ormDomain = null;
-
-//				$this->recorder->putErrorLine($e->getMessage());
-
-				throw new StateException('Cannot create an orm domain');
-			}
-
-			$this->dispose();
+		try {
+			$this->load();
+			$this->generateDomain();
 		}
+		catch (Exception $e) {
+			$this->dispose();
+
+//			$this->recorder->putErrorLine($e->getMessage());
+
+			throw $e;
+		}
+
+		$this->dispose();
 
 		return $this->ormDomain;
 	}
@@ -141,10 +135,6 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 		$classEntities = array();
 		$classProperties = array();
 		$classContainers = array();
-
-		if (isset($this->xmlElement['name'])) {
-			$this->ormDomain->setName((string) $this->xmlElement['name']);
-		}
 
 		if (isset($this->xmlElement['db-schema'])) {
 			$this->ormDomain->setDbSchema((string) $this->xmlElement['db-schema']);
@@ -276,7 +266,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 
 		if (isset($xmlIdentifier['db-columns'])) {
 			$identifier->setDBColumnNames(
-				$this->getDBColumns($xmlIdentifier['db-columns'])
+				$this->getDBFields($xmlIdentifier['db-columns'])
 			);
 		}
 
@@ -286,7 +276,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 	/**
 	 * @return array
 	 */
-	private function getDBColumns($columnsList)
+	private function getDBFields($columnsList)
 	{
 		$columns = explode(',', $columnsList);
 		$yield = array();
@@ -321,7 +311,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 
 		if (isset($xmlProperty['db-columns'])) {
 			$property->setDBColumnNames(
-				$this->getDBColumns($xmlProperty['db-columns'])
+				$this->getDBFields($xmlProperty['db-columns'])
 			);
 		}
 
@@ -425,7 +415,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 
 		if (isset($xmlContainer['db-columns'])) {
 			$property->setDBColumnNames(
-				$this->getDBColumns($xmlContainer['db-columns'])
+				$this->getDBFields($xmlContainer['db-columns'])
 			);
 		}
 
@@ -470,6 +460,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 					&& call_user_func(array($name, 'orm'))->hasDao()
 				) {
 				return new AssociationPropertyType(
+				// new EntityWrap('EntityName'), EntityWrap implements IQueryable
 					call_user_func(
 						array($name, 'orm')
 					),
@@ -486,7 +477,7 @@ class XmlOrmDomainImporter implements IOrmDomainImporter
 			}
 			// nothing for now
 			else {
-				Assert::notImplemented('handle type failure (failed %s type)', $name);
+				throw new OrmModelDefinitionException('handle type failure (failed '.$name.' type)');
 			}
 		}
 		else {

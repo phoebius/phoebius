@@ -47,7 +47,7 @@ class NumericPropertyType extends FloatPropertyType
 	/**
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::NUMERIC)

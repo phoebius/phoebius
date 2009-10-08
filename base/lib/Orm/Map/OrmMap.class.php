@@ -132,7 +132,7 @@ final class OrmMap implements IOrmEntityMapper
 
 				Assert::isTrue(
 					is_array($rawValue)
-					&& array_keys($rawValue) === array_keys($property->getType()->getDbColumns()),
+					&& array_keys($rawValue) === array_keys($property->getType()->getDBFields()),
 					'wrong raw value %s for property %s',
 					$rawValue,
 					$property->getName()

@@ -61,7 +61,7 @@ final class EntityProperty
 	{
 		$yield = array();
 
-		foreach ($this->property->getDbColumns() as $key) {
+		foreach ($this->property->getDBFields() as $key) {
 			$yield[] = new SqlColumn(
 				$key,
 				$this->entityQuery->getAlias()

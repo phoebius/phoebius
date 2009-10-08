@@ -12,7 +12,7 @@
 /**
  * @ingroup OrmModel
  */
-class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
+class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 {
 	/**
 	 * @var string
@@ -62,7 +62,7 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
 		return new $this->name;
 	}
 
-	function _sleep()
+	function __sleep()
 	{
 		return array (
 			'name', 'properties', 'identifier', 'hasDao', 'dbSchema'
@@ -361,12 +361,12 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueried
 	 * Array of columnName => DBType
 	 * @return array
 	 */
-	function getDbColumns()
+	function getDBFields()
 	{
 		$columns = array();
 
 		foreach ($this->properties as $property) {
-			foreach ($property->getDBColumns() as $field) {
+			foreach ($property->getDBFields() as $field) {
 				$columns[] = $field;
 			}
 		}

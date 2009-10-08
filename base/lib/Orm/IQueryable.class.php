@@ -12,17 +12,17 @@
 /**
  * @ingroup Orm
  */
-interface IMapped
+interface IQueryable extends IMappable
 {
 	/**
-	 * @return IOrmEntityMapper
+	 * @return IOrmEntityAccessor
 	 */
-	function getMap();
+	function getDao();
 
 	/**
-	 * @return ILogicallySchematic
+	 * @return IPhysicallySchematic
 	 */
-	function getLogicalSchema();
+	function getPhysicalSchema();
 }
 
 ?>
