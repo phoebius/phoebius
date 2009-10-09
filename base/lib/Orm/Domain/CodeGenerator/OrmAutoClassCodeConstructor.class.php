@@ -15,72 +15,25 @@
 class OrmAutoClassCodeConstructor extends ClassCodeConstructor
 {
 	/**
-	 * @var OrmClass
-	 */
-	private $ormClass;
-
-	private $classProperties = array();
-	private $classMethods = array();
-
-	/**
-	 * @return OrmAutoClassCodeConstructor
-	 */
-	static function create(OrmClass $ormClass)
-	{
-		return new self ($ormClass);
-	}
-
-	function __construct(OrmClass $ormClass)
-	{
-		$this->ormClass = $ormClass;
-	}
-
-	/**
 	 * @return string
 	 */
 	function getClassName()
 	{
-		return 'Auto' .  $this->ormClass->getName();
+		return 'Auto' .  $this->ormClass->getEntityName();
 	}
 
 	/**
-	 * @return void
+	 * @return boolean
 	 */
-	function make(IWriteStream $writeStream)
+	function isPublicEditable()
 	{
-		$this->classMethods = array();
-		$this->classProperties = array();
-
-		$writeStream
-			->write($this->getFileHeader())
-			->write($this->getClassHeader());
-
-		$this->prepare();
-		foreach ($this->ormClass->getProperties() as $ormProperty) {
-			$this->fetchClassMembers($ormProperty);
-		}
-
-		// write properties & methods here
-
-		$writeStream
-			->write(
-				join(PHP_EOL . PHP_EOL, $this->classProperties)
-			)
-			->write(PHP_EOL)
-			->write(PHP_EOL)
-			->write(
-				join(PHP_EOL . PHP_EOL, $this->classMethods)
-			);
-
-		$writeStream
-			->write($this->getClassFooter())
-			->write($this->getFileFooter());
+		return false;
 	}
 
 	/**
 	 * @return void
 	 */
-	private function prepare()
+	protected function findMembers()
 	{
 		$ormClassSerialized = str_replace(
 			'\'',
@@ -133,45 +86,36 @@ EOT;
 	}
 EOT;
 		}
+
+		foreach ($this->ormClass->getProperties() as $ormProperty) {
+			$this->fetchClassMembers($ormProperty);
+		}
 	}
 
 	/**
-	 * @return string
+	 * @return string final|abstract|null
 	 */
-	private function getClassHeader()
+	protected function getClassType()
 	{
-		$baseClassName =
+		return 'abstract';
+	}
+
+	protected function getExtendsClassName()
+	{
+		return
 			$this->ormClass->getIdentifier()
 				? 'IdentifiableOrmEntity'
 				: 'OrmEntity';
+	}
 
-		// TODO: cut out this functionality outside to the OrmClass
+	protected function getImplementsInterfaceNames()
+	{
 		$interfaces = array('IOrmRelated');
 		if ($this->ormClass->hasDao()) {
 			$interfaces[] = 'IDaoRelated';
 		}
 
-		$implements = join(', ', $interfaces);
-
-		return <<<EOT
-/**
- *
- */
-abstract class {$this->getClassName()} extends {$baseClassName} implements {$implements}
-{
-
-EOT;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function getClassFooter()
-	{
-		return <<<EOT
-
-}
-EOT;
+		return $interfaces;
 	}
 
 	/**
@@ -283,7 +227,7 @@ EOT;
 	}
 EOT;
 
-			if ($this->ormClass->getIdentifier() === $ormProperty) {
+			if ($this->ormClass->getIdentifier()->getName() == $ormProperty->getName()) {
 				$this->classMethods[] = <<<EOT
 	/**
 	 * @internal
@@ -317,7 +261,7 @@ EOT;
 	}
 EOT;
 
-			if ($this->ormClass->getIdentifier() === $ormProperty) {
+			if ($this->ormClass->getIdentifier()->getName() == $ormProperty->getName()) {
 				$this->classMethods[] = <<<EOT
 	/**
 	 * @internal

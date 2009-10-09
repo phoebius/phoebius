@@ -98,6 +98,16 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 	{
 		return $this->isNullable;
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			'null',
+			$this->isNullable
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

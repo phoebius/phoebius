@@ -57,6 +57,19 @@ class FloatPropertyType extends PrimitivePropertyType
 				->setIsNullable($this->isNullable())
 		);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			is_null($this->precision)
+				? 'null'
+				: $this->precision,
+			'null',
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

@@ -43,6 +43,15 @@ final class TimestampPropertyType extends ObjectPropertyType
 				->setIsNullable($this->isNullable())
 		);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

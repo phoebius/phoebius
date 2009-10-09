@@ -46,6 +46,15 @@ class OneToManyContainerPropertyType extends ContainerPropertyType
 	{
 		return null;
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			$this->getContainer()->getLogicalSchema()->getEntityName() . '::orm()',
+			$this->getEncapsulant()->getLogicalSchema()->getEntityName() . '::orm()',
+			$this->getEncapsulant()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulantProperty->getName() . '\')',
+		);
+	}
 }
 
 ?>

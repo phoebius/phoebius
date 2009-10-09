@@ -15,11 +15,6 @@
 class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 {
 	/**
-	 * @var OrmClass
-	 */
-	private $ormClass;
-
-	/**
 	 * @var OrmProperty
 	 */
 	private $ormProperty;
@@ -34,8 +29,17 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 
 	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
 	{
-		$this->ormClass = $ormClass;
 		$this->ormProperty = $ormProperty;
+
+		parent::__construct($ormClass);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	function isPublicEditable()
+	{
+		return false;
 	}
 
 	/**
@@ -49,58 +53,28 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 	/**
 	 * @return void
 	 */
-	function make(IWriteStream $writeStream)
+	protected function findMembers()
 	{
-		$writeStream
-			->write($this->getFileHeader())
-			->write($this->getClassHeader())
-			->write($this->getClassBody())
-			->write($this->getClassFooter())
-			->write($this->getFileFooter());
-	}
-
-	/**
-	 * @return void
-	 */
-	private function getClassBody()
-	{
-		return <<<EOT
-	function __construct({$this->ormClass->getName()} \$parent, \$partialFetch = false)
+		$this->classMethods[] = <<<EOT
+	function __construct({$this->ormClass->getName()} \$parent)
 	{
 		parent::__construct(
 			\$parent,
 			{$this->ormClass->getName()}::map(),
-			{$this->ormClass->getName()}::orm()->getProperty('{$this->ormProperty->getName()}'),
-			\$partialFetch
+			{$this->ormClass->getName()}::orm()->getProperty('{$this->ormProperty->getName()}')
 		);
 	}
 EOT;
 	}
 
-	/**
-	 * @return string
-	 */
-	private function getClassHeader()
+	protected function getClassType()
 	{
-		return <<<EOT
-/**
- *
- */
-abstract class {$this->getClassName()} extends ManyToManyContainer
-{
-
-EOT;
+		return 'abstract';
 	}
 
-	/**
-	 * @return string
-	 */
-	private function getClassFooter()
+	protected function getExtendsClassName()
 	{
-		return <<<EOT
-
-}
-EOT;
+		return 'ManyToManyContainer';
 	}
 }
 

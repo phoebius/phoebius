@@ -56,6 +56,22 @@ class NumericPropertyType extends FloatPropertyType
 				->setIsNullable($this->isNullable())
 		);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			is_null($this->precision)
+				? 'null'
+				: $this->precision,
+			is_null($this->scale)
+				? 'null'
+				: $this->scale,
+			'null',
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

@@ -290,6 +290,32 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		return $yield;
 	}
 
+	private function generateDBFields($propertyName, OrmPropertyType $ormPropertyTpe)
+	{
+		$fields = array();
+
+		$propertyPrefix = strtolower(
+			preg_replace(
+				'/([a-z])([A-Z])/',
+				'$1_$2',
+				$propertyName
+			)
+		);
+
+		foreach (array_keys($ormPropertyTpe->getDBFields()) as $key) {
+			$fields[] = (
+				$propertyPrefix
+				. (
+					(!is_int($key) || $key > 0)
+						? '_' . $key
+						: ''
+				)
+			);
+		}
+
+		return $fields;
+	}
+
 	/**
 	 * @return OrmProperty
 	 */
@@ -304,16 +330,13 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		$property = new OrmProperty(
 			(string) $xmlProperty['name'],
+			isset($xmlProperty['db-columns'])
+				? $this->getDBFields($xmlProperty['db-columns'])
+				: $this->$this->getDBFields((string) $xmlProperty['name'], $type),
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			$xmlProperty['unique'] == 'true'
 		);
-
-		if (isset($xmlProperty['db-columns'])) {
-			$property->setDBColumnNames(
-				$this->getDBFields($xmlProperty['db-columns'])
-			);
-		}
 
 //		$this->recorder->putMsg(' done.');
 

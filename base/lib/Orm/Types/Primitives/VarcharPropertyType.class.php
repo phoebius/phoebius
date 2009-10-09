@@ -49,6 +49,19 @@ class VarcharPropertyType extends PrimitivePropertyType
 				->setIsNullable($this->isNullable())
 		);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			is_null($this->length)
+				? 'null'
+				: $this->length,
+			'null',
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

@@ -46,14 +46,14 @@ interface IPropertyMappable
 	 */
 	function getDefaultValue();
 
-	/**
-	 * @return IEntityPropertyExpression
-	 */
-	function getEntityPropertyExpression(
-			$table,
-			OrmProperty $ormProperty,
-			IExpression $expression
-	);
+//	/**
+//	 * @return IEntityPropertyExpression
+//	 */
+//	function getEntityPropertyExpression(
+//			$table,
+//			OrmProperty $ormProperty,
+//			IExpression $expression
+//	);
 }
 
 ?>

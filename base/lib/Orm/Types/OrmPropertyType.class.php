@@ -14,14 +14,6 @@
  */
 abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructurized
 {
-	private static $entityPropertyExpressionWorkers = array(
-		ExpressionType::BETWEEN => 'BetweenEntityPropertyExpression',
-		ExpressionType::BINARY => 'BinaryPropertyExpression',
-		ExpressionType::IN_SET => 'InSetEntityPropertyExpression',
-		ExpressionType::PREFIX_UNARY => 'PrefixUnaryEntityPropertyExpression',
-		ExpressionType::UNARY_POSTFIX => 'UnaryPostfixPropertyExpression'
-	);
-
 	/**
 	 * @return string
 	 */
@@ -44,25 +36,22 @@ abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructuriz
 	}
 
 	/**
-	 * @return IEntityPropertyExpression
+	 * @return string
 	 */
-	function getEntityPropertyExpression(
-			$table,
-			OrmProperty $ormProperty,
-			IExpression $expression
-		)
+	function toPhpCodeCall()
 	{
-		Assert::isScalar($table);
+		return join('', array(
+			'new ',
+			get_class($this),
+			'(',
+			join(',', $this->getCtorArgumentsPhpCode()),
+			')'
+		));
+	}
 
-		$entityPropertyExpressionClass = self::$entityPropertyExpressionWorkers[
-			$expression->getExpressionType()->getValue()
-		];
-
-		return new $entityPropertyExpressionClass(
-			$table,
-			$ormProperty,
-			$expression
-		);
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array();
 	}
 }
 

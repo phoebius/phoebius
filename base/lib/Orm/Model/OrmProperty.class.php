@@ -37,7 +37,7 @@ class OrmProperty implements IOrmProperty
 	/**
 	 * @var array
 	 */
-	private $dbColumnNames = array();
+	private $dbFields = array();
 
 	/**
 	 * @return OrmProperty
@@ -59,6 +59,7 @@ class OrmProperty implements IOrmProperty
 	 */
 	function __construct(
 			$name,
+			array $fields,
 			OrmPropertyType $type,
 			OrmPropertyVisibility $visibility,
 			$isUnique = false
@@ -75,21 +76,21 @@ class OrmProperty implements IOrmProperty
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
 
-		$this->autoFillColumnNames();
+		$this->setDBFields($fields);
 	}
 
 	/**
 	 * @return OrmProperty
 	 */
-	function setDBColumnNames(array $dbColumnNames)
+	private function setDBFields(array $fields)
 	{
 		Assert::isTrue(
-			sizeof($dbColumnNames)
+			sizeof($fields)
 			== sizeof($this->type->getDBFields()),
 			'wrong DB column count for the specified type'
 		);
 
-		$this->dbColumnNames = $dbColumnNames;
+		$this->dbFields = $fields;
 
 		return $this;
 	}
@@ -158,30 +159,28 @@ class OrmProperty implements IOrmProperty
 		return $this->dbColumnNames;
 	}
 
-	private function autoFillColumnNames()
+	function toPhpCall()
 	{
-		$columns = array();
-
-		$propertyPrefix = strtolower(
-			preg_replace(
-				'/([a-z])([A-Z])/',
-				'$1_$2',
-				$this->getName()
-			)
-		);
-
-		foreach (array_keys($this->getType()->getDBFields()) as $key) {
-			$columns[] = (
-				$propertyPrefix
-				. (
-					(!is_int($key) || $key > 0)
-						? '_' . $key
-						: ''
-				)
-			);
+		$fields = array();
+		foreach ($this->dbFields as $field) {
+			$fields[] = '\'' . $field . '\'';
 		}
 
-		$this->setDBColumnNames($columns);
+		$ctorArguments = array(
+			'{$this->name}',
+			$fields,
+			$this->type->toPhpCodeCall(),
+			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()}",
+			$this->unique
+				? 'true'
+				: 'false'
+		);
+
+		return join('', array(
+			'new OrmProperty(',
+			join(',', $ctorArguments),
+			')'
+		));
 	}
 }
 

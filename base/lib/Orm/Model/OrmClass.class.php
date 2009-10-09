@@ -20,12 +20,12 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 	private $name;
 
 	/**
-	 * @var array of {@link OrmProperty}
+	 * @var array of {@link IOrmProperty}
 	 */
     private $properties = array();
 
 	/**
-	 * @var OrmProperty
+	 * @var IOrmProperty|null
 	 */
 	private $identifier;
 
@@ -242,6 +242,14 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		$this->properties[$property->getName()] = $property;
 
 		return $this;
+	}
+
+	/**
+	 * @return array of string
+	 */
+	function getPropertyNames()
+	{
+		return array_keys($this->properties);
 	}
 
 	/**

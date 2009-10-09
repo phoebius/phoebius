@@ -10,8 +10,7 @@
  ************************************************************************************************/
 
 /**
- * Defines an interface for accessing physical schema information that stores a internal
- * data
+ * Defines an interface for accessing physical schema information
  * @ingroup Orm
  */
 interface IPhysicallySchematic
@@ -23,7 +22,7 @@ interface IPhysicallySchematic
 	function getDBTableName();
 
 	/**
-	 * Array of columnName
+	 * Array of field names
 	 * @return array
 	 */
 	function getDBFields();

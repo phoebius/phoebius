@@ -12,8 +12,16 @@
 /**
  * @ingroup OrmCodeGenerator
  */
-class OrmClassCodeConstructor extends ClassCodeConstructor
+class OrmEntityClassCodeConstructor extends ClassCodeConstructor
 {
+	/**
+	 * @return string
+	 */
+	function getClassName()
+	{
+		return $this->ormClass->getEntityName() . 'Entity';
+	}
+
 	/**
 	 * @return boolean
 	 */
@@ -22,17 +30,30 @@ class OrmClassCodeConstructor extends ClassCodeConstructor
 		return true;
 	}
 
-	/**
-	 * @return string
-	 */
-	function getClassName()
-	{
-		return $this->ormClass->getEntityName();
-	}
-
 	protected function getExtendsClassName()
 	{
 		return 'Auto' . $this->getClassName();
+	}
+
+	protected function getClassType()
+	{
+		return 'final';
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function findMembers()
+	{
+		$this->classMethods[] = <<<EOT
+	/**
+	 * @return {$this->getClassName()}
+	 */
+	static function getInstance()
+	{
+		return parent::instance(__CLASS__);
+	}
+EOT;
 	}
 }
 

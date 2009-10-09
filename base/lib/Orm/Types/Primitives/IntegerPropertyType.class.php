@@ -57,6 +57,19 @@ class IntegerPropertyType extends PrimitivePropertyType
 				->setIsNullable($this->isNullable())
 		);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			is_null($this->size)
+				? 'null'
+				: $this->size,
+			'null',
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>

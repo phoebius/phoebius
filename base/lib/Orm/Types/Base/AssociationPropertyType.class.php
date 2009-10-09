@@ -223,6 +223,15 @@ class AssociationPropertyType extends OrmPropertyType
 	{
 		return $this->multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE);
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			$this->container->getLogicalSchema()->getEntityName() . '::orm()',
+			'new AssociationMultiplicity(AssociationMultiplicity::' . $this->multiplicity()->getId() . ')',
+			'new AssociationBreakAction(AssociationBreakAction::' . $this->action->getId() . ')'
+		);
+	}
 }
 
 ?>

@@ -129,47 +129,48 @@ class OrmGenerator
 	/**
 	 * @return void
 	 */
+	private function buildClass(ClassCodeConstructor $ccc)
+	{
+		$path =
+			(
+				$ccc->isPublicEditable()
+					? $this->publicClassDir
+					: $this->autoClassDir
+			)
+			. DIRECTORY_SEPARATOR
+			. $ccc->getClassName()
+			. PHOEBIUS_TYPE_EXTENSION;
+
+		if (
+				!$ccc->isPublicEditable()
+				|| !file_exists($path)
+				|| !$this->regeneratePublic
+		) {
+			$ccc->make(new FileWriteStream($path));
+		}
+	}
+
+	/**
+	 * @return void
+	 */
 	private function generateClassFiles(OrmClass $class)
 	{
-		$auto = new OrmAutoClassCodeConstructor($class);
-		$auto->make(
-			new FileWriteStream(
-				$this->autoClassDir . DIRECTORY_SEPARATOR . $auto->getClassName() . PHOEBIUS_TYPE_EXTENSION
-			)
-		);
+		$this->buildClass(new OrmAutoClassCodeConstructor($class));
+		$this->buildClass(new OrmClassCodeConstructor($class));
 
-		$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . $class->getName() . PHOEBIUS_TYPE_EXTENSION;
-		if (!file_exists($publicFile) || $this->regeneratePublic) {
-			OrmClassCodeConstructor::create($class, $auto)
-				->make(
-					new FileWriteStream(
-						$publicFile
-					)
-				);
-		}
+		$this->buildClass(new OrmLogicalSchemaClassCodeConstructor($class));
+		$this->buildClass(new OrmPhysicalSchemaClassCodeConstructor($class));
+		$this->buildClass(new OrmAutoEntityClassCodeConstructor($class));
+		$this->buildClass(new OrmEntityClassCodeConstructor($class));
 
 		foreach ($class->getProperties() as $property) {
-			if ($property->getType() instanceof OneToManyContainerPropertyType) {
-				$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . ucfirst($property->getName()) . PHOEBIUS_TYPE_EXTENSION;
-				if (!file_exists($publicFile) || $this->regeneratePublic) {
-					OrmOneToManyClassCodeConstructor::create($class, $property)
-						->make(
-							new FileWriteStream(
-								$publicFile
-							)
-						);
-				}
+			$type = $property->getType();
+
+			if ($type instanceof OneToManyContainerPropertyType) {
+				$this->buildClass(new OrmOneToManyClassCodeConstructor($class, $property));
 			}
-			else if ($property->getType() instanceof ManyToManyContainerPropertyType) {
-				$publicFile = $this->publicClassDir . DIRECTORY_SEPARATOR . ucfirst($property->getName()) . PHOEBIUS_TYPE_EXTENSION;
-				if (!file_exists($publicFile) || $this->regeneratePublic) {
-					OrmManyToManyClassCodeConstructor::create($class, $property)
-						->make(
-							new FileWriteStream(
-								$publicFile
-							)
-						);
-				}
+			else if ($type instanceof ManyToManyContainerPropertyType) {
+				$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
 			}
 		}
 	}

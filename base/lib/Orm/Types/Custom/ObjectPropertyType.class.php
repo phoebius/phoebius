@@ -111,6 +111,17 @@ class ObjectPropertyType extends PrimitivePropertyType
 	{
 		return $this->type;
 	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			'\'' . $this->type . '\'',
+			'null',
+			$this->isNullable
+				? 'true'
+				: 'false'
+		);
+	}
 }
 
 ?>
