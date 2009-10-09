@@ -59,7 +59,6 @@ class OrmGenerator
 		return $this->schemaDir;
 	}
 
-
 	/**
 	 * @return string
 	 */
@@ -74,6 +73,26 @@ class OrmGenerator
 	function getPublicClassDir()
 	{
 		return $this->publicClassDir;
+	}
+
+	/**
+	 * @return OrmGenerator
+	 */
+	function regeneratePublic()
+	{
+		$this->regeneratePublic = true;
+
+		return $this;
+	}
+
+	/**
+	 * @return OrmGenerator
+	 */
+	function skipPublic()
+	{
+		$this->regeneratePublic = false;
+
+		return $this;
 	}
 
 	/**
@@ -93,19 +112,7 @@ class OrmGenerator
 	 */
 	private function generateDbSchema(OrmDomain $ormDomain)
 	{
-		if (!($schemaName = $ormDomain->getName())) {
-			$schemaName = 'db-schema';
-		}
-
 		$dbSchema = DBSchemaImporter::create()->import($ormDomain, new DBSchema());
-
-		DbSchemaCodeConstructor
-			::create($dbSchema)
-			->make(
-				new FileWriteStream(
-					$this->schemaDir . DIRECTORY_SEPARATOR . $schemaName . '.php'
-				)
-			);
 
 		if (($dbSchemaName = $ormDomain->getDbSchema())) {
 			try {
@@ -118,7 +125,7 @@ class OrmGenerator
 			SqlSchemaConstructor::create($dbSchema)
 				->make(
 					new FileWriteStream(
-						$this->schemaDir . DIRECTORY_SEPARATOR . $schemaName . '.sql'
+						$this->schemaDir . DIRECTORY_SEPARATOR . $ormDomain->getName() . '.sql'
 					),
 					$db->getDialect()
 				);
