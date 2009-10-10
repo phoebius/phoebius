@@ -35,33 +35,15 @@ class OrmAutoClassCodeConstructor extends ClassCodeConstructor
 	 */
 	protected function findMembers()
 	{
-		$ormClassSerialized = str_replace(
-			'\'',
-			'\\\'',
-			serialize($this->ormClass)
-		);
-		$this->classProperties[] = <<<EOT
-	/**
-	 * @var OrmClass|null
-	 */
-	private static \$ormClass = '{$ormClassSerialized}';
-EOT;
+		$ormEntityHolder = $this->ormClass->getEntityName() . 'Entity';
 
 		$this->classMethods[] = <<<EOT
 	/**
-	 * @return OrmClass
+	 * @return {$ormEntityHolder}
 	 */
 	static function orm()
 	{
-		if (is_scalar(self::\$ormClass)) {
-			self::\$ormClass = unserialize(self::\$ormClass);
-		}
-
-		Assert::isTrue(
-			self::\$ormClass instanceof OrmClass
-		);
-
-		return self::\$ormClass;
+		return {$ormEntityHolder}::getInstance();
 	}
 EOT;
 
