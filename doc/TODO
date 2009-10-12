@@ -19,6 +19,7 @@ Orm/Metainfo
 Think over replacing serialized graph of OrmDomain/OrmClass/OrmProperty set of objects with
 class/property-level attributes using addendum (http://code.google.com/p/addendum/)
 
+Remove OrmPropertyType::defaultValue wrt of populating default property values by Entity itself
  
 Dao/Cache
 =========
