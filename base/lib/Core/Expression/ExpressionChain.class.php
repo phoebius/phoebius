@@ -81,9 +81,9 @@ class ExpressionChain implements IExpression
 	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
-		$newChain = new self;
+		$newChain = new self ($this->predicate);
 		foreach ($this->chain as $item) {
-			$newChain->chain[] = $item->convert($converter);
+			$newChain->chain[] = $item->toExpression($converter);
 		}
 
 		return $newChain;

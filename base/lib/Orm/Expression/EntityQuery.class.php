@@ -294,7 +294,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	 */
 	function where(IExpression $expression)
 	{
-		$this->expressionChain->add($expression);
+		$this->expressionChain->add($expression->toExpression($this));
 
 		return $this;
 	}
@@ -484,9 +484,9 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 				return $this->entityPropertyCache[$property];
 			}
 
-			if (false !== strpos('.', $property)) {
-				$ep = $this->resolveAssocProperty($property);
-				$this->guessEntityProperty[$property] = $ep;
+			if (false !== strpos($property, '.')) {
+				$ep = $this->guessEntityProperty($property);
+				$this->entityPropertyCache[$property] = $ep;
 
 				return $ep;
 			}
@@ -554,15 +554,15 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	 */
 	private function fill(SelectQuery $selectQuery)
 	{
-		foreach ($this->joined as $entityQuery) {
-			$property = $entityQuery->getProperty();
+		foreach ($this->joined as $propertyName => $entityQuery) {
+			$property = $this->getEntityProperty($propertyName)->getProperty();
 			$type = $property->getType();
 
 			Assert::isTrue($type instanceof AssociationPropertyType);
 
 			$joinMethod =
 				$type->getAssociationMultiplicity()->is(
-					AssociationMultiplicity::exactlyOne()
+					AssociationMultiplicity::EXACTLY_ONE
 				)
 					? SqlJoinMethod::INNER // exactlyOne association is strict enough
 					: SqlJoinMethod::LEFT;
@@ -570,20 +570,21 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 			$selectQuery->join(
 				new SqlConditionalJoin(
 					$entityQuery->table,
-					$entityQuery->table == $entityQuery->alias
-						? $entityQuery->alias
-						: null,
+					$entityQuery->alias,
 					new SqlJoinMethod($joinMethod),
-					$type->getEntityPropertyExpression(
-						$this->alias,
-						$property,
-						Expresssion::eq(
+					Expression
+						::eq(
+							new EntityProperty(
+								$this,
+								$property
+							),
 							new EntityProperty(
 								$entityQuery,
 								$entityQuery->entity->getLogicalSchema()->getIdentifier()
 							)
 						)
-					)
+						->toExpression($this)
+						->toDalExpression()
 				)
 			);
 
@@ -604,26 +605,24 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 		Assert::isTrue(
 			$property->getType() instanceof AssociationPropertyType,
 			'%s::%s property should be of AssociationPropertyType',
-			$this->entity->getLogicalSchema()->getName(),
+			$this->entity->getLogicalSchema()->getEntityName(),
 			$propertyName
 		);
 
-		$query =
-			isset($this->joined[$propertyName])
-				? $this->joined[$propertyName]
-				: new EntityQuery(
-					$property->getType()->getContainer(),
-					(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
-						? $this->alias . '_' . $propertyName
-						: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
-				);
-
-		if (sizeof($propertyPath) > 1) {
-			return $query->guessEntityProperty(join('.', array_slice($propertyPath, 1)));
+		if (isset($this->joined[$propertyName])) {
+			$query = $this->joined[$propertyName];
 		}
 		else {
-			return $this->getEntityProperty($property);
+			$query = $this->joined[$propertyName]
+				= new EntityQuery(
+						$property->getType()->getContainer(),
+						(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
+							? $this->alias . '_' . $propertyName
+							: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
+					);
 		}
+
+		return $query->getEntityProperty(join('.', array_slice($propertyPath, 1)));
 	}
 }
 
