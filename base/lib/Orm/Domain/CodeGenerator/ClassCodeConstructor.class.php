@@ -104,10 +104,11 @@ abstract class ClassCodeConstructor extends CodeConstructor
 	{
 		return
 			join(self::NEW_LINE . self::NEW_LINE, $this->classProperties)
-			. (!empty($this->classMethods)
-				? self::NEW_LINE . self::NEW_LINE . join(self::NEW_LINE . self::NEW_LINE, $this->classMethods)
+			. (!empty($this->classProperties) && !empty($this->classMethods)
+				? self::NEW_LINE . self::NEW_LINE
 				: ''
-			);
+			)
+			. join(self::NEW_LINE . self::NEW_LINE, $this->classMethods);
 	}
 
 	protected function getClassComment()

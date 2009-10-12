@@ -120,10 +120,10 @@ EOT;
 	/**
 	 * @return {$capitalizedPropertyName}
 	 */
-	function get{$capitalizedPropertyName}(\$partialFetch = false)
+	function get{$capitalizedPropertyName}()
 	{
 		if (!\$this->{$propertyName}) {
-			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this, \$partialFetch);
+			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this);
 		}
 
 		return \$this->{$propertyName};

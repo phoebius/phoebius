@@ -45,7 +45,7 @@ class DBSchemaBuilder
 	private $ormProperty;
 
 	/**
-	 * @return DBSchemaImportWorker
+	 * @return DBSchemaBuilder
 	 */
 	static function create(OrmDomain $ormDomain, DBSchema $dbSchema = null)
 	{

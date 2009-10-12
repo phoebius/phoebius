@@ -55,7 +55,7 @@ class OrmPhysicalSchemaClassCodeConstructor extends ClassCodeConstructor
 
 		return join('', array(
 			'array(',
-			join(',', $fields),
+			join(', ', $fields),
 			')'
 		));
 	}

@@ -33,6 +33,14 @@ class OrmAutoEntityClassCodeConstructor extends ClassCodeConstructor
 	/**
 	 * @return string
 	 */
+	protected function getExtendsClassName()
+	{
+		return 'LazySingleton';
+	}
+
+	/**
+	 * @return string
+	 */
 	protected function getImplementsInterfaceNames()
 	{
 		return array(

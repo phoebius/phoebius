@@ -112,7 +112,7 @@ class OrmGenerator
 	 */
 	private function generateDbSchema(OrmDomain $ormDomain)
 	{
-		$dbSchema = DBSchemaImporter::create()->import($ormDomain, new DBSchema());
+		$dbSchema = DBSchemaBuilder::create($ormDomain)->build();
 
 		if (($dbSchemaName = $ormDomain->getDbSchema())) {
 			try {
@@ -151,7 +151,7 @@ class OrmGenerator
 		if (
 				!$ccc->isPublicEditable()
 				|| !file_exists($path)
-				|| !$this->regeneratePublic
+				|| $this->regeneratePublic
 		) {
 			$ccc->make(new FileWriteStream($path));
 		}

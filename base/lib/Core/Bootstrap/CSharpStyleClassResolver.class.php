@@ -136,7 +136,7 @@ final class CSharpStyleClassResolver extends ClassResolver
 		// check the directory as completely scanned only in two cases:
 		// 1. pre-scan is allowed (so that we surely prescanned the directory even if we have found the path before)
 		// 2. we didn't found the filepath to a class (it means that we scanned the directory as deep as possible)
-		if ($this->allowPreScan || !$existingFilepath) {
+		if ($this->allowPreScan /* || !$existingFilepath */) {
 			// drop paths to a nested dirs - we would never go thru them again
 			// because the path of a curent level will prevent this
 			$this->scannedPaths = array_slice($this->scannedPaths, $currentPreScanIdx);

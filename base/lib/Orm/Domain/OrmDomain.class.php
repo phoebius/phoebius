@@ -121,6 +121,14 @@ final class OrmDomain
 
 		return $this->classes[$name];
 	}
+
+	/**
+	 * @return boolean
+	 */
+	function classExists($name)
+	{
+		return isset($this->classes[$name]);
+	}
 }
 
 ?>

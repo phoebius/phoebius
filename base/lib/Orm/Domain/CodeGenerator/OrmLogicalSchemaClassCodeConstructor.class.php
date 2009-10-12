@@ -90,7 +90,7 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 		$arrayContents = join(",\n", $arrayItems);
 		return <<<EOT
 		array(
-			{$arrayContents}
+{$arrayContents}
 		);
 EOT;
 	}

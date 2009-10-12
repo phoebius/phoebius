@@ -156,7 +156,7 @@ class OrmProperty implements IOrmProperty
 	 */
 	function getDBFields()
 	{
-		return $this->dbColumnNames;
+		return $this->dbFields;
 	}
 
 	function toPhpCall()
@@ -167,8 +167,8 @@ class OrmProperty implements IOrmProperty
 		}
 
 		$ctorArguments = array(
-			'{$this->name}',
-			$fields,
+			"'{$this->name}'",
+			'array(' . join(', ', $fields).')',
 			$this->type->toPhpCodeCall(),
 			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()}",
 			$this->unique

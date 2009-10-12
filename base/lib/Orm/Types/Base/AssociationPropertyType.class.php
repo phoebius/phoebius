@@ -228,7 +228,7 @@ class AssociationPropertyType extends OrmPropertyType
 	{
 		return array(
 			$this->container->getLogicalSchema()->getEntityName() . '::orm()',
-			'new AssociationMultiplicity(AssociationMultiplicity::' . $this->multiplicity()->getId() . ')',
+			'new AssociationMultiplicity(AssociationMultiplicity::' . $this->multiplicity->getId() . ')',
 			'new AssociationBreakAction(AssociationBreakAction::' . $this->action->getId() . ')'
 		);
 	}

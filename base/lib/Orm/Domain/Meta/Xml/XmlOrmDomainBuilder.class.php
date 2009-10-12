@@ -71,8 +71,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		catch (Exception $e) {
 			$this->dispose();
 
-//			$this->recorder->putErrorLine($e->getMessage());
-
 			throw $e;
 		}
 
@@ -259,16 +257,13 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		$identifier = new OrmProperty(
 			(string) $xmlIdentifier['name'],
+			isset($xmlIdentifier['db-columns'])
+				? $this->getDBFields($xmlIdentifier['db-columns'])
+				: $this->generateDBFields((string) $xmlIdentifier['name'], $type),
 			$type,
 			OrmPropertyVisibility::full(),
 			false
 		);
-
-		if (isset($xmlIdentifier['db-columns'])) {
-			$identifier->setDBColumnNames(
-				$this->getDBFields($xmlIdentifier['db-columns'])
-			);
-		}
 
 		return $identifier;
 	}
@@ -332,7 +327,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			(string) $xmlProperty['name'],
 			isset($xmlProperty['db-columns'])
 				? $this->getDBFields($xmlProperty['db-columns'])
-				: $this->$this->getDBFields((string) $xmlProperty['name'], $type),
+				: $this->getDBFields((string) $xmlProperty['name'], $type),
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			$xmlProperty['unique'] == 'true'
@@ -384,13 +379,15 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 			$type_id_name = '___mtm_' . $type->getDBTableName();
 			try {
-				$type_property = new OrmProperty(
-					$type_id_name,
-					new AssociationPropertyType(
+				$type = new AssociationPropertyType(
 						$type,
 						AssociationMultiplicity::exactlyOne(),
 						AssociationBreakAction::cascade()
-					)
+					);
+				$type_property = new OrmProperty(
+					$type_id_name,
+					$this->generateDBFields($type_id_name, $type),
+					$type
 				);
 
 				$proxy->addProperty(
@@ -403,13 +400,16 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 			$referredType_id_name = '___mtm_' . $type->getDBTableName();
 			try {
-				$referredType_property = new OrmProperty(
-					$referredType_id_name,
+				$type =
 					new AssociationPropertyType(
 						$referredType,
 						AssociationMultiplicity::exactlyOne(),
 						AssociationBreakAction::cascade()
-					)
+					);
+				$referredType_property = new OrmProperty(
+					$referredType_id_name,
+					$this->generateDBFields($referredType_id_name, $type),
+					$type
 				);
 
 				$proxy->addProperty(
@@ -431,6 +431,9 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		$property = new OrmProperty(
 			(string) $xmlContainer['name'],
+			isset($xmlContainer['db-columns'])
+				? $this->getDBFields($xmlContainer['db-columns'])
+				: $this->generateDBFields($type_id_name, $propertyType),
 			$propertyType,
 			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
 			false
@@ -457,7 +460,27 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		// {$typeName} : IOrmRelated
 		// ... not implemented yet. Possibly create an enumeration
 
-		if (class_exists($name, true)) {
+		if ($this->ormDomain->classExists($name)) {
+			$class = $this->ormDomain->getClass($name);
+
+			if ($class->hasDao() && $class->getIdentifier()) {
+				// map via db foreign key
+				return new AssociationPropertyType(
+					$class,
+					$multiplicity,
+					AssociationBreakAction::cascade()
+				);
+			}
+			else {
+				// map via injecting the fields
+				// currently unsupported. Needed to implement EntityPropertyType
+				Assert::notImplemented(
+					'for now only identifiable DAOized entities can be referenced; %s is daoless or (and) identifierless entity',
+					$name
+				);
+			}
+		}
+		else if (class_exists($name, true)) {
 			$interfaces = class_implements($name);
 
 			// type resolves handler by itself
@@ -503,32 +526,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				throw new OrmModelDefinitionException('handle type failure (failed '.$name.' type)');
 			}
 		}
-		else {
-			try {
-				$class = $this->ormDomain->getClass($name);
-			}
-			catch (OrmModelIntegrityException $e) {
-//				$this->recorder->putError(' failed.');
-				throw $e;
-			}
-
-			if ($class->hasDao() && $class->getIdentifier()) {
-				// map via db foreign key
-				return new AssociationPropertyType(
-					$class,
-					$multiplicity,
-					AssociationBreakAction::cascade()
-				);
-			}
-			else {
-				// map via injecting the fields
-				// currently unsupported. Needed to implement EntityPropertyType
-				Assert::notImplemented(
-					'for now only identifiable DAOized entities can be referenced; %s is daoless or (and) identifierless entity',
-					$name
-				);
-			}
-		}
 	}
 
 	/**
@@ -543,8 +540,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 * @return void
 	 */
 	private function dispose()
-	{
-		$this->xmlElement = null;
+	{//$this->xmlElement = null;
 	}
 
 	/**

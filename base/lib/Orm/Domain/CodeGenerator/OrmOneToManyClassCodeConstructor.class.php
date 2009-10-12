@@ -60,7 +60,7 @@ class OrmOneToManyClassCodeConstructor extends ClassCodeConstructor
 	{
 		parent::__construct(
 			\$parent,
-			{$this->ormClass->getName()}::map()
+			{$this->ormClass->getEntityName()}::map()
 		);
 	}
 EOT;

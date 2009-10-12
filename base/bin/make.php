@@ -29,12 +29,10 @@ else {
 	$console = new RawConsoleOutput();
 }
 
-$logger = new ConsoleExecutionRecorder($console);
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 if ($argc == 1) {
-	$logger->putMsg('
+	exit('
 Usage:
 # make.php [switches] $app
 
@@ -42,44 +40,36 @@ where:
  - $app is the absolute path to the application with the unified directory structure
  - switches are not yet used
 ');
-
-	exit(1);
 }
 
 $appDir = realpath($argv[1]);
 
 if (!$appDir) {
-	$logger->putErrorLine("Unknown path to the application {$argv[0]}");
-	exit;
+	exit ("Unknown path to the application {$argv[1]}");
 }
 
 define('APP_ROOT', $appDir);
 
 $applicationConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'config.php';
 if (file_exists($applicationConfig)) {
-	$logger->putMsgLine('Including the application config');
 	include $applicationConfig;
 }
 
 $hostConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . APP_SLOT . DIRECTORY_SEPARATOR . 'config.php';
 if (file_exists($hostConfig)) {
-	$logger->putMsgLine('Including the host config');
 	include $hostConfig;
 }
 
 $xmlSchema = $appDir . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'domain.xml';
 if (!file_exists($xmlSchema)) {
-	$logger->putErrorLine('$app/var/domain.xml not found at ' . $xmlSchema);
-	exit (1);
+	exit ('$app/var/domain.xml not found at ' . $xmlSchema);
 }
 
-$xmlOrmDomainImporter = new XmlOrmDomainImporter($logger, $xmlSchema);
+$domainBuilder = new XmlOrmDomainBuilder(new OrmDomain, $xmlSchema);
 
 try {
 
-	$ormDomain = $xmlOrmDomainImporter->import(
-		new OrmDomain()
-	);
+	$ormDomain = $domainBuilder->build();
 
 	$schemaDir = APP_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'db';
 	$autoRoot = APP_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Domain';
@@ -92,14 +82,11 @@ try {
 	}
 
 	$generator = new OrmGenerator($schemaDir, $autoRoot, $publicRoot);
-
-	$dbSchema = DBSchemaImporter::create()->import($ormDomain, new DBSchema());
-
 	$generator->generate($ormDomain);
 }
 catch (Exception $e) {
-	$logger->putErrorLine($e->getMessage());
-	exit (1);
+	var_dump($e);
+	exit ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
 }
 
 
