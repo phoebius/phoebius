@@ -125,7 +125,7 @@ class OrmGenerator
 			SqlSchemaConstructor::create($dbSchema)
 				->make(
 					new FileWriteStream(
-						$this->schemaDir . DIRECTORY_SEPARATOR . $ormDomain->getName() . '.sql'
+						$this->schemaDir . DIRECTORY_SEPARATOR . $dbSchemaName. '.sql' // FIXME use OrmDomain->name here instead of dbSchemaName
 					),
 					$db->getDialect()
 				);

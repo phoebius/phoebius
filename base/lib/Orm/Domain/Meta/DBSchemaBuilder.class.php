@@ -62,7 +62,7 @@ class DBSchemaBuilder
 	}
 
 	/**
-	 * @return void
+	 * @return DBSchema
 	 */
 	function build()
 	{
@@ -85,6 +85,8 @@ class DBSchemaBuilder
 			}
 			$this->ormClass = $class;
 		}
+
+		return $this->dbSchema;
 	}
 
 	/**
