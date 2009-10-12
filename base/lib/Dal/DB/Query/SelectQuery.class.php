@@ -352,9 +352,12 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		$querySlices[] = $this->compileTargets($dialect);
 
 		// WHERE
-		if ($this->expression && !($this->expression instanceof NullExpression)) {
-			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->expression->toDialectString($dialect);
+		if ($this->expression) {
+			$expressionAsString = $this->expression->toDialectString($dialect);
+			if (!empty($expressionAsString)) {
+				$querySlices[] = 'WHERE';
+				$querySlices[] = $expressionAsString;
+			}
 		}
 
 		// GROUP BY
