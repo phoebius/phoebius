@@ -209,8 +209,8 @@ class AssociationPropertyType extends OrmPropertyType
 				is_null($value)
 					? null
 					: (
-						$value instanceof IIdentifiable
-							? $value->getId()
+						$value instanceof IdentifiableOrmEntity
+							? $value->_getId()
 							: $value
 					)
 			);

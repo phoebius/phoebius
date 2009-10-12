@@ -31,6 +31,14 @@ class OrmAutoClassCodeConstructor extends ClassCodeConstructor
 	}
 
 	/**
+	 * @return string final|abstract|null
+	 */
+	protected function getClassType()
+	{
+		return 'abstract';
+	}
+
+	/**
 	 * @return void
 	 */
 	protected function findMembers()
@@ -72,14 +80,6 @@ EOT;
 		foreach ($this->ormClass->getProperties() as $ormProperty) {
 			$this->fetchClassMembers($ormProperty);
 		}
-	}
-
-	/**
-	 * @return string final|abstract|null
-	 */
-	protected function getClassType()
-	{
-		return 'abstract';
 	}
 
 	protected function getExtendsClassName()

@@ -23,6 +23,14 @@ class OrmAutoEntityClassCodeConstructor extends ClassCodeConstructor
 	}
 
 	/**
+	 * @return string final|abstract|null
+	 */
+	protected function getClassType()
+	{
+		return 'abstract';
+	}
+
+	/**
 	 * @return boolean
 	 */
 	function isPublicEditable()
@@ -76,13 +84,19 @@ EOT;
 EOT;
 
 		if ($this->ormClass->hasDao()) {
+			//
+			// FIXME allow entity to hav custom db-schema
+			//
 			$this->classMethods[] = <<<EOT
 	/**
 	 * @return IOrmEntityAccessor
 	 */
 	function getDao()
 	{
-		return new RdbmsDao(\$this->getPhysicalSchema());
+		return new RdbmsDao(
+			DBPool::getDefault(),
+			\$this
+		);
 	}
 EOT;
 

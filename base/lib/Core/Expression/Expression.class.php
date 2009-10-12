@@ -243,6 +243,57 @@ final class Expression extends StaticClass
 	{
 		return new PrefixUnaryExpression(PrefixUnaryPredicate::minus(), $subject);
 	}
+
+	/**
+	 * Creates a block of {@link IExpression} arguments joined with `OR` predicate and
+	 * wrapped by {@link ExpressionChain}
+	 * @param IExpression ...
+	 * @return ExpressionChain
+	 */
+	static function joinByOr()
+	{
+		$args = func_get_args();
+		$chain = self::orChain();
+		foreach ($args as $arg) {
+			$chain->add($arg);
+		}
+
+		return $chain;
+	}
+
+	/**
+	 * Creates a block of {@link IExpression} arguments joined with `AND` predicate and
+	 * wrapped by {@link ExpressionChain}
+	 * @param IExpression ...
+	 * @return ExpressionChain
+	 */
+	static function joinByAnd()
+	{
+		$args = func_get_args();
+		$chain = self::andChain();
+		foreach ($args as $arg) {
+			$chain->add($arg);
+		}
+		return $chain;
+	}
+
+	/**
+	 * Creates an instance of {@link ExpressionChain} with `OR` predicate
+	 * @return ExpressionChain
+	 */
+	static function orChain()
+	{
+		return new ExpressionChain(ExpressionChainPredicate::conditionOr());
+	}
+
+	/**
+	 * Creates an instance of {@link ExpressionChain} with `AND` predicate
+	 * @return ExpressionChain
+	 */
+	static function andChain()
+	{
+		return new ExpressionChain(ExpressionChainPredicate::conditionAnd());
+	}
 }
 
 ?>

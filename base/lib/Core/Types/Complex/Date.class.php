@@ -133,7 +133,7 @@ class Date implements IObjectMappable, IHandled, IBoxed
 			$value = strtotime($value);
 		}
 
-		$this->resolveAssocProperty($value);
+		$this->import($value);
 	}
 
 	/**
@@ -239,7 +239,7 @@ class Date implements IObjectMappable, IHandled, IBoxed
 		}
 
 		$this->int = $time;
-		$this->resolveAssocProperty($this->int);
+		$this->import($this->int);
 
 		return $this;
 	}

@@ -131,7 +131,7 @@ class OrmIdentityMap
 	 */
 	function add(IdentifiableOrmEntity $entity)
 	{
-		Assert::isTrue(is_subclass_of($entity, get_class($this->stubObject)));
+		Assert::isTrue(get_class($entity) == get_class($this->stubObject));
 
 		$id = $entity->_getId();
 

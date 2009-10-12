@@ -18,11 +18,13 @@ class DalExpressionChain implements IDalExpression
 	/**
 	 * @var ExpressionChain
 	 */
-	private $expressionChain;
+	private $chain;
 
 	function __construct(ExpressionChain $expressionChain)
 	{
-		$this->expressionChain = $expressionChain;
+		foreach ($expressionChain->getChain() as $item) {
+			$this->chain[] = $item->toDalExpression();
+		}
 	}
 
 	/**
@@ -44,7 +46,7 @@ class DalExpressionChain implements IDalExpression
 				$slices[] = ' ( ' . $sqlExpression . ' ) ';
 			}
 
-			$out = join($this->predicate->toDialectString($dialect), $slices);
+			$out = join($this->chain->getPredicate()->toDialectString($dialect), $slices);
 
 			return $out;
 		}

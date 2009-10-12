@@ -49,7 +49,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 * null if orm entity is identifierless
 	 * @var OrmProperty|null
 	 */
-	private $identitifier;
+	private $identifier;
 
 	/**
 	 * @var IQueryable
@@ -67,7 +67,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$this->logicalSchema = $entity->getLogicalSchema();
 		$this->physicalSchema = $entity->getPhysicalSchema();
 
-		if (($this->identitifier = $this->logicalSchema->getIdentifier())) {
+		if (($this->identifier = $this->logicalSchema->getIdentifier())) {
 			$this->identityMap = new OrmIdentityMap($this->logicalSchema);
 		}
 	}
@@ -100,7 +100,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function getById($id)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		$entity = $this->identityMap->getLazy($id);
 
@@ -110,11 +110,12 @@ class RdbmsDao implements IOrmEntityAccessor
 			try {
 				$row = $this->getDB()->getRow(
 					$this->getSelectQuery()->setExpression(
-						EntityQuery::create($this->entity)
-							->where(
-								$this->identitifier,
-								$id
-							)
+						Expression::eq(
+							$this->identifier,
+							$id
+						)
+						->toExpression(EntityQuery::create($this->entity))
+						->toDalExpression()
 					)
 				);
 			}
@@ -136,7 +137,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function getLazyById($id)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		return $this->identityMap->getLazy($id);
 	}
@@ -148,7 +149,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function getByIds(array $ids)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		$fetched = array();
 		$toFetch = array();
@@ -255,6 +256,13 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	private function buildEntity(OrmEntity $entity, array $dbValues)
 	{
+		if ($this->identifier) {
+			$id = $entity->_getId();
+			$entity->_setId(null);
+			$entity->fetch();
+			$entity->_setId($id);
+		}
+
 		$rawValueSet = array();
 		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
 			foreach ($property->getDBFields() as $columnName) {
@@ -262,11 +270,8 @@ class RdbmsDao implements IOrmEntityAccessor
 			}
 		}
 
-		if ($this->identitifier) {
-			$entity->fetch();
-		}
-
 		$this->map->setRawValues($entity, $rawValueSet, $this->getFetchStrategy());
+
 
 		if ($this->identityMap) {
 			$this->identityMap->add($entity);
@@ -329,7 +334,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function dropById($id)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
@@ -354,7 +359,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function dropByIds(array $ids)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		$expression = OrmQuery::create($this->entity, ExpressionChainPredicate::conditionOr());
 
@@ -363,7 +368,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			$this->identityMap->drop($id);
 
 			$expression->add(
-				$this->identitifier,
+				$this->identifier,
 				$id
 			);
 		}
@@ -400,7 +405,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function drop(IdentifiableOrmEntity $entity)
 	{
-		Assert::isNotEmpty($this->identitifier, 'identifierless orm entity');
+		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		return $this->dropById($entity->_getId());
 	}
@@ -439,9 +444,9 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		$fetched = true;
 
-		if ($this->identitifier) {
+		if ($this->identifier) {
 			$id = $entity->_getId();
-			$idOrmPropertyType = $this->identitifier->getType();
+			$idOrmPropertyType = $this->identifier->getType();
 
 			// INSERT
 			if (empty($id)) {
@@ -462,7 +467,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		$fvc = $this->getFieldValueCollection($entity);
 
-		if ($this->identitifier && $fetched) {
+		if ($this->identifier && $fetched) {
 			$affected = $this->sendQuery(
 				new UpdateQuery(
 					$this->physicalSchema->getDBTableName(),
@@ -502,7 +507,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		Assert::isTrue($affected == 1);
 
-		if ($this->identitifier && !$fetched) {
+		if ($this->identifier && !$fetched) {
 			$id = $idOrmPropertyType->getGeneratedId(
 				$this->getDB(),
 				$this->physicalSchema->getDBTableName(),

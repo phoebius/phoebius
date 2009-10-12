@@ -170,7 +170,7 @@ class OrmProperty implements IOrmProperty
 			"'{$this->name}'",
 			'array(' . join(', ', $fields).')',
 			$this->type->toPhpCodeCall(),
-			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()}",
+			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()})",
 			$this->unique
 				? 'true'
 				: 'false'

@@ -34,7 +34,7 @@
  *
  * @ingroup OrmExpression
  */
-final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionSubjectConverter
+final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter //, IDalExpression
 {
 	/**
 	 * @var array of Property{name,path} => EntityQuery
@@ -116,7 +116,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 				? $alias
 				: $this->table;
 
-		$this->expressionChain = new ExpressionChain();
+		$this->expressionChain = Expression::andChain();
 	}
 
 	/**
@@ -356,7 +356,7 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 			try {
 				$subject = $this->getEntityProperty($subject);
 			}
-			catch (OrmModelIntegrityException $e) {
+			catch (Exception $e) {
 				// probably, a value, not a property path
 			}
 		}
@@ -381,7 +381,10 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 			Assert::isTrue(sizeof($columns) == 1, 'single-field properties are only supported');
 
 			return reset($columns);
+		}
 
+		if ($subject instanceof OrmProperty) {
+			return $this->convert(EntityProperty::create($this, $subject), $object);
 		}
 
 		if ($subject instanceof ISqlCastable) {
@@ -450,10 +453,10 @@ final class EntityQuery implements ISqlSelectQuery, IDalExpression, IExpressionS
 		$selectQuery->from($this->table, $this->alias != $this->table ? $this->alias : null);
 
 		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
-			$selectQuery->get($field, $this->alias);
+			$selectQuery->get($field, null, $this->alias);
 		}
 
-		$this->fillJoins($selectQuery);
+		$this->fill($selectQuery);
 
 		$selectQuery->setExpression($this->toDalExpression());
 

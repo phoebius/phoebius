@@ -58,8 +58,9 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	 */
 	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty)
 	{
-		$columns = reset($ormProperty->getDBFields());
-		return $db->preGenerate($tableName, key($columns));
+		$fields = $ormProperty->getDBFields();
+		reset($fields);
+		return $db->preGenerate($tableName, key($fields));
 	}
 
 	/**
@@ -67,8 +68,18 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	 */
 	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty)
 	{
-		$columns = reset($ormProperty->getDBFields());
-		return $db->getGeneratedId($tableName, key($columns));
+		$fields = $ormProperty->getDBFields();
+		reset($fields);
+		return $db->getGeneratedId($tableName, key($fields));
+	}
+
+	protected function getCtorArgumentsPhpCode()
+	{
+		return array(
+			$this->isNullable()
+				? 'true'
+				: 'false'
+		);
 	}
 }
 

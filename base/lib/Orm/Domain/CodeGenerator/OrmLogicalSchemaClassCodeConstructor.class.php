@@ -89,7 +89,7 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 
 		$arrayContents = join(",\n", $arrayItems);
 		return <<<EOT
-		array(
+		return array(
 {$arrayContents}
 		);
 EOT;
@@ -142,7 +142,7 @@ EOL;
 	 */
 	function getProperties()
 	{
-{$this->getGetPropertiesMethodBody()};
+{$this->getGetPropertiesMethodBody()}
 	}
 EOL;
 
@@ -152,8 +152,8 @@ EOL;
 	 */
 	function getProperty(\$name)
 	{
-		if (!isset(\$this->propertyNames[\$name])) {
-			throw new ArgumentException('name');
+		if (!in_array(\$name, \$this->propertyNames)) {
+			throw new ArgumentException('name', \$name);
 		}
 
 		\$properties = \$this->getProperties();
