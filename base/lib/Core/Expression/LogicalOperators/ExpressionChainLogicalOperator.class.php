@@ -10,18 +10,18 @@
  ************************************************************************************************/
 
 /**
- * Represents a predicate used in expression chaining
- * @ingroup ExpressionPredicates
+ * Represents a logical operator used in expression chaining
+ * @ingroup ExpressionLogicalOperators
  */
-final class ExpressionChainPredicate extends Predicate
+final class ExpressionChainLogicalOperator extends LogicalOperator
 {
 	const CONDITION_AND = 'AND';
 	const CONDITION_OR = 'OR';
 
 	/**
-	 * Creates an instance of {@link ExpressionChainPredicate}
+	 * Creates an instance of {@link ExpressionChainLogicalOperator}
 	 * @param string $id one of the class constants
-	 * @return ExpressionChainPredicate
+	 * @return ExpressionChainLogicalOperator
 	 */
 	static function create($id)
 	{
@@ -29,9 +29,9 @@ final class ExpressionChainPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChainPredicate} with
-	 * {@link ExpressionChainPredicate::CONDITION_AND} chain joiner
-	 * @return ExpressionChainPredicate
+	 * Creates an instance of {@link ExpressionChainLogicalOperator} with
+	 * {@link ExpressionChainLogicalOperator::CONDITION_AND} chain joiner
+	 * @return ExpressionChainLogicalOperator
 	 */
 	static function conditionAnd()
 	{
@@ -39,9 +39,9 @@ final class ExpressionChainPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChainPredicate} with
-	 * {@link ExpressionChainPredicate::CONDITION_OR} chain joiner
-	 * @return ExpressionChainPredicate
+	 * Creates an instance of {@link ExpressionChainLogicalOperator} with
+	 * {@link ExpressionChainLogicalOperator::CONDITION_OR} chain joiner
+	 * @return ExpressionChainLogicalOperator
 	 */
 	static function conditionOr()
 	{

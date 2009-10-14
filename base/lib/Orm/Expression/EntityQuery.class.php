@@ -304,7 +304,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	 */
 	function andWhere(IExpression $expression)
 	{
-		$this->resortChain(ExpressionChainPredicate::conditionAnd());
+		$this->resortChain(ExpressionChainLogicalOperator::conditionAnd());
 
 		$this->where($expression);
 
@@ -316,7 +316,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	 */
 	function orWhere(IExpression $expression)
 	{
-		$this->resortChain(ExpressionChainPredicate::conditionOr());
+		$this->resortChain(ExpressionChainLogicalOperator::conditionOr());
 
 		$this->where($expression);
 
@@ -335,7 +335,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 		}
 
 		$this
-			->resortChain(ExpressionChainPredicate::conditionAnd())
+			->resortChain(ExpressionChainLogicalOperator::conditionAnd())
 			->add($entityQuery->expressionChain->toExpression($entityQuery));
 
 		return $this;
@@ -536,9 +536,9 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	/**
 	 * @return EntityExpressionChain
 	 */
-	private function resortChain(ExpressionChainPredicate $ecp)
+	private function resortChain(ExpressionChainLogicalOperator $ecp)
 	{
-		if ($this->expressionChain->getPredicate()->isNot($ecp)) {
+		if ($this->expressionChain->getLogicalOperator()->isNot($ecp)) {
 			$this->expressionChain =
 				new ExpressionChain(
 					$ecp,

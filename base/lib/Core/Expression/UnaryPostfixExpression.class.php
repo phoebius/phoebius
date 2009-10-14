@@ -21,11 +21,11 @@ class UnaryPostfixExpression implements IExpression
 	private $subject;
 
 	/**
-	 * @var UnaryPostfixPredicate
+	 * @var UnaryPostfixLogicalOperator
 	 */
 	private $logic;
 
-	function __construct($subject, UnaryPostfixPredicate $logic)
+	function __construct($subject, UnaryPostfixLogicalOperator $logic)
 	{
 		$this->subject = $subject;
 		$this->logic = $logic;
@@ -40,9 +40,9 @@ class UnaryPostfixExpression implements IExpression
 	}
 
 	/**
-	 * @return UnaryPostfixPredicate
+	 * @return UnaryPostfixLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
 		return $this->logic;
 	}

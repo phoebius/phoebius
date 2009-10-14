@@ -10,10 +10,10 @@
  ************************************************************************************************/
 
 /**
- * Represents a predicate used in unary prefix expression
- * @ingroup ExpressionPredicates
+ * Represents an operator used in unary prefix expression
+ * @ingroup ExpressionLogicalOperators
  */
-final class UnaryPostfixPredicate extends Predicate
+final class UnaryPostfixLogicalOperator extends LogicalOperator
 {
 	const IS_NULL = 'IS NULL';
 	const IS_NOT_NULL = 'IS NOT NULL';
@@ -22,9 +22,9 @@ final class UnaryPostfixPredicate extends Predicate
 	const IS_FALSE = 'IS FALSE';
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixPredicate}
+	 * Creates an instance of {@link UnaryPostfixLogicalOperator}
 	 * @param string $id one of the class constants
-	 * @return UnaryPostfixPredicate
+	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function create($id)
 	{
@@ -32,9 +32,9 @@ final class UnaryPostfixPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixPredicate} with
-	 * {@link UnaryPostfixPredicate::IS_NULL} value
-	 * @return UnaryPostfixPredicate
+	 * Creates an instance of {@link UnaryPostfixLogicalOperator} with
+	 * {@link UnaryPostfixLogicalOperator::IS_NULL} value
+	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function isNull()
 	{
@@ -42,9 +42,9 @@ final class UnaryPostfixPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixPredicate} with
-	 * {@link UnaryPostfixPredicate::IS_NOT_NULL} value
-	 * @return UnaryPostfixPredicate
+	 * Creates an instance of {@link UnaryPostfixLogicalOperator} with
+	 * {@link UnaryPostfixLogicalOperator::IS_NOT_NULL} value
+	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function isNotNull()
 	{
@@ -52,9 +52,9 @@ final class UnaryPostfixPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixPredicate} with
-	 * {@link UnaryPostfixPredicate::IS_TRUE} value
-	 * @return UnaryPostfixPredicate
+	 * Creates an instance of {@link UnaryPostfixLogicalOperator} with
+	 * {@link UnaryPostfixLogicalOperator::IS_TRUE} value
+	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function isTrue()
 	{
@@ -62,9 +62,9 @@ final class UnaryPostfixPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixPredicate} with
-	 * {@link UnaryPostfixPredicate::IS_FALSE} value
-	 * @return UnaryPostfixPredicate
+	 * Creates an instance of {@link UnaryPostfixLogicalOperator} with
+	 * {@link UnaryPostfixLogicalOperator::IS_FALSE} value
+	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function isFalse()
 	{

@@ -16,7 +16,7 @@
 final class DalExpression extends StaticClass
 {
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `and` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `and` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -24,11 +24,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function expAnd(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::expAnd(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::expAnd(), $value));
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `Or` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `Or` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -36,7 +36,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function expOr(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::expOr(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::expOr(), $value));
 	}
 
 	/**
@@ -48,7 +48,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function eq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::equals(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::equals(), $value));
 	}
 
 	/**
@@ -67,11 +67,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function notEq(SqlColumn $field, IIdentifiable $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notEquals(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::notEquals(), $value));
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `greater than` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `greater than` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -79,11 +79,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function gt(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::greaterThan(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::greaterThan(), $value));
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `greater than or equals` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `greater than or equals` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -91,11 +91,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function gtEq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::greaterOrEquals(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::greaterOrEquals(), $value));
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `lower than` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `lower than` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -103,11 +103,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function lt(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::lowerThan(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::lowerThan(), $value));
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryDalExpression} with `lower than or equals` predicate
+	 * Creates an instance of {@link BinaryDalExpression} with `lower than or equals` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -115,11 +115,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function ltEq(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::lowerOrEquals(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::lowerOrEquals(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with `like` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with `like` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -127,11 +127,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function like(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::like(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::like(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with `like` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with `like` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -139,11 +139,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function notLike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notIlike(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::notIlike(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with case-insensitive `like` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with case-insensitive `like` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -151,11 +151,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function ilike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::ilike(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::ilike(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with case-insensitive `not like` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with case-insensitive `not like` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -163,11 +163,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function notIlike(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notIlike(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::notIlike(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with `similar to` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with `similar to` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -175,11 +175,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function similar(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::similarTo(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::similarTo(), $value));
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryDalExpression} with inverted `similar to` predicate
+	 * Creates an instnace of {@link BinaryDalExpression} with inverted `similar to` logical operator
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $value value to be compared. In most cases, {@link SqlValue} is
 	 * 	needed here, but expressions are allowed to (e.g., {@link SelectQuery})
@@ -187,7 +187,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notSimilar(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::notSimilarTo(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::notSimilarTo(), $value));
 	}
 
 	/**
@@ -199,7 +199,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function add(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::add(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::add(), $value));
 	}
 
 	/**
@@ -211,7 +211,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function sub(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::substract(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::substract(), $value));
 	}
 
 	/**
@@ -223,7 +223,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function mul(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::multiply(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::multiply(), $value));
 	}
 
 	/**
@@ -235,7 +235,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function div(SqlColumn $field, ISqlValueExpression $value)
 	{
-		return new BinaryDalExpression(new BinaryExpression($field, BinaryPredicate::divide(), $value));
+		return new BinaryDalExpression(new BinaryExpression($field, BinaryLogicalOperator::divide(), $value));
 	}
 
 	/**
@@ -246,7 +246,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function notNull(ISqlValueExpression $subject)
 	{
-		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNotNull()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isNotNull()));
 	}
 
 	/**
@@ -257,7 +257,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function isNull(ISqlValueExpression $subject)
 	{
-		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNull()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isNull()));
 	}
 
 	/**
@@ -268,7 +268,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function isTrue(ISqlValueExpression $subject)
 	{
-		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isTrue()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isTrue()));
 	}
 
 	/**
@@ -279,7 +279,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function isFalse(ISqlValueExpression $subject)
 	{
-		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isFalse()));
+		return new UnaryPostfixDalExpression(new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isFalse()));
 	}
 
 	/**
@@ -307,7 +307,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function in(SqlColumn $field, ISqlValueExpression $set)
 	{
-		return new InSetDalExpression(new InSetExpression($field, $set, InSetPredicate::in()));
+		return new InSetDalExpression(new InSetExpression($field, $set, InSetLogicalOperator::in()));
 	}
 
 	/**
@@ -321,11 +321,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function notIn(SqlColumn $field, ISqlValueExpression $set)
 	{
-		return new InSetDalExpression(new InSetExpression($field, $set, InSetPredicate::notIn()));
+		return new InSetDalExpression(new InSetExpression($field, $set, InSetLogicalOperator::notIn()));
 	}
 
 	/**
-	 * Creates a block of {@link IDalExpression} arguments joined with `OR` predicate and
+	 * Creates a block of {@link IDalExpression} arguments joined with `OR` logical operator and
 	 * wrapped by {@link ExpressionChain}
 	 * @param IDalExpression ...
 	 * @return DalExpressionChain
@@ -342,7 +342,7 @@ final class DalExpression extends StaticClass
 	}
 
 	/**
-	 * Creates a block of {@link IDalExpression} arguments joined with `AND` predicate and
+	 * Creates a block of {@link IDalExpression} arguments joined with `AND` logical operator and
 	 * wrapped by {@link ExpressionChain}
 	 * @param IDalExpression ...
 	 * @return DalExpressionChain
@@ -358,25 +358,25 @@ final class DalExpression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `OR` predicate
+	 * Creates an instance of {@link ExpressionChain} with `OR` logical operator
 	 * @return DalExpressionChain
 	 */
 	static function orChain()
 	{
-		return new DalExpressionChain(ExpressionChainPredicate::conditionOr());
+		return new DalExpressionChain(ExpressionChainLogicalOperator::conditionOr());
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `AND` predicate
+	 * Creates an instance of {@link ExpressionChain} with `AND` logical operator
 	 * @return DalExpressionChain
 	 */
 	static function andChain()
 	{
-		return new DalExpressionChain(ExpressionChainPredicate::conditionAnd());
+		return new DalExpressionChain(ExpressionChainLogicalOperator::conditionAnd());
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "NOT" predicate to
+	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "NOT" logical operator to
 	 * invert the value
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
@@ -384,11 +384,11 @@ final class DalExpression extends StaticClass
 	 */
 	static function not(ISqlValueExpression $subject)
 	{
-		return new PrefixUnaryDalExpression(new PrefixUnaryExpression(PrefixUnaryPredicate::not(), $subject));
+		return new PrefixUnaryDalExpression(new PrefixUnaryExpression(PrefixUnaryLogicalOperator::not(), $subject));
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "MINUS" predicate to
+	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "MINUS" logical operator to
 	 * treat the field value as negative
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
@@ -396,7 +396,7 @@ final class DalExpression extends StaticClass
 	 */
 	static function negative(ISqlValueExpression $subject)
 	{
-		return new PrefixUnaryDalExpression(new PrefixUnaryExpression(PrefixUnaryPredicate::minus(), $subject));
+		return new PrefixUnaryDalExpression(new PrefixUnaryExpression(PrefixUnaryLogicalOperator::minus(), $subject));
 	}
 }
 

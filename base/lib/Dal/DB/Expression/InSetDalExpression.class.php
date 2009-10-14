@@ -26,7 +26,7 @@ class InSetDalExpression implements IDalExpression
 	private $set;
 
 	/**
-	 * @var InSetPredicate
+	 * @var InSetLogicalOperator
 	 */
 	private $logic;
 
@@ -34,7 +34,7 @@ class InSetDalExpression implements IDalExpression
 	{
 		$this->field = $expression->getSubject();
 		$this->set = $expression->getSet();
-		$this->logic = $expression->getPredicate();
+		$this->logic = $expression->getLogicalOperator();
 	}
 
 	/**

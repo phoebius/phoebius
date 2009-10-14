@@ -10,18 +10,18 @@
  ************************************************************************************************/
 
 /**
- * Represents a prefix unary predicate
- * @ingroup ExpressionPredicates
+ * Represents a prefix unary logical operator
+ * @ingroup ExpressionLogicalOperators
  */
-final class PrefixUnaryPredicate extends Predicate
+final class PrefixUnaryLogicalOperator extends LogicalOperator
 {
 	const NOT = 'NOT';
 	const MINUS	= '-';
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryPredicate}
+	 * Creates an instance of {@link PrefixUnaryLogicalOperator}
 	 * @param string $id one of the class constants
-	 * @return PrefixUnaryPredicate
+	 * @return PrefixUnaryLogicalOperator
 	 */
 	static function create($id)
 	{
@@ -29,9 +29,9 @@ final class PrefixUnaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryPredicate} with {@link PrefixUnaryPredicate::NOT}
+	 * Creates an instance of {@link PrefixUnaryLogicalOperator} with {@link PrefixUnaryLogicalOperator::NOT}
 	 * value
-	 * @return PrefixUnaryPredicate
+	 * @return PrefixUnaryLogicalOperator
 	 */
 	static function not()
 	{
@@ -39,9 +39,9 @@ final class PrefixUnaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryPredicate} with {@link PrefixUnaryPredicate::MINUS}
+	 * Creates an instance of {@link PrefixUnaryLogicalOperator} with {@link PrefixUnaryLogicalOperator::MINUS}
 	 * value
-	 * @return PrefixUnaryPredicate
+	 * @return PrefixUnaryLogicalOperator
 	 */
 	static function minus()
 	{

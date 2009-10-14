@@ -15,9 +15,9 @@
 final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 {
 	/**
-	 * @var ExpressionChainPredicate
+	 * @var ExpressionChainLogicalOperator
 	 */
-	private $expressionChainPredicate;
+	private $expressionChainLogicalOperator;
 
 	/**
 	 * @var array of {@link EntityQuery}
@@ -27,25 +27,25 @@ final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 	/**
 	 * @return EntityQuery
 	 */
-	static function create(ExpressionChainPredicate $expressionChainPredicate = null)
+	static function create(ExpressionChainLogicalOperator $expressionChainLogicalOperator = null)
 	{
-		return new self ($expressionChainPredicate);
+		return new self ($expressionChainLogicalOperator);
 	}
 
-	function __construct(ExpressionChainPredicate $expressionChainPredicate = null)
+	function __construct(ExpressionChainLogicalOperator $expressionChainLogicalOperator = null)
 	{
-		$this->expressionChainPredicate =
-			$expressionChainPredicate
-				? $expressionChainPredicate
-				: ExpressionChainPredicate::conditionAnd();
+		$this->expressionChainLogicalOperator =
+			$expressionChainLogicalOperator
+				? $expressionChainLogicalOperator
+				: ExpressionChainLogicalOperator::conditionAnd();
 	}
 
 	/**
-	 * @return ExpressionChainPredicate
+	 * @return ExpressionChainLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
-		return $this->expressionChainPredicate;
+		return $this->expressionChainLogicalOperator;
 	}
 
 	/**
@@ -53,7 +53,7 @@ final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 	 */
 	function setAndBlock()
 	{
-		$this->expressionChainPredicate = ExpressionChainPredicate::conditionAnd();
+		$this->expressionChainLogicalOperator = ExpressionChainLogicalOperator::conditionAnd();
 
 		return $this;
 	}
@@ -63,7 +63,7 @@ final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 	 */
 	function setOrBlock()
 	{
-		$this->expressionChainPredicate = ExpressionChainPredicate::conditionOr();
+		$this->expressionChainLogicalOperator = ExpressionChainLogicalOperator::conditionOr();
 
 		return $this;
 	}
@@ -80,7 +80,7 @@ final class EntityPropertyExpressionChain implements IEntityPropertyExpression
 	 */
 	function toDalExpression()
 	{
-		$chain = new DalExpressionChain($this->expressionChainPredicate);
+		$chain = new DalExpressionChain($this->expressionChainLogicalOperator);
 		foreach ($this->children as $child) {
 			$chain->add($child->toDalExpression());
 		}

@@ -16,9 +16,9 @@
 class ExpressionChain implements IExpression
 {
 	/**
-	 * @var ExpressionChainPredicate
+	 * @var ExpressionChainLogicalOperator
 	 */
-	private $predicate;
+	private $logicalOperator;
 
 	/**
 	 * @var array
@@ -28,14 +28,14 @@ class ExpressionChain implements IExpression
 	/**
 	 * @return ExpressionChain
 	 */
-	static function create(ExpressionChainPredicate $predicate, array $elements = array())
+	static function create(ExpressionChainLogicalOperator $logicalOperator, array $elements = array())
 	{
-		return new self ($predicate, $elements);
+		return new self ($logicalOperator, $elements);
 	}
 
-	function __construct(ExpressionChainPredicate $predicate, array $elements = array())
+	function __construct(ExpressionChainLogicalOperator $logicalOperator, array $elements = array())
 	{
-		$this->predicate = $predicate;
+		$this->logicalOperator = $logicalOperator;
 		foreach ($elements as $element) {
 			$this->add($element);
 		}
@@ -61,11 +61,11 @@ class ExpressionChain implements IExpression
 	}
 
 	/**
-	 * @return ExpressionChainPredicate
+	 * @return ExpressionChainLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
-		return $this->predicate;
+		return $this->logicalOperator;
 	}
 
 	/**
@@ -81,7 +81,7 @@ class ExpressionChain implements IExpression
 	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
-		$newChain = new self ($this->predicate);
+		$newChain = new self ($this->logicalOperator);
 		foreach ($this->chain as $item) {
 			$newChain->chain[] = $item->toExpression($converter);
 		}

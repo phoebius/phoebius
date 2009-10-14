@@ -26,7 +26,7 @@ class BinaryDalExpression implements IDalExpression
 	private $value;
 
 	/**
-	 * @var BinaryPredicate
+	 * @var BinaryLogicalOperator
 	 */
 	private $logic;
 
@@ -34,7 +34,7 @@ class BinaryDalExpression implements IDalExpression
 	{
 		$this->field = $expression->getSubject();
 		$this->value = $expression->getValue();
-		$this->logic = $expression->getPredicate();
+		$this->logic = $expression->getLogicalOperator();
 	}
 
 	/**

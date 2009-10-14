@@ -168,7 +168,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		if (!empty($toFetch)) {
-			$fetchExpression = new OrmQuery($this->entity, ExpressionChainPredicate::conditionOr());
+			$fetchExpression = new OrmQuery($this->entity, ExpressionChainLogicalOperator::conditionOr());
 
 			$fetchExpression = Expression::orChain();
 			foreach ($toFetchIds as $id) {
@@ -361,7 +361,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
-		$expression = OrmQuery::create($this->entity, ExpressionChainPredicate::conditionOr());
+		$expression = OrmQuery::create($this->entity, ExpressionChainLogicalOperator::conditionOr());
 
 		foreach ($ids as $id) {
 

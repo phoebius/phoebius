@@ -10,10 +10,10 @@
  ************************************************************************************************/
 
 /**
- * Represents an abstract expression predicate
- * @ingroup ExpressionPredicates
+ * Represents an abstract logical operator used for connecting subjects in expression trees
+ * @ingroup ExpressionLogicalOperators
  */
-abstract class Predicate extends Enumeration implements ISqlCastable
+abstract class LogicalOperator extends Enumeration implements ISqlCastable
 {
 	/**
 	 * Casts an object to the SQL dialect string

@@ -21,7 +21,7 @@ final class Expression extends StaticClass
 	 */
 	static function eq($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::equals(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::equals(), $value);
 	}
 
 	/**
@@ -30,97 +30,97 @@ final class Expression extends StaticClass
 	 */
 	static function neq($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::notEquals(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::notEquals(), $value);
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `greater than` predicate
+	 * Creates an instance of {@link BinaryExpression} with `greater than` logical operator
 	 * @return BinaryExpression
 	 */
 	static function gt($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::greaterThan(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::greaterThan(), $value);
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `greater than or equals` predicate
+	 * Creates an instance of {@link BinaryExpression} with `greater than or equals` logical operator
 	 * @return BinaryExpression
 	 */
 	static function gtEq($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::greaterOrEquals(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::greaterOrEquals(), $value);
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `lower than` predicate
+	 * Creates an instance of {@link BinaryExpression} with `lower than` logical operator
 	 * @return BinaryExpression
 	 */
 	static function lt($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::lowerThan(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::lowerThan(), $value);
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `lower than or equals` predicate
+	 * Creates an instance of {@link BinaryExpression} with `lower than or equals` logical operator
 	 * @return BinaryExpression
 	 */
 	static function ltEq($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::lowerOrEquals(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::lowerOrEquals(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `like` predicate
+	 * Creates an instnace of {@link BinaryExpression} with `like` logical operator
 	 * @return BinaryExpression
 	 */
 	static function like($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::like(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::like(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `like` predicate
+	 * Creates an instnace of {@link BinaryExpression} with `like` logical operator
 	 * @return BinaryExpression
 	 */
 	static function notLike($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::notIlike(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::notIlike(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `like` predicate
+	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `like` logical operator
 	 * @return BinaryExpression
 	 */
 	static function ilike($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::ilike(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::ilike(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `not like` predicate
+	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `not like` logical operator
 	 * @return BinaryExpression
 	 */
 	static function notIlike($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::notIlike(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::notIlike(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `similar to` predicate
+	 * Creates an instnace of {@link BinaryExpression} with `similar to` logical operator
 	 * @return BinaryExpression
 	 */
 	static function similar($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::similarTo(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::similarTo(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with inverted `similar to` predicate
+	 * Creates an instnace of {@link BinaryExpression} with inverted `similar to` logical operator
 	 * @return BinaryExpression
 	 */
 	static function notSimilar($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::notSimilarTo(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::notSimilarTo(), $value);
 	}
 
 	/**
@@ -129,7 +129,7 @@ final class Expression extends StaticClass
 	 */
 	static function add($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::add(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::add(), $value);
 	}
 
 	/**
@@ -138,7 +138,7 @@ final class Expression extends StaticClass
 	 */
 	static function sub($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::substract(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::substract(), $value);
 	}
 
 	/**
@@ -147,7 +147,7 @@ final class Expression extends StaticClass
 	 */
 	static function mul($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::multiply(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::multiply(), $value);
 	}
 
 	/**
@@ -156,7 +156,7 @@ final class Expression extends StaticClass
 	 */
 	static function div($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryPredicate::divide(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::divide(), $value);
 	}
 
 	/**
@@ -165,7 +165,7 @@ final class Expression extends StaticClass
 	 */
 	static function notNull($subject)
 	{
-		return new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNotNull());
+		return new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isNotNull());
 	}
 
 	/**
@@ -174,7 +174,7 @@ final class Expression extends StaticClass
 	 */
 	static function isNull($subject)
 	{
-		return new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isNull());
+		return new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isNull());
 	}
 
 	/**
@@ -183,7 +183,7 @@ final class Expression extends StaticClass
 	 */
 	static function isTrue($subject)
 	{
-		return new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isTrue());
+		return new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isTrue());
 	}
 
 	/**
@@ -192,7 +192,7 @@ final class Expression extends StaticClass
 	 */
 	static function isFalse($subject)
 	{
-		return new UnaryPostfixExpression($subject, UnaryPostfixPredicate::isFalse());
+		return new UnaryPostfixExpression($subject, UnaryPostfixLogicalOperator::isFalse());
 	}
 
 	/**
@@ -211,7 +211,7 @@ final class Expression extends StaticClass
 	 */
 	static function in($subject, $set)
 	{
-		return new InSetExpression($subject, $set, InSetPredicate::in());
+		return new InSetExpression($subject, $set, InSetLogicalOperator::in());
 	}
 
 	/**
@@ -221,31 +221,31 @@ final class Expression extends StaticClass
 	 */
 	static function notIn($subject, $set)
 	{
-		return new InSetExpression($subject, $set, InSetPredicate::notIn());
+		return new InSetExpression($subject, $set, InSetLogicalOperator::notIn());
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "NOT" predicate to
+	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "NOT" logical operator to
 	 * invert the value
 	 * @return PrefixUnaryExpression
 	 */
 	static function not($subject)
 	{
-		return new PrefixUnaryExpression(PrefixUnaryPredicate::not(), $subject);
+		return new PrefixUnaryExpression(PrefixUnaryLogicalOperator::not(), $subject);
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "MINUS" predicate to
+	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "MINUS" logical operator to
 	 * treat the field value as negative
 	 * @return PrefixUnaryExpression
 	 */
 	static function negative($subject)
 	{
-		return new PrefixUnaryExpression(PrefixUnaryPredicate::minus(), $subject);
+		return new PrefixUnaryExpression(PrefixUnaryLogicalOperator::minus(), $subject);
 	}
 
 	/**
-	 * Creates a block of {@link IExpression} arguments joined with `OR` predicate and
+	 * Creates a block of {@link IExpression} arguments joined with `OR` logical operator and
 	 * wrapped by {@link ExpressionChain}
 	 * @param IExpression ...
 	 * @return ExpressionChain
@@ -262,7 +262,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates a block of {@link IExpression} arguments joined with `AND` predicate and
+	 * Creates a block of {@link IExpression} arguments joined with `AND` logical operator and
 	 * wrapped by {@link ExpressionChain}
 	 * @param IExpression ...
 	 * @return ExpressionChain
@@ -278,21 +278,21 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `OR` predicate
+	 * Creates an instance of {@link ExpressionChain} with `OR` logical operator
 	 * @return ExpressionChain
 	 */
 	static function orChain()
 	{
-		return new ExpressionChain(ExpressionChainPredicate::conditionOr());
+		return new ExpressionChain(ExpressionChainLogicalOperator::conditionOr());
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `AND` predicate
+	 * Creates an instance of {@link ExpressionChain} with `AND` logical operator
 	 * @return ExpressionChain
 	 */
 	static function andChain()
 	{
-		return new ExpressionChain(ExpressionChainPredicate::conditionAnd());
+		return new ExpressionChain(ExpressionChainLogicalOperator::conditionAnd());
 	}
 }
 

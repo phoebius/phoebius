@@ -26,11 +26,11 @@ class BinaryExpression implements IExpression
 	private $value;
 
 	/**
-	 * @var BinaryPredicate
+	 * @var BinaryLogicalOperator
 	 */
 	private $logic;
 
-	function __construct($subject, BinaryPredicate $logic, $value)
+	function __construct($subject, BinaryLogicalOperator $logic, $value)
 	{
 		$this->subject = $subject;
 		$this->logic = $logic;
@@ -54,9 +54,9 @@ class BinaryExpression implements IExpression
 	}
 
 	/**
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
 		return $this->logic;
 	}

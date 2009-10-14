@@ -21,11 +21,11 @@ class PrefixUnaryExpression implements IExpression
 	private $subject;
 
 	/**
-	 * @var PrefixUnaryPredicate
+	 * @var PrefixUnaryLogicalOperator
 	 */
 	private $logic;
 
-	function __construct(PrefixUnaryPredicate $logic, $subject)
+	function __construct(PrefixUnaryLogicalOperator $logic, $subject)
 	{
 		$this->logic = $logic;
 		$this->subject = $subject;
@@ -40,9 +40,9 @@ class PrefixUnaryExpression implements IExpression
 	}
 
 	/**
-	 * @return PrefixUnaryPredicate
+	 * @return PrefixUnaryLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
 		return $this->logic;
 	}

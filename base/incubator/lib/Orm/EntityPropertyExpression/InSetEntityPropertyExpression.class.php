@@ -34,7 +34,7 @@ class InSetEntityPropertyExpression extends SingleRowEntityPropertyExpression
 			$this->getSqlColumn(),
 			new InSetExpression(
 				$sqlValues,
-				$this->getExpression()->getPredicate()
+				$this->getExpression()->getLogicalOperator()
 			)
 		);
 	}

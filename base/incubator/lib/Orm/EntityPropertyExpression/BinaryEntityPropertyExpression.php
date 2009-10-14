@@ -29,7 +29,7 @@ class BinaryEntityPropertyExpression extends SingleRowEntityPropertyExpression
 		return new BinaryDalExpression(
 			$this->getSqlColumn(),
 			new BinaryExpression(
-				$this->getExpression()->getPredicate(),
+				$this->getExpression()->getLogicalOperator(),
 				$this->getSqlValue($this->getExpression()->getValue())
 			)
 		);

@@ -10,10 +10,10 @@
  ************************************************************************************************/
 
 /**
- * Represents a predicate used in {@link BinaryExpression}
- * @ingroup ExpressionPredicates
+ * Represents a logical operator used in {@link BinaryExpression}
+ * @ingroup ExpressionLogicalOperators
  */
-final class BinaryPredicate extends Predicate
+final class BinaryLogicalOperator extends LogicalOperator
 {
 	const EQUALS = '=';
 	const NOT_EQUALS = '!=';
@@ -42,9 +42,9 @@ final class BinaryPredicate extends Predicate
 
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate}
+	 * Creates an instance of {@link BinaryLogicalOperator}
 	 * @param string $id one of the class constants
-	 * @return BinaryPredicatePredicate
+	 * @return BinaryLogicalOperatorLogicalOperator
 	 */
 	static function create($id)
 	{
@@ -52,8 +52,8 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::EQUALS} value
-	 * @return BinaryPredicate
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::EQUALS} value
+	 * @return BinaryLogicalOperator
 	 */
 	static function equals()
 	{
@@ -61,9 +61,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::NOT_EQUALS}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::NOT_EQUALS}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function notEquals()
 	{
@@ -71,9 +71,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::EXPRESSION_AND}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::EXPRESSION_AND}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function expAnd()
 	{
@@ -81,9 +81,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::EXPRESSION_OR}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::EXPRESSION_OR}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function expOr()
 	{
@@ -91,9 +91,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::GREATER_THAN}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::GREATER_THAN}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function greaterThan()
 	{
@@ -101,9 +101,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with
+	 * Creates an instance of {@link BinaryLogicalOperator} with
 	 * {@link BinaryExpression::GREATER_THAN_OR_EQUALS} value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function greaterOrEquals()
 	{
@@ -111,9 +111,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::LOWER_THAN}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::LOWER_THAN}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function lowerThan()
 	{
@@ -121,9 +121,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with
+	 * Creates an instance of {@link BinaryLogicalOperator} with
 	 * {@link BinaryExpression::LOWER_OR_EQUALS} value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function lowerOrEquals()
 	{
@@ -131,9 +131,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::LIKE}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::LIKE}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function like()
 	{
@@ -141,9 +141,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::NOT_LIKE}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::NOT_LIKE}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function notLike()
 	{
@@ -151,9 +151,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::ILIKE}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::ILIKE}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function ilike()
 	{
@@ -161,9 +161,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::NOT_ILIKE}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::NOT_ILIKE}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function notIlike()
 	{
@@ -171,9 +171,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::SIMILAR_TO}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::SIMILAR_TO}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function similarTo()
 	{
@@ -181,9 +181,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::NOT_SIMILAR_TO}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::NOT_SIMILAR_TO}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function notSimilarTo()
 	{
@@ -191,9 +191,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::ADD}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::ADD}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function add()
 	{
@@ -201,9 +201,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::SUBTRACT}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::SUBTRACT}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function substract()
 	{
@@ -211,9 +211,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::MULTIPLY}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::MULTIPLY}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function multiply()
 	{
@@ -221,9 +221,9 @@ final class BinaryPredicate extends Predicate
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryPredicate} with {@link BinaryExpression::DIVIDE}
+	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::DIVIDE}
 	 * value
-	 * @return BinaryPredicate
+	 * @return BinaryLogicalOperator
 	 */
 	static function divide()
 	{

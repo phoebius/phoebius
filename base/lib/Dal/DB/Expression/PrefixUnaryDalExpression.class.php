@@ -21,19 +21,19 @@ class PrefixUnaryDalExpression implements IDalExpression
 	private $subject;
 
 	/**
-	 * @var PrefixUnaryPredicate
+	 * @var PrefixUnaryLogicalOperator
 	 */
 	private $logic;
 
 	/**
-	 * @param PrefixUnaryPredicate $logic
+	 * @param PrefixUnaryLogicalOperator $logic
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
 	 */
 	function __construct(PrefixUnaryExpression $expression)
 	{
 		$this->subject = $expression->getSubject();
-		$this->logic = $expression->getPredicate();
+		$this->logic = $expression->getLogicalOperator();
 	}
 
 	/**

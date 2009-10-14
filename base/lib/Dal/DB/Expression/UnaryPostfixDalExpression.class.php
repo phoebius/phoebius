@@ -21,19 +21,19 @@ class UnaryPostfixDalExpression implements IDalExpression
 	private $subject;
 
 	/**
-	 * @var UnaryPostfixPredicate
+	 * @var UnaryPostfixLogicalOperator
 	 */
 	private $logic;
 
 	/**
 	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
 	 * 	{@link SelectQuery} or any other sql expression
-	 * @param UnaryPostfixPredicate $logic
+	 * @param UnaryPostfixLogicalOperator $logic
 	 */
 	function __construct(UnaryPostfixExpression $expression)
 	{
 		$this->subject = $expression->getSubject();
-		$this->logic = $expression->getPredicate();
+		$this->logic = $expression->getLogicalOperator();
 	}
 
 	/**

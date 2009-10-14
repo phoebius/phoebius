@@ -26,18 +26,18 @@ class InSetExpression implements IExpression
 	private $set;
 
 	/**
-	 * @var InSetPredicate
+	 * @var InSetLogicalOperator
 	 */
 	private $logic;
 
-	function __construct($subject, array $set, InSetPredicate $logic = null)
+	function __construct($subject, array $set, InSetLogicalOperator $logic = null)
 	{
 		$this->subject = $subject;
 		$this->set = $set;
 		$this->logic =
 			$logic
 				? $logic
-				: InSetPredicate::in();
+				: InSetLogicalOperator::in();
 	}
 
 	/**
@@ -57,9 +57,9 @@ class InSetExpression implements IExpression
 	}
 
 	/**
-	 * @return InSetPredicate
+	 * @return InSetLogicalOperator
 	 */
-	function getPredicate()
+	function getLogicalOperator()
 	{
 		return $this->logic;
 	}

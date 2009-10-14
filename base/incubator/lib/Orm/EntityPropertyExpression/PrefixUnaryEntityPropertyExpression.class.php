@@ -27,7 +27,7 @@ class PrefixUnaryEntityPropertyExpression extends SingleRowEntityPropertyExpress
 	{
 		return new PrefixUnaryDalExpression(
 			new PrefixUnaryExpression(
-				$this->getExpression()->getPredicate(),
+				$this->getExpression()->getLogicalOperator(),
 				$this->getSqlColumn()
 			)
 		);
