@@ -17,7 +17,7 @@ define('APP_ROOT', join(
 	)
 );
 
-require ( APP_ROOT . '/../base/etc/app.init.php' );
+require ( APP_ROOT . '/../src/etc/app.init.php' );
 require ( APP_ROOT . '/etc/config.php' );
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
