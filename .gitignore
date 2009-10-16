@@ -1,6 +1,5 @@
-.cache
-.settings
-.project
-.buildpath
-app/tmp/*
-base/tmp/*
+.*
+!.keepdir
+
+tmp/*
+!tmp/.keepdir
