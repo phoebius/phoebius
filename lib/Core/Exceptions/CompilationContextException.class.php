@@ -5,7 +5,14 @@
  *
  * **********************************************************************************************
  *
- * Copyright notice
+ * Copyright (c) 2009 phoebius.org
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
  *
  ************************************************************************************************/
 
@@ -14,7 +21,7 @@
  * errors that raised with the little help of {@link trigger_error} and {@link E_USER_ERROR}.
  * Normally, it shouldn't be used to make manual exceptions, use your own custom exceptions that
  * conform your component API
- * @ingroup CoreExceptions
+ * @ingroup Core_Exceptions
  * @see Exceptionizer
  */
 final class CompilationContextException extends ErrorException implements IErrorExceptionFactory

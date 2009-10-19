@@ -5,7 +5,14 @@
  *
  * **********************************************************************************************
  *
- * Copyright notice
+ * Copyright (c) 2009 phoebius.org
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
  *
  ************************************************************************************************/
 
@@ -18,7 +25,7 @@
  * the constraints against parameters it does noting if the parameter is not defined within the
  * route (i.e. {@link ParameterMissingException} is not thrown).
  *
- * @ingroup Routing
+ * @ingroup App_Routing
  */
 class ParametricRewriteRule implements IRequestRewriteRule
 {

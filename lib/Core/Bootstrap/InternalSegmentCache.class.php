@@ -5,7 +5,14 @@
  *
  * **********************************************************************************************
  *
- * Copyright notice
+ * Copyright (c) 2009 phoebius.org
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
  *
  ************************************************************************************************/
 
@@ -13,7 +20,7 @@
  * Implements the internal cacher to optimize bootstrapping procedures. It uses eaccelerator,
  * xcache and FS storage. If some of your classes/singletons are needed a session data between
  * every script execution, just inherit this cacher and use the protected API
- * @ingroup Bootstrap
+ * @ingroup Core_Bootstrap
  */
 abstract class InternalSegmentCache
 {
