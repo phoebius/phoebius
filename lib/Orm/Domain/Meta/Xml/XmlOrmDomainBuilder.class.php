@@ -547,7 +547,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 * @return void
 	 */
 	private function dispose()
-	{//$this->xmlElement = null;
+	{
+		$this->xmlElement = null;
 	}
 
 	/**
