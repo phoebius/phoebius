@@ -31,6 +31,14 @@ class TempFile implements IWriteStream
 	 */
 	private $path;
 
+	/**
+	 * @return TempFile
+	 */
+	static function create($keepAfterShutdown = false)
+	{
+		return new self ($keepAfterShutdown);
+	}
+
 	function __construct($keepAfterShutdown = false)
 	{
 		$this->path = FSUtils::getTempFilename(__CLASS__);
@@ -63,6 +71,15 @@ class TempFile implements IWriteStream
 		file_put_contents($this->path, null);
 
 		return $this;
+	}
+
+	/**
+	 * Path to the file
+	 * @return string
+	 */
+	function __toString()
+	{
+		return $this->getPath();
 	}
 
 	function __destruct()
