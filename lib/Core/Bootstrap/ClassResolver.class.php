@@ -87,20 +87,13 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 			}
 			catch (ExecutionContextException $e) {
 				if ($e->getSeverity() == E_WARNING) {
-					$trace = $e->getTrace();
-					$ex = reset($trace);
+					unset($this->foundClasspaths[$classname]);
+					$this->uncache($classname);
 
-					if (isset($ex['args'])) {
-						$lastArg = end($ex['args']);
-						if (
-								   (isset($lastArg['classname']) && $lastArg['classname'] == $classname)
-								&& (isset($lastArg['classpath']) && $lastArg['classpath'] == $classpath)
-						) {
-							unset($this->foundClasspaths[$classname]);
-							$this->uncache($classname);
+					if ($classpath = $this->resolveClassPath($classname, true, false)) {
+						include $classpath;
 
-							return $this->resolveClassPath($classname, false, false);
-						}
+						return true;
 					}
 				}
 
@@ -276,7 +269,7 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 			}
 		}
 
-		if (!$classpath && $useCacheOnly != true) {
+		if (!$classpath && !$useCacheOnly) {
 			$classpath = $this->scanClassPaths($classname);
 
 			if ($classpath) {
