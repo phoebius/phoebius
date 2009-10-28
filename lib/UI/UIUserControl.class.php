@@ -17,17 +17,31 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc_Exceptions
+ * @ingroup UI
  */
-class ApplicationMasterPageView extends PhpMasterPageView
+class UIUserControl extends UITemplateControl
 {
-	const VIEW_EXTENSION = '.view.php';
+	/**
+	 * @var UITemplateControl|null
+	 */
+	private $parentControl;
 
-	function __construct($viewName)
+	/**
+	 * @return UIUserControl an object itself
+	 */
+	function setParentControl(UITemplateControl $parentControl)
 	{
-		parent::__construct(
-			APP_ROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . self::VIEW_EXTENSION
-		);
+		$this->parentControl = $parentControl;
+
+		return $this;
+	}
+
+	/**
+	 * @return UITemplateControl|null
+	 */
+	function getParentControl()
+	{
+		return $this->parentControl;
 	}
 }
 

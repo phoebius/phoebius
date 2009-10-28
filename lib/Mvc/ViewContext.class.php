@@ -19,10 +19,10 @@
 /**
  * @ingroup Mvc
  */
-class ViewContext extends ControllerContext implements IViewContext
+class ViewContext implements IViewContext
 {
 	/**
-	 * @var IController
+	 * @var IController|null
 	 */
 	private $controller;
 
@@ -31,21 +31,24 @@ class ViewContext extends ControllerContext implements IViewContext
 	 */
 	private $model;
 
+	/**
+	 * @var IOutput
+	 */
+	private $ws;
+
 	function __construct(
-			IController $controller,
 			Model $model,
-			IRouteContext $routeContext,
-			IAppContext $appContext
+			IOutput $ws = null,
+			IController $controller = null
 		)
 	{
-		parent::__construct($routeContext, $appContext);
-
-		$this->controller = $controller;
 		$this->model = $model;
+		$this->ws = $ws;
+		$this->controller = $controller;
 	}
 
 	/**
-	 * @return IController
+	 * @return IController|null
 	 */
 	function getController()
 	{
@@ -58,6 +61,14 @@ class ViewContext extends ControllerContext implements IViewContext
 	function getModel()
 	{
 		return $this->model;
+	}
+
+	/**
+	 * @return IOutput
+	 */
+	function getWriteStream()
+	{
+		return $this->ws;
 	}
 }
 

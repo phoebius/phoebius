@@ -17,46 +17,51 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc_PhpLayout
+ * @ingroup UI
  */
-class SimplePhpView implements IView
+class UIPage extends UITemplateControl
 {
 	/**
-	 * @var string
+	 * @var UIMasterPage|null
 	 */
-	private $layoutPath;
+	private $masterPage = null;
 
 	/**
-	 * @throws FileNotFoundException
-	 * @param string $layoutPath
+	 * @return UIPage an object itself
 	 */
-	function __construct($layoutPath)
+	function setMasterPage(UIMasterPage $masterPage)
 	{
-		Assert::isScalar($layoutPath);
+		$this->assertInsideRenderingContext();
 
-		$this->layoutPath = $layoutPath;
+		$this->masterPage = $masterPage;
 
-		if (!file_exists($layoutPath)) {
-			throw new FileNotFoundException($layoutPath, 'view does not exists at the specified path');
+		return $this;
+	}
+
+	/**
+	 * @return UIMasterPage
+	 */
+	function getMasterPage()
+	{
+		return $this->masterPage;
+	}
+
+	/**
+	 * @return void
+	 */
+	function render(IOutput $output)
+	{
+		$memoryBuffer = new MemoryStream;
+
+		parent::render($memoryBuffer);
+
+		if ($this->masterPage) {
+			$this->masterPage->setDefaultContent($memoryBuffer->getBuffer());
+			$this->masterPage->render($output);
 		}
-	}
-
-	/**
-	 * @return void
-	 */
-	function render(IViewContext $context)
-	{
-		// isolate inclusion to introduce a clean scope
-		$this->injectLayout();
-	}
-
-	/**
-	 * Overridden
-	 * @return void
-	 */
-	private function injectLayout()
-	{
-		require $this->layoutPath;
+		else {
+			$output->write($memoryBuffer->getBuffer());
+		}
 	}
 }
 

@@ -17,30 +17,35 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc_Exceptions
+ * @ingroup UI
  */
-interface IPhpViewDispatcher
+abstract class UITemplateControl extends UIControl
 {
 	/**
-	 * @throws ArgumentException
-	 * @param string $viewName
-	 * @return PhpControlView
+	 * @var UIPresentation
 	 */
-	function getControl($viewName);
+	private $presentation;
+
+	function __construct(UIPresentation $presentation)
+	{
+		$this->presentation = $presentation;
+	}
 
 	/**
-	 * @throws ArgumentException
-	 * @param string $viewName
-	 * @return PhpContentPageView
+	 * @return UIPresentation
 	 */
-	function getContentPage($viewName);
+	function getPresentation()
+	{
+		return $this->presentation;
+	}
 
 	/**
-	 * @throws ArgumentException
-	 * @param string $viewName
-	 * @return PhpMasterPageView
+	 * @return void
 	 */
-	function getMasterPage($viewName);
+	function render(IOutput $output)
+	{
+		$this->presentation->render($output);
+	}
 }
 
 ?>

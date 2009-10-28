@@ -26,6 +26,11 @@ interface IController
 	 * @return void
 	 */
 	function handle(IControllerContext $context);
+
+	/**
+	 * @return IControllerContext
+	 */
+	function getContext();
 }
 
 ?>

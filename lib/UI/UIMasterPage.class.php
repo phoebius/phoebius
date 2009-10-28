@@ -17,10 +17,9 @@
  ************************************************************************************************/
 
 /**
- * ContentBuffer getter is not represented here specially
- * @ingroup Mvc_Exceptions
+ * @ingroup UI
  */
-class PhpMasterPageView extends PhpPageView
+class UIMasterPage extends UIPage
 {
 	/**
 	 * @var array
@@ -38,8 +37,18 @@ class PhpMasterPageView extends PhpPageView
 	private $contentPlaceholderCurrentLevel = 0;
 
 	/**
+	 * @var IOutput
+	 */
+	private $output;
+
+	/**
+	 * @var string
+	 */
+	private $defaultContent;
+
+	/**
 	 * @throws ArgumentException
-	 * @return PhpMasterPageViewan object itsef
+	 * @return UIMasterPage
 	 */
 	function addContentBuffer($contentId, $content)
 	{
@@ -53,7 +62,7 @@ class PhpMasterPageView extends PhpPageView
 	}
 
 	/**
-	 * @return PhpMasterPageView an object itsef
+	 * @return UIMasterPage an object itsef
 	 */
 	function setContentBuffer($contentId, $content)
 	{
@@ -67,7 +76,7 @@ class PhpMasterPageView extends PhpPageView
 
 	/**
 	 * @throws ArgumentException
-	 * @return PhpMasterPageView an object itsef
+	 * @return UIMasterPage an object itsef
 	 */
 	function addContentBuffers(array $contentBuffers)
 	{
@@ -79,7 +88,7 @@ class PhpMasterPageView extends PhpPageView
 	}
 
 	/**
-	 * @return PhpMasterPageView an object itsef
+	 * @return UIMasterPage an object itsef
 	 */
 	function setContentBuffers(array $contentBuffers)
 	{
@@ -89,7 +98,7 @@ class PhpMasterPageView extends PhpPageView
 	}
 
 	/**
-	 * @return PhpMasterPageView an object itsef
+	 * @return UIMasterPage an object itsef
 	 */
 	function dropContentBuffers()
 	{
@@ -99,9 +108,37 @@ class PhpMasterPageView extends PhpPageView
 	}
 
 	/**
+	 * @return void
+	 */
+	function render(IOutput $output)
+	{
+		$this->output = $output;
+
+		parent::render($output);
+
+		if ($this->contentPlaceholderCurrentId) {
+			$this->endContent();
+		}
+
+		$this->output = null;
+	}
+
+	/**
+	 * @return UIMasterPage
+	 */
+	function setDefaultContent($content)
+	{
+		Assert::isScalar($content);
+
+		$this->defaultContent = $content;
+
+		return $this;
+	}
+
+	/**
 	 * @return string
 	 */
-	function getContent($contentId, $defaultContent = null)
+	protected function getContent($contentId, $defaultContent = null)
 	{
 		$this->assertInsideRenderingContext();
 
@@ -115,9 +152,17 @@ class PhpMasterPageView extends PhpPageView
 	}
 
 	/**
+	 * @return string
+	 */
+	protected function getDefaultContent()
+	{
+		return $this->defaultContent;
+	}
+
+	/**
 	 * @return void
 	 */
-	function beginContentPlaceholder($contentId)
+	protected function beginContentPlaceholder($contentId)
 	{
 		Assert::isScalar($contentId);
 
@@ -137,7 +182,7 @@ class PhpMasterPageView extends PhpPageView
 	/**
 	 * @return void
 	 */
-	function endContentPlaceholder()
+	protected function endContentPlaceholder()
 	{
 		$this->assertInsideRenderingContext();
 
@@ -148,12 +193,13 @@ class PhpMasterPageView extends PhpPageView
 
 		Assert::isTrue(
 			$this->contentBufferCurrentLevel == ob_get_level(),
-			'unknown buffers inside view are not closed'
+			'unknown buffers inside %s are not closed',
+			get_class($this)
 		);
 
 		$buffer = ob_get_clean();
 
-		$this->getViewContext()->getAppContext()->getResponse()->out(
+		$this->output->write(
 			isset($this->contentBuffers[$this->contentPlaceholderCurrentId])
 				? $this->contentBuffers[$this->contentPlaceholderCurrentId]
 				: $buffer
@@ -166,7 +212,7 @@ class PhpMasterPageView extends PhpPageView
 	/**
 	 * @return void
 	 */
-	function cleanContentPlaceholder()
+	protected function cleanContentPlaceholder()
 	{
 		$this->assertInsideRenderingContext();
 
@@ -177,25 +223,14 @@ class PhpMasterPageView extends PhpPageView
 
 		Assert::isTrue(
 			$this->contentBufferCurrentLevel == ob_get_level(),
-			'unknown buffers inside view are not closed'
+			'unknown buffers inside %s are not closed',
+			get_class($this)
 		);
 
 		ob_end_clean();
 
 		$this->contentPlaceholderCurrentId = null;
 		$this->contentPlaceholderCurrentLevel = 0;
-	}
-
-	/**
-	 * @return void
-	 */
-	function render(IViewContext $context)
-	{
-		parent::render($context);
-
-		if ($this->contentPlaceholderCurrentId) {
-			$this->endContent();
-		}
 	}
 }
 

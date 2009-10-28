@@ -17,18 +17,19 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc_Exceptions
+ * @ingroup UI_Presentation
  */
-class ApplicationContentPageView extends PhpContentPageView
+interface IUIControlBindedPresentation
 {
-	const VIEW_EXTENSION = '.view.php';
+	/**
+	 * @return IUIControlBindedPresentation an object itself
+	 */
+	function setUIControl(UIControl $control);
 
-	function __construct($viewName)
-	{
-		parent::__construct(
-			APP_ROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . self::VIEW_EXTENSION
-		);
-	}
+	/**
+	 * @return UIControl|null
+	 */
+	function getUIControl();
 }
 
 ?>

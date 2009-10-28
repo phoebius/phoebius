@@ -17,15 +17,14 @@
  ************************************************************************************************/
 
 /**
- * Microsoft ASP.NET Web.UI realization
- * @ingroup Mvc_Exceptions
+ * @ingroup UI_Presentation
  */
-abstract class PhpView extends SimplePhpView
+class UIPhpLayoutPresentation extends UIPresentation
 {
 	/**
-	 * @var IViewContext|null
+	 * @var string
 	 */
-	private $viewContext = null;
+	private $layoutPath;
 
 	/**
 	 * @var boolean
@@ -33,55 +32,54 @@ abstract class PhpView extends SimplePhpView
 	private $inRenderingContext = false;
 
 	/**
+	 * @var IOutput
+	 */
+	private $output;
+
+	/**
+	 * @throws FileNotFoundException
+	 * @param string $layoutPath
+	 */
+	function __construct($layoutPath)
+	{
+		Assert::isScalar($layoutPath);
+
+		$this->layoutPath = $layoutPath;
+
+		if (!file_exists($layoutPath)) {
+			throw new FileNotFoundException(
+				$layoutPath,
+				'template not found at the specified path'
+			);
+		}
+	}
+
+	/**
 	 * @return void
 	 */
-	function render(IViewContext $context)
+	function render(IOutput $output)
 	{
 		$this->assertOutsideRenderingContext();
 
 		$this->inRenderingContext = true;
-		$this->viewContext = $context;
+		$this->output = $output;
 
-		parent::render($context);
+		ob_start();
+
+		// isolate inclusion to introduce a clean scope
+		$this->injectLayout();
+
+		$output->write(ob_get_clean());
 
 		$this->inRenderingContext = false;
-		$this->viewContext = null;
+		$this->output = null;
 	}
 
 	/**
+	 * Wrapper over ASP.NET-like "CodeBehind" and "Inherits" attributes
 	 * @return void
 	 */
-	function renderPartial(PhpControlView $control, Model $model = null)
-	{
-		$this->assertInsideRenderingContext();
-
-		$control->setParentView($this);
-
-		$control->render(
-			new ViewContext(
-				$this->viewContext->getController(),
-				$model ? $model : new Model(),
-				$this->viewContext->getRouteContext(),
-				$this->viewContext->getAppContext()
-			)
-		);
-	}
-
-	/**
-	 * @return IViewContext|null
-	 */
-	function getViewContext()
-	{
-		$this->assertInsideRenderingContext();
-
-		return $this->viewContext;
-	}
-
-	/**
-	 * Wrapped over ASP.NET-like "CodeBehind" and "Inherits" attributes
-	 * @return void
-	 */
-	function codeBehind($type)
+	final protected function codeBehind($type)
 	{
 		$this->assertInsideRenderingContext();
 
@@ -110,6 +108,15 @@ abstract class PhpView extends SimplePhpView
 	{
 		Assert::isFalse($this->inRenderingContext, 'can be called OUTSIDE render context only');
 	}
+
+	/**
+	 * @return void
+	 */
+	private function injectLayout()
+	{
+		require $this->layoutPath;
+	}
 }
+
 
 ?>

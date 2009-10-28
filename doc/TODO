@@ -4,6 +4,11 @@
   Copyright notice
  ================================================================================================
 
+DAL/DB
+======
+Use postgresql RETURNING_ID instead of invoking the sequence
+
+
 Logging
 =======
 Centralized pool of loggers (system logger, subsystem loggers)

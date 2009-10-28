@@ -19,10 +19,10 @@
 /**
  * @ingroup Mvc
  */
-interface IViewContext extends IControllerContext
+interface IViewContext
 {
 	/**
-	 * @return IController
+	 * @return IController|null
 	 */
 	function getController();
 
@@ -30,6 +30,11 @@ interface IViewContext extends IControllerContext
 	 * @return Model
 	 */
 	function getModel();
+
+	/**
+	 * @return IOutput
+	 */
+	function getWriteStream();
 }
 
 ?>

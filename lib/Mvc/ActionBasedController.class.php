@@ -106,11 +106,17 @@ abstract class ActionBasedController extends Controller
 		$actionResult->handleResult(
 			new ViewContext(
 				$this,
-				$this->getModel(),
-				$context->getRouteContext(),
-				$context->getAppContext()
+				$this->getModel()
 			)
 		);
+	}
+
+	/**
+	 * @return IControllerContext|null
+	 */
+	function getContext()
+	{
+		return $this->currentControllerContext;
 	}
 
 	/**
@@ -193,7 +199,7 @@ abstract class ActionBasedController extends Controller
 		}
 
 		if (is_string($actionResult)) {
-			return new ViewResult(new ApplicationContentPageView($actionResult));
+			return new ViewResult(UIViewPresentation::view($actionResult, $this->getModel()));
 		}
 	}
 

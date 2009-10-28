@@ -17,35 +17,11 @@
  ************************************************************************************************/
 
 /**
- * TODO: move parent view setter to a ctor
- * @ingroup Mvc_Exceptions
+ * @ingroup UI_Presentation
  */
-class PhpControlView extends PhpView
+abstract class UIPresentation
 {
-	/**
-	 * @var PhpView
-	 */
-	private $parentView;
-
-	/**
-	 * @return PhpControlView an object itself
-	 */
-	function setParentView(PhpView $parentView)
-	{
-		$this->parentView = $parentView;
-
-		return $this;
-	}
-
-	/**
-	 * @return PhpView
-	 */
-	function getParentView()
-	{
-		Assert::isNotEmpty($this->parentView, 'parent view not yet set');
-
-		return $this->parentView;
-	}
+	abstract function render(IOutput $output);
 }
 
 ?>

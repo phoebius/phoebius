@@ -24,11 +24,11 @@
 class ViewResult implements IActionResult
 {
 	/**
-	 * @var IView
+	 * @var UITemplateControl
 	 */
 	private $view;
 
-	function __construct(IView $view)
+	function __construct(UITemplateControl $view)
 	{
 		$this->view = $view;
 	}
@@ -38,9 +38,11 @@ class ViewResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$this->view->render($context);
+		$this->view->render(
+			$context->getController()->getContext()->getAppContext()->getResponse()
+		);
 
-		$context->getAppContext()->getResponse()->finish();
+		$context->getController()->getContext()->getAppContext()->getResponse()->finish();
 	}
 
 }

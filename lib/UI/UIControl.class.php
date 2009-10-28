@@ -17,18 +17,14 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc_Exceptions
+ * @ingroup UI
  */
-class ApplicationControlView extends PhpControlView
+abstract class UIControl
 {
-	const VIEW_EXTENSION = '.view.php';
-
-	function __construct($viewName)
-	{
-		parent::__construct(
-			APP_ROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $viewName . self::VIEW_EXTENSION
-		);
-	}
+	/**
+	 * @return void
+	 */
+	abstract function render(IOutput $output);
 }
 
 ?>
