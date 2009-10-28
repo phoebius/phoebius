@@ -19,30 +19,47 @@
 /**
  * @ingroup Utils_Stream
  */
-class FileWriteStream implements IOutput
+final class MemoryStream implements IOutput
 {
 	/**
 	 * @var string
 	 */
-	private $filename;
-
-	function __construct($filename)
-	{
-		Assert::isScalar($filename);
-
-		$this->filename = $filename;
-
-		file_put_contents($filename, null);
-	}
+	private $buffer;
 
 	/**
 	 * @return FileWriteStream
 	 */
 	function write($buffer)
 	{
-		file_put_contents($this->filename, $buffer, FILE_APPEND);
+		$this->buffer .= $buffer;
 
 		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getBuffer()
+	{
+		return $this->buffer;
+	}
+
+	/**
+	 * @return MemoryStream
+	 */
+	function clean()
+	{
+		$this->buffer = null;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	function __toString()
+	{
+		return $this->buffer;
 	}
 }
 

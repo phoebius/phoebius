@@ -19,31 +19,12 @@
 /**
  * @ingroup Utils_Stream
  */
-class FileWriteStream implements IOutput
+interface IOutput
 {
 	/**
-	 * @var string
+	 * @return IOutput
 	 */
-	private $filename;
-
-	function __construct($filename)
-	{
-		Assert::isScalar($filename);
-
-		$this->filename = $filename;
-
-		file_put_contents($filename, null);
-	}
-
-	/**
-	 * @return FileWriteStream
-	 */
-	function write($buffer)
-	{
-		file_put_contents($this->filename, $buffer, FILE_APPEND);
-
-		return $this;
-	}
+	function write($buffer);
 }
 
 ?>

@@ -45,7 +45,7 @@ final class FSUtils extends StaticClass
 			}
 		}
 		catch (ExecutionContextException $e) {
-			throw new FSOperationException("Cannot read {$dir}: {$e->getMessage()}");
+			//throw new FSOperationException("Cannot read {$dir}: {$e->getMessage()}");
 		}
 	}
 
@@ -64,7 +64,7 @@ final class FSUtils extends StaticClass
 			rmdir($dir);
 		}
 		catch (ExecutionContextException $e) {
-			throw new FSAccessException("Cannot remove {$dir} (though it should be empty now): {$e->getMessage()}");
+			//throw new FSAccessException("Cannot remove {$dir} (though it should be empty now): {$e->getMessage()}");
 		}
 	}
 

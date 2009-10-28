@@ -44,7 +44,7 @@ class ConsoleOutput
 	 */
 	function write($text)
 	{
-		$this->response->out($text);
+		$this->response->write($text);
 
 		return $this;
 	}
@@ -54,7 +54,7 @@ class ConsoleOutput
 	 */
 	function writeLine($text)
 	{
-		$this->response->out($this->eol . $text);
+		$this->response->write($this->eol . $text);
 
 		return $this;
 	}
@@ -64,7 +64,7 @@ class ConsoleOutput
 	 */
 	function newLine()
 	{
-		$this->response->out($this->eol);
+		$this->response->write($this->eol);
 
 		return $this;
 	}
@@ -84,7 +84,7 @@ class ConsoleOutput
 			. $foreground->getValue() . ';'
 			. $background->getValue() . 'm';
 
-		$this->response->out($mode);
+		$this->response->write($mode);
 
 		return $this;
 	}
