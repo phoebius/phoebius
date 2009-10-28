@@ -49,7 +49,7 @@ abstract class ClassCodeConstructor extends CodeConstructor
 	/**
 	 * @return void
 	 */
-	function make(IWriteStream $writeStream)
+	function make(IOutput $writeStream)
 	{
 		$this->classMethods = array();
 		$this->classProperties = array();

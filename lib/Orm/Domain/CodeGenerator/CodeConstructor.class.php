@@ -24,7 +24,7 @@ abstract class CodeConstructor
 	/**
 	 * @return void
 	 */
-	abstract function make(IWriteStream $ws);
+	abstract function make(IOutput $ws);
 
 	/**
 	 * @return string

@@ -42,7 +42,7 @@ class SqlSchemaConstructor
 	/**
 	 * @return void
 	 */
-	function make(IWriteStream $writeStream, IDialect $dialect)
+	function make(IOutput $writeStream, IDialect $dialect)
 	{
 		$now = date('d.m.y H:i');
 

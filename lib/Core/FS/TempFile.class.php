@@ -19,7 +19,7 @@
 /**
  * @ingroup Core_FS
  */
-class TempFile implements IWriteStream
+class TempFile implements IOutput
 {
 	/**
 	 * @var boolean
@@ -54,7 +54,7 @@ class TempFile implements IWriteStream
 	}
 
 	/**
-	 * @return IWriteStream
+	 * @return IOutput
 	 */
 	function write($buffer)
 	{

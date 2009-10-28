@@ -47,7 +47,7 @@ class WebResponse implements IWebResponse
 	/**
 	 * @return IAppResponse an object itself
 	 */
-	function out($string)
+	function write($string)
 	{
 		echo $string;
 

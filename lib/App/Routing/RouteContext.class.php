@@ -31,7 +31,7 @@ class RouteContext implements IRouteContext
 	 */
 	private $rewriteRuleContext;
 
-	function __construct(Route $route, IRewriteRuleContext $context)
+	function __construct(Route $route, IRewriteRuleContext $context = null)
 	{
 		$this->route = $route;
 		$this->rewriteRuleContext = $context;
