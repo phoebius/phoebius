@@ -124,7 +124,7 @@ class ObjectPropertyType extends PrimitivePropertyType
 		return array(
 			'\'' . $this->type . '\'',
 			'null',
-			$this->isNullable
+			$this->isNullable()
 				? 'true'
 				: 'false'
 		);

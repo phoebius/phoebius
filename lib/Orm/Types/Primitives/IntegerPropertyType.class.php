@@ -41,6 +41,7 @@ class IntegerPropertyType extends PrimitivePropertyType
 	{
 		return array (
 			DBType::create(DBType::INTEGER)
+				->setSize(11)
 				->setIsNullable($this->isNullable())
 		);
 	}

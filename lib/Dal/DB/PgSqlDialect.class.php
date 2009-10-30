@@ -128,7 +128,7 @@ class PgSqlDialect extends LazySingleton implements IDialect
 		$type = self::$baseTypes[$dbType->getValue()];
 
 		if ($dbType->hasSize() && ($size = $dbType->getSize())) {
-			$type .= '(' . $size . ')';
+			//$type .= '(' . $size . ')';
 		}
 		else if ($dbType->hasPrecision() && ($precision = $dbType->getPrecision())) {
 			$type .= '(' . $precision;
