@@ -404,8 +404,9 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 
 		// else -- a property value
 		$epHashId = reset($this->expressionObjectStack);
+		$rawValue = $this->expressionSubjects[$epHashId]->getProperty()->getType()->makeRawValue($subject);
 		return reset(
-			$this->expressionSubjects[$epHashId]->getProperty()->getType()->makeRawValue($subject)
+			$rawValue
 		);
 	}
 

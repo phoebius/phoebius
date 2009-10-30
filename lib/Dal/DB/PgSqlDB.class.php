@@ -53,8 +53,8 @@ class PgSqlDB extends DB
 
 		$connectionParameters = array();
 
-		$connectionParameters['host'] = $this->getHost();
-		$connectionParameters['user'] = $this->getUser();
+		$connectionParameters['host'] = (string) $this->getHost();
+		$connectionParameters['user'] = (string) $this->getUser();
 
 		if ($this->getPassword()) {
 			$connectionParameters['password'] = $this->getPassword();
