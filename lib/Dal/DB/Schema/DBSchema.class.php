@@ -143,7 +143,7 @@ final class DBSchema implements ISqlCastable
 			}
 		}
 
-		return join(PHP_EOL.PHP_EOL, $sql);
+		return join(StringUtils::DELIM_STANDART.StringUtils::DELIM_STANDART, $sql);
 	}
 }
 

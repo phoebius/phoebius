@@ -62,7 +62,7 @@ class CreateTableQuery implements ISqlQuery
 
 		$queryParts[] = join(',', $this->commaSeparatedQueryParts);
 
-		$queryParts[] = PHP_EOL;
+		$queryParts[] = StringUtils::DELIM_STANDART;
 		$queryParts[] = ');';
 
 		return join('', $queryParts);
@@ -91,7 +91,7 @@ class CreateTableQuery implements ISqlQuery
 	 */
 	private function makeColumn(DBColumn $column, IDialect $dialect)
 	{
-		$queryParts = array(PHP_EOL, "\t");
+		$queryParts = array(StringUtils::DELIM_STANDART, "\t");
 
 		$queryParts[] = $dialect->quoteIdentifier($column->getName());
 		$queryParts[] = ' ';
@@ -111,7 +111,7 @@ class CreateTableQuery implements ISqlQuery
 	private function makeConstraints(IDialect $dialect)
 	{
 		foreach ($this->table->getConstraints() as $constraint) {
-			$queryParts = array(PHP_EOL, "\t");
+			$queryParts = array(StringUtils::DELIM_STANDART, "\t");
 			$queryParts[] = $constraint->toDialectString($dialect);
 			$this->commaSeparatedQueryParts[] = join('', $queryParts);
 		}

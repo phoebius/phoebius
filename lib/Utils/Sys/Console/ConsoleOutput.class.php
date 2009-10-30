@@ -29,7 +29,7 @@ class ConsoleOutput
 	/**
 	 * @var string
 	 */
-	private $eol = PHP_EOL;
+	private $eol = StringUtils::DELIM_LOCALE;
 
 	function __construct(IAppResponse $response = null)
 	{

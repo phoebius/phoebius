@@ -25,6 +25,7 @@ final class StringUtils extends StaticClass
 	const DELIM_WIN = "\r\n";
 	const DELIM_LOCALE = PHP_EOL;
 	const EMPTY_STRING = '';
+	const DELIM_STANDART = self::DELIM_UNIX;
 }
 
 ?>
