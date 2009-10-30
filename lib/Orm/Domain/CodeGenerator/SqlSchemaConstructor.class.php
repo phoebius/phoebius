@@ -52,6 +52,7 @@ class SqlSchemaConstructor
 -- Generated at {$now} for {$dialect->getDBDriver()->getValue()}
 --
 
+
 EOT;
 
 		$writeStream

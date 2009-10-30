@@ -56,7 +56,7 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 	private function getIdentifierMethodReturn()
 	{
 		if (($identifier = $this->ormClass->getIdentifier())) {
-			return "\$this->getProperty('{$identifier->getName()}')";
+			return $identifier->toPhpCall();
 		}
 		else {
 			return "null";

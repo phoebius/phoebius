@@ -334,7 +334,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			(string) $xmlProperty['name'],
 			isset($xmlProperty['db-columns'])
 				? $this->getDBFields($xmlProperty['db-columns'])
-				: $this->getDBFields((string) $xmlProperty['name'], $type),
+				: $this->generateDBFields((string) $xmlProperty['name'], $type),
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			$xmlProperty['unique'] == 'true'
