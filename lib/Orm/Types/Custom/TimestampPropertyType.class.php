@@ -45,7 +45,6 @@ final class TimestampPropertyType extends ObjectPropertyType
 	{
 		return array (
 			DBType::create(DBType::INTEGER)
-				->setSize(11)
 				->setUnsigned(true)
 				->setIsNullable($this->isNullable())
 		);

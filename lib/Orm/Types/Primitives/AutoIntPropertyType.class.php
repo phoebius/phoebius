@@ -38,14 +38,13 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	{
 		return new IntegerPropertyType(
 			null,
-			null,
 			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
 		);
 	}
 
 	function __construct($isNullable)
 	{
-		parent::__construct(null, null, $isNullable);
+		parent::__construct(null, $isNullable);
 	}
 
 	/**

@@ -57,7 +57,6 @@ class Integer extends Ranged
 	{
 		return new IntegerPropertyType(
 			null,
-			null,
 			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
 		);
 	}

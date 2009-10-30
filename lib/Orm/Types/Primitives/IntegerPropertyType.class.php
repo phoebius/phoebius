@@ -21,19 +21,8 @@
  */
 class IntegerPropertyType extends PrimitivePropertyType
 {
-	/**
-	 * @var integer|null
-	 */
-	private $size;
-
-	function __construct($size = null, $defaultValue = null, $isNullable = false)
+	function __construct($defaultValue = null, $isNullable = false)
 	{
-		if (!is_null($size)) {
-			Assert::isPositiveInteger($size);
-		}
-
-		$this->size = $size;
-
 		parent::__construct($defaultValue, $isNullable);
 	}
 
@@ -46,21 +35,12 @@ class IntegerPropertyType extends PrimitivePropertyType
 	}
 
 	/**
-	 * @return integer|null
-	 */
-	function getSize()
-	{
-		return $this->size;
-	}
-
-	/**
 	 * @return array
 	 */
 	function getDBFields()
 	{
 		return array (
 			DBType::create(DBType::INTEGER)
-				->setSize($this->size)
 				->setIsNullable($this->isNullable())
 		);
 	}
@@ -68,9 +48,6 @@ class IntegerPropertyType extends PrimitivePropertyType
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
-			is_null($this->size)
-				? 'null'
-				: $this->size,
 			'null',
 			$this->isNullable()
 				? 'true'

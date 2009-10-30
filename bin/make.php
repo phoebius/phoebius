@@ -59,7 +59,7 @@ define('APP_ROOT', $appDir);
 
 $applicationConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'config.php';
 if (file_exists($applicationConfig)) {
-	include $applicationConfig;
+		include $applicationConfig;
 }
 
 $hostConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . APP_SLOT . DIRECTORY_SEPARATOR . 'config.php';

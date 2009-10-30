@@ -379,6 +379,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				$proxy = new OrmClass();
 				$proxy->setHasDao(true);
 				$proxy->setName((string)$xmlContainer['refs']);
+
+				$this->ormDomain->addClass($proxy);
 			}
 
 			// FIXME: check whether type and referenced type are identifiable and id property types implement IReferenced

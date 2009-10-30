@@ -216,7 +216,10 @@ EOT;
 	}
 EOT;
 
-			if ($this->ormClass->getIdentifier()->getName() == $ormProperty->getName()) {
+			if (
+					($identifier = $this->ormClass->getIdentifier())
+					&& $identifier->getName() == $ormProperty->getName()
+			) {
 				$this->classMethods[] = <<<EOT
 	/**
 	 * @internal
@@ -250,7 +253,10 @@ EOT;
 	}
 EOT;
 
-			if ($this->ormClass->getIdentifier()->getName() == $ormProperty->getName()) {
+			if (
+					($identifier = $this->ormClass->getIdentifier())
+					&& $identifier->getName() == $ormProperty->getName()
+			) {
 				$this->classMethods[] = <<<EOT
 	/**
 	 * @internal
