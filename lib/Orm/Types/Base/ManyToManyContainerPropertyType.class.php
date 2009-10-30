@@ -88,7 +88,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
-			$this->mtm->getLogicalSchema()->getEntityName() . '::orm()',
+			$this->proxy->getLogicalSchema()->getEntityName() . '::orm()',
 			$this->getContainer()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->container->getName() . '\')',
 			$this->getEncapsulant()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulant->getName() . '\')',
 		);

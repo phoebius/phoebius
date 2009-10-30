@@ -362,7 +362,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		}
 
 		try { // one-to-many
-			$referredProperty = $referredType->getEntityProperty((string)$xmlContainer['refs']);
+			$referredProperty = $referredType->getProperty((string)$xmlContainer['refs']);
 
 			$propertyType = new OneToManyContainerPropertyType(
 				$type,
@@ -386,15 +386,16 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 			$type_id_name = '___mtm_' . $type->getDBTableName();
 			try {
-				$type = new AssociationPropertyType(
+				$mtmType = new AssociationPropertyType(
 						$type,
 						AssociationMultiplicity::exactlyOne(),
 						AssociationBreakAction::cascade()
 					);
 				$type_property = new OrmProperty(
 					$type_id_name,
-					$this->generateDBFields($type_id_name, $type),
-					$type
+					$this->generateDBFields($type_id_name, $mtmType),
+					$mtmType,
+					OrmPropertyVisibility::full()
 				);
 
 				$proxy->addProperty(
@@ -407,7 +408,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 			$referredType_id_name = '___mtm_' . $type->getDBTableName();
 			try {
-				$type =
+				$mtmType =
 					new AssociationPropertyType(
 						$referredType,
 						AssociationMultiplicity::exactlyOne(),
@@ -415,8 +416,9 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 					);
 				$referredType_property = new OrmProperty(
 					$referredType_id_name,
-					$this->generateDBFields($referredType_id_name, $type),
-					$type
+					$this->generateDBFields($referredType_id_name, $mtmType),
+					$mtmType,
+					OrmPropertyVisibility::full()
 				);
 
 				$proxy->addProperty(
@@ -424,7 +426,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$referredType_property = $proxy->getEntityProperty($referredType_id_name);
+				$referredType_property = $proxy->getProperty($referredType_id_name);
 			}
 
 			$propertyType = new ManyToManyContainerPropertyType(

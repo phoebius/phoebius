@@ -119,14 +119,15 @@ class DBSchemaBuilder
 	 */
 	private function importProperty()
 	{
+		if (!sizeof($this->ormProperty->getDBFields())) {
+			// columnless properties are skipped
+			return;
+		}
+
 		$columns = array_combine(
 			$this->ormProperty->getDBFields(),
 			$this->ormProperty->getType()->getDBFields()
 		);
-		if (empty($columns)) {
-			// columnless properties are skipped
-			return;
-		}
 
 		$dbColumns = array();
 		foreach ($columns as $name => $dbType) {
