@@ -138,7 +138,7 @@ class UIMasterPage extends UIPage
 	/**
 	 * @return string
 	 */
-	protected function getContent($contentId, $defaultContent = null)
+	function getContent($contentId, $defaultContent = null)
 	{
 		$this->assertInsideRenderingContext();
 
@@ -154,7 +154,7 @@ class UIMasterPage extends UIPage
 	/**
 	 * @return string
 	 */
-	protected function getDefaultContent()
+	function getDefaultContent()
 	{
 		return $this->defaultContent;
 	}
@@ -162,7 +162,7 @@ class UIMasterPage extends UIPage
 	/**
 	 * @return void
 	 */
-	protected function beginContentPlaceholder($contentId)
+	function beginContentPlaceholder($contentId)
 	{
 		Assert::isScalar($contentId);
 
@@ -182,7 +182,7 @@ class UIMasterPage extends UIPage
 	/**
 	 * @return void
 	 */
-	protected function endContentPlaceholder()
+	function endContentPlaceholder()
 	{
 		$this->assertInsideRenderingContext();
 
@@ -212,7 +212,7 @@ class UIMasterPage extends UIPage
 	/**
 	 * @return void
 	 */
-	protected function cleanContentPlaceholder()
+	function cleanContentPlaceholder()
 	{
 		$this->assertInsideRenderingContext();
 

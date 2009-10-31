@@ -31,8 +31,6 @@ class UIPage extends UITemplateControl
 	 */
 	function setMasterPage(UIMasterPage $masterPage)
 	{
-		$this->assertInsideRenderingContext();
-
 		$this->masterPage = $masterPage;
 
 		return $this;

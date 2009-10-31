@@ -212,9 +212,10 @@ class UIViewPresentation
 	private function spawn($view, Model $model = null)
 	{
 		$presentation = new self ($view);
-		if ($model) {
-			$presentation->model = $model;
-		}
+		$presentation->model =
+			$model
+				? $model
+				: $this->model;
 
 		return $presentation;
 	}
