@@ -394,7 +394,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 						AssociationBreakAction::cascade()
 					);
 				$type_property = new OrmProperty(
-					$type_id_name,
+					$type->getEntityName(),
 					$this->generateDBFields($type_id_name, $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full()
@@ -405,10 +405,10 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$type_property = $proxy->getEntityProperty($type_id_name);
+				$type_property = $proxy->getProperty($type->getEntityName());
 			}
 
-			$referredType_id_name = '___mtm_' . $type->getDBTableName();
+			$referredType_id_name = '___mtm_' . $referredType->getDBTableName();
 			try {
 				$mtmType =
 					new AssociationPropertyType(
@@ -417,7 +417,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 						AssociationBreakAction::cascade()
 					);
 				$referredType_property = new OrmProperty(
-					$referredType_id_name,
+					$referredType->getEntityName(),
 					$this->generateDBFields($referredType_id_name, $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full()
@@ -428,7 +428,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$referredType_property = $proxy->getProperty($referredType_id_name);
+				$referredType_property = $proxy->getProperty($referredType->getEntityName());
 			}
 
 			$propertyType = new ManyToManyContainerPropertyType(

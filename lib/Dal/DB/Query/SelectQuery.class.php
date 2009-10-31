@@ -355,8 +355,11 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 			$querySlices[] = 'DISTINCT';
 		}
 		$querySlices[] = $this->compileFields($dialect);
-		$querySlices[] = 'FROM';
-		$querySlices[] = $this->compileTargets($dialect);
+
+		if (!empty($this->sources)) {
+			$querySlices[] = 'FROM';
+			$querySlices[] = $this->compileTargets($dialect);
+		}
 
 		// WHERE
 		if ($this->expression) {

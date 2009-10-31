@@ -147,7 +147,8 @@ EOT;
 
 		if ($visibility->is(OrmPropertyVisibility::TRANSPARENT)) {
 			if ($ormProperty->getType() instanceof ContainerPropertyType) {
-				$this->buildContainerGetter($ormProperty);
+				//TODO containers are not supported yet
+				//$this->buildContainerGetter($ormProperty);
 			}
 
 			return;

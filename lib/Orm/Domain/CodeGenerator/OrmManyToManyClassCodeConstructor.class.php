@@ -67,16 +67,11 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 	{
 		parent::__construct(
 			\$parent,
-			{$this->ormClass->getName()}::map(),
-			{$this->ormClass->getName()}::orm()->getProperty('{$this->ormProperty->getName()}')
+			{$this->ormClass->getName()}::orm(),
+			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}')->getType()
 		);
 	}
 EOT;
-	}
-
-	protected function getClassType()
-	{
-		return 'abstract';
 	}
 
 	protected function getExtendsClassName()

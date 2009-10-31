@@ -405,11 +405,14 @@ class PgSqlDB extends DB
 	function preGenerate($tableName, $columnName)
 	{
 		$this->generatedIds[$tableName.$columnName] = $this->getCell(
-			new PlainQuery(
-				'SELECT nextval(' . $this->getDialect()->quoteValue(
-					PgSqlDialect::getInstance()->getSequenceName($tableName, $columnName)
-				) . ');'
-			)
+			SelectQuery::create()
+				->getExpr(
+					SqlFunction::create('nextval')->addArg(
+						new ScalarSqlValue(
+							PgSqlDialect::getInstance()->getSequenceName($tableName, $columnName)
+						)
+					)
+				)
 		);
 
 		return $this->generatedIds[$tableName.$columnName];

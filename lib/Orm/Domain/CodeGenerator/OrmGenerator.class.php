@@ -177,6 +177,14 @@ class OrmGenerator
 		$this->buildClass(new OrmAutoEntityClassCodeConstructor($class));
 		$this->buildClass(new OrmEntityClassCodeConstructor($class));
 
+		//$this->generateContainerFiles($class);
+	}
+
+	/**
+	 * @return void
+	 */
+	private function generateContainerFiles(OrmClass $class)
+	{
 		foreach ($class->getProperties() as $property) {
 			$type = $property->getType();
 
