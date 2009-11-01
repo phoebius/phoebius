@@ -93,7 +93,6 @@ try {
 	$generator->generate($ormDomain);
 }
 catch (Exception $e) {
-	var_dump($e);
 	exit ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
 }
 
