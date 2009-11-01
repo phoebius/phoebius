@@ -245,10 +245,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Drops ORDERBY list and adds an order expression
 	 * @return SelectQuery an object itself
 	 */
-	function orderBy(ISqlValueExpression $expression, SqlOrderDirection $direction = null)
+	function orderBy(SqlOrderExpression $orderExpression)
 	{
 		$this->dropOrderBy();
-		$this->andOrderBy($expression, $direction);
+		$this->orderByChain->add($orderExpression);
 
 		return $this;
 	}
@@ -257,9 +257,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Adds an order expression
 	 * @return SelectQuery an object itself
 	 */
-	function andOrderBy(ISqlValueExpression $expression, SqlOrderDirection $direction = null)
+	function andOrderBy(SqlOrderExpression $orderExpression)
 	{
-		$this->orderByChain->add(new SqlOrderExpression($expression, $direction));
+		$this->orderByChain->add($orderExpression);
 
 		return $this;
 	}

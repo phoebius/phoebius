@@ -27,7 +27,7 @@ class EmptyResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getController()->getContext()->getAppContext()->getResponse()->finish();
+		$context->getAppContext()->getResponse()->finish();
 	}
 }
 

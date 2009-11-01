@@ -105,8 +105,9 @@ abstract class ActionBasedController extends Controller
 	{
 		$actionResult->handleResult(
 			new ViewContext(
-				$this,
-				$this->getModel()
+				$this->getModel(),
+				$context->getRouteContext(),
+				$context->getAppContext()
 			)
 		);
 	}

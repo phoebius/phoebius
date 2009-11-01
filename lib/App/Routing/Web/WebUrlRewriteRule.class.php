@@ -266,7 +266,7 @@ class WebUrlRewriteRule extends WebRequestRewriteRule
 		}
 
 		if (sizeof($this->chunkRewriters) > 0) {
-			foreach (array_slice($this->chunkRewriters, -1) as $qsChunkRewriter) {
+			foreach (array_slice($this->chunkRewriters, 0, -1) as $qsChunkRewriter) {
 				Assert::isFalse(
 					$qsChunkRewriter->isGreedy(),
 					'only the last one chunk can be specified as greedy'

@@ -19,22 +19,12 @@
 /**
  * @ingroup Mvc
  */
-interface IViewContext
+interface IViewContext extends IControllerContext
 {
-	/**
-	 * @return IController|null
-	 */
-	function getController();
-
 	/**
 	 * @return Model
 	 */
 	function getModel();
-
-	/**
-	 * @return IOutput
-	 */
-	function getWriteStream();
 }
 
 ?>
