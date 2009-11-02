@@ -336,7 +336,7 @@ class Url
 		$out = array();
 
 		// Scheme
-		if ($this->getScheme()) {
+		if ($this->getScheme() && $this->getHost()) {
 			$out[] = $this->getScheme() . '://';
 		}
 

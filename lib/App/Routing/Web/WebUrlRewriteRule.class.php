@@ -259,7 +259,7 @@ class WebUrlRewriteRule extends WebRequestRewriteRule
 	 */
 	private function parsePath($path)
 	{
-		$pathChunks = explode('/', $path);
+		$pathChunks = explode('/', '/' . trim($path,'/'));
 		array_shift($pathChunks);
 		foreach ($pathChunks as $pathChunk) {
 			$this->chunkRewriters[] = WebUrlRewriteChunk::import($pathChunk);

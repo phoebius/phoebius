@@ -325,7 +325,7 @@ abstract class ActionBasedController extends Controller
 								if (is_array($argument)) {
 									$rawValueSet = array();
 
-									foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
+									foreach ($ormClass->getLogicalSchema()->getProperties() as $propertyName => $property) {
 										foreach ($property->getDBFields() as $columnName) {
 											if (array_key_exists($columnName, $argument)) {
 												$rawValueSet[$propertyName][] = $argument[$columnName];
@@ -338,13 +338,15 @@ abstract class ActionBasedController extends Controller
 									}
 								}
 								else if ($class->implementsInterface('IDaoRelated')) {
-									$rawValueSet[$ormClass->getIdentifier()->getName()][] = $argument;
+									$argument = $ormClass->getDao()->getById($argument);
+									$arguments[] = $argument;
+									continue;
 								}
 
 								if ($class->implementsInterface('IDaoRelated')) {
 									$dao = call_user_func(array($class->getName(), 'dao'));
 
-									$idProperty = $ormClass->getIdentifier();
+									$idProperty = $ormClass->getLogicalSchema()->getIdentifier();
 
 									if (
 											isset($rawValueSet[$idProperty->getName()])
@@ -373,12 +375,12 @@ abstract class ActionBasedController extends Controller
 										}
 									}
 									else {
-										$argument = $ormClass->getNewEntity();
+										$argument = $ormClass->getLogicalSchema()->getNewEntity();
 									}
 
 								}
 								else {
-									$argument = $ormClass->getNewEntity();
+									$argument = $ormClass->getLogicalSchema()->getNewEntity();
 								}
 
 								try {
