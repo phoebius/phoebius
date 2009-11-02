@@ -66,7 +66,7 @@ class WebUrlRewriteChunk
 			$unparsedChunk = substr(
 				$unparsedChunk,
 				0,
-				-1 * (strlen(self::GREEDYNESS_OPERATOR) - 1)
+				-1 * (strlen(self::GREEDYNESS_OPERATOR))
 			);
 		}
 
