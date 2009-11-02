@@ -445,6 +445,17 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	 */
 	function toSelectQuery()
 	{
+		$selectQuery = $this->fillSelect(new SelectQuery);
+
+		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
+			$selectQuery->get($field, null, $this->alias);
+		}
+
+		return $selectQuery;
+	}
+
+	private function fillSelect(SelectQuery $selectQuery)
+	{
 		// FROM
 		// - distinct
 		// fields
@@ -459,10 +470,6 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 		$selectQuery = new SelectQuery;
 
 		$selectQuery->from($this->table, $this->alias != $this->table ? $this->alias : null);
-
-		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
-			$selectQuery->get($field, null, $this->alias);
-		}
 
 		$this->fill($selectQuery);
 
@@ -539,6 +546,25 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	function getList()
 	{
 		return $this->entity->getDao()->getListByQuery($this->toSelectQuery());
+	}
+
+	/**
+	 * @return integer
+	 */
+	function getCount()
+	{
+		$selectQuery = $this->fillSelect(new SelectQuery);
+		$selectQuery->getExpr(
+			SqlFunction::create('COUNT')
+				->aggregateWithNulls(),
+			'count'
+		);
+		$selectQuery->setLimit(1);
+		$selectQuery->setOffset(0);
+
+		$row = $this->entity->getDao()->getCustomRowByQuery($selectQuery);
+
+		return $row['count'];
 	}
 
 	/**
