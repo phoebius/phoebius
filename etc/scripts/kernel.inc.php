@@ -93,7 +93,11 @@ if (!defined('APP_SLOT')) {
 		'APP_SLOT',
 		isset($_ENV['PHOEBIUS_APP_SLOT'])
 			? $_ENV['PHOEBIUS_APP_SLOT']
-			: 'default'
+			: (
+				isset($_SERVER['PHOEBIUS_APP_SLOT'])
+					? $_SERVER['PHOEBIUS_APP_SLOT']
+					: 'default'
+			)
 	);
 }
 
