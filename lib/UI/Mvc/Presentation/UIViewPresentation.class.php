@@ -17,6 +17,7 @@
  ************************************************************************************************/
 
 /**
+ * TODO cut view resolver functionality into a separate level
  * @ingroup UI_Mvc_Presentation
  */
 class UIViewPresentation
@@ -26,14 +27,14 @@ class UIViewPresentation
 	const VIEW_EXTENSION = '.view.php';
 
 	/**
-	 * @var UIControl
+	 * @var UIControl|null
 	 */
-	private $control;
+	protected $control;
 
 	/**
-	 * @var Model
+	 * @var Model|null
 	 */
-	private $model;
+	protected $model;
 
 	/**
 	 * @var array of IOutput
@@ -45,6 +46,8 @@ class UIViewPresentation
 	 */
 	private $output;
 
+	private $viewName;
+
 	/**
 	 * @return UIPage
 	 */
@@ -55,13 +58,20 @@ class UIViewPresentation
 		$page = $presentation->getPage();
 
 		$presentation->control = $page;
-		$presentation->model = $model;
+		$presentation->model =
+			$model
+				? $model
+				: new Model;
 
 		return $page;
 	}
 
 	function __construct($viewName)
 	{
+		Assert::isScalar($viewName);
+
+		$this->viewName = $viewName;
+
 		parent::__construct(
 			APP_ROOT . DIRECTORY_SEPARATOR
 			. 'views' . DIRECTORY_SEPARATOR
@@ -70,23 +80,102 @@ class UIViewPresentation
 	}
 
 	/**
-	 * @return array
+	 * @return void
 	 */
-	function getVariables(array $vars)
+	function __set($name, $value)
 	{
-		$yield = array();
-		foreach ($vars as $var) {
-			if ($this->model) {
-				try {
-					$yield[$var] = $this->model->getValue($var);
-				}
-				catch (ArgumentException $e) {
-					$yield[$var] = null;
-				}
+		Assert::isScalar($name);
+
+		$this->model[$name] = $value;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function __get($name)
+	{
+		Assert::isScalar($name);
+
+		return
+			isset($this->model[$name])
+				? $this->model[$name]
+				: null;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	function __isset($name)
+	{
+		Assert::isScalar($name);
+
+		return isset($this->model[$name]);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function __call($name, array $arguments)
+	{
+		if ($this->control) {
+			$object = $this->findMethod($this->control, $name);
+			if ($object) {
+				return call_user_func_array(array($object, $name), $arguments);
 			}
 		}
 
-		return $yield;
+		Assert::isUnreachable('unknown method %s', $name);
+	}
+
+	/**
+	 * @return object
+	 */
+	private function findMethod(UIControl $control, $name)
+	{
+		if (method_exists($control, $name)) {
+			return $control;
+		}
+
+		$parent = $control->getParentControl();
+
+		if ($parent && ($found = $this->findMethod($parent, $name))) {
+			return $found;
+		}
+	}
+
+	function getModel()
+	{
+		return $this->model;
+	}
+
+	/**
+	 * @var string ...
+	 */
+	function expect()
+	{
+		$vars = func_get_args();
+
+		foreach ($vars as $var) {
+			Assert::isTrue(
+				isset($this->model[$var]),
+				'%s expected but not found a model of %s',
+				$var, $this->viewName
+			);
+		}
+	}
+
+	/**
+	 * @var string ...
+	 */
+	function accept()
+	{
+		$vars = func_get_args();
+
+		foreach ($vars as $var) {
+			if (!isset($this->model[$var])) {
+				$this->model[$var] = null;
+			}
+		}
 	}
 
 	/**

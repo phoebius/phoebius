@@ -17,92 +17,94 @@
  ************************************************************************************************/
 
 /**
- * Represents a custom field=>value collection
+ * Represents a custom key=>value collection
  * @ingroup Core_Patterns
  */
-class Collection implements IteratorAggregate
+class Collection implements IteratorAggregate, ArrayAccess
 {
 	/**
-	 * Represents a field=>value collection
+	 * Represents a key=>value collection
 	 * @var array
 	 */
 	private $collection = array();
 
 	/**
-	 * Appends the collection of field=>value elements to the collection
-	 * @throws ArgumentException if the value with the specified field is already added to
-	 * 	the collection
-	 * @param array of field=>value elements
-	 * @return Collection an object itself
+	 * @return boolean
 	 */
-	function addCollection(array $collection)
+	function offsetExists($offset)
 	{
-		foreach ($collection as $key => $value) {
-			$this->collection[$key] = $value;
-		}
-
-		return $this;
+		return $this->has($offset);
 	}
 
 	/**
-	 *
-	 * @return Collection an object itself
+	 * @return mixed
 	 */
-	function setCollection(array $collection)
+	function offsetGet($offset)
 	{
-		return $this->dropCollection()->addCollection($collection);
+		return $this->get($offset);
+	}
+
+	/**
+	 * @return void
+	 */
+	function offsetSet($offset, $value)
+	{
+		$this->set($offset, $value);
+	}
+
+	/**
+	 * @return void
+	 */
+	function offsetUnset($offset)
+	{
+		$this->drop($offset);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	function has($key)
+	{
+		return isset($this->collection[$key]);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function get($key)
+	{
+		return $this->collection[$key];
 	}
 
 	/**
 	 * @return Collection
 	 */
-	function addPair($key, $value)
+	function set($key, $value)
 	{
-		if (array_key_exists($key, $this->collection)) {
-			throw new ArgumentException('field', 'already added');
-		}
-
 		$this->collection[$key] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * Drops out the collection members
-	 * @return Collection an object itself
+	 * @return Collection
 	 */
-	function dropCollection()
+	function drop($key)
 	{
-		$this->collection = array();
+		unset($this->collection[$key]);
 
 		return $this;
 	}
 
 	/**
-	 * Returns the value for the field name specified
-	 * @throws ArgumentException if the field is not defined in the collection an thus value not found
-	 * @return mixed
-	 */
-	function getValue($field)
-	{
-		if (!array_key_exists($field, $this->collection)) {
-			throw new ArgumentException('field', 'field an its value not found in the collection');
-		}
-
-		return $this->collection[$field];
-	}
-
-	/**
-	 * Gets the field list
 	 * @return array
 	 */
-	function getFields()
+	function getKeys()
 	{
 		return array_keys($this->collection);
 	}
 
 	/**
-	 * Gets the value list
 	 * @return array
 	 */
 	function getValues()
@@ -111,21 +113,50 @@ class Collection implements IteratorAggregate
 	}
 
 	/**
-	 * Gets the collection represented as an array
+	 * @see IteratorAggregate::getIterator()
+	 * @return ArrayIterator
+	 */
+	function getIterator()
+	{
+		return new ArrayIterator($this->collection);
+	}
+
+	/**
+	 * @return Collection
+	 */
+	function merge(Collection $collection)
+	{
+		$this->fill($collection->collection);
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection
+	 */
+	function fill(array $values)
+	{
+		$this->collection = array_merge($this->collection, $values);
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection
+	 */
+	function erase()
+	{
+		$this->collection = array();
+
+		return $this;
+	}
+
+	/**
 	 * @return array
 	 */
 	function toArray()
 	{
 		return $this->collection;
-	}
-
-	/**
-	 * @see IteratorAggregate::getIterator()
-	 *
-	 */
-	function getIterator()
-	{
-		return new ArrayIterator($this->collection);
 	}
 
 	/**

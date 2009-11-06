@@ -45,6 +45,14 @@ class UIPage extends UITemplateControl
 	}
 
 	/**
+	 * @return UIMasterPage
+	 */
+	function getParentControl()
+	{
+		return $this->masterPage;
+	}
+
+	/**
 	 * @return void
 	 */
 	function render(IOutput $output)

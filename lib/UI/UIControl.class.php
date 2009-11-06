@@ -25,6 +25,11 @@ abstract class UIControl
 	 * @return void
 	 */
 	abstract function render(IOutput $output);
+
+	/**
+	 * @return UIControl|null
+	 */
+	abstract function getParentControl();
 }
 
 ?>
