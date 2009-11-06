@@ -118,7 +118,7 @@ class UIViewPresentation
 			}
 		}
 
-		Assert::isUnreachable();
+		Assert::isUnreachable('unknown method %s', $name);
 	}
 
 	/**
