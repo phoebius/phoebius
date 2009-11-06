@@ -24,7 +24,7 @@ class Model extends Collection
 	/**
 	 * @return Model
 	 */
-	static function from(array $array)
+	static function from(array $array = array())
 	{
 		$me = new self;
 		$me->fill($array);
