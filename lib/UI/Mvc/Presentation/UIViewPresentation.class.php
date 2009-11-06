@@ -106,6 +106,35 @@ class UIViewPresentation
 		return isset($this->model[$name]);
 	}
 
+	/**
+	 * @return mixed
+	 */
+	function __call($name, array $arguments)
+	{
+		if ($this->control) {
+			$object = $this->findMethod($this->control);
+			if ($object) {
+				return call_user_func_array(array($object, $name), $arguments);
+			}
+		}
+	}
+
+	/**
+	 * @return object
+	 */
+	private function findMethod(UIControl $control, $name)
+	{
+		if (method_exists($control, $name)) {
+			return $control;
+		}
+
+		$parent = $control->getParentControl();
+
+		if (($found = $this->findMethod($parent, $name))) {
+			return $found;
+		}
+	}
+
 	function getModel()
 	{
 		return $this->model;
