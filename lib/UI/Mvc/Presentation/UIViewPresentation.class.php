@@ -117,6 +117,8 @@ class UIViewPresentation
 				return call_user_func_array(array($object, $name), $arguments);
 			}
 		}
+
+		Assert::isUnreachable();
 	}
 
 	/**
