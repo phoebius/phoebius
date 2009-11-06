@@ -17,6 +17,7 @@
  ************************************************************************************************/
 
 /**
+ * TODO cut view resolver functionality into a separate level
  * @ingroup UI_Mvc_Presentation
  */
 class UIViewPresentation
@@ -55,7 +56,10 @@ class UIViewPresentation
 		$page = $presentation->getPage();
 
 		$presentation->control = $page;
-		$presentation->model = $model;
+		$presentation->model =
+			$model
+				? $model
+				: new Model;
 
 		return $page;
 	}
@@ -70,23 +74,53 @@ class UIViewPresentation
 	}
 
 	/**
-	 * @return array
+	 * @return void
 	 */
-	function getVariables(array $vars)
+	function __set($name, $value)
 	{
-		$yield = array();
-		foreach ($vars as $var) {
-			if ($this->model) {
-				try {
-					$yield[$var] = $this->model->getValue($var);
-				}
-				catch (ArgumentException $e) {
-					$yield[$var] = null;
-				}
-			}
-		}
+		Assert::isScalar($name);
 
-		return $yield;
+		$this->model[$name] = $value;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function __get($name)
+	{
+		Assert::isScalar($name);
+
+		return
+			isset($this->model[$name])
+				? $this->model[$name]
+				: null;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	function __isset($name)
+	{
+		Assert::isScalar($name);
+
+		return isset($this->model[$name]);
+	}
+
+	function getModel()
+	{
+		return $this->model;
+	}
+
+	/**
+	 * @var string ...
+	 */
+	function expectModel()
+	{
+		$vars = func_get_args();
+
+		foreach ($vars as $var) {
+			Assert::isTrue(isset($this->model[$var]));
+		}
 	}
 
 	/**
