@@ -24,9 +24,30 @@ class Model extends Collection
 	/**
 	 * @return Model
 	 */
-	static function create()
+	static function from(array $array)
 	{
-		return new self;
+		$me = new self;
+		$me->fill($array);
+
+		return $me;
+	}
+
+	/**
+	 * @return Model
+	 */
+	function spawn(array $copy = null)
+	{
+		if (null === $copy) {
+			return clone $this;
+		}
+		else {
+			$me = new self;
+			foreach ($copy as $var) {
+				$me[$var] = $this[$var];
+			}
+
+			return $me;
+		}
 	}
 }
 

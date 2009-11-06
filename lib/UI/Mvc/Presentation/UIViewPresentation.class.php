@@ -27,14 +27,14 @@ class UIViewPresentation
 	const VIEW_EXTENSION = '.view.php';
 
 	/**
-	 * @var UIControl
+	 * @var UIControl|null
 	 */
-	private $control;
+	protected $control;
 
 	/**
-	 * @var Model
+	 * @var Model|null
 	 */
-	private $model;
+	protected $model;
 
 	/**
 	 * @var array of IOutput
@@ -45,6 +45,8 @@ class UIViewPresentation
 	 * @var IOutput
 	 */
 	private $output;
+
+	private $viewName;
 
 	/**
 	 * @return UIPage
@@ -66,6 +68,10 @@ class UIViewPresentation
 
 	function __construct($viewName)
 	{
+		Assert::isScalar($viewName);
+
+		$this->viewName = $viewName;
+
 		parent::__construct(
 			APP_ROOT . DIRECTORY_SEPARATOR
 			. 'views' . DIRECTORY_SEPARATOR
@@ -112,7 +118,7 @@ class UIViewPresentation
 	function __call($name, array $arguments)
 	{
 		if ($this->control) {
-			$object = $this->findMethod($this->control);
+			$object = $this->findMethod($this->control, $name);
 			if ($object) {
 				return call_user_func_array(array($object, $name), $arguments);
 			}
@@ -132,7 +138,7 @@ class UIViewPresentation
 
 		$parent = $control->getParentControl();
 
-		if (($found = $this->findMethod($parent, $name))) {
+		if ($parent && ($found = $this->findMethod($parent, $name))) {
 			return $found;
 		}
 	}
@@ -145,12 +151,30 @@ class UIViewPresentation
 	/**
 	 * @var string ...
 	 */
-	function expectModel()
+	function expect()
 	{
 		$vars = func_get_args();
 
 		foreach ($vars as $var) {
-			Assert::isTrue(isset($this->model[$var]));
+			Assert::isTrue(
+				isset($this->model[$var]),
+				'%s expected but not found a model of %s',
+				$var, $this->viewName
+			);
+		}
+	}
+
+	/**
+	 * @var string ...
+	 */
+	function accept()
+	{
+		$vars = func_get_args();
+
+		foreach ($vars as $var) {
+			if (!isset($this->model[$var])) {
+				$this->model[$var] = null;
+			}
 		}
 	}
 
