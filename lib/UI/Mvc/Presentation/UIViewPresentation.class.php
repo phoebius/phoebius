@@ -96,10 +96,20 @@ class UIViewPresentation
 	{
 		Assert::isScalar($name);
 
-		return
-			isset($this->model[$name])
-				? $this->model[$name]
-				: null;
+		if (array_key_exists($name, $this->model->toArray())) {
+			return $this->model[$name];
+		}
+		else if (!error_reporting()) {
+			$this->model[$name] = null;
+
+			return null;
+		}
+		else {
+			Assert::isUnreachable(
+				'unknown model variable %s expected within %s view',
+				$name, $this->viewName
+			);
+		}
 	}
 
 	/**
