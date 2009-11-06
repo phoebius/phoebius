@@ -29,67 +29,41 @@ class Type
 
 	/**
 	 * @throws ArgumentException
-	 * @param string $typename
 	 * @return Type
 	 */
-	static function create($typename)
+	static function of($object)
 	{
-		return new self ($typename);
-	}
-
-	/**
-	 * @param string $typename
-	 * @return Type
-	 */
-	static function check($typename)
-	{
-		try {
-			return new self ($typename);
-		}
-		catch (ArgumentException $e) {
-			Assert::isFalse(true, 'unknown type');
-		}
+		return new self ($object);
 	}
 
 	/**
 	 * @throws ArgumentException
-	 * @return Type
+	 * @param string $name
 	 */
-	static function typeof($object)
+	function __construct($object)
 	{
-		return new self (
-			is_object($object)
-				? get_class($object)
-				: $object
-		);
-	}
+		$name = is_object($object)
+			? get_class($object)
+			: $object;
 
-	/**
-	 * @throws ArgumentException
-	 * @param string $typename
-	 */
-	function __construct($typename)
-	{
-		$typename = is_object($typename)
-			? get_class($typename)
-			: $typename;
-
-		if (!class_exists($typename, true) && !interface_exists($typename, true))
-		{
-			throw new ArgumentException('typename', 'unknown type ' . $typename);
+		if (
+				!class_exists($name, true)
+				&& !interface_exists($name, true)
+		) {
+			Assert::isUnreachable('unknown type %s', $name);
 		}
 
-		$this->name = $typename;
+		$this->name = $name;
 	}
 
 	/**
 	 * @return boolean
 	 */
-	function isDescendantOf(Type $typename)
+	function isChildOf(Type $parent)
 	{
 		return
-			   is_subclass_of($this->name, $typename->name)
-			|| in_array($typename->name, class_implements($this->name));
+			   is_subclass_of($this->name, $parent->name)
+			|| in_array($parent->name, class_implements($this->name));
 	}
 
 	/**

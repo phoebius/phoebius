@@ -65,7 +65,7 @@ class AssociationPropertyType extends OrmPropertyType
 		$this->container = $container;
 
 		Assert::isTrue(
-			Type::create($identifier->getType())->isDescendantOf(new Type('IReferenced'))
+			Type::of($identifier->getType())->isChildOf(new Type('IReferenced'))
 			// TODO: clean up
 		);
 

@@ -102,7 +102,7 @@ final class Exceptionizer extends LazySingleton
 	 */
 	function setDefaultException($exceptionName)
 	{
-		Assert::isTrue(Type::create($exceptionName)->isDescendantOf(new Type('IErrorExceptionFactory')));
+		Assert::isTrue(Type::of($exceptionName)->isChildOf(new Type('IErrorExceptionFactory')));
 
 		$this->defaultException = $exceptionName;
 
@@ -119,7 +119,7 @@ final class Exceptionizer extends LazySingleton
 	function setException($errorType, $exceptionName)
 	{
 		Assert::isTrue(in_array($errorType, $this->translatableErrorTypes));
-		Assert::isTrue(Type::create($exceptionName)->isDescendantOf(new Type('IErrorExceptionFactory')));
+		Assert::isTrue(Type::of($exceptionName)->isChildOf(new Type('IErrorExceptionFactory')));
 
 		if ($errorType == E_ALL) {
 			$this->setDefaultException($exceptionName);
@@ -258,7 +258,7 @@ final class Exceptionizer extends LazySingleton
 
 		if (isset ($this->exceptionsTable[$errno])) {
 			$exceptionClass = $this->exceptionsTable[$errno];
-			Assert::isTrue(Type::create($exceptionClass)->isDescendantOf(new Type('IErrorExceptionFactory')));
+			Assert::isTrue(Type::of($exceptionClass)->isChildOf(new Type('IErrorExceptionFactory')));
 			$exceptionObject = call_user_func_array(
 				array($exceptionClass, 'makeException'),
 				array($errstr, $errno, $errfile, $errline)
@@ -270,7 +270,7 @@ final class Exceptionizer extends LazySingleton
 
 		if (!($exceptionObject instanceof Exception)) {
 			$exceptionClass = $this->defaultException;
-			Assert::isTrue(Type::create($exceptionClass)->isDescendantOf(new Type('IErrorExceptionFactory')));
+			Assert::isTrue(Type::of($exceptionClass)->isChildOf(new Type('IErrorExceptionFactory')));
 
 			$exceptionObject = call_user_func_array(
 				array($exceptionClass, 'makeException'),

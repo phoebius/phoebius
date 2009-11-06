@@ -83,11 +83,11 @@ class UIPhpLayoutPresentation extends UIPresentation
 	{
 		$this->assertInsideRenderingContext();
 
-		$me = Type::typeof($this);
-		$type = Type::check($type);
+		$me = Type::of($this);
+		$type = Type::of($type);
 
 		Assert::isTrue(
-			$me->getName() == $type->getName() || $me->isDescendantOf($type),
+			$me->getName() == $type->getName() || $me->isChildOf($type),
 			'fatal error: %s should be the only wrapper for invoked layout to handle it successfully',
 			$type->getName()
 		);

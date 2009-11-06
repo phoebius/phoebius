@@ -34,7 +34,7 @@ class TypeCastException extends ArgumentTypeException
 
 	function __construct(Type $failedType, $value, $message = 'type cast failed')
 	{
-		Assert::isTrue($failedType->isDescendantOf(new Type('IObjectMappable')));
+		Assert::isTrue($failedType->isChildOf(new Type('IObjectMappable')));
 
 		parent::__construct('value', $failedType->getName(), $message);
 

@@ -43,7 +43,7 @@ abstract class BuiltInType implements IObjectMappable, IHandled
 			$this->value = $value;
 		}
 		else {
-			throw new TypeCastException(Type::typeof($this), $value);
+			throw new TypeCastException(Type::of($this), $value);
 		}
 
 		return $this;

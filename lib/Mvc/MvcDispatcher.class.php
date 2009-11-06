@@ -75,7 +75,7 @@ class MvcDispatcher implements IRouteDispatcher
 	 */
 	function addControllerFactory(Type $controller, IControllerFactory $controllerFactory)
 	{
-		Assert::isTrue($controller->isDescendantOf(new Type('Controller')));
+		Assert::isTrue($controller->isChildOf(new Type('Controller')));
 
 		$this->controllerFactories[$controller->getName()] = $controllerFactory;
 
@@ -111,7 +111,7 @@ class MvcDispatcher implements IRouteDispatcher
 			);
 		}
 
-		if (!Type::create($controllerClassName)->isDescendantOf(new Type('Controller'))) {
+		if (!Type::of($controllerClassName)->isChildOf(new Type('Controller'))) {
 			throw new MvcBadControllerException(
 				$context,
 				$controllerName,

@@ -49,11 +49,11 @@ abstract class Ranged extends Decimal
 		Assert::isTrue($this->getMin() < $this->getMax());
 
 		if ($this->getMin() > $value) {
-			throw new TypeCastException(Type::typeof($this), $value, 'value is out of range');
+			throw new TypeCastException(Type::of($this), $value, 'value is out of range');
 		}
 
 		if ($this->getMax() < $value) {
-			throw new TypeCastException(Type::typeof($this), $value, 'value is out of range');
+			throw new TypeCastException(Type::of($this), $value, 'value is out of range');
 		}
 	}
 }

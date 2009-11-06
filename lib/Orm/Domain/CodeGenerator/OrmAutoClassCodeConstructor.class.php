@@ -160,7 +160,7 @@ EOT;
 		$typeImpl = $ormProperty->getType()->getImplClass();
 		$isObjective = (
 				class_exists($typeImpl)
-				&& Type::create($typeImpl)->isDescendantOf(new Type('BuiltInType'))
+				&& Type::of($typeImpl)->isChildOf(new Type('BuiltInType'))
 			)
 				? false
 				: true;

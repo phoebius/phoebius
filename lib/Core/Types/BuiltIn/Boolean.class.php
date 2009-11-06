@@ -65,7 +65,7 @@ final class Boolean extends Scalar
 			}
 			else {
 				throw new TypeCastException(
-					Type::typeof($this),
+					Type::of($this),
 					$value,
 					'not an Boolean value specified'
 				);
