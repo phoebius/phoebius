@@ -131,7 +131,7 @@ class InsertQuery implements ISqlQuery
 	{
 		return
 			SqlFieldList::create(
-				$this->fields->getFields()
+				$this->fields->getKeys()
 			)
 			->toDialectString($dialect);
 	}

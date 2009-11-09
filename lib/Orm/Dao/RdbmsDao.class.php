@@ -422,7 +422,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		$fvc = new SqlFieldValueCollection();
 		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
-			$fvc->addCollection(
+			$fvc->fill(
 				array_combine(
 					$this->logicalSchema->getProperty($propertyName)->getDBFields(),
 					$rawValue
