@@ -21,34 +21,7 @@
  */
 class Model extends Collection
 {
-	/**
-	 * @return Model
-	 */
-	static function from(array $array = array())
-	{
-		$me = new self;
-		$me->fill($array);
-
-		return $me;
-	}
-
-	/**
-	 * @return Model
-	 */
-	function spawn(array $copy = null)
-	{
-		if (null === $copy) {
-			return clone $this;
-		}
-		else {
-			$me = new self;
-			foreach ($copy as $var) {
-				$me[$var] = $this[$var];
-			}
-
-			return $me;
-		}
-	}
+	// nothing here
 }
 
 ?>

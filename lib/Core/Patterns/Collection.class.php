@@ -29,6 +29,19 @@ class Collection implements IteratorAggregate, ArrayAccess
 	private $collection = array();
 
 	/**
+	 * @return Collection
+	 */
+	static function create(array $array = array())
+	{
+		return new self ($array);
+	}
+
+	function __construct(array $array = array())
+	{
+		$this->fill($array);
+	}
+
+	/**
 	 * @return boolean
 	 */
 	function offsetExists($offset)
@@ -165,6 +178,25 @@ class Collection implements IteratorAggregate, ArrayAccess
 	function toArrayObject()
 	{
 		return new ArrayObject($this->collection);
+	}
+
+	/**
+	 * Copies an object.
+	 * If the list of keys is specified then only those keys will be presented in a spawned object
+	 * @return Collection
+	 */
+	function spawn(array $copy = null)
+	{
+		$spawned = clone $this;
+
+		if (null !== $copy) {
+			$spawned->collection = array_intersect_key(
+				$this->collection,
+				array_combine($copy, $copy)
+			);
+		}
+
+		return $spawned;
 	}
 }
 
