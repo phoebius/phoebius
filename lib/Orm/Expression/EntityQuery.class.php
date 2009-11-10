@@ -471,7 +471,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 
 		$selectQuery->from($this->table, $this->alias != $this->table ? $this->alias : null);
 
-		$this->fill($selectQuery);
+		$this->append($selectQuery);
 
 		$selectQuery->setExpression($this->toDalExpression());
 
@@ -586,7 +586,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	/**
 	 * @return void
 	 */
-	private function fill(SelectQuery $selectQuery)
+	private function append(SelectQuery $selectQuery)
 	{
 		foreach ($this->joined as $propertyName => $entityQuery) {
 			$property = $this->getEntityProperty($propertyName)->getProperty();
@@ -622,7 +622,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 				)
 			);
 
-			$entityQuery->fill($selectQuery);
+			$entityQuery->append($selectQuery);
 		}
 	}
 

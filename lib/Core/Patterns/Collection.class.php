@@ -38,7 +38,7 @@ class Collection implements IteratorAggregate, ArrayAccess
 
 	function __construct(array $array = array())
 	{
-		$this->fill($array);
+		$this->append($array);
 	}
 
 	/**
@@ -139,7 +139,21 @@ class Collection implements IteratorAggregate, ArrayAccess
 	 */
 	function merge(Collection $collection)
 	{
-		$this->fill($collection->collection);
+		$this->append($collection->collection);
+
+		return $this;
+	}
+
+	/**
+	 * @return Collection
+	 */
+	function append(array $values)
+	{
+		// avoid array_merge wrt set() overridden behaviour
+		//$this->collection = array_merge($this->collection, $values);
+		foreach ($values as $key => $value) {
+			$this->set($key, $value);
+		}
 
 		return $this;
 	}
@@ -149,7 +163,7 @@ class Collection implements IteratorAggregate, ArrayAccess
 	 */
 	function fill(array $values)
 	{
-		$this->collection = array_merge($this->collection, $values);
+		$this->erase()->append($values);
 
 		return $this;
 	}
