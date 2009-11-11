@@ -21,10 +21,7 @@
  */
 interface IWebContext extends IAppContext
 {
-	/**
-	 * @return IWebContext
-	 */
-	static function getCurrent();
+	// nothing here
 }
 
 ?>
