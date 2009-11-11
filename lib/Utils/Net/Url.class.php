@@ -157,6 +157,31 @@ class Url
 	}
 
 	/**
+	 * @return string
+	 */
+	function getSubdomain()
+	{
+		if ($this->baseHost) {
+			return substr($this->host, strlen($this->baseHost) + 1);
+		}
+		else {
+			return $this->host;
+		}
+	}
+
+	/**
+	 * @return Url
+	 */
+	function setSubdomain($subdomain)
+	{
+		Assert::isScalar($subdomain);
+
+		$this->host = $subdomain . '.' . $this->baseHost;
+
+		return $this;
+	}
+
+	/**
 	 * @param string $baseHost
 	 * @return Url an object itself
 	 */
@@ -348,31 +373,6 @@ class Url
 	function getUri()
 	{
 		return $this->getFullPath() . $this->getQueryAsString();
-	}
-
-	/**
-	 * @return string
-	 */
-	function getSubdomain()
-	{
-		if ($this->baseHost) {
-			return substr($this->host, strlen($this->baseHost) + 1);
-		}
-		else {
-			return $this->host;
-		}
-	}
-
-	/**
-	 * @return Url
-	 */
-	function setSubdomain($subdomain)
-	{
-		Assert::isScalar($subdomain);
-
-		$this->host = $subdomain . '.' . $this->baseHost;
-
-		return $this;
 	}
 
 	function toString()

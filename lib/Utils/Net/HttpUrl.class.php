@@ -78,6 +78,18 @@ class HttpUrl extends Url
 
 		return $url;
 	}
+
+	/**
+	 * @return HttpUrl
+	 */
+	function spawnBase()
+	{
+		$clone = clone $this;
+		$clone->setPath('/');
+		$clone->setSubdomain(null);
+
+		return $clone;
+	}
 }
 
 ?>
