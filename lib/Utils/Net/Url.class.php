@@ -28,10 +28,8 @@ class Url
 	private $scheme = 'http';
 	private $user = null;
 	private $pass = null;
-	private $baseHost = null;
 	private $host = null;
 	private $port = null;
-	private $base = '/';
 	private $path = '/';
 	private $query = array();
 	private $fragment = '';
@@ -149,57 +147,7 @@ class Url
 
 		$this->host = $host;
 
-		if (!$this->baseHost) {
-			$this->baseHost = $this->host;
-		}
-
 		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	function getSubdomain()
-	{
-		if ($this->baseHost) {
-			return substr($this->host, strlen($this->baseHost) + 1);
-		}
-		else {
-			return $this->host;
-		}
-	}
-
-	/**
-	 * @return Url
-	 */
-	function setSubdomain($subdomain)
-	{
-		Assert::isScalar($subdomain);
-
-		$this->host = $subdomain . '.' . $this->baseHost;
-
-		return $this;
-	}
-
-	/**
-	 * @param string $baseHost
-	 * @return Url an object itself
-	 */
-	function setBaseHost($baseHost = null)
-	{
-		Assert::isScalarOrNull($baseHost);
-
-		$this->baseHost = $baseHost;
-
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	function getBaseHost()
-	{
-		return $this->baseHost;
 	}
 
 	/**
@@ -219,27 +167,6 @@ class Url
 		Assert::isNumeric($port);
 
 		$this->port = $port;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	function getBase()
-	{
-		return $this->base;
-	}
-
-	/**
-	 * @return Url an object itself
-	 */
-	function setBase($base)
-	{
-		Assert::isScalar($base);
-
-		//avoid multiple slashing (i.e. setBase('////////')
-		$this->base = '/' . trim($base, '/');
 
 		return $this;
 	}
@@ -358,21 +285,11 @@ class Url
 	}
 
 	/**
-	 * @return string base + path
-	 */
-	function getFullPath()
-	{
-		$base = $this->base == '/' ? "" : $this->base;
-
-		return $base . $this->path;
-	}
-
-	/**
-	 * @return string base + path + qs
+	 * @return string path + qs
 	 */
 	function getUri()
 	{
-		return $this->getFullPath() . $this->getQueryAsString();
+		return $this->getPath() . $this->getQueryAsString();
 	}
 
 	function toString()
@@ -428,7 +345,7 @@ class Url
 	 */
 	private function encodePath($path)
 	{
-		$chunks = preg_split("/([\/;=])/", $path, - 1, PREG_SPLIT_DELIM_CAPTURE);
+		$chunks = preg_split('/([\/;=])/', $path, - 1, PREG_SPLIT_DELIM_CAPTURE);
 		$path = '';
 		foreach ($chunks as $var) {
 			switch ( $var )

@@ -21,6 +21,9 @@
  */
 class HttpUrl extends Url
 {
+	private $baseHost = null;
+	private $basePath = '/';
+
 	/**
 	 * @return HttpUrl
 	 */
@@ -77,6 +80,107 @@ class HttpUrl extends Url
 		}
 
 		return $url;
+	}
+
+	/**
+	 * @param string $host
+	 * @return Url an object itself
+	 */
+	function setHost($host)
+	{
+		parent::setHost($host);
+
+		if (!$this->baseHost) {
+			$this->baseHost = $this->host;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getSubdomain()
+	{
+		if ($this->baseHost) {
+			return substr($this->host, strlen($this->baseHost) + 1);
+		}
+		else {
+			return $this->host;
+		}
+	}
+
+	/**
+	 * @return Url
+	 */
+	function setSubdomain($subdomain)
+	{
+		Assert::isScalar($subdomain);
+
+		$this->setHost($subdomain . '.' . $this->baseHost);
+
+		return $this;
+	}
+
+	/**
+	 * @param string $baseHost
+	 * @return Url an object itself
+	 */
+	function setBaseHost($baseHost = null)
+	{
+		Assert::isScalarOrNull($baseHost);
+
+		$this->baseHost = $baseHost;
+
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	function getBaseHost()
+	{
+		return $this->baseHost;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getBasePath()
+	{
+		return $this->basePath;
+	}
+
+	/**
+	 * @return Url an object itself
+	 */
+	function setBasePath($basePath = '/')
+	{
+		Assert::isScalar($basePath);
+
+		//avoid multiple slashing (i.e. setBase('////////')
+		$this->basePath = '/' . trim($basePath, '/');
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getVirtualPath()
+	{
+		$path = $this->getPath();
+
+		if ('/' == $this->basePath) {
+			return $path;
+		}
+
+		$prefix = substr($path, 0, strlen($this->basePath));
+		if ($this->basePath == $prefix) {
+			$path = substr($path, strlen($this->basePath));
+		}
+
+		return $path;
 	}
 
 	/**
