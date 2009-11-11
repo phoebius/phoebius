@@ -24,9 +24,11 @@ class HttpUrl extends Url
 	/**
 	 * @return HttpUrl
 	 */
-	static function import(HttpUrlDictionary $dictionary, HttpUrl $base = null)
+	static function import(HttpUrlDictionary $dictionary, $baseHost = null, $baseUri = '/')
 	{
 		$url = new self;
+
+		$url->setBaseHost($baseHost);
 
 		$url
 			->setScheme(
@@ -47,11 +49,13 @@ class HttpUrl extends Url
 		if (isset($parts['path'])) {
 			$path = urldecode($parts['path']);
 
-			if ($base && $base->getBase() && $base->getBase() != '/') {
-				$url->setBase($base->getBase());
+			if ($baseUri != '/') {
+				$baseUri = $url->setBase($baseUri)->getBase();
+				$path = $url->setPath($path)->getPath();
+
 				$path = substr(
 					$path,
-					-1 * (strlen($path) - strlen($url->getBase()))
+					strlen($baseUri)
 				);
 			}
 

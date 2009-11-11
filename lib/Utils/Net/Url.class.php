@@ -28,6 +28,7 @@ class Url
 	private $scheme = 'http';
 	private $user = null;
 	private $pass = null;
+	private $baseHost = null;
 	private $host = null;
 	private $port = null;
 	private $base = '/';
@@ -148,7 +149,32 @@ class Url
 
 		$this->host = $host;
 
+		if (!$this->baseHost) {
+			$this->baseHost = $this->host;
+		}
+
 		return $this;
+	}
+
+	/**
+	 * @param string $baseHost
+	 * @return Url an object itself
+	 */
+	function setBaseHost($baseHost = null)
+	{
+		Assert::isScalarOrNull($baseHost);
+
+		$this->baseHost = $baseHost;
+
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	function getBaseHost()
+	{
+		return $this->baseHost;
 	}
 
 	/**
@@ -185,17 +211,10 @@ class Url
 	 */
 	function setBase($base)
 	{
-		Assert::isScalarOrNull($base);
+		Assert::isScalar($base);
 
-		if ($base == '/' || empty($base)) {
-			$base = '/';
-		}
-		else {
-			//avoid multiple slashing (i.e. setBase('////////')
-			$base = '/' . trim($base, '/');
-		}
-
-		$this->base = $base;
+		//avoid multiple slashing (i.e. setBase('////////')
+		$this->base = '/' . trim($base, '/');
 
 		return $this;
 	}
@@ -329,6 +348,31 @@ class Url
 	function getUri()
 	{
 		return $this->getFullPath() . $this->getQueryAsString();
+	}
+
+	/**
+	 * @return string
+	 */
+	function getSubdomain()
+	{
+		if ($this->baseHost) {
+			return substr($this->host, strlen($this->baseHost) + 1);
+		}
+		else {
+			return $this->host;
+		}
+	}
+
+	/**
+	 * @return Url
+	 */
+	function setSubdomain($subdomain)
+	{
+		Assert::isScalar($subdomain);
+
+		$this->host = $subdomain . '.' . $this->baseHost;
+
+		return $this;
 	}
 
 	function toString()
