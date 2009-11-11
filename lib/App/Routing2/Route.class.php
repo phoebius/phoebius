@@ -37,23 +37,11 @@ class Route
 	 */
 	private $rules = array();
 
-	/**
-	 * @var string
-	 */
-	private $pathChunks = array();
-
 	function __construct(
-			$urlPattern,
 			IRouteDispatcher $dispatcher,
 			array $rules = array()
 		)
 	{
-		Assert::isScalar($urlPattern);
-
-		$this->urlPattern = '/' . ltrim($urlPattern, '/');
-
-		$this->parsePattern();
-
 		$this->dispatcher = $dispatcher;
 
 		foreach ($rules as $rule) {
@@ -146,22 +134,6 @@ class Route
 			catch (RewriteException $e) {
 				throw new RouteException($e->getMessage());
 			}
-		}
-	}
-
-	/**
-	 * @return void
-	 */
-	private function parsePattern()
-	{
-		$parsedUrlPattern = parse_url($this->urlPattern);
-
-		if (isset($parsedUrlPattern['path'])) {
-			$this->parsePath($parsedUrlPattern['path']);
-		}
-
-		if (isset($parsedUrlPattern['query'])) {
-			$this->parseQueryString($parsedUrlPattern['query']);
 		}
 	}
 }
