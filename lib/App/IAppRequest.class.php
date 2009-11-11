@@ -21,15 +21,7 @@
  */
 interface IAppRequest
 {
-	/**
-	 * @throws ArgumentException
-	 */
-	function getAnyVariable($variable);
-
-	/**
-	 * @return IAppRequest
-	 */
-	function getCleanCopy();
+	// nothing here
 }
 
 ?>

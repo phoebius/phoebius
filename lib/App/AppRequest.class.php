@@ -19,7 +19,7 @@
 /**
  * @ingroup App
  */
-abstract class AppRequest implements IAppRequest
+class AppRequest implements IAppRequest
 {
 	// nothing here due IAppRequest is empty now
 }
