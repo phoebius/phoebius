@@ -22,7 +22,7 @@
 class HttpUrl extends Url
 {
 	private $baseHost = null;
-	private $basePath = '/';
+	private $basePath = null;
 
 	/**
 	 * @return HttpUrl
@@ -32,6 +32,7 @@ class HttpUrl extends Url
 		$url = new self;
 
 		$url->setBaseHost($baseHost);
+		$url->setBasePath($baseUri);
 
 		$url
 			->setScheme(
@@ -51,16 +52,6 @@ class HttpUrl extends Url
 
 		if (isset($parts['path'])) {
 			$path = urldecode($parts['path']);
-
-			if ($baseUri != '/') {
-				$baseUri = $url->setBase($baseUri)->getBase();
-				$path = $url->setPath($path)->getPath();
-
-				$path = substr(
-					$path,
-					strlen($baseUri)
-				);
-			}
 
 			$url->setPath($path);
 		}
@@ -103,7 +94,7 @@ class HttpUrl extends Url
 	function getSubdomain()
 	{
 		if ($this->baseHost) {
-			return substr($this->host, strlen($this->baseHost) + 1);
+			return substr($this->host, 0, strlen($this->baseHost));
 		}
 		else {
 			return $this->host;
@@ -158,8 +149,7 @@ class HttpUrl extends Url
 	{
 		Assert::isScalar($basePath);
 
-		//avoid multiple slashing (i.e. setBase('////////')
-		$this->basePath = '/' . trim($basePath, '/');
+		$this->basePath = trim($basePath, '/');
 
 		return $this;
 	}
@@ -171,7 +161,7 @@ class HttpUrl extends Url
 	{
 		$path = $this->getPath();
 
-		if ('/' == $this->basePath) {
+		if (!$this->basePath) {
 			return $path;
 		}
 
@@ -181,6 +171,18 @@ class HttpUrl extends Url
 		}
 
 		return $path;
+	}
+
+	/**
+	 * @return HttpUrl
+	 */
+	function setVirtualPath($path)
+	{
+		$this->setPath(
+			$this->basePath . '/' . ltrim($path, '/')
+		);
+
+		return $this;
 	}
 
 	/**
