@@ -1,0 +1,133 @@
+<?php
+/* ***********************************************************************************************
+ *
+ * Phoebius Framework
+ *
+ * **********************************************************************************************
+ *
+ * Copyright (c) 2009 phoebius.org
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
+ *
+ ************************************************************************************************/
+
+/**
+ * Imports the variable taken from the request
+ *
+ * @ingroup App_Routing
+ */
+class RequestVarImportRule implements IRewriteRule
+{
+	/**
+	 * @var string
+	 */
+	private $name;
+	
+	/**
+	 * @var WebRequestPart
+	 */
+	private $requestPart;
+	
+	/**
+	 * @var mixed|null
+	 */
+	private $defaultValue;
+	
+	/**
+	 * @var boolean
+	 */
+	private $isOptional;
+	
+	function __construct(
+		$name,
+		WebRequestPart $part = null,
+		$isOptional = false,
+		$defaultValue = null
+		)
+	{
+		Assert::isScalar($name);
+		Assert::isBoolean($isOptional);
+		
+		$this->name = $name;
+		$this->requestPart =
+			$part
+				? $part
+				: new WebRequestPart(WebRequestPart::GET);
+		$this->isOptional = $isOptional;
+		$this->defaultValue = $defaultValue;
+	}
+	
+	/**
+	 * @return array
+	 */
+	function getParameterList($requiredOnly = true)
+	{
+		Assert::isBoolean($requiredOnly);
+		
+		if ($requiredOnly && $this->isOptional) {
+			return array();
+		}
+		
+		return array($this->name);
+	}
+	
+	/**
+	 * @throws RewriteException
+	 * @return array
+	 */
+	function rewrite(IWebContext $webContext)
+	{
+		$request = $webContext->getRequest();
+		
+		if (!$request->hasVar($this->name, $this->requestPart)) {
+			if ($this->isOptional) {
+				$value = $this->defaultValue;
+			}
+			else {
+				throw new RewriteException(
+					$this,
+					$webContext,
+					"variable {$this->name} is not defined by the request"
+				);
+			}
+		}
+		else {
+			$value = $request->getVar($this->name, $this->requestPart);
+		}
+		
+		return array(
+			$this->name => $value
+		);
+	}
+	
+	/**
+	 * @return void
+	 */
+	function compose(HttpUrl $url, array $parameters)
+	{
+		if ($this->requestPart->isNot(WebRequestPart::GET)) {
+			if (isset($parameters[$this->name])) {
+				$url->addQueryArgument($this->name, $parameters[$this->name]);
+			}
+			else if (!$this->isOptional) {
+				if ($this->defaultValue) {
+					$url->addQueryArgument($this->name, $this->defaultValue);
+				}
+				else {
+					// FIXME: use exception
+					Assert::isUnreachable(
+						'missing %s parameter',
+						$this->name	
+					);
+				}
+			}
+		}
+	}
+}
+
+?>

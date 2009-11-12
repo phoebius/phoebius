@@ -21,7 +21,7 @@
  *
  * Pattern syntax:
  *
- *  constant_value | [ [ predefined_value | ( predefined_value_1 | predefined_value_2 | ... ) ] :parameter_name ]
+ *  constant_value | [ predefined_value | ( predefined_value_1 | predefined_value_2 | ... ) ] :parameter_name
  *
  * where:
  *  * constant_value - freezed chunk
