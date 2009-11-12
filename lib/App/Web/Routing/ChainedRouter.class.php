@@ -49,7 +49,7 @@ class ChainedRouter implements IRouteTable
 	/**
 	 * @return Trace|null
 	 */
-	function route(IWebContext $wc)
+	function getTrace(IWebContext $wc)
 	{
 		$trace = null;
 
@@ -68,11 +68,11 @@ class ChainedRouter implements IRouteTable
 
 		return $trace;
 	}
-
+	
 	/**
 	 * @return Trace
 	 */
-	function routeFallback(Trace $parentTrace)
+	function getFallbackTrace(Trace $parentTrace)
 	{
 		Assert::isNotEmpty($this->fallbackRoute, 'fallback route not found');
 
