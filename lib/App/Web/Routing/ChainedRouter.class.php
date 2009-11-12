@@ -45,7 +45,56 @@ class ChainedRouter implements IRouteTable
 	{
 		$this->defaultDispatcher = $dispatcher;
 	}
-
+	
+	/**
+	 * Smart route assembler.
+	 * Accepts the name of the route to be assembled, URI to be used as a template for the rules.
+	 * Example:
+	 * <code>
+	 * $this->route("blogEntry", "/blog:controller/entry:action/?id");
+	 * </code>
+	 *
+	 * In future, the third parameter will be allowed to contain various objects that will be
+	 * smartly mapped to appropriate rules.
+	 *
+	 * @param string $name name of the route
+	 * @param string $uri URI that will be used as request variables template
+	 * @param array $rules array of IRewriteRule to be appended to the general list of rules
+	 * @return ChainedRouter
+	 */
+	function route($name, $uri, array $rules = array())
+	{
+		Assert::isScalar($name);
+		Assert::isScalar($uri);
+		
+		$firstRules = array();
+		
+		$parsedUrlPattern = parse_url($uri);
+		
+		if (isset($parsedUrlPattern['path'])) {
+			$firstRules = new PathRewriteRule($parsedUrlPattern['path']);
+		}
+		
+		if (isset($parsedUrlPattern['query'])) {
+			$queryStringVariables = array();
+			parse_str($parsedUrlPattern['query'], $queryStringVariables);
+			
+			foreach ($queryStringVariables as $qsVar => $qsValue) {
+				$firstRules[] = new RequestVarImportRule(
+					$qsVar,
+					null,
+					!empty($qsValue),
+					empty($qsValue) ? null : $qsValue
+				);
+		}
+		
+		$rules = array_merge($firstRules, $rules);
+		
+		$this->addRoute($name, new Route($this->defaultDispatcher, $rules));
+		
+		return $this;
+	}
+	
 	/**
 	 * @return Trace|null
 	 */
