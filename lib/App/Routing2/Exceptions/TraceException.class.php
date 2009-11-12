@@ -17,13 +17,13 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing_Exception
+ * @ingroup App_Routing_Exceptions
  */
-class RouteException extends StateException
+class TraceException extends RouteException
 {
-	function __construct($message = 'request cannot be routed', Route $route)
+	function __construct($message, Trace $trace)
 	{
-		parent::__construct($message);
+		parent::__construct($message, $trace->getRoute());
 	}
 }
 
