@@ -22,7 +22,7 @@
 interface IRouteDispatcher
 {
 	/**
-	 * @throws RouteHandleException
+	 * @throws TraceException
 	 * @return void
 	 */
 	function handle(Trace $trace);
