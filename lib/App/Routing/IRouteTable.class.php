@@ -17,14 +17,15 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing_Exceptions
+ * @ingroup App_Web_Routing
  */
-class TraceException extends RouteException
+interface IRouteTable
 {
-	function __construct($message, Trace $trace)
-	{
-		parent::__construct($message, $trace->getRoute());
-	}
+	/**
+	 * @throws ArgumentException if named route not found
+	 * @return Route
+	 */
+	function getRoute($name);
 }
 
 ?>

@@ -17,25 +17,14 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing_Exceptions
  */
-interface IRewriteRule
+class RouteException extends StateException
 {
-	/**
-	 * @return array
-	 */
-	function getParameterList($requiredOnly = true);
-
-	/**
-	 * @throws RewriteException
-	 * @return array
-	 */
-	function rewrite(IWebContext $webContext);
-
-	/**
-	 * @return void
-	 */
-	function compose(HttpUrl $url, array $parameters);
+	function __construct($message = 'request cannot be routed', Route $route)
+	{
+		parent::__construct($message);
+	}
 }
 
 ?>

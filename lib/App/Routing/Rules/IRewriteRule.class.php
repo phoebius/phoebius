@@ -17,15 +17,25 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing_Rules
  */
-interface IRouteTable
+interface IRewriteRule
 {
 	/**
-	 * @throws ArgumentException if named route not found
-	 * @return Route
+	 * @return array
 	 */
-	function getRoute($name);
+	function getParameterList($requiredOnly = true);
+
+	/**
+	 * @throws RewriteException
+	 * @return array
+	 */
+	function rewrite(IWebContext $webContext);
+
+	/**
+	 * @return void
+	 */
+	function compose(HttpUrl $url, array $parameters);
 }
 
 ?>

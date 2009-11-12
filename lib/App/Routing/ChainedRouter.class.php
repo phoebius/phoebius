@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing
  */
 class ChainedRouter implements IRouteTable
 {

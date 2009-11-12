@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing_Exceptions
+ * @ingroup App_Web_Routing_Exceptions
  */
 class RewriteException extends StateException
 {

@@ -17,11 +17,7 @@
  ************************************************************************************************/
 
 /**
- * variables:
- *  use null if casting failed
- *  use def. value or null if not specified
- *
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing
  */
 class Route
 {

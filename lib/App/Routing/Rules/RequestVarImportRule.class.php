@@ -19,7 +19,7 @@
 /**
  * Imports the variable taken from the request
  *
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing_Rules
  */
 class RequestVarImportRule implements IRewriteRule
 {

@@ -18,7 +18,7 @@
 
 /**
  * Trace is a collection of parameters initialized over processing the request parameters
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing
  */
 final class Trace extends Collection
 {

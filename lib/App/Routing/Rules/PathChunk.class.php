@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing_Web
+ * @ingroup App_Web_Routing_Rules
  * @internal
  */
 class PathChunk

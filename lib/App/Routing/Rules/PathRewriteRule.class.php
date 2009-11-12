@@ -40,7 +40,7 @@
  *  * "/blog:controller/ matches "/blog/" only.
  *  * "/:controller/(rss|html):action/" matches "/<anything>/rss/" (controller="<anything>", action="rss") and "/<anything>/html/" (controller="<anything>", action="html")
  *
- * @ingroup App_Routing_Rules
+ * @ingroup App_Web_Routing_Rules
  */
 class PathRewriteRule implements IRewriteRule
 {

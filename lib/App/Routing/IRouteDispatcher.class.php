@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * @ingroup App_Routing
+ * @ingroup App_Web_Routing
  */
 interface IRouteDispatcher
 {
