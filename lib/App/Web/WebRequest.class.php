@@ -17,40 +17,24 @@
  ************************************************************************************************/
 
 /**
- * TODO: Authentication layer for apache
+ * FIXME implement ArrayAccess for request variables (GPC resolution order)
  * @ingroup App_Web
  */
-class WebRequest extends AppRequest
+class WebRequest extends AppRequest implements ArrayAccess
 {
-	/**
-	 * @var array
-	 */
-	private $getVars = array();
-
-	/**
-	 * @var array
-	 */
-	private $postVars = array();
-
-	/**
-	 * @var array
-	 */
-	private $cookieVars = array();
-
-	/**
-	 * @var array
-	 */
-	private $filesVars = array();
+	private $vars = array(
+		WebRequestPart::GET => array(),
+		WebRequestPart::POST => array(),
+		WebRequestPart::COOKIE => array(),
+		WebRequestPart::FILES => array(),
+	);
+	
+	private $allVars = array();
 
 	/**
 	 * @var HttpUrl
 	 */
 	private $httpUrl;
-
-	/**
-	 * @var HttpUrl
-	 */
-	private $baseHttpUrl;
 
 	/**
 	 * @var array
@@ -60,27 +44,24 @@ class WebRequest extends AppRequest
 	/**
 	 * @return WebRequest
 	 */
-	static function create(WebRequestDictionary $dictonary, HttpUrl $baseHttpUrl = null)
+	static function create(WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/')
 	{
-		return new self ($dictonary, $baseHttpUrl);
+		return new self ($dictonary, $baseHost, $baseUri);
 	}
 
-	function __construct(WebRequestDictionary $dictonary, HttpUrl $baseHttpUrl = null)
+	function __construct(WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/')
 	{
+		Assert::isScalar($baseUri);
+
 		$this->dictionary = $dictonary->getFields();
 
-		$this->baseHttpUrl =
-			$baseHttpUrl
-				? $baseHttpUrl
-				: HttpUrl::import($dictonary)->setBase('/')->setPath('/');
-
-		$this->httpUrl = HttpUrl::import($dictonary, $this->baseHttpUrl);
+		$this->httpUrl = HttpUrl::import($dictonary, $baseHost, $baseUri);
 	}
 
 	function __clone()
 	{
 		$this->httpUrl = clone $this->httpUrl;
-		$this->baseHttpUrl = clone $this->baseHttpUrl;
+		$this->dictionary = clone $this->dictionary;
 	}
 
 	/**
@@ -122,7 +103,7 @@ class WebRequest extends AppRequest
 	}
 
 	/**
-	 * @return string|null
+	 * @return HttpUrl|null
 	 */
 	function getHttpReferer()
 	{
@@ -178,14 +159,6 @@ class WebRequest extends AppRequest
 	/**
 	 * @return HttpUrl|null
 	 */
-	function getBaseHttpUrl()
-	{
-		return $this->baseHttpUrl;
-	}
-
-	/**
-	 * @return HttpUrl|null
-	 */
 	function getHttpUrl()
 	{
 		return $this->httpUrl;
@@ -228,9 +201,7 @@ class WebRequest extends AppRequest
 	 */
 	function setGetVars(array $getVars)
 	{
-		$this->getVars = $getVars;
-
-		$this->httpUrl->setQuery($getVars);
+		$this->vars[WebRequestPart::GET] = $getVars;
 
 		return $this;
 	}
@@ -240,7 +211,7 @@ class WebRequest extends AppRequest
 	 */
 	function setPostVars(array $postVars)
 	{
-		$this->postVars = $postVars;
+		$this->vars[WebRequestPart::POST] = $postVars;
 
 		return $this;
 	}
@@ -250,7 +221,7 @@ class WebRequest extends AppRequest
 	 */
 	function setCookieVars(array $cookieVars)
 	{
-		$this->cookieVars = $cookieVars;
+		$this->vars[WebRequestPart::COOKIE] = $cookieVars;
 
 		return $this;
 	}
@@ -260,107 +231,79 @@ class WebRequest extends AppRequest
 	 */
 	function setFilesVars(array $filesVars)
 	{
-		$this->filesVars = $filesVars;
+		$this->vars[WebRequestPart::FILES] = $filesVars;
 
 		return $this;
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	function hasVar($variableName, WebRequestPart $part = null)
+	{
+		return array_key_exists(
+			$variableName,
+			$part
+				? $this->vars[$part->getValue()]
+				: $this->allVars
+		);
 	}
 
 	/**
 	 * @return ArgumentException
 	 */
-	function getVariable($variableName, WebRequestPart $type = null)
+	function getVar($variableName, WebRequestPart $part = null)
 	{
-		foreach ($this->getAllVars() as $varsType => $vars) {
-			if (!is_null($type) && $type->isNot($varsType)) {
-				continue;
-			}
-
-			if (isset($vars[$variableName])) {
-				return $vars[$variableName];
-			}
+		$vars =
+			$part
+				? $this->vars[$part->getValue()]
+				: $this->allVars;
+		
+		if (isset($variableName, $vars)) {
+			return $vars[$variableName];
 		}
-
-		throw new ArgumentException('variableName', "unknown variable {$variableName}");
+		
+		return null;
 	}
-
+	
 	/**
-	 * @return WebRequest
+	 * @return boolean
 	 */
-	function setVariable($variableName, WebRequestPart $type, $variableValue)
+	function offsetExists($offset)
 	{
-		switch ($type->getValue()) {
-			case WebRequestPart::GET: {
-				$this->getVars[$variableName] = $variableValue;
-				$this->httpUrl->addQueryArgument($variableName, $variableValue);
-				break;
-			}
-			case WebRequestPart::POST: {
-				$this->postVars[$variableName] = $variableValue;
-				break;
-			}
-			case WebRequestPart::COOKIE: {
-				$this->cookieVars[$variableName] = $variableValue;
-				break;
-			}
-			case WebRequestPart::FILES: {
-				$this->filesVars[$variableName] = $variableValue;
-				break;
-			}
-		}
-
-		return $this;
+		return array_key_exists($this->allVars[$offset]);
 	}
-
+	
 	/**
-	 * @throws ArgumentException
 	 * @return mixed
 	 */
-	function getAnyVariable($variable)
+	function offsetGet($offset)
 	{
-		return $this->getVariable($variable);
+		return $this->allVars[$offset];
+	}
+	
+	/**
+	 * @return void
+	 */
+	function offsetSet($offset, $value)
+	{
+		Assert::isUnreachable();
+	}
+	
+	/**
+	 * @return void
+	 */
+	function offsetUnset($offset)
+	{
+		Assert::isUnreachable();
 	}
 
 	/**
-	 * @return IAppRequest
+	 * @return void
 	 */
-	function getCleanCopy()
+	private function regenerateAllVars()
 	{
-		$copy = clone $this;
-
-		$copy
-			->setGetVars(array())
-			->setPostVars(array())
-			->setFilesVars(array())
-			->setCookieVars(array());
-
-		$copy->httpUrl->setQuery(array());
-
-		return $copy;
-	}
-
-	/**
-	 * @return array of {@link array}
-	 */
-	private function getAllVars()
-	{
-		return array(
-			WebRequestPart::GET => $this->getGetVars(),
-			WebRequestPart::POST => $this->getPostVars(),
-			WebRequestPart::COOKIE => $this->getCookieVars(),
-			WebRequestPart::FILES => $this->getFilesVars()
-		);
-	}
-
-	/**
-	 * @return array
-	 */
-	private function getVars(WebRequestPart $type)
-	{
-		$set = $this->getAllVars();
-
-		Assert::isTrue(isset($set[$type->getValue()]));
-
-		return $set[$type->getValue()];
+		$this->allVars = call_user_func_array('array_merge', array_reverse($this->vars));
 	}
 }
 
