@@ -17,9 +17,9 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Utils_Net
+ * @ingroup App_Web
  */
-class SiteUrl extends Url
+class SiteUrl extends HttpUrl
 {
 	private $baseHost = null;
 	private $basePath = null;
