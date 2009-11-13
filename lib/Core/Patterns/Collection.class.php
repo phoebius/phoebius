@@ -28,14 +28,6 @@ class Collection implements IteratorAggregate, ArrayAccess
 	 */
 	private $collection = array();
 
-	/**
-	 * @return Collection
-	 */
-	static function create(array $array = array())
-	{
-		return new self ($array);
-	}
-
 	function __construct(array $array = array())
 	{
 		$this->append($array);
