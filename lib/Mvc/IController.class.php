@@ -22,15 +22,10 @@
 interface IController
 {
 	/**
-	 * @throws RouteHandleException
+	 * @throws TraceException
 	 * @return void
 	 */
-	function handle(IControllerContext $context);
-
-	/**
-	 * @return IControllerContext
-	 */
-	function getContext();
+	function handle(Trace $trace);
 }
 
 ?>

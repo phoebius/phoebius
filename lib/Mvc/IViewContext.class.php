@@ -19,12 +19,17 @@
 /**
  * @ingroup Mvc
  */
-interface IViewContext extends IControllerContext
+interface IViewContext
 {
 	/**
 	 * @return Model
 	 */
 	function getModel();
+	
+	/**
+	 * @return Trace
+	 */
+	function getTrace();
 }
 
 ?>

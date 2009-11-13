@@ -24,7 +24,7 @@ abstract class Controller implements IController
 	/**
 	 * @var Model|null
 	 */
-	private $model = null;
+	private $model;
 
 	/**
 	 * @return Model
@@ -36,16 +36,6 @@ abstract class Controller implements IController
 		}
 
 		return $this->model;
-	}
-
-	/**
-	 * @return Controller an object itself
-	 */
-	function setModel(Model $model)
-	{
-		$this->model = $model;
-
-		return $this;
 	}
 }
 

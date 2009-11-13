@@ -19,22 +19,25 @@
 /**
  * @ingroup Mvc
  */
-class ViewContext extends ControllerContext implements IViewContext
+class ViewContext implements IViewContext
 {
 	/**
 	 * @var Model
 	 */
 	private $model;
+	
+	/**
+	 * @var Trace
+	 */
+	private $trace;
 
 	function __construct(
 			Model $model,
-			IRouteContext $routeContext,
-			IAppContext $appContext
+			Trace $trace
 		)
 	{
 		$this->model = $model;
-
-		parent::__construct($routeContext, $appContext);
+		$this->trace = $trace;
 	}
 
 	/**
@@ -43,6 +46,14 @@ class ViewContext extends ControllerContext implements IViewContext
 	function getModel()
 	{
 		return $this->model;
+	}
+	
+	/**
+	 * @return Trace
+	 */
+	function getTrace()
+	{
+		return $this->trace;
 	}
 }
 
