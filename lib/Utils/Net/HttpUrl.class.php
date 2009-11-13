@@ -19,109 +19,82 @@
 /**
  * @ingroup Utils_Net
  */
-class HttpUrl extends Url
+class HttpUrl
 {
-	private $baseHost = null;
-	private $basePath = null;
+	// ports to be ommited
+	const DEFAULT_HTTP_PORT = 80;
+	const DEFAULT_HTTPS_PORT = 443;
 
-	/**
-	 * @return HttpUrl
-	 */
-	static function import(HttpUrlDictionary $dictionary, $baseHost = null, $baseUri = '/')
+	private $scheme = 'http';
+	private $user = null;
+	private $pass = null;
+	private $host = null;
+	private $port = null;
+	private $path = '/';
+	private $query = array();
+	private $fragment = '';
+
+	function __construct($url = null)
 	{
-		$url = new self;
+		if ($url) {
+			$chunks = parse_url($url);
 
-		$url->setBaseHost($baseHost);
-		$url->setBasePath($baseUri);
-
-		$url
-			->setScheme(
-				$dictionary->getField(HttpUrlDictionary::HTTPS)
-					? "https"
-					: "http"
-			)
-			->setHost($dictionary->getField(HttpUrlDictionary::HOST))
-			->setPort($dictionary->getField(HttpUrlDictionary::PORT));
-
-		//get the URI itself
-		$uri = $dictionary->getField(HttpUrlDictionary::URI);
-		if (!preg_match('/^https?:\/\//', $uri)) {
-			$uri = '/' . ltrim($uri, '/');
-		}
-		$parts = parse_url($uri);
-
-		if (isset($parts['path'])) {
-			$path = urldecode($parts['path']);
-
-			$url->setPath($path);
-		}
-
-		if (isset($parts['query'])) {
-			$newQuery = $query = array();
-			parse_str($parts['query'], $query);
-
-			foreach ($query as $k => $v) {
-				$newQuery[urldecode($k)] =
-					is_array($v)
-						? $v
-						: urldecode($v);
+			if (isset($chunks['scheme'])) {
+				$this->setScheme($chunks['scheme']);
 			}
 
-			$url->setQuery($newQuery);
+			if (isset($chunks['host'])) {
+				$this->setHost($chunks['host']);
+			}
+
+			if (isset($chunks['port'])) {
+				$this->setPort($chunks['port']);
+			}
+
+			if (isset($chunks['user'])) {
+				$user = $chunks['user'];
+				if (isset($chunks['pass'])) {
+					$pass = $chunks['pass'];
+				}
+				else {
+					$pass = null;
+				}
+				$this->setCredentials($user, $pass);
+			}
+
+			if (isset($chunks['path'])) {
+				$this->setPath($chunks['path']);
+			}
+
+			if (isset($chunks['query'])) {
+				$query = array();
+				parse_str($chunks['query'], $query);
+				$this->setQuery($query);
+			}
+
+			if (isset($chunks['fragment'])) {
+				$this->setFragment($chunks['fragment']);
+			}
 		}
-
-		return $url;
-	}
-
-	/**
-	 * @param string $host
-	 * @return Url an object itself
-	 */
-	function setHost($host)
-	{
-		parent::setHost($host);
-
-		if (!$this->baseHost) {
-			$this->baseHost = $this->host;
-		}
-
-		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	function getSubdomain()
+	function getScheme()
 	{
-		if ($this->baseHost) {
-			return substr($this->host, 0, strlen($this->baseHost));
-		}
-		else {
-			return $this->host;
-		}
+		return $this->scheme;
 	}
 
 	/**
-	 * @return Url
+	 * @param string $scheme
+	 * @return HttpUrl an object itself
 	 */
-	function setSubdomain($subdomain)
+	function setScheme($scheme)
 	{
-		Assert::isScalar($subdomain);
+		Assert::isScalar($scheme);
 
-		$this->setHost($subdomain . '.' . $this->baseHost);
-
-		return $this;
-	}
-
-	/**
-	 * @param string $baseHost
-	 * @return Url an object itself
-	 */
-	function setBaseHost($baseHost = null)
-	{
-		Assert::isScalarOrNull($baseHost);
-
-		$this->baseHost = $baseHost;
+		$this->scheme = $scheme;
 
 		return $this;
 	}
@@ -129,27 +102,71 @@ class HttpUrl extends Url
 	/**
 	 * @return string|null
 	 */
-	function getBaseHost()
+	function getUser()
 	{
-		return $this->baseHost;
+		return $this->user;
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	function getBasePath()
+	function getPassword()
 	{
-		return $this->basePath;
+		return $this->pass;
 	}
 
 	/**
-	 * @return Url an object itself
+	 * @return HttpUrl an object itself
 	 */
-	function setBasePath($basePath = '/')
+	function setCredentials($user, $password)
 	{
-		Assert::isScalar($basePath);
+		Assert::isScalarOrNull($user);
+		Assert::isScalarOrNull($password);
 
-		$this->basePath = trim($basePath, '/');
+		$this->user = $user;
+		$this->pass = $password;
+
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	function getHost()
+	{
+		return $this->host;
+	}
+
+	/**
+	 * @param string $host
+	 * @return HttpUrl an object itself
+	 */
+	function setHost($host)
+	{
+		Assert::isScalar($host);
+
+		$this->host = $host;
+
+		return $this;
+	}
+
+	/**
+	 * @return integer|null
+	 */
+	function getPort()
+	{
+		return $this->port;
+	}
+
+	/**
+	 * @param integer $port
+	 * @return HttpUrl an object itself
+	 */
+	function setPort($port)
+	{
+		Assert::isNumeric($port);
+
+		$this->port = $port;
 
 		return $this;
 	}
@@ -157,44 +174,199 @@ class HttpUrl extends Url
 	/**
 	 * @return string
 	 */
-	function getVirtualPath()
+	function getPath()
 	{
-		$path = $this->getPath();
+		return $this->path;
+	}
 
-		if (!$this->basePath) {
-			return $path;
+	/**
+	 * @param string $path
+	 * @return HttpUrl an object itself
+	 */
+	function setPath($path)
+	{
+		Assert::isScalar($path);
+
+		$this->path = '/' . trim($path, '/');
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	function getQuery()
+	{
+		return $this->query;
+	}
+
+	/**
+	 * @param array $query
+	 * @return HttpUrl an object itself
+	 */
+	function setQuery(array $query)
+	{
+		$this->query = $query;
+
+		return $this;
+	}
+
+	/**
+	 * @return HttpUrl an object itself
+	 */
+	function addQueryArgument($key, $value)
+	{
+		Assert::isScalar($key);
+		Assert::isScalar($value);
+
+		$this->query[$key] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * @return HttpUrl an object itself
+	 */
+	function mergeQuery(array $query)
+	{
+		$this->query = $this->query + $query;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $query
+	 * @return HttpUrl an object itself
+	 */
+	function dropQuery()
+	{
+		$this->query = array();
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getQueryAsString()
+	{
+		$pairs = $this->getQuery();
+
+		if (sizeof($pairs)) {
+			$query = http_build_query($pairs);
+			$query = '?' . $query;
+		}
+		else {
+			$query = '';
 		}
 
-		$prefix = substr($path, 0, strlen($this->basePath));
-		if ($this->basePath == $prefix) {
-			$path = substr($path, strlen($this->basePath));
+		return $query;
+	}
+
+	/**
+	 * @return string
+	 */
+	function getFragment()
+	{
+		return $this->fragment;
+	}
+
+	/**
+	 * @param string $fragment
+	 * @return HttpUrl an object itself
+	 */
+	function setFragment($fragment)
+	{
+		Assert::isScalar($fragment);
+
+		$this->fragment = rtrim($fragment, '#');
+
+		return $this;
+	}
+
+	/**
+	 * @return string path + qs
+	 */
+	function getUri()
+	{
+		return $this->getPath() . $this->getQueryAsString();
+	}
+
+	function toString()
+	{
+		$out = array();
+
+		// Scheme
+		if ($this->getScheme() && $this->getHost()) {
+			$out[] = $this->getScheme() . '://';
 		}
+
+		// Auth
+		if (($user = $this->getUser()) && ($pass = $this->getUser())) {
+			$out[] = rawurlencode($user) . ':';
+			$out[] = rawurlencode($pass) . '@';
+		}
+		else if ($user) {
+			$out[] = rawurlencode($user) . '@';
+		}
+
+
+		// Host
+		$out[] = $this->getHost();
+
+		// Port
+		if ($this->getHost() && $this->getPort()) {
+			if (
+					   !(
+					   		   $this->getScheme() == 'http'
+					   		&& $this->getPort() == self::DEFAULT_HTTP_PORT
+					)
+					&& !(
+							   $this->getScheme() == 'https'
+							&& $this->getPort() == self::DEFAULT_HTTPS_PORT
+					)
+			) {
+				$out[] = ':' . $this->getPort();
+			}
+		}
+
+		$out[] = $this->encodePath($this->getFullPath());
+		$out[] = $this->getQueryAsString();
+
+		if ($this->getFragment()) {
+			$out[] = '#' . urlencode($this->getFragment());
+		}
+
+		return join('', $out);
+	}
+
+	/**
+	 * @return string
+	 */
+	private function encodePath($path)
+	{
+		$chunks = preg_split('/([\/;=])/', $path, - 1, PREG_SPLIT_DELIM_CAPTURE);
+		$path = '';
+		foreach ($chunks as $var) {
+			switch ( $var )
+			{
+				case "/":
+				case ";":
+				case "=":
+					{
+						$path .= $var;
+						break;
+					}
+				default:
+					{
+						$path .= rawurlencode($var);
+					}
+			}
+		}
+		// legacy patch for servers that need a literal /~username
+		$path = str_replace('/%7E', '/~', $path);
 
 		return $path;
-	}
-
-	/**
-	 * @return HttpUrl
-	 */
-	function setVirtualPath($path)
-	{
-		$this->setPath(
-			$this->basePath . '/' . ltrim($path, '/')
-		);
-
-		return $this;
-	}
-
-	/**
-	 * @return HttpUrl
-	 */
-	function spawnBase()
-	{
-		$clone = clone $this;
-		$clone->setPath('/');
-		$clone->setSubdomain(null);
-
-		return $clone;
 	}
 }
 
