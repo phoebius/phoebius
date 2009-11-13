@@ -49,7 +49,7 @@ interface IWebResponse extends IAppResponse
 	/**
 	 * @return void
 	 */
-	function redirect(WebRequest $request, Url $url = null);
+	function redirect(HttpUrl $url);
 }
 
 ?>

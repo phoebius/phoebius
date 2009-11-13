@@ -21,11 +21,16 @@
  */
 class WebResponse implements IWebResponse
 {
+	
+	/**
+	 * @var IWebRequest
+	 */
+	private $request;
 	private $bufferOpened = false;
 	private $isFinished = false;
 	private $useGzip = false;
 
-	function __construct($useGzip = false)
+	function __construct($useGzip = false, IWebRequest $request = null)
 	{
 		Assert::isBoolean($useGzip);
 
@@ -34,6 +39,8 @@ class WebResponse implements IWebResponse
 		if ($this->useGzip) {
 			$this->openBuffer();
 		}
+		
+		$this->request = $request;
 	}
 
 	/**
@@ -204,15 +211,13 @@ class WebResponse implements IWebResponse
 	/**
 	 * @return void
 	 */
-	function redirect(WebRequest $request, Url $url = null)
+	function redirect(HttpUrl $url)
 	{
-		if (!$url) {
-			$url = $request->getHttpUrl();
+		if ($this->request) {
+			$protocol = $this->request->getProtocol();
 		}
 
-		$protocol = $request->getProtocol();
-
-		if ($protocol == 'HTTP/1.1') {
+		if ($protocol && $protocol == 'HTTP/1.1') {
 			$status = 303;
 			header('HTTP/1.1 303 See Other', true);
 		}
@@ -222,7 +227,7 @@ class WebResponse implements IWebResponse
 		}
 
 		//header('Content-Length: 0');
-		header('Location: ' .$url->toString(), true, $status);
+		header('Location: ' . ((string) $url), true, $status);
 
 		$this->finish();
 	}
