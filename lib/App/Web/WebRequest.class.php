@@ -31,7 +31,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	private $allVars = array();
 
 	/**
-	 * @var HttpUrl
+	 * @var SiteUrl
 	 */
 	private $httpUrl;
 
@@ -41,18 +41,19 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	private $dictionary = array();
 
 	function __construct(
-				WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/',
+				WebRequestDictionary $dictonary,
 				array $getVars,
 				array $postVars,
 				array $cookieVars,
-				array $filesVars
+				array $filesVars,
+				$baseHost = null, $baseUri = '/'
 		)
 	{
 		Assert::isScalar($baseUri);
 
 		$this->dictionary = $dictonary->getFields();
 
-		$this->httpUrl = HttpUrl::import($dictonary, $baseHost, $baseUri);
+		$this->httpUrl = SiteUrl::import($dictonary, $baseHost, $baseUri);
 		
 		$this->allVars = array(
 			WebRequestPart::GET => $getVars,
@@ -152,11 +153,13 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function hasVar($variableName, WebRequestPart $part = null)
 	{
-		return isset(
-			$variableName,
+		$vars =
 			$part
 				? $this->vars[$part->getValue()]
-				: $this->allVars
+				: $this->allVars;
+				
+		return isset(
+			$vars[$variableName]			
 		);
 	}
 

@@ -50,7 +50,7 @@ class PathRewriteRule implements IRewriteRule
 	private $urlPattern;
 
 	/**
-	 * @var array of {@link WebUrlRewriteChunk}
+	 * @var array array of PathChunk
 	 */
 	private $chunkRewriters = array();
 
@@ -63,7 +63,7 @@ class PathRewriteRule implements IRewriteRule
 	}
 
 	/**
-	 * @return WebUrlRewriteRule an object itself
+	 * @return PathRewriteRule an object itself
 	 */
 	function setPattern($pattern)
 	{
@@ -203,7 +203,7 @@ class PathRewriteRule implements IRewriteRule
 		array_shift($pathChunks);
 
 		foreach ($pathChunks as $pathChunk) {
-			$this->chunkRewriters[] = WebUrlRewriteChunk::import($pathChunk);
+			$this->chunkRewriters[] = PathChunk::import($pathChunk);
 		}
 
 		if (sizeof($this->chunkRewriters) > 0) {

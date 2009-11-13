@@ -51,7 +51,7 @@ class Route
 	function from(Trace $trace)
 	{
 		$webContext = $trace->getWebContext();
-		$trace = $trace->spawn();
+		$trace = $trace->spawnNested();
 
 		$this->fillTrace($trace, $webContext);
 

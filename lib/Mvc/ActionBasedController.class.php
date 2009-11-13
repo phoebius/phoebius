@@ -37,7 +37,7 @@ abstract class ActionBasedController extends Controller
 		$this->trace = $trace;
 		
 		if (isset($trace[self::PARAMETER_ACTION])) {
-			$result = $this->processAction($action);
+			$result = $this->processAction($trace[self::PARAMETER_ACTION]);
 		}
 		else {
 			$result = $this->handleUnknownAction(null);
@@ -175,15 +175,14 @@ abstract class ActionBasedController extends Controller
 
 		if ($reflectedController->hasMethod($actionMethod)) {
 			$actionResult = $this->invokeActionMethod(
-				$reflectedController->getMethod($actionMethod),
-				$context
+				$reflectedController->getMethod($actionMethod)
 			);
 		}
 		else {
 			$actionResult = $this->handleUnknownAction($action, $context);
 		}
 
-		$this->trace->getRoute()->setHandled();
+		$this->trace->setHandled();
 
 		if (
 				!(
@@ -228,7 +227,7 @@ abstract class ActionBasedController extends Controller
 	protected function view($viewName)
 	{
 		return new ViewResult(
-			UIVIewPresentation::view($viewName, $this->getModel())
+			UIViewPresentation::view($viewName, $this->getModel())
 		);
 	}
 	

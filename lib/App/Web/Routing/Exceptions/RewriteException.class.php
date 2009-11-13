@@ -26,11 +26,6 @@
 class RewriteException extends StateException
 {
 	/**
-	 * @var string|null
-	 */
-	private $variableName;
-	
-	/**
 	 * @var IRewriteRule
 	 */
 	private $rewriteRule;
@@ -42,12 +37,10 @@ class RewriteException extends StateException
 
 	function __construct(
 			$message = 'rule does not match',
-			$variableName = null,
 			IRewriteRule $rewriteRule,
 			IWebContext $webContext
 		)
 	{
-		$this->variableName = $variableName;
 		$this->rewriteRule = $rewriteRule;
 		$this->webContext = $webContext;
 

@@ -82,7 +82,7 @@ class SiteUrl extends HttpUrl
 		parent::setHost($host);
 
 		if (!$this->baseHost) {
-			$this->baseHost = $this->host;
+			$this->baseHost = $this->getHost();
 		}
 
 		return $this;

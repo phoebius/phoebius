@@ -38,7 +38,7 @@ class ParameterImportRule implements IRewriteRule
 	{
 		$rules = array();
 		
-		foreach ($parameters as $parmeter => $value) {
+		foreach ($parameters as $parameter => $value) {
 			$rules[] = new self($parameter, $value);
 		}
 		

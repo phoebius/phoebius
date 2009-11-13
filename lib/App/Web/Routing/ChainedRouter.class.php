@@ -47,6 +47,14 @@ class ChainedRouter implements IRouteTable
 	}
 	
 	/**
+	 * @return IRouteDispatcher
+	 */
+	function getDefaultDispatcher()
+	{
+		return $this->defaultDispatcher;
+	}
+	
+	/**
 	 * Smart route assembler.
 	 * Accepts the name of the route to be assembled, URI to be used as a template for the rules.
 	 * Example:
@@ -86,9 +94,10 @@ class ChainedRouter implements IRouteTable
 					!empty($qsValue),
 					empty($qsValue) ? null : $qsValue
 				);
+			}
 		}
 		
-		foreach ($parameters as $parmeter => $value) {
+		foreach ($parameters as $parameter => $value) {
 			$rules[] = new ParameterImportRule($parameter, $value);
 		}
 		
@@ -108,7 +117,7 @@ class ChainedRouter implements IRouteTable
 			try {
 				$trace = $route->trace($this, $webContext);
 			}
-			catch (RouteException $e){
+			catch (RouteException $e) {
 				//FIXME log failure here
 			}
 		}

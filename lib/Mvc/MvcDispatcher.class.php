@@ -37,11 +37,11 @@ class MvcDispatcher implements IRouteDispatcher
 			throw new TraceException(
 				sprintf('unknown controller %s', $controllerClassName),
 				$trace
-			);
+				);
 		}
 		
 		if (
-				in_array('IController', class_implements($controllerClassName))
+				!in_array('IController', class_implements($controllerClassName, true))
 		) {
 			throw new TraceException(
 				sprintf('%s is not a controller due it does not implement IController', $controllerClassName),

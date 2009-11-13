@@ -23,14 +23,14 @@ class WebResponse implements IWebResponse
 {
 	
 	/**
-	 * @var IWebRequest
+	 * @var WebRequest
 	 */
 	private $request;
 	private $bufferOpened = false;
 	private $isFinished = false;
 	private $useGzip = false;
 
-	function __construct($useGzip = false, IWebRequest $request = null)
+	function __construct($useGzip = false, WebRequest $request = null)
 	{
 		Assert::isBoolean($useGzip);
 
