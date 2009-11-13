@@ -21,7 +21,11 @@
  */
 class RouteException extends StateException
 {
-	function __construct($message = 'request cannot be routed', Route $route)
+	function __construct(
+			$message = 'request cannot be routed',
+			Route $route,
+			IWebContext $webContext
+		)
 	{
 		parent::__construct($message);
 	}

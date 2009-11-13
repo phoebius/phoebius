@@ -128,7 +128,11 @@ class Route
 				);
 			}
 			catch (RewriteException $e) {
-				throw new RouteException($e->getMessage());
+				throw new RouteException(
+					$e->getMessage(),
+					$this,
+					$webContext
+				);
 			}
 		}
 	}

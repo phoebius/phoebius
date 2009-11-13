@@ -17,10 +17,19 @@
  ************************************************************************************************/
 
 /**
+ *  * missing varable
+ *  * variable constraint failure
+ *
+ *
  * @ingroup App_Web_Routing_Exceptions
  */
 class RewriteException extends StateException
 {
+	/**
+	 * @var string|null
+	 */
+	private $variableName;
+	
 	/**
 	 * @var IRewriteRule
 	 */
@@ -32,11 +41,13 @@ class RewriteException extends StateException
 	private $webContext;
 
 	function __construct(
+			$message = 'rule does not match',
+			$variableName = null,
 			IRewriteRule $rewriteRule,
-			IWebContext $webContext,
-			$message = 'rule does not match'
+			IWebContext $webContext
 		)
 	{
+		$this->variableName = $variableName;
 		$this->rewriteRule = $rewriteRule;
 		$this->webContext = $webContext;
 

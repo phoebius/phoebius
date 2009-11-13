@@ -59,20 +59,20 @@ class ChainedRouter implements IRouteTable
 	 *
 	 * @param string $name name of the route
 	 * @param string $uri URI that will be used as request variables template
-	 * @param array $rules array of IRewriteRule to be appended to the general list of rules
+	 * @param array $parameters array of parameters to be appended to Trace
 	 * @return ChainedRouter
 	 */
-	function route($name, $uri, array $rules = array())
+	function route($name, $uri, array $parameters = array())
 	{
 		Assert::isScalar($name);
 		Assert::isScalar($uri);
 		
-		$firstRules = array();
+		$rules = array();
 		
 		$parsedUrlPattern = parse_url($uri);
 		
 		if (isset($parsedUrlPattern['path'])) {
-			$firstRules = new PathRewriteRule($parsedUrlPattern['path']);
+			$rules[] = new PathRewriteRule($parsedUrlPattern['path']);
 		}
 		
 		if (isset($parsedUrlPattern['query'])) {
@@ -80,15 +80,17 @@ class ChainedRouter implements IRouteTable
 			parse_str($parsedUrlPattern['query'], $queryStringVariables);
 			
 			foreach ($queryStringVariables as $qsVar => $qsValue) {
-				$firstRules[] = new RequestVarImportRule(
+				$rules[] = new RequestVarImportRule(
 					$qsVar,
-					null,
+					new WebRequestPart(WebRequestPart::GET),
 					!empty($qsValue),
 					empty($qsValue) ? null : $qsValue
 				);
 		}
 		
-		$rules = array_merge($firstRules, $rules);
+		foreach ($parameters as $parmeter => $value) {
+			$rules[] = new ParameterImportRule($parameter, $value);
+		}
 		
 		$this->addRoute($name, new Route($this->defaultDispatcher, $rules));
 		
@@ -98,13 +100,13 @@ class ChainedRouter implements IRouteTable
 	/**
 	 * @return Trace|null
 	 */
-	function getTrace(IWebContext $wc)
+	function getTrace(IWebContext $webContext)
 	{
 		$trace = null;
 
 		foreach ($this->chain as $route) {
 			try {
-				$trace = $route->trace($this, $wc);
+				$trace = $route->trace($this, $webContext);
 			}
 			catch (RouteException $e){
 				//FIXME log failure here
@@ -112,7 +114,7 @@ class ChainedRouter implements IRouteTable
 		}
 
 		if (!$trace && $this->fallbackRoute) {
-			$trace = $this->fallbackRoute->trace($this, $wc);
+			$trace = $this->fallbackRoute->trace($this, $webContext);
 		}
 
 		return $trace;

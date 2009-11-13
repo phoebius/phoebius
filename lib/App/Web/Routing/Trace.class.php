@@ -128,6 +128,24 @@ final class Trace extends Collection
 
 		return $clone;
 	}
+	
+	/**
+	 * @throws TraceException
+	 * @return mixed
+	 */
+	function getRequiredParameter($parameter)
+	{
+		Assert::isScalar($parameter);
+		
+		if (!$this->has($parameter)) {
+			throw new TraceException(
+				sprintf('missing required parameter %s', $parameter),
+				$this
+			);
+		}
+		
+		return $this->get($parameter);
+	}
 }
 
 ?>

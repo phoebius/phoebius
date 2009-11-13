@@ -23,7 +23,7 @@ class TraceException extends RouteException
 {
 	function __construct($message, Trace $trace)
 	{
-		parent::__construct($message, $trace->getRoute());
+		parent::__construct($message, $trace->getRoute(), $trace->getWebContext());
 	}
 }
 
