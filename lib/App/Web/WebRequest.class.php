@@ -202,6 +202,8 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function setGetVars(array $getVars)
 	{
 		$this->vars[WebRequestPart::GET] = $getVars;
+		
+		$this->regenerateAllVars();
 
 		return $this;
 	}
@@ -212,6 +214,8 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function setPostVars(array $postVars)
 	{
 		$this->vars[WebRequestPart::POST] = $postVars;
+		
+		$this->regenerateAllVars();
 
 		return $this;
 	}
@@ -222,6 +226,8 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function setCookieVars(array $cookieVars)
 	{
 		$this->vars[WebRequestPart::COOKIE] = $cookieVars;
+		
+		$this->regenerateAllVars();
 
 		return $this;
 	}
@@ -232,6 +238,8 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function setFilesVars(array $filesVars)
 	{
 		$this->vars[WebRequestPart::FILES] = $filesVars;
+		
+		$this->regenerateAllVars();
 
 		return $this;
 	}
