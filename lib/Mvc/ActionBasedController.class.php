@@ -65,7 +65,9 @@ abstract class ActionBasedController extends Controller
 			return $this->trace[$argument->name];
 		}
 		
-		$request = $this->trace->getWebContext()->getWebRequest();
+		$request = $this->trace->getWebContext()->getRequest();
+		
+		$value = null;
 		if (isset($request[$argument->name])) {
 			$value = $this->getActualVariableValue($argument, $request[$argument->name]);
 		}
