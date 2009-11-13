@@ -87,7 +87,7 @@ class PathRewriteRule implements IRewriteRule
 	/**
 	 * @return void
 	 */
-	function compose(HttpUrl $url, array $parameters)
+	function compose(SiteUrl $url, array $parameters)
 	{
 		$pathChunks = array();
 
@@ -160,7 +160,7 @@ class PathRewriteRule implements IRewriteRule
 		reset($pathChunks);
 
 		if (sizeof($this->chunkRewriters) > sizeof($pathChunks)) {
-			throw new RewriteException('wrong path chunk count');
+			throw new RewriteException('wrong path chunk count', $this, $webContext);
 		}
 
 		$parameters = array();
@@ -178,7 +178,11 @@ class PathRewriteRule implements IRewriteRule
 						$chunkRewriter->getValueCount()
 						&& !in_array($pathChunk, $chunkRewriter->getValues())
 				) {
-					throw new RewriteException('path chunks` value should be in set of predefined values');
+					throw new RewriteException(
+						'path chunks` value should be in set of predefined values',
+						$this,
+						$webContext
+					);
 				}
 
 				$parameters[$name] = $pathChunk;

@@ -35,7 +35,7 @@ interface IRewriteRule
 	/**
 	 * @return void
 	 */
-	function compose(HttpUrl $url, array $parameters);
+	function compose(SiteUrl $url, array $parameters);
 }
 
 ?>

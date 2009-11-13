@@ -90,9 +90,9 @@ class RequestVarImportRule implements IRewriteRule
 			}
 			else {
 				throw new RewriteException(
+					"variable {$this->name} is not defined by the request",
 					$this,
-					$webContext,
-					"variable {$this->name} is not defined by the request"
+					$webContext
 				);
 			}
 		}
@@ -108,7 +108,7 @@ class RequestVarImportRule implements IRewriteRule
 	/**
 	 * @return void
 	 */
-	function compose(HttpUrl $url, array $parameters)
+	function compose(SiteUrl $url, array $parameters)
 	{
 		if ($this->requestPart->isNot(WebRequestPart::GET)) {
 			if (isset($parameters[$this->name])) {
