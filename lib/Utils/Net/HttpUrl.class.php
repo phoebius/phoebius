@@ -335,7 +335,7 @@ class HttpUrl
 			}
 		}
 
-		$out[] = $this->encodePath($this->getFullPath());
+		$out[] = $this->encodePath($this->getPath());
 		$out[] = $this->getQueryAsString();
 
 		if ($this->getFragment()) {
