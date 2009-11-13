@@ -166,31 +166,30 @@ class PathRewriteRule implements IRewriteRule
 		$parameters = array();
 
 		foreach ($this->chunkRewriters as $chunkRewriter) {
+			$pathChunk = current($pathChunks);
 
+			if ($chunkRewriter->isLast() && $chunkRewriter->isGreedy()) {
+				$pathChunk = join('/', array_slice($pathChunks, key($pathChunks)));
+			}
+
+			if (
+					$chunkRewriter->getValueCount()
+					&& !in_array($pathChunk, $chunkRewriter->getValues())
+			) {
+				throw new RewriteException(
+					'path chunks` value should be in set of predefined values',
+					$this,
+					$webContext
+				);
+			}
+			
 			if (($name = $chunkRewriter->getName())) {
-				$pathChunk = current($pathChunks);
-
-				if ($chunkRewriter->isLast() && $chunkRewriter->isGreedy()) {
-					$pathChunk = join('/', array_slice($pathChunks, key($pathChunks)));
-				}
-
-				if (
-						$chunkRewriter->getValueCount()
-						&& !in_array($pathChunk, $chunkRewriter->getValues())
-				) {
-					throw new RewriteException(
-						'path chunks` value should be in set of predefined values',
-						$this,
-						$webContext
-					);
-				}
-
 				$parameters[$name] = $pathChunk;
 			}
 
 			next($pathChunks);
 		}
-
+		
 		return $parameters;
 	}
 
