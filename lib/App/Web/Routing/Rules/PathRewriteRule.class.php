@@ -171,7 +171,7 @@ class PathRewriteRule implements IRewriteRule
 				$pathChunk = current($pathChunks);
 
 				if ($chunkRewriter->isLast() && $chunkRewriter->isGreedy()) {
-					$pathChunk = array_slice($pathChunks, key($pathChunks));
+					$pathChunk = join('/', array_slice($pathChunks, key($pathChunks)));
 				}
 
 				if (

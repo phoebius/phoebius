@@ -21,7 +21,13 @@
  */
 class Model extends Collection
 {
-	// nothing here
+	/**
+	 * @return Model
+	 */
+	static function create(array $array = array())
+	{
+		return new self ($array);
+	}
 }
 
 ?>

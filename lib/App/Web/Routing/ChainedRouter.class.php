@@ -116,6 +116,7 @@ class ChainedRouter implements IRouteTable
 		foreach ($this->chain as $route) {
 			try {
 				$trace = $route->trace($this, $webContext);
+				break;
 			}
 			catch (RouteException $e) {
 				//FIXME log failure here

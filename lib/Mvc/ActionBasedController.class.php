@@ -61,17 +61,18 @@ abstract class ActionBasedController extends Controller
 	 */
 	protected function filterArgumentValue(ReflectionParameter $argument)
 	{
-		if (isset($this->trace[$argument->name])) {
-			return $this->trace[$argument->name];
-		}
-		
 		$request = $this->trace->getWebContext()->getRequest();
-		
-		$value = null;
+
 		if (isset($request[$argument->name])) {
 			$value = $this->getActualVariableValue($argument, $request[$argument->name]);
 		}
-		
+		else if (isset($this->trace[$argument->name])) {
+			$value = $this->getActualVariableValue($argument, $this->trace[$argument->name]);
+		}
+		else {
+			$value = null;
+		}
+
 		if (!is_null($value)) {
 			return $value;
 		}
@@ -88,7 +89,7 @@ abstract class ActionBasedController extends Controller
 		}
 		else {
 			throw new TraceException(
-				'nothing to pass to %s argument',
+				sprintf('nothing to pass to %s argument', $argument->name),
 				$this->trace
 			);
 		}
@@ -181,7 +182,7 @@ abstract class ActionBasedController extends Controller
 			);
 		}
 		else {
-			$actionResult = $this->handleUnknownAction($action, $context);
+			$actionResult = $this->handleUnknownAction($action);
 		}
 
 		$this->trace->setHandled();

@@ -89,7 +89,7 @@ class PathChunk
 				$me->values[] = $value;
 			}
 		}
-		else {
+		else if (!$me->name || ($me->name && !empty($unparsedChunk))) {
 			$me->values[] = $unparsedChunk;
 		}
 
