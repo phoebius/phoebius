@@ -187,7 +187,7 @@ class HttpUrl
 	{
 		Assert::isScalar($path);
 
-		$this->path = '/' . trim($path, '/');
+		$this->path = '/' . ltrim($path, '/');
 
 		return $this;
 	}
@@ -279,7 +279,7 @@ class HttpUrl
 	{
 		Assert::isScalar($fragment);
 
-		$this->fragment = rtrim($fragment, '#');
+		$this->fragment = ltrim($fragment, '#');
 
 		return $this;
 	}
