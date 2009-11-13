@@ -17,143 +17,165 @@
  ************************************************************************************************/
 
 /**
- * TODO: add the following helper methods to generate {@link IActionResult}:
- * View – Returns a ViewResult action result.
- * Redirect – Returns a RedirectResult action result.
- * RedirectToAction – Returns a RedirectToRouteResult action result.
- * RedirectToRoute – Returns a RedirectToRouteResult action result.
- * Json – Returns a JsonResult action result.
- * Content – Returns a ContentResult action result.
- * FIXME: reimplement map system, map types withing routing
  * @ingroup Mvc
  */
 abstract class ActionBasedController extends Controller
 {
 	const PARAMETER_ACTION = 'action';
-
+	
 	/**
-	 * @var IControllerContext|null
+	 * @var Trace|null
 	 */
-	private $currentControllerContext = null;
-
-	/**
-	 * @var array
-	 */
-	private $argumentFilters = array();
-
-	/**
-	 * Overridden.
-	 * @return IPhpViewDispatcher
-	 */
-	function getPhpViewDispatcher()
-	{
-		return new SimplePhpViewDispatcher();
-	}
+	private $trace;
 
 	/**
 	 * @throws RouteHandleException
 	 * @return void
 	 */
-	function handle(IControllerContext $context)
+	function handle(Trace $trace)
 	{
-		try {
-			$action = $context->getRouteContext()->getRoute()->getParameter(
-				self::PARAMETER_ACTION,
-				$context->getAppContext()->getRequest()
-			);
+		$this->trace = $trace;
+		
+		if (isset($trace[self::PARAMETER_ACTION])) {
+			$result = $this->processAction($action);
 		}
-		catch (ArgumentException $e) {
-			throw new ParameterMissingException(
-				$context->getRouteContext(),
-				$this->getActionParameterName()
-			);
+		else {
+			$result = $this->handleUnknownAction(null);
 		}
 
-		$this->currentControllerContext = $context;
-
-		$result = $this->processAction($action, $context);
-		$this->processResult($result, $context);
-
-		$this->currentControllerContext = null;
+		$this->processResult($result);
+		
+		$this->trace = null;
 	}
-
-	private $filterArgumentCallbackArgs = array();
+	
+	/**
+	 * @return Trace|null
+	 */
+	protected function getCurrentTrace()
+	{
+		return $this->trace;
+	}
 
 	/**
-	 * Filter for target method (aka action) argument.
-	 *
-	 * Arguments passed to the filter:
-	 *  * argument name
-	 *  * argument type hint (if presented)
-	 *  * argument default value (taken from the method definition)
-	 *  * IControllerContext
-	 *
-	 * Expected filter invokation logic:
-	 *  * mixed value - treated as smth to be passed as an argument
-	 *
-	 * @return ActionBasedController
+	 * @return mixed
 	 */
-	function addArgumentFilter($argumentName, $callbackOrValue, array $argumentToPass = array())
+	protected function filterArgumentValue(ReflectionParameter $argument)
 	{
-		$this->argumentFilters[$argumentName] = $callbackOrValue;
-		$this->filterArgumentCallbackArgs[$argumentName] = $argumentToPass;
-
-		return $this;
+		if (isset($this->trace[$argument->name])) {
+			return $this->trace[$argument->name];
+		}
+		
+		$request = $this->trace->getWebContext()->getWebRequest();
+		if (isset($request[$argument->name])) {
+			$value = $this->getActualVariableValue($argument, $request[$argument->name]);
+		}
+		
+		if (!is_null($value)) {
+			return $value;
+		}
+		
+		// check whether it is optional or have the default value
+		if ($argument->allowsNull()) {
+			return null;
+		}
+		elseif ($argument->isDefaultValueAvailable()) {
+			return $argument->getDefaultValue();
+		}
+		elseif ($argument->isArray()) {
+			return array();
+		}
+		else {
+			throw new TraceException(
+				'nothing to pass to %s argument',
+				$this->trace
+			);
+		}
+	}
+	
+	/**
+	 * @return array|null
+	 */
+	protected function getArrayValue(ReflectionParameter $argument, $value)
+	{
+		if (is_array($value)) {
+			return $value;
+		}
+	}
+	
+	/**
+	 * @return object|null
+	 */
+	protected function getClassValue(ReflectionClass $class, ReflectionParameter $argument, $value)
+	{
+		if (is_object($value)) {
+			if ($class->isSubclassOf($value)) {
+				return $value;
+			}
+		}
+		else if ($class->implementsInterface('IObjectMappable')) {
+			try {
+				return call_user_func_array(
+					array($class->name, 'cast'),
+					array($value)
+				);	
+			}
+			catch (TypeCastException $e){}
+		}
+	}
+	
+	/**
+	 * @return mixed
+	 */
+	protected function getActualVariableValue(ReflectionParameter $argument, $value)
+	{
+		if ($argument->isArray()) {
+			return $this->getArrayValue($argument, $value);
+		}
+		else if (($class = $argument->getClass())) {
+			return $this->getClassValue($class, $argument, $value);
+		}
+		else {
+			return $value;
+		}
 	}
 
-	protected function processResult(IActionResult $actionResult, IControllerContext $context)
+	/**
+	 * @return void
+	 */
+	protected function processResult(IActionResult $actionResult)
 	{
 		$actionResult->handleResult(
 			new ViewContext(
 				$this->getModel(),
-				$context->getRouteContext(),
-				$context->getAppContext()
+				$this->trace
 			)
 		);
 	}
 
 	/**
-	 * @return IControllerContext|null
-	 */
-	function getContext()
-	{
-		return $this->currentControllerContext;
-	}
-
-	/**
-	 * @return IControllerContext|null
-	 */
-	protected function getCurrentControllerContext()
-	{
-		return $this->currentControllerContext;
-	}
-
-	/**
 	 * Overridden
-	 * @throws RouteHandleException
+	 * @throws TraceException
 	 * @return IActionResult
 	 */
-	function handleUnknownAction($action, IControllerContext $context)
+	protected function handleUnknownAction($action)
 	{
-		throw new ParameterTypeException(
-			$context->getRouteContext(),
-			self::PARAMETER_ACTION,
-			$action,
-			'unknown action'
+		throw new TraceException(
+			sprintf('unknown action `%s`', (string) $action),
+			$this->trace
 		);
 	}
 
 	/**
 	 * @return IActionResult
 	 */
-	protected function processAction($action, IControllerContext $context)
+	protected function processAction($action)
 	{
-		$targetActionMethod = $this->getTargetMethodName($action);
+		$actionMethod = $this->getMethodName($action);
 		$reflectedController = new ReflectionObject($this);
 
-		if ($reflectedController->hasMethod($targetActionMethod)) {
-			$actionResult = $this->invokeTargetActionMethod(
-				$reflectedController->getMethod($targetActionMethod),
+		if ($reflectedController->hasMethod($actionMethod)) {
+			$actionResult = $this->invokeActionMethod(
+				$reflectedController->getMethod($actionMethod),
 				$context
 			);
 		}
@@ -161,308 +183,78 @@ abstract class ActionBasedController extends Controller
 			$actionResult = $this->handleUnknownAction($action, $context);
 		}
 
-		$context->getRouteContext()->getRoute()->setHandled();
+		$this->trace->getRoute()->setHandled();
 
-		$actionResult = $this->processActionResult($actionResult);
+		if (
+				!(
+					is_object($actionResult) && $actionResult instanceof IActionResult
+				)
+		) {
+			$actionResult = $this->makeActionResult($actionResult);
+		}
 
 		Assert::isTrue(
 			$actionResult instanceof IActionResult,
-			'target action method can return IActionResult, scalar or array'
+			'action method can return IActionResult or view name'
 		);
 
 		return $actionResult;
 	}
 
 	/**
-	 * Cast the result (of any type) of target method to IActionResult. Now works as a stub ONLY
+	 * Cast the result (of any type) of method to IActionResult. Now works as a stub ONLY
 	 * @return IActionResult
 	 */
-	protected function processActionResult($actionResult)
+	protected function makeActionResult($actionResult)
 	{
-
-//		if (empty($actionResult))
-//		{
-//			$actionResult = $this->view($action);
-//		}
-//
-//		if (is_array($actionResult))
-//		{
-//			$actionResult = $this->view($action, $actionResult);
-//		}
-//
-//		if (is_scalar($actionResult))
-//		{
-//			$actionResult = ContentResult::create()->setContent($actionResult);
-//		}
-
 		if (is_object($actionResult) && $actionResult instanceof IActionResult) {
 			return $actionResult;
 		}
 
 		if (is_string($actionResult)) {
-			return new ViewResult(UIViewPresentation::view($actionResult, $this->getModel()));
+			return $this->view($actionResult);
 		}
+		
+		Assert::isUnreachable(
+			'unknown actionResult %s: %s',
+			get_type($actionResult),
+			$actionResult
+		);
 	}
-
+	
+	/**
+	 * @return ViewResult
+	 */
+	protected function view($viewName)
+	{
+		return new ViewResult(
+			UIVIewPresentation::view($viewName, $this->getModel())
+		);
+	}
+	
 	/**
 	 * Overridden
 	 * @return string
 	 */
-	protected function getTargetMethodName($action)
+	protected function getMethodName($action)
 	{
 		return 'action_' . ($action);
 	}
 
 	/**
-	 * @return IActionResult
+	 * @return mixed
 	 */
-	private function invokeTargetActionMethod(
-			ReflectionMethod $method,
-			IControllerContext $context
-		)
+	private function invokeActionMethod(ReflectionMethod $method)
 	{
-		$methodParameters = $method->getParameters();
 		$argumentsToPass = array();
 
-		if (!empty($methodParameters)) {
-			$argumentsToPass = $this->getTargetMethodArguments($methodParameters, $context);
+		foreach ($method->getParameters() as $parameter) {
+			$argumentsToPass[$parameter->name] = $this->filterArgumentValue($parameter);
 		}
+		
+		$actionMethodResult = $method->invokeArgs($this, $argumentsToPass);
 
-		$targetActionMethodResult = $method->invokeArgs($this, $argumentsToPass);
-
-		return $targetActionMethodResult;
-	}
-
-	/**
-	 * FIXME: cut out mapping functionality to a separate rewriting classes
-	 * @return array
-	 */
-	private function getTargetMethodArguments(array $parameters, IControllerContext $context)
-	{
-		$arguments = array();
-		foreach ($parameters as $parameter) {
-			$argument = null;
-			$name = $parameter->getName();
-
-			Assert::isFalse(
-				$parameter->isPassedByReference(),
-				'%s argument cannot be passed by reference',
-				$name
-			);
-
-			if (isset($this->argumentFilters[$name])) {
-				$filter = $this->argumentFilters[$name];
-
-				if (is_callable($filter)) {
-					$argsToPass = array_merge(
-						array (
-							$name,
-							(!is_null($class = $parameter->getClass()))
-								? $class->getName()
-								: null,
-							$parameter->isDefaultValueAvailable()
-								? $parameter->getDefaultValue()
-								: null,
-							$context
-						),
-						$this->filterArgumentCallbackArgs[$name]
-					);
-
-					$argument = call_user_func_array($filter, $argsToPass);
-				}
-				else {
-					$argument = $filter;
-				}
-			}
-			else {
-				try {
-					$argument = $context->getRouteContext()->getRoute()->getParameter(
-						$parameter->getName(),
-						$context->getAppContext()->getRequest()
-					);
-
-					if ($parameter->isArray()) {
-						if (!is_array($argument)) {
-							if ($parameter->allowsNull() && !is_null($argument)) {
-								throw new ParameterTypeException(
-									$context->getRouteContext(),
-									$parameter->getName(),
-									$argument,
-									'array expected as defined in target action method'
-								);
-							}
-						}
-					}
-					else if (!is_null($class = $parameter->getClass())) {
-
-						if (
-								!( // isInstance accepts only objects (stdclass)
-									   is_object($argument)
-									&& $class->isInstance($argument)
-								)
-						) {
-							if ($class->implementsInterface('IObjectMappable')) {
-								try {
-									$argument = call_user_func_array(
-										array($class->getName(), 'cast'),
-										array($argument)
-									);
-								}
-								catch (TypeCastException $e) {
-									throw new MvcActionHandleException(
-										$context,
-										$name,
-										$argument,
-										'cannot cast value to ' . $class->getName()
-									);
-								}
-							}
-							else if ($class->implementsInterface('IOrmRelated') && !!$argument) {
-
-								$ormClass = call_user_func(array($class->getName(), 'orm'));
-								$rawValueSet = array();
-
-								if (is_array($argument)) {
-									$rawValueSet = array();
-
-									foreach ($ormClass->getLogicalSchema()->getProperties() as $propertyName => $property) {
-										foreach ($property->getDBFields() as $columnName) {
-											if (array_key_exists($columnName, $argument)) {
-												$rawValueSet[$propertyName][] = $argument[$columnName];
-											}
-											else {
-												unset ($rawValueSet[$propertyName]);
-												continue(2);
-											}
-										}
-									}
-								}
-								else if ($class->implementsInterface('IDaoRelated')) {
-									$argument = $ormClass->getDao()->getById($argument);
-									$arguments[] = $argument;
-									continue;
-								}
-
-								if ($class->implementsInterface('IDaoRelated')) {
-									$dao = call_user_func(array($class->getName(), 'dao'));
-
-									$idProperty = $ormClass->getLogicalSchema()->getIdentifier();
-
-									if (
-											isset($rawValueSet[$idProperty->getName()])
-									) {
-										$id = $idProperty->getType()->makeValue(
-											$rawValueSet[$idProperty->getName()],
-											FetchStrategy::cascade()
-										);
-									}
-
-									if (isset($id) && $id) {
-										try {
-											$argument = $dao->getLazyById($id);
-											$argument->fetch();
-										}
-										catch (OrmEntityNotFoundException $e) {
-											// fuck
-											if (sizeof($rawValueSet) == 1) {
-												throw new MvcActionHandleException(
-													$context,
-													$parameter->getName(),
-													$argument,
-													'accessing non-existent entity'
-												);
-											}
-										}
-									}
-									else {
-										$argument = $ormClass->getLogicalSchema()->getNewEntity();
-									}
-
-								}
-								else {
-									$argument = $ormClass->getLogicalSchema()->getNewEntity();
-								}
-
-								try {
-									$ormClass->getMap()
-										->setRawValues(
-											$argument,
-											$rawValueSet,
-											FetchStrategy::cascade()
-										);
-								}
-								catch (Exception $e) {
-									throw new MvcActionHandleException(
-										$context,
-										$parameter->getName(),
-										$argument,
-										'cannot cast to ' . $class->getName(). ' due to  ' . $e->getMessage()
-									);
-								}
-							}
-							else if ($parameter->allowsNull() && !is_null($argument)) {
-								throw new MvcActionHandleException(
-									$context,
-									$parameter->getName(),
-									$argument,
-									'instance of ' . $class->getName() . ' expected as defined in target action method'
-								);
-							}
-						}
-					}
-				}
-				catch (ArgumentException $e) {
-					do {
-						if ($this->isOptionalParameter($parameter)) {
-							$argument = $parameter->isDefaultValueAvailable()
-								? $parameter->getDefaultValue()
-								: null;
-
-							break;
-						}
-
-						if (($class = $parameter->getClass())) {
-							if ($class->getName() == 'Route') {
-								$argument = $context->getRouteContext()->getRoute();
-								break;
-							}
-
-							if ($class->getName() == 'IControllerContext') {
-								$argument = $context;
-								break;
-							}
-						}
-
-						throw new ParameterMissingException(
-							$context->getRouteContext(),
-							$parameter->getName()
-						);
-
-					} while (0);
-				}
-			}
-
-			$arguments[] = $argument;
-		}
-
-		return $arguments;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	private function isOptionalParameter(ReflectionParameter $parameter)
-	{
-		return (
-			   $parameter->isOptional()
-			|| (
-				   $parameter->allowsNull()
-				&& (
-					   $parameter->isArray()
-					|| !is_null($parameter->getClass())
-				)
-			)
-		);
+		return $actionMethodResult;
 	}
 }
 
