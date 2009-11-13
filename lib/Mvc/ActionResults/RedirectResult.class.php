@@ -37,7 +37,7 @@ class RedirectResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getAppContext()->getResponse()->redirect($context->getAppContext()->getRequest(), $this->url);
+		$context->getResponse()->redirect($this->url);
 	}
 }
 

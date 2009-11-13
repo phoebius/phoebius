@@ -46,7 +46,7 @@ class ContentResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getAppContext()->getResponse()
+		$context->getResponse()
 			->write($this->content)
 			->finish();
 	}

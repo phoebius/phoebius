@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * TODO: export Content-Disposition logic (i.e. type: inline/attachment, filename, content-type, creation/modification time into a separate class)
+ * TODO: export Content-Disposition logic (i.e. type: inline/attachment, filename, content-type,
+ * creation/modification time into a separate class)
  * @ingroup Mvc_ActionResults
  */
 class FileResult implements IActionResult
@@ -89,7 +90,7 @@ class FileResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$response = $context->getAppContext()->getResponse();
+		$response = $context->getResponse();
 
 		if ($this->contentType) {
 			$response->addHeader('Content-type', $this->contentType);

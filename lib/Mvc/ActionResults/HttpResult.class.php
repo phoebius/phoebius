@@ -41,7 +41,8 @@ class HttpResult implements IActionResult
 	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getAppContext()->getResponse()->addHeaders($this->headers);
+		$context->getResponse()->addHeaders($this->headers);
+		
 		$this->childResult->handleResult($context);
 	}
 

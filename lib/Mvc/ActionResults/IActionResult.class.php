@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Mvc
+ * @ingroup Mvc_ActionResults
  */
 interface IActionResult
 {

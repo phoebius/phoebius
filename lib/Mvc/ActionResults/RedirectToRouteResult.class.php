@@ -22,20 +22,18 @@
  */
 class RedirectToRouteResult extends RedirectResult
 {
-	function __construct($ruleName, IControllerContext $controllerContext, array $parameters = array())
+	function __construct($routeName, array $parameters = array(), Trace $trace)
 	{
-		Assert::isScalar($ruleName);
-
-		$rrc = $controllerContext->getRouteContext()->getRewriteRuleContext();
-		$rule = $rrc->getRoutingPolicy()->getRule($ruleName);
-		$route = new Route;
-
-		$request = $rule->compose(
-			$route->setParameters($parameters),
-			$rrc->getRequest()->getCleanCopy()
-		);
-
-		parent::__construct($request->getHttpUrl());
+		Assert::isScalar($routeName);
+		
+		$url = $trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
+		
+		$trace
+			->getRouteTable()
+			->getRoute($routeName)
+			->compose($url, $parameters);
+		
+		parent::__construct($url);
 	}
 }
 
