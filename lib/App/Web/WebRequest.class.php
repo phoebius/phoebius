@@ -17,10 +17,9 @@
  ************************************************************************************************/
 
 /**
- * FIXME implement ArrayAccess for request variables (GPC resolution order)
  * @ingroup App_Web
  */
-class WebRequest extends AppRequest implements ArrayAccess
+final class WebRequest extends AppRequest implements ArrayAccess
 {
 	private $vars = array(
 		WebRequestPart::GET => array(),
@@ -41,21 +40,28 @@ class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	private $dictionary = array();
 
-	/**
-	 * @return WebRequest
-	 */
-	static function create(WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/')
-	{
-		return new self ($dictonary, $baseHost, $baseUri);
-	}
-
-	function __construct(WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/')
+	function __construct(
+				WebRequestDictionary $dictonary, $baseHost = null, $baseUri = '/',
+				array $getVars,
+				array $postVars,
+				array $cookieVars,
+				array $filesVars
+		)
 	{
 		Assert::isScalar($baseUri);
 
 		$this->dictionary = $dictonary->getFields();
 
 		$this->httpUrl = HttpUrl::import($dictonary, $baseHost, $baseUri);
+		
+		$this->allVars = array(
+			WebRequestPart::GET => $getVars,
+			WebRequestPart::POST => $postVars,
+			WebRequestPart::COOKIE => $cookieVars,
+			WebRequestPart::FILES => $filesVars,	
+		);
+		
+		$this->regenerateAllVars();
 	}
 
 	function __clone()
@@ -70,28 +76,6 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function getRequestMethod()
 	{
 		return new RequestMethod($this->dictionary[WebRequestDictionary::REQUEST_METHOD]);
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setRequestMethod(RequestMethod $method)
-	{
-		$this->dictionary[WebRequestDictionary::REQUEST_METHOD] = $method->getValue();
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setProtocol($protocol)
-	{
-		Assert::isScalar($protocol);
-
-		$this->dictionary[WebRequestDictionary::PROTOCOL] = $protocol;
-
-		return $this;
 	}
 
 	/**
@@ -121,39 +105,6 @@ class WebRequest extends AppRequest implements ArrayAccess
 	function isSecured()
 	{
 		return !!$this->dictionary[WebRequestDictionary::HTTPS];
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setHttps($flag)
-	{
-		Assert::isBoolean($flag);
-
-		$this->dictionary[WebRequestDictionary::HTTPS] = $flag;
-		$this->httpUrl->setScheme($flag ? 'https' : 'http');
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setSecured()
-	{
-		$this->setHttps(true);
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setNotSecured()
-	{
-		$this->setHttps(false);
-
-		return $this;
 	}
 
 	/**
@@ -195,61 +146,13 @@ class WebRequest extends AppRequest implements ArrayAccess
 	{
 		return $this->filesVars;
 	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setGetVars(array $getVars)
-	{
-		$this->vars[WebRequestPart::GET] = $getVars;
-		
-		$this->regenerateAllVars();
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setPostVars(array $postVars)
-	{
-		$this->vars[WebRequestPart::POST] = $postVars;
-		
-		$this->regenerateAllVars();
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setCookieVars(array $cookieVars)
-	{
-		$this->vars[WebRequestPart::COOKIE] = $cookieVars;
-		
-		$this->regenerateAllVars();
-
-		return $this;
-	}
-
-	/**
-	 * @return WebRequest an object itself
-	 */
-	function setFilesVars(array $filesVars)
-	{
-		$this->vars[WebRequestPart::FILES] = $filesVars;
-		
-		$this->regenerateAllVars();
-
-		return $this;
-	}
 	
 	/**
 	 * @return boolean
 	 */
 	function hasVar($variableName, WebRequestPart $part = null)
 	{
-		return array_key_exists(
+		return isset(
 			$variableName,
 			$part
 				? $this->vars[$part->getValue()]
@@ -271,7 +174,7 @@ class WebRequest extends AppRequest implements ArrayAccess
 			return $vars[$variableName];
 		}
 		
-		return null;
+		throw new ArgumentException('variableName', 'argument is not defined');
 	}
 	
 	/**
@@ -279,7 +182,7 @@ class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function offsetExists($offset)
 	{
-		return array_key_exists($this->allVars[$offset]);
+		return isset($this->allVars[$offset]);
 	}
 	
 	/**
@@ -295,7 +198,7 @@ class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function offsetSet($offset, $value)
 	{
-		Assert::isUnreachable();
+		Assert::isUnreachable('request arguments are read-only');
 	}
 	
 	/**
@@ -303,7 +206,7 @@ class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function offsetUnset($offset)
 	{
-		Assert::isUnreachable();
+		Assert::isUnreachable('request arguments are read-only');
 	}
 
 	/**
