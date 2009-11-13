@@ -170,6 +170,13 @@ class PathRewriteRule implements IRewriteRule
 
 			if ($chunkRewriter->isLast() && $chunkRewriter->isGreedy()) {
 				$pathChunk = join('/', array_slice($pathChunks, key($pathChunks)));
+				if (empty($pathChunk)) {
+					throw new RewriteException(
+						'greedy chunks does not capture empty values',
+						$this,
+						$webContext
+					);
+				}
 			}
 
 			if (
