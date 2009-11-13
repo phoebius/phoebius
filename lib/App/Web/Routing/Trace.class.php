@@ -121,7 +121,7 @@ final class Trace extends Collection
 	/**
 	 * @return Trace
 	 */
-	function spawn()
+	function spawnNested()
 	{
 		$clone = clone $this;
 		$clone->parentTrace = $this;
