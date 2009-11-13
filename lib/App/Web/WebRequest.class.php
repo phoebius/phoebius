@@ -55,7 +55,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 
 		$this->httpUrl = SiteUrl::import($dictonary, $baseHost, $baseUri);
 		
-		$this->allVars = array(
+		$this->vars = array(
 			WebRequestPart::GET => $getVars,
 			WebRequestPart::POST => $postVars,
 			WebRequestPart::COOKIE => $cookieVars,
