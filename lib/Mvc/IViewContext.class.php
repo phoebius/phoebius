@@ -30,6 +30,11 @@ interface IViewContext
 	 * @return Trace
 	 */
 	function getTrace();
+	
+	/**
+	 * @return IWebResponse
+	 */
+	function getResponse();
 }
 
 ?>

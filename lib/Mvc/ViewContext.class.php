@@ -55,6 +55,14 @@ class ViewContext implements IViewContext
 	{
 		return $this->trace;
 	}
+	
+	/**
+	 * @return IWebResponse
+	 */
+	function getResponse()
+	{
+		return $this->trace->getWebContext()->getResponse();
+	}
 }
 
 ?>
