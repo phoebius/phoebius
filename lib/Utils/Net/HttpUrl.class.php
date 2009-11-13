@@ -291,6 +291,11 @@ class HttpUrl
 	{
 		return $this->getPath() . $this->getQueryAsString();
 	}
+	
+	function __toString()
+	{
+		return $this->toString();
+	}
 
 	function toString()
 	{
