@@ -235,6 +235,14 @@ abstract class ActionBasedController extends Controller
 	}
 	
 	/**
+	 * @return RedirectToRouteResult
+	 */
+	protected function redirect($routeName, array $parameters = array())
+	{
+		return new RedirectToRouteResult($routeName, $parameters, $this->trace);
+	}
+	
+	/**
 	 * Overridden
 	 * @return string
 	 */
