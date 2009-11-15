@@ -104,11 +104,16 @@ class SiteUrl extends HttpUrl
 	/**
 	 * @return SiteUrl
 	 */
-	function setSubdomain($subdomain)
+	function setSubdomain($subdomain = null)
 	{
-		Assert::isScalar($subdomain);
-
-		$this->setHost($subdomain . '.' . $this->baseHost);
+		Assert::isScalarOrNull($subdomain);
+		
+		$host =
+			$subdomain
+				? $subdomain . '.' . $this->baseHost
+				: $this->baseHost;
+				
+		$this->setHost($host);
 
 		return $this;
 	}
