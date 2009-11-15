@@ -146,6 +146,24 @@ final class Trace extends Collection
 		
 		return $this->get($parameter);
 	}
+	
+	
+	/**
+	 * @return HttpUrl
+	 */
+	function getUrl($routeName, array $parameters = array())
+	{
+		Assert::isScalar($routeName);
+		
+		$url = $this->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
+		
+		$this
+			->getRouteTable()
+			->getRoute($routeName)
+			->compose($url, $parameters);
+		
+		return $url;
+	}
 }
 
 ?>
