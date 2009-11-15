@@ -127,7 +127,7 @@ class UIViewPresentation
 	/**
 	 * @return string
 	 */
-	function getLink($routeName, array $parameters = array())
+	function getHref($routeName, array $parameters = array())
 	{
 		Assert::isNotEmpty($this->trace, 'trace is not set');
 		
@@ -142,7 +142,7 @@ class UIViewPresentation
 	/**
 	 * @return string
 	 */
-	function getHref($href, $routeName, array $parameters = array())
+	function getHtmlLink($href, $routeName, array $parameters = array())
 	{
 		return
 			'<a href="'
@@ -155,7 +155,7 @@ class UIViewPresentation
 	/**
 	 * @return string
 	 */
-	function getSelfLink()
+	function getSelfHref()
 	{
 		Assert::isNotEmpty($this->trace, 'trace is not set');
 		
