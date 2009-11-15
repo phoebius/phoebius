@@ -110,7 +110,7 @@ class RequestVarImportRule implements IRewriteRule
 	 */
 	function compose(SiteUrl $url, array $parameters)
 	{
-		if ($this->requestPart->isNot(WebRequestPart::GET)) {
+		if ($this->requestPart->is(WebRequestPart::GET)) {
 			if (isset($parameters[$this->name])) {
 				$url->addQueryArgument($this->name, $parameters[$this->name]);
 			}
