@@ -229,9 +229,11 @@ abstract class ActionBasedController extends Controller
 	 */
 	protected function view($viewName)
 	{
-		return new ViewResult(
-			UIViewPresentation::view($viewName, $this->getModel())
-		);
+		$presentation = new UIViewPresentation($viewName);
+		$presentation->setModel($this->getModel());
+		$presentation->setTrace($this->trace);
+		
+		return new ViewResult(new UIPage($presentation));
 	}
 	
 	/**

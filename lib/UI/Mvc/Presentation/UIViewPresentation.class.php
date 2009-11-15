@@ -35,6 +35,11 @@ class UIViewPresentation
 	 * @var Model|null
 	 */
 	protected $model;
+	
+	/**
+	 * @var Trace|null
+	 */
+	protected $trace;
 
 	/**
 	 * @var array of IOutput
@@ -47,24 +52,6 @@ class UIViewPresentation
 	private $output;
 
 	private $viewName;
-
-	/**
-	 * @return UIPage
-	 */
-	static function view($view, Model $model = null)
-	{
-		$presentation = new self ($view);
-
-		$page = $presentation->getPage();
-
-		$presentation->control = $page;
-		$presentation->model =
-			$model
-				? $model
-				: new Model;
-
-		return $page;
-	}
 
 	function __construct($viewName)
 	{
@@ -136,6 +123,44 @@ class UIViewPresentation
 
 		Assert::isUnreachable('unknown method %s', $name);
 	}
+	
+	/**
+	 * @return string
+	 */
+	function getLink($routeName, array $parameters = array())
+	{
+		Assert::isNotEmpty($this->trace, 'trace is not set');
+		
+		$url = $this->trace->getUrl($routeName, $parameters);
+		
+		// TODO: check whether formed url has the same schema, host and port as the requested
+		// and strip those unused chunks leaving the URI only
+		
+		return (string) $url;
+	}
+	
+	/**
+	 * @return string
+	 */
+	function getHref($href, $routeName, array $parameters = array())
+	{
+		return
+			'<a href="'
+			. $this->getLink($routeName, $parameters)
+			. '">'
+			. $href
+			. '</a>';
+	}
+	
+	/**
+	 * @return string
+	 */
+	function getSelfLink()
+	{
+		Assert::isNotEmpty($this->trace, 'trace is not set');
+		
+		return $this->trace->getWebContext()->getRequest()->getHttpUrl()->getUri();
+	}
 
 	/**
 	 * @return object
@@ -152,12 +177,43 @@ class UIViewPresentation
 			return $found;
 		}
 	}
-
+	
+	/**
+	 * @return Model|null
+	 */
 	function getModel()
 	{
 		return $this->model;
 	}
-
+	
+	/**
+	 * @return Trace|null
+	 */
+	function getTrace()
+	{
+		return $this->trace;
+	}
+	
+	/**
+	 * @return UIViewPresentation
+	 */
+	function setModel(Model $model)
+	{
+		$this->model = $model;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return UIViewPresentation
+	 */
+	function setTrace(Trace $trace)
+	{
+		$this->trace = $trace;
+		
+		return $this;
+	}
+	
 	/**
 	 * @var string ...
 	 */
@@ -311,6 +367,8 @@ class UIViewPresentation
 	private function spawn($view, Model $model = null)
 	{
 		$presentation = new self ($view);
+		
+		$presentation->trace = $this->trace;
 		$presentation->model =
 			$model
 				? $model

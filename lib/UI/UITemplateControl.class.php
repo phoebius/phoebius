@@ -29,6 +29,10 @@ abstract class UITemplateControl extends UIControl
 	function __construct(UIPresentation $presentation)
 	{
 		$this->presentation = $presentation;
+		
+		if ($presentation instanceof IUIControlBindedPresentation) {
+			$presentation->setUIControl($this);
+		}
 	}
 
 	/**
