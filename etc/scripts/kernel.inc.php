@@ -16,6 +16,8 @@
  *
  ************************************************************************************************/
 
+define('PHOEBIUS_VERSION', '1.0.0');
+
 $initializeRootDirectory = str_replace(array('/','\\'), DIRECTORY_SEPARATOR, dirname(__FILE__));
 $initializeRootDirectory = explode(DIRECTORY_SEPARATOR, $initializeRootDirectory);
 array_pop($initializeRootDirectory);
@@ -31,6 +33,9 @@ define('PHOEBIUS_BASE_ROOT', $baseRootDirectory);
  * Defines the state when framework core is initialized
  */
 define('PHOEBIUS_INITIALIZED', true);
+
+define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v.'.PHOEBIUS_VERSION);
+define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v.'.PHOEBIUS_VERSION);
 
 if (!defined('APP_AREA')) {
 	/**
