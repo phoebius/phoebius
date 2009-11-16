@@ -19,7 +19,7 @@
 /**
  * @ingroup App_Web_Routing
  */
-class ChainedRouter implements IRouteTable
+class ChainedRouter implements IRouteTable, IRouter
 {
 	/**
 	 * @var array of name => {@link Route}
