@@ -19,38 +19,23 @@
 /**
  * @ingroup App_Web
  */
-interface IWebResponse extends IAppResponse
+class HttpStatus extends Enumeration
 {
+	const STATUS_404 = 404;
+	const STATUS_500 = 500;
+	
+	private static $statusMessages = array(
+		self::STATUS_404 => 'Not Found',
+		self::STATUS_500 => 'Internal Server Error',		
+	);
+	
 	/**
-	 * @return boolean
+	 * @return string
 	 */
-	function isHeadersSent();
-
-	/**
-	 * @return array
-	 */
-	function getHeaders();
-
-	/**
-	 * @return IWebResponse
-	 */
-	function addHeader($header, $value);
-
-	/**
-	 * @return IWebResponse
-	 */
-	function addHeaders(array $headers);
-
-	/**
-	 * Not implemented
-	 * @return IWebResponse
-	 */
-	function setStatus(HttpStatus $status);
-
-	/**
-	 * @return void
-	 */
-	function redirect(HttpUrl $url);
+	function getStatusMessage()
+	{
+		return self::$statusMessages[$this->getValue()];
+	}
 }
 
 ?>

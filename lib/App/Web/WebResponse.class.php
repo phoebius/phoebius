@@ -21,25 +21,15 @@
  */
 class WebResponse implements IWebResponse
 {
-	
 	/**
 	 * @var WebRequest
 	 */
 	private $request;
 	private $bufferOpened = false;
 	private $isFinished = false;
-	private $useGzip = false;
 
-	function __construct($useGzip = false, WebRequest $request = null)
+	function __construct(WebRequest $request = null)
 	{
-		Assert::isBoolean($useGzip);
-
-		$this->useGzip = $useGzip;
-
-		if ($this->useGzip) {
-			$this->openBuffer();
-		}
-		
 		$this->request = $request;
 	}
 
@@ -131,11 +121,11 @@ class WebResponse implements IWebResponse
 	/**
 	 * @return IAppResponse
 	 */
-	function openBuffer()
+	function openBuffer($useGzip)
 	{
 		Assert::isFalse($this->bufferOpened, 'already opened');
 
-		if ($this->useGzip) {
+		if ($useGzip) {
 			ob_start('ob_gzhandler', 5);
 		}
 		else {
@@ -217,7 +207,7 @@ class WebResponse implements IWebResponse
 			$protocol = $this->request->getProtocol();
 		}
 
-		if ($protocol && $protocol == 'HTTP/1.1') {
+		if (isset($protocol) && $protocol == 'HTTP/1.1') {
 			$status = 303;
 			header('HTTP/1.1 303 See Other', true);
 		}
@@ -231,7 +221,19 @@ class WebResponse implements IWebResponse
 
 		$this->finish();
 	}
-
+	
+	/**
+	 * @return IWebResponse
+	 */
+	function setStatus(HttpStatus $status)
+	{
+		$protocol =
+			$this->request
+			? $this->request->getProtocol()
+			: 'HTTP/1.0';
+		
+		header($protocol . ' ' . $status->getValue() . ' ' . $status->getStatusMessage(), true);
+	}
 }
 
 ?>
