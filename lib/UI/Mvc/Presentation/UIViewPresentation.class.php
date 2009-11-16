@@ -40,6 +40,11 @@ class UIViewPresentation
 	 * @var Trace|null
 	 */
 	protected $trace;
+	
+	/**
+	 * @var IRouteTable|null
+	 */
+	protected $routeTable;
 
 	/**
 	 * @var array of IOutput
@@ -129,12 +134,25 @@ class UIViewPresentation
 	 */
 	function getHref($routeName, array $parameters = array())
 	{
-		Assert::isNotEmpty($this->trace, 'trace is not set');
+		Assert::isNotEmpty($this->routeTable, 'routeTable is not set');
 		
-		$url = $this->trace->getUrl($routeName, $parameters);
+		// TODO: Trace can be not set when used in MVCless environments => force setting
+		// the base SiteUrl explicitly like Trace and IRouteTable are set
 		
-		// TODO: check whether formed url has the same schema, host and port as the requested
-		// and strip those unused chunks leaving the URI only
+		if ($this->trace) {
+			$url = $this->trace->getUrl($routeName, $parameters);
+		}
+		else {
+			$url = new SiteUrl;
+		
+			$this
+				->routeTable
+				->getRoute($routeName)
+				->compose($url, $parameters);
+
+			// TODO: check whether formed url has the same schema, host and port as the requested
+			// and strip those unused chunks leaving the URI only
+		}
 		
 		return (string) $url;
 	}
@@ -195,6 +213,14 @@ class UIViewPresentation
 	}
 	
 	/**
+	 * @return IRouteTable|null
+	 */
+	function getRouteTable()
+	{
+		return $this->routeTable;
+	}
+	
+	/**
 	 * @return UIViewPresentation
 	 */
 	function setModel(Model $model)
@@ -210,6 +236,20 @@ class UIViewPresentation
 	function setTrace(Trace $trace)
 	{
 		$this->trace = $trace;
+		
+		if (!$this->routeTable) {
+			$this->routeTable = $trace->getRouteTable();
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * @return UIViewPresentation
+	 */
+	function setRouteTable(IRouteTable $routeTable)
+	{
+		$this->routeTable = $routeTable;
 		
 		return $this;
 	}
