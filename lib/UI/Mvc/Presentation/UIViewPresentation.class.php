@@ -134,7 +134,6 @@ class UIViewPresentation
 	 */
 	function getHref($routeName, array $parameters = array())
 	{
-		Assert::isNotEmpty($this->routeTable, 'routeTable is not set');
 		
 		// TODO: Trace can be not set when used in MVCless environments => force setting
 		// the base SiteUrl explicitly like Trace and IRouteTable are set
@@ -143,6 +142,8 @@ class UIViewPresentation
 			$url = $this->trace->getUrl($routeName, $parameters);
 		}
 		else {
+			Assert::isNotEmpty($this->routeTable, 'routeTable is not set');
+			
 			$url = new SiteUrl;
 		
 			$this
@@ -163,8 +164,8 @@ class UIViewPresentation
 	function getHtmlLink($href, $routeName, array $parameters = array())
 	{
 		return
-			'<a href="'
-			. $this->getLink($routeName, $parameters)
+		'<a href="'
+			. $this->getHref($routeName, $parameters)
 			. '">'
 			. $href
 			. '</a>';
@@ -409,6 +410,7 @@ class UIViewPresentation
 		$presentation = new self ($view);
 		
 		$presentation->trace = $this->trace;
+		$this->routeTable = $this->routeTable;
 		$presentation->model =
 			$model
 				? $model
