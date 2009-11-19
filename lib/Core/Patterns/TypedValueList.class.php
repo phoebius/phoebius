@@ -17,38 +17,56 @@
  ************************************************************************************************/
 
 /**
+ * Type-safe collection
+ *
  * @ingroup Core_Patterns
  */
 abstract class TypedValueList extends ValueList
 {
-	/**
-	 * Determines whether the specified value is of valid type supported by the list implementation
-	 * @return boolean
-	 */
-	abstract protected function isValueOfValidType($value);
+	private $type;
 
 	/**
-	 * @return ValueList
+	 * @param $type name of a type
+	 * @param $array initial values to be imported to the value list
 	 */
-	function append($value)
+	function __construct($type, array $array = array())
 	{
-		if (!$this->isValueOfValidType($value)) {
-			throw new ArgumentException('value', 'not of expected type');
-		}
+		$this->type =
+			is_object($type)
+				? get_class($type)
+				: $type;
 
-		return parent::append($value);
+		parent::__construct($array);
 	}
 
-	/**
-	 * @return ValueList
-	 */
-	function prepend($value)
+	function appendValue($value)
 	{
-		if (!$this->isValueOfValidType($value)) {
-			throw new ArgumentException('value', 'not of expected type');
-		}
+		Assert::isTrue(
+			($value instanceof $this->type),
+			'wrong type passed to %s, expected %s but %s found',
+			get_class($this),
+			$this->type,
+			gettype($value)
+		);
 
-		return parent::prepend($value);
+		parent::appendValue($value);
+
+		return $this;
+	}
+
+	function prependValue($value)
+	{
+		Assert::isTrue(
+			($value instanceof $this->type),
+			'wrong type passed to %s, expected %s but %s found',
+			get_class($this),
+			$this->type,
+			gettype($value)
+		);
+
+		parent::prependValue($value);
+
+		return $this;
 	}
 }
 

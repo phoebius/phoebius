@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Represents a unary prefix expression
+ * Represents a unary prefix expression.
+ *
  * @ingroup Core_Expression
  */
 class PrefixUnaryExpression implements IExpression
@@ -32,6 +33,10 @@ class PrefixUnaryExpression implements IExpression
 	 */
 	private $logic;
 
+	/**
+	 * @param PrefixUnaryLogicalOperator
+	 * @param mixed
+	 */
 	function __construct(PrefixUnaryLogicalOperator $logic, $subject)
 	{
 		$this->logic = $logic;
@@ -54,9 +59,6 @@ class PrefixUnaryExpression implements IExpression
 		return $this->logic;
 	}
 
-	/**
-	 * @return PrefixUnaryExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		return new self(
@@ -65,20 +67,9 @@ class PrefixUnaryExpression implements IExpression
 		);
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new PrefixUnaryDalExpression($this);
-	}
-
-	/**
-	 * @return ExpressionType
-	 */
-	function getExpressionType()
-	{
-		return new ExpressionType(ExpressionType::PREFIX_UNARY);
 	}
 }
 

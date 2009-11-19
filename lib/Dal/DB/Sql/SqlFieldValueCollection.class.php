@@ -17,33 +17,18 @@
  ************************************************************************************************/
 
 /**
- * Represetns a field=>value collection. Field is a name of the column without specifying
+ * Represetns a key=>value collection if SqlValue. Field is a name of the column without specifying
  * its belonging to a table
  * @ingroup Dal_DB_Sql
  */
 class SqlFieldValueCollection extends TypedCollection implements ISqlCastable
 {
 	/**
-	 * Adds a field=>value pair to the collection
-	 * @throws ArgumentException if the value with the specified field is already added to
-	 * 	the collection
-	 * @return SqlFieldValueCollection an object itself
+	 * @param array set of value to be appened to collection
 	 */
-	function add($field, SqlValue $value)
+	function __construct(array $array = array())
 	{
-		$this->addPair($field, $value);
-
-		return $this;
-	}
-
-	/**
-	 * Returns the value for the field name specified
-	 * @throws ArgumentException if the field is not defined in the collection an thus value not found
-	 * @return SqlValue
-	 */
-	function getValue($field)
-	{
-		return parent::getValue($field);
+		parent::__construct('SqlValue', $array);
 	}
 
 	/**
@@ -62,16 +47,6 @@ class SqlFieldValueCollection extends TypedCollection implements ISqlCastable
 
 		$compiledCollection = join(', ', $fieldValueCompiledPairs);
 		return $compiledCollection;
-	}
-
-	/**
-	 * Determines whether the specified value is of valid type supported by the collection
-	 * implementation
-	 * @return boolean
-	 */
-	protected function isValueOfValidType($value)
-	{
-		return ($value instanceof SqlValue);
 	}
 }
 

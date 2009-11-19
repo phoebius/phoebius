@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents a so-called static class, that functions like a method container grouped by
- * namespace. By design, static classes cannot have instances. They contain only static
- * helper methods. Refer MSDN to see what static classes are
+ * Represents a so-called static class, that functions like a method container.
+ *
+ * By design, static classes cannot have instances. They contain only static
+ * helper methods.
+ *
  * @ingroup Core_Patterns
  */
 abstract class StaticClass

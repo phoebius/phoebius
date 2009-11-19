@@ -17,61 +17,41 @@
  ************************************************************************************************/
 
 /**
- * Represents a C#-like type. Type is a class or an interface defiend in PHP scope
- * @ingroup Core_Patterns
+ * Represents a query result resource.
+ *
+ * @ingroup Dal_DB
  */
-class Type
+class DBQueryResult
 {
 	/**
-	 * @var string
+	 * @var DB
 	 */
-	private $name;
+	private $db;
 
 	/**
-	 * @throws ArgumentException
-	 * @return Type
+	 * @var resource
 	 */
-	static function of($object)
+	private $resource;
+
+	/**
+	 * @param DB $db
+	 * @param resource $resultId
+	 */
+	function __construct(DB $db, $resource)
 	{
-		return new self ($object);
+		Assert::isTrue(is_resource($resource) || $resource === true);
+
+		$this->db = $db;
+		$this->resource = $resource;
 	}
 
 	/**
-	 * @throws ArgumentException
-	 * @param string $name
+	 * Returns the result.
+	 * @return resource|boolean
 	 */
-	function __construct($object)
+	function getResource()
 	{
-		$name = is_object($object)
-			? get_class($object)
-			: $object;
-
-		if (
-				!class_exists($name, true)
-				&& !interface_exists($name, true)
-		) {
-			Assert::isUnreachable('unknown type %s', $name);
-		}
-
-		$this->name = $name;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function isChildOf(Type $parent)
-	{
-		return
-			   is_subclass_of($this->name, $parent->name)
-			|| in_array($parent->name, class_implements($this->name));
-	}
-
-	/**
-	 * @return string
-	 */
-	function getName()
-	{
-		return $this->name;
+		return $this->resource;
 	}
 }
 

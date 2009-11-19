@@ -47,24 +47,13 @@ final class BinaryLogicalOperator extends LogicalOperator
 	const MULTIPLY = '*';
 	const DIVIDE = '/';
 
-
-	/**
-	 * Creates an instance of {@link BinaryLogicalOperator}
-	 * @param string $id one of the class constants
-	 * @return BinaryLogicalOperatorLogicalOperator
-	 */
-	static function create($id)
-	{
-		return new self($id);
-	}
-
 	/**
 	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::EQUALS} value
 	 * @return BinaryLogicalOperator
 	 */
 	static function equals()
 	{
-		return self::create(self::EQUALS);
+		return new self (self::EQUALS);
 	}
 
 	/**
@@ -74,7 +63,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function notEquals()
 	{
-		return self::create(self::NOT_EQUALS);
+		return new self (self::NOT_EQUALS);
 	}
 
 	/**
@@ -84,7 +73,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function expAnd()
 	{
-		return self::create(self::EXPRESSION_AND);
+		return new self (self::EXPRESSION_AND);
 	}
 
 	/**
@@ -94,7 +83,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function expOr()
 	{
-		return self::create(self::EXPRESSION_OR);
+		return new self (self::EXPRESSION_OR);
 	}
 
 	/**
@@ -104,7 +93,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function greaterThan()
 	{
-		return self::create(self::GREATER_THAN);
+		return new self (self::GREATER_THAN);
 	}
 
 	/**
@@ -114,7 +103,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function greaterOrEquals()
 	{
-		return self::create(self::GREATER_OR_EQUALS);
+		return new self (self::GREATER_OR_EQUALS);
 	}
 
 	/**
@@ -124,7 +113,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function lowerThan()
 	{
-		return self::create(self::LOWER_THAN);
+		return new self (self::LOWER_THAN);
 	}
 
 	/**
@@ -134,7 +123,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function lowerOrEquals()
 	{
-		return self::create(self::LOWER_OR_EQUALS);
+		return new self (self::LOWER_OR_EQUALS);
 	}
 
 	/**
@@ -144,7 +133,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function like()
 	{
-		return self::create(self::LIKE);
+		return new self (self::LIKE);
 	}
 
 	/**
@@ -154,7 +143,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function notLike()
 	{
-		return self::create(self::NOT_LIKE);
+		return new self (self::NOT_LIKE);
 	}
 
 	/**
@@ -164,7 +153,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function ilike()
 	{
-		return self::create(self::ILIKE);
+		return new self (self::ILIKE);
 	}
 
 	/**
@@ -174,7 +163,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function notIlike()
 	{
-		return self::create(self::NOT_ILIKE);
+		return new self (self::NOT_ILIKE);
 	}
 
 	/**
@@ -184,7 +173,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function similarTo()
 	{
-		return self::create(self::SIMILAR_TO);
+		return new self (self::SIMILAR_TO);
 	}
 
 	/**
@@ -194,7 +183,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function notSimilarTo()
 	{
-		return self::create(self::NOT_SIMILAR_TO);
+		return new self (self::NOT_SIMILAR_TO);
 	}
 
 	/**
@@ -204,7 +193,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function add()
 	{
-		return self::create(self::ADD);
+		return new self (self::ADD);
 	}
 
 	/**
@@ -214,7 +203,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function substract()
 	{
-		return self::create(self::SUBSTRACT);
+		return new self (self::SUBSTRACT);
 	}
 
 	/**
@@ -224,7 +213,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function multiply()
 	{
-		return self::create(self::MULTIPLY);
+		return new self (self::MULTIPLY);
 	}
 
 	/**
@@ -234,7 +223,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 */
 	static function divide()
 	{
-		return self::create(self::DIVIDE);
+		return new self (self::DIVIDE);
 	}
 
 }

@@ -17,14 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * Describes the expression subject converter.
+ *
+ * This converter is used to
+ *
  * @ingroup Core_Expression
  */
 interface IExpressionSubjectConverter
 {
 	/**
 	 * @param mixed subject to convert
-	 * @param IExpression subject container (for building call tree while resolving)
-	 * @return IExpression
+	 * @param IExpression subject container
+	 * @return mixed converted subject
 	 */
 	function convert($subject, IExpression $object);
 }

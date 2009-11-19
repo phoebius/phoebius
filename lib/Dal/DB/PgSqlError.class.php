@@ -297,15 +297,6 @@ final class PgSqlError extends Enumeration
 	private static $sanitized = array();
 
 	/**
-	 * Creates an instance of {@link PgSqlError}
-	 * @return PgSqlError
-	 */
-	static function create($id)
-	{
-		return new self ($id);
-	}
-
-	/**
 	 * Overridden. Returns the id=>value hash of enumeration members
 	 * @return array
 	 */
@@ -336,12 +327,6 @@ final class PgSqlError extends Enumeration
 		return self::$sanitized[$this->getValue()];
 	}
 
-	/**
-	 * @see Enumeration::setValue()
-	 *
-	 * @param scalar $value
-	 * @return Enumeration
-	 */
 	function setValue($value)
 	{
 		$value = (string) $value;

@@ -129,11 +129,9 @@ class InsertQuery implements ISqlQuery
 	 */
 	private function getCompiledFields(IDialect $dialect)
 	{
-		return
-			SqlFieldList::create(
-				$this->fields->getKeys()
-			)
-			->toDialectString($dialect);
+		$list = new SqlFieldList($this->fields->getKeys());
+
+		return $list->toDialectString($dialect);
 	}
 
 	/**
@@ -141,11 +139,9 @@ class InsertQuery implements ISqlQuery
 	 */
 	private function getCompiledValues(IDialect $dialect)
 	{
-		return
-			SqlValueList::create(
-				$this->fields->getValues()
-			)
-			->toDialectString($dialect);
+		$list = new SqlValueList($this->fields->getValues());
+
+		return $list->toDialectString($dialect);
 	}
 }
 

@@ -17,24 +17,16 @@
  ************************************************************************************************/
 
 /**
- * Used to implement strict public APIs, where the callable argument should be passed
- * @ingroup Core_Patterns
+ * Represents the boxed type.
+ *
+ * A boxable type is a type that can be accurately represented either as primitive or as an object
+ * of the corresponding class.
+ *
+ * @ingroup Core_Types
  */
-interface IDelegate
+interface IBoxable extends IObjectCastable, IStringCastable
 {
-	/**
-	 * Invokes the delegate
-	 * @param mixed $1[,...] the arguments to be passed to the delegate
-	 * @return mixed delegate result
-	 */
-	function invoke();
-
-	/**
-	 * Invokes the delegate
-	 * @param array $args the arguments to be passed to the delegate
-	 * @return mixed delegate result
-	 */
-	function invokeArgs(array $args = array());
+	// nothing here
 }
 
 ?>

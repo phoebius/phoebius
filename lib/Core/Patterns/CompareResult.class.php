@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Comparison results
+ *
  * @ingroup Core_Patterns
  */
 final class CompareResult

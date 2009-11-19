@@ -17,16 +17,14 @@
  ************************************************************************************************/
 
 /**
- * Must be in sync with OrmPropertyType::$entityExpressionWorkers.
- * @ingroup Core_Expression
+ * @ingroup Core_Types
  */
-class ExpressionType extends Enumeration
+interface IOrmEntityIdGenerator
 {
-	const BINARY = 1;
-	const BETWEEN = 2;
-	const IN_SET = 3;
-	const PREFIX_UNARY = 4;
-	const UNARY_POSTFIX = 5;
+	/**
+	 * @return IIDGenerator
+	 */
+	function generate(IdentifiableOrmEntity $entity);
 }
 
 ?>

@@ -29,23 +29,13 @@ final class UnaryPostfixLogicalOperator extends LogicalOperator
 	const IS_FALSE = 'IS FALSE';
 
 	/**
-	 * Creates an instance of {@link UnaryPostfixLogicalOperator}
-	 * @param string $id one of the class constants
-	 * @return UnaryPostfixLogicalOperator
-	 */
-	static function create($id)
-	{
-		return new self($id);
-	}
-
-	/**
 	 * Creates an instance of {@link UnaryPostfixLogicalOperator} with
 	 * {@link UnaryPostfixLogicalOperator::IS_NULL} value
 	 * @return UnaryPostfixLogicalOperator
 	 */
 	static function isNull()
 	{
-		return self::create(self::IS_NULL);
+		return new self (self::IS_NULL);
 	}
 
 	/**
@@ -55,7 +45,7 @@ final class UnaryPostfixLogicalOperator extends LogicalOperator
 	 */
 	static function isNotNull()
 	{
-		return self::create(self::IS_NOT_NULL);
+		return new self (self::IS_NOT_NULL);
 	}
 
 	/**
@@ -65,7 +55,7 @@ final class UnaryPostfixLogicalOperator extends LogicalOperator
 	 */
 	static function isTrue()
 	{
-		return self::create(self::IS_TRUE);
+		return new self (self::IS_TRUE);
 	}
 
 	/**
@@ -75,7 +65,7 @@ final class UnaryPostfixLogicalOperator extends LogicalOperator
 	 */
 	static function isFalse()
 	{
-		return self::create(self::IS_FALSE);
+		return new self (self::IS_FALSE);
 	}
 
 }

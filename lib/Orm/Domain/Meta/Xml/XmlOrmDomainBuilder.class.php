@@ -383,7 +383,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				$this->ormDomain->addClass($proxy);
 			}
 
-			// FIXME: check whether type and referenced type are identifiable and id property types implement IReferenced
+			// FIXME: check whether type and referenced type are identifiable and id property types implement IOrmPropertyReferencable
 			// FIXME: check whether those properties are already set
 
 			$type_id_name = '___mtm_' . $type->getDBTableName();
@@ -442,9 +442,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		$property = new OrmProperty(
 			(string) $xmlContainer['name'],
-			isset($xmlContainer['db-columns'])
-				? $this->getDBFields($xmlContainer['db-columns'])
-				: $this->generateDBFields($type_id_name, $propertyType),
+			array (),
 			$propertyType,
 			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
 			false
@@ -465,8 +463,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	private function resolvePropertyType($name, AssociationMultiplicity $multiplicity)
 	{
 		// resolve order:
-		// {$typeName} : IHandled (--> IHandled::getHandler())
-		// {$typeName} : IBoxed (--> ObjectPropertyType)
+		// {$typeName} : IOrmPropertyAssignable (--> IOrmPropertyAssignable::getHandler())
+		// {$typeName} : IBoxable (--> ObjectPropertyType)
 		// {$typeName} : IDaoRelated
 		// {$typeName} : IOrmRelated
 		// ... not implemented yet. Possibly create an enumeration
@@ -495,7 +493,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			$interfaces = class_implements($name);
 
 			// type resolves handler by itself
-			if (in_array('IHandled', $interfaces)) {
+			if (in_array('IOrmPropertyAssignable', $interfaces)) {
 				return call_user_func(
 					array(
 						$name, 'getHandler'
@@ -504,7 +502,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				);
 			}
 			// type can be wrapped automatically
-			else if (in_array('IBoxed', $interfaces)) {
+			else if (in_array('IBoxable', $interfaces)) {
 				return new ObjectPropertyType(
 					$name,
 					/* defaultValue */ null,

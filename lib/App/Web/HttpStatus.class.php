@@ -17,19 +17,35 @@
  ************************************************************************************************/
 
 /**
+ * Encapsulates the HTTP response status.
+ *
+ * @todo expand the list of supported status codes
+ *
  * @ingroup App_Web
  */
-class HttpStatus extends Enumeration
+final class HttpStatus extends Enumeration
 {
-	const STATUS_404 = 404;
-	const STATUS_500 = 500;
-	
+	const CODE_404 = 404;
+	const CODE_500 = 500;
+
 	private static $statusMessages = array(
-		self::STATUS_404 => 'Not Found',
-		self::STATUS_500 => 'Internal Server Error',		
+		self::CODE_404 => 'Not Found',
+		self::CODE_500 => 'Internal Server Error',
 	);
-	
+
 	/**
+	 * Gets the code of the status
+	 *
+	 * @return int
+	 */
+	function getStatusCode()
+	{
+		return $this->getValue();
+	}
+
+	/**
+	 * Gets the message of the status
+	 *
 	 * @return string
 	 */
 	function getStatusMessage()

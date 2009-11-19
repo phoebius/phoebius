@@ -141,7 +141,6 @@ $classes = array
 	'PathResolver' => 'Core/Bootstrap',
 	'Autoloader' => 'Core/Bootstrap',
 	'Exceptionizer' => 'Core/Bootstrap',
-	'Type' => 'Core/Patterns',
 	'IErrorExceptionFactory' => 'Core/Bootstrap',
 	'ApplicationException' => 'Core/Exceptions',
 	'ArgumentException' => 'Core/Exceptions',
@@ -150,7 +149,8 @@ $classes = array
 	'InternalOperationException' => 'Core/Exceptions',
 	'RecoverableErrorFactory' => 'Core/Bootstrap',
 	'CompilationContextException' => 'Core/Exceptions',
-	'PhpUtils' => 'Utils'
+	'PhpUtils' => 'Utils',
+	'TypeUtils' => 'Utils'
 );
 
 foreach ($classes as $classname => $classDirectory)

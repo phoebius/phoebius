@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Basic application request implementation.
+ *
  * @ingroup App
  */
 class AppRequest implements IAppRequest

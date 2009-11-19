@@ -19,7 +19,7 @@
 /**
  * @ingroup Utils_Net
  */
-class HttpUrl
+class HttpUrl implements IStringCastable
 {
 	// ports to be ommited
 	const DEFAULT_HTTP_PORT = 80;
@@ -291,13 +291,8 @@ class HttpUrl
 	{
 		return $this->getPath() . $this->getQueryAsString();
 	}
-	
-	function __toString()
-	{
-		return $this->toString();
-	}
 
-	function toString()
+	function __toString()
 	{
 		$out = array();
 

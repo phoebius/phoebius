@@ -17,15 +17,13 @@
  ************************************************************************************************/
 
 /**
- * Helper class to implement factory pattern
- * @ingroup Core_Patterns
+ * @ingroup Orm_Types_Id
  */
-class Factory implements IFactory
+final class IDGeneratorType extends Enumeration
 {
-	final protected function __construct()
-	{
-		// nothing here. Factory classes have their own static ctors
-	}
+	const PRE = 1;
+	const POST = 2;
+	const BOTH = 3;
 }
 
 ?>

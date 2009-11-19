@@ -17,6 +17,10 @@
  ************************************************************************************************/
 
 /**
+ * Encapsulates the request part where the request variable can reside.
+ *
+ * @warning This is not the request part (GET, POST, etc).
+ *
  * @ingroup App_Web
  */
 class WebRequestPart extends Enumeration

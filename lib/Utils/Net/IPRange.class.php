@@ -19,7 +19,7 @@
 /**
  * @ingroup Utils_Net
  */
-final class IPRange
+final class IPRange implements IStringCastable
 {
 	/**
 	 * @var IP
@@ -86,21 +86,18 @@ final class IPRange
 	 */
 	function getRange()
 	{
-		return $this->from->toString() . '/' . $this->to->toString();
+		return $this->from . '/' . $this->to;
 	}
 
-	/**
-	 * @return string
-	 */
-	function toString()
+	function __toString()
 	{
 		return $this->getRange();
 	}
 
 	private function findRange(IP $ip1, IP $ip2)
 	{
-		list ($a, $b, $c, $d) = explode('.', $ip1->toString());
-		list ($e, $f, $g, $h) = explode('.', $ip2->toString());
+		list ($a, $b, $c, $d) = explode('.', (string) $ip1);
+		list ($e, $f, $g, $h) = explode('.', (string) $ip2);
 
 		if ($a !== $e) {
 			$this->from = $ip1;

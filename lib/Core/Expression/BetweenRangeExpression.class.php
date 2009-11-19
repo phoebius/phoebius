@@ -18,6 +18,12 @@
 
 /**
  * Represents an range expression
+ *
+ * SQL example:
+ * @code
+ * // "price" BETWEEN 50 AND 100
+ * Expression::between("price", 50, 100);
+ * @endcode
  * @ingroup Core_Expression
  */
 class BetweenRangeExpression implements IExpression
@@ -68,9 +74,6 @@ class BetweenRangeExpression implements IExpression
 		return $this->to;
 	}
 
-	/**
-	 * @return BetweenRangeExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		return new self(
@@ -80,20 +83,9 @@ class BetweenRangeExpression implements IExpression
 		);
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new BetweenRangeDalExpression($this);
-	}
-
-	/**
-	 * @return ExpressionType
-	 */
-	function getExpressionType()
-	{
-		return new ExpressionType(ExpressionType::BETWEEN);
 	}
 }
 

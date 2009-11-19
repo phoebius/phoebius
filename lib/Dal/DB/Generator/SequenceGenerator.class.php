@@ -16,13 +16,35 @@
  *
  ************************************************************************************************/
 
-/**
- * @ingroup Core_Types
- */
-interface IIdentifierMappable extends IBoxed
+class SequenceGenerator implements IIDGenerator
 {
-	function toScalarId();
-	function __toString();
+	/**
+	 * @var DB
+	 */
+	private $db;
+
+	/**
+	 * @var ISqlSelectQuery
+	 */
+	private $query;
+
+	function __construct(DB $db, ISqlSelectQuery $query)
+	{
+		$this->db = $db;
+		$this->query = $query;
+	}
+
+	function getType()
+	{
+		return new IDGeneratorType(IDGeneratorType::PRE);
+	}
+
+	function generate(IdentifiableOrmEntity $entity)
+	{
+		$id = $this->db->getCell($this->query);
+
+		return $id;
+	}
 }
 
 ?>

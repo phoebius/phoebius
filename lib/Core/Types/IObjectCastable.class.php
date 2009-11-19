@@ -17,13 +17,27 @@
  ************************************************************************************************/
 
 /**
- * Specifies that the class could be instantiated throw the static method, implementing
- * the factory pattern
- * @ingroup Core_Patterns
+ * Indicates that type can be produced from scalar
+ *
+ * @ingroup Core_Types
  */
-interface IFactory
+interface IObjectCastable
 {
-	// nothing here
+	/**
+	 * Casts scalar to the corresponding object wrapper
+	 *
+	 * @param scalar
+	 * @return IObjectCastable
+	 * @throws TypeCastException
+	 */
+	static function cast($value);
+
+	/**
+	 * Gets the scalar value of an object
+	 *
+	 * @return scalar
+	 */
+	function getValue();
 }
 
 ?>

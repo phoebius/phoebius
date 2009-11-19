@@ -17,6 +17,10 @@
  ************************************************************************************************/
 
 /**
+ * Basic web-server response implementation.
+ *
+ * @todo introduce buffering
+ *
  * @ingroup App_Web
  */
 class WebResponse implements IWebResponse
@@ -25,25 +29,25 @@ class WebResponse implements IWebResponse
 	 * @var WebRequest
 	 */
 	private $request;
-	private $bufferOpened = false;
+
+	/**
+	 * @var boolean
+	 */
 	private $isFinished = false;
 
+	/**
+	 * @param WebResponse *MAY* now about the request to provide accure results
+	 */
 	function __construct(WebRequest $request = null)
 	{
 		$this->request = $request;
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isFinished()
 	{
 		return $this->isFinished;
 	}
 
-	/**
-	 * @return IAppResponse an object itself
-	 */
 	function write($string)
 	{
 		echo $string;
@@ -52,132 +56,40 @@ class WebResponse implements IWebResponse
 	}
 
 	/**
-	 * @return IAppResponse an object itself
+	 * Writes the contents of the file to the response.
+	 *
+	 * @return WebResponse an object itself
 	 */
-	function outFile($filepath)
+	function writeFile($filepath)
 	{
 		readfile($filepath);
 
 		return $this;
 	}
 
-	/**
-	 * @return IAppResponse
-	 */
-	function flush()
-	{
-		Assert::isFalse($this->isFinished, 'already finished');
-
-		if ($this->bufferOpened) {
-			ob_end_flush();
-		}
-
-		$this->clean();
-
-		return $this;
-	}
-
-	/**
-	 * @return IAppResponse
-	 */
-	function clean()
-	{
-		Assert::isFalse($this->isFinished, 'already finished');
-
-		if ($this->bufferOpened) {
-			ob_end_clean();
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function isBufferOpened()
-	{
-		return $this->bufferOpened;
-	}
-
-	/**
-	 * Flush + finish
-	 * @return void
-	 */
 	function finish()
 	{
 		Assert::isFalse($this->isFinished, 'already finished');
 
-		$this->flush();
-
 		$this->isFinished = true;
 
 		// http://php-fpm.anight.org/extra_features.html
-		// TODO: cut out this functionality to the outer class descendant (PhpFpmResponse)
+		// TODO: cut out this functionality to the outer class descendant (e.g., PhpFpmResponse)
 		if (function_exists('fastcgi_finish_request')) {
 			fastcgi_finish_request();
 		}
 	}
 
-	/**
-	 * @return IAppResponse
-	 */
-	function openBuffer($useGzip)
-	{
-		Assert::isFalse($this->bufferOpened, 'already opened');
-
-		if ($useGzip) {
-			ob_start('ob_gzhandler', 5);
-		}
-		else {
-			ob_start();
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return IAppResponse
-	 */
-	function flushBuffer()
-	{
-		Assert::isTrue($this->bufferOpened, 'no buffers opened');
-
-		ob_end_flush();
-
-		return $this;
-	}
-
-	/**
-	 * @return IAppResponse
-	 */
-	function dropBuffer()
-	{
-		Assert::isTrue($this->bufferOpened, 'no buffers opened');
-
-		ob_end_clean();
-
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
 	function isHeadersSent()
 	{
 		return headers_sent();
 	}
 
-	/**
-	 * @return array
-	 */
 	function getHeaders()
 	{
 		return headers_list();
 	}
 
-	/**
-	 * @return IWebResponse
-	 */
 	function addHeader($header, $value)
 	{
 		header($header . ': ' . $value, true);
@@ -185,9 +97,6 @@ class WebResponse implements IWebResponse
 		return $this;
 	}
 
-	/**
-	 * @return IWebResponse
-	 */
 	function addHeaders(array $headers)
 	{
 		foreach ($headers as $header => $value)
@@ -198,9 +107,6 @@ class WebResponse implements IWebResponse
 		return $this;
 	}
 
-	/**
-	 * @return void
-	 */
 	function redirect(HttpUrl $url)
 	{
 		if ($this->request) {
@@ -221,17 +127,14 @@ class WebResponse implements IWebResponse
 
 		$this->finish();
 	}
-	
-	/**
-	 * @return IWebResponse
-	 */
+
 	function setStatus(HttpStatus $status)
 	{
 		$protocol =
 			$this->request
 			? $this->request->getProtocol()
 			: 'HTTP/1.0';
-		
+
 		header($protocol . ' ' . $status->getValue() . ' ' . $status->getStatusMessage(), true);
 	}
 }

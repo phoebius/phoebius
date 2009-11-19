@@ -18,6 +18,13 @@
 
 /**
  * Represents binary expression
+ *
+ * SQL example:
+ * @code
+ * // "id" = 1
+ * Expression::eq("id", 1);
+ * @endcode
+ *
  * @ingroup Core_Expression
  */
 class BinaryExpression implements IExpression
@@ -68,9 +75,6 @@ class BinaryExpression implements IExpression
 		return $this->logic;
 	}
 
-	/**
-	 * @return BinaryExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		return new self(
@@ -80,20 +84,9 @@ class BinaryExpression implements IExpression
 		);
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new BinaryDalExpression($this);
-	}
-
-	/**
-	 * @return ExpressionType
-	 */
-	function getExpressionType()
-	{
-		return new ExpressionType(ExpressionType::BINARY);
 	}
 }
 

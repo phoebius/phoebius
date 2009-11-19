@@ -16,17 +16,35 @@
  *
  ************************************************************************************************/
 
-/**
- * Honour the tradition of disposable resources, as in .NET
- * @ingroup Core_Patterns
- */
-interface IDisposable
+final class LastInsertIdGenerator implements IIDGenerator
 {
 	/**
-	 * Closes the resources held by an object
-	 * @return IDisposable an object itself
+	 * @var DB
 	 */
-	function dispose();
+	private $db;
+
+	function __construct(DB $db)
+	{
+		Assert::isTrue(
+			method_exists($db, 'getLastInsertId'),
+			'DB should provide getLastInsertId() method to be used within %s',
+			__CLASS__
+		);
+
+		$this->db = $db;
+	}
+
+	function getType()
+	{
+		return new IDGeneratorType(IDGeneratorType::POST);
+	}
+
+	function generate(IdentifiableOrmEntity $entity)
+	{
+		$id = $this->db->getLastInsertId();
+
+		return $id;
+	}
 }
 
 ?>

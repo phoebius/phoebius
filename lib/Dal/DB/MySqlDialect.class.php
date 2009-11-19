@@ -51,16 +51,16 @@ class MySqlDialect implements IDialect
 	);
 
 	/**
-	 * @var MySqlDB
+	 * @var resource
 	 */
-	private $db;
+	private $link;
 
 	/**
-	 * @return MySqlDialect
+	 * @param resource mysql link
 	 */
-	function __construct(MySqlDB $db)
+	function __construct($link = null)
 	{
-		$this->db = $db;
+		$this->link = $link;
 	}
 
 	/**
@@ -104,7 +104,7 @@ class MySqlDialect implements IDialect
 			return 'NULL';
 		}
 
-		return '\'' . mysql_real_escape_string($value, $this->db->getLink()) . '\'';
+		return '\'' . mysql_real_escape_string($value, $this->link) . '\'';
 	}
 
 	/**
@@ -195,9 +195,7 @@ class MySqlDialect implements IDialect
 			}
 		}
 
-		return array_merge(
-			$queries
-		);
+		return $queries;
 	}
 }
 

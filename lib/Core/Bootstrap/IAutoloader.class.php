@@ -23,14 +23,14 @@
 interface IAutoloader
 {
 	/**
-	 * Registers the object as an autoloader. Consider using SPL ({@link spl_autoload_register})
-	 * @return IAutoloader
+	 * Registers the object as autoloader. Consider using SPL (spl_autoload_register())
+	 * @return void
 	 */
 	function register();
 
 	/**
 	 * Unregisters the object autoload
-	 * @return IAutoloader
+	 * @return void
 	 */
 	function unregister();
 }

@@ -19,7 +19,7 @@
 /**
  * @ingroup Core_Types_Complex
  */
-class Date implements IObjectMappable, IHandled, IBoxed
+class Date implements IOrmPropertyAssignable, IBoxable
 {
 	/**
 	 * @var int
@@ -309,27 +309,16 @@ class Date implements IObjectMappable, IHandled, IBoxed
 	}
 
 	/**
-	 * @return int
-	 */
-	function toScalar()
-	{
-		return $this->getStamp();
-	}
-
-	/**
-	 * @return int
-	 */
-	function getScalar()
-	{
-		return $this->getValue();
-	}
-
-	/**
 	 * @return string
 	 */
 	function toFormattedString($format = 'd-m-Y')
 	{
 		return date($format, $this->int);
+	}
+
+	function __toString()
+	{
+		return $this->toFormattedString();
 	}
 
 	/**

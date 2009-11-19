@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Encapsulates container over HTTP wrappers.
+ *
  * @ingroup App_Web
  */
 final class WebContext extends AppContext implements IWebContext

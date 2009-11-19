@@ -19,7 +19,7 @@
 /**
  * @ingroup Core_Types_BuiltIn
  */
-abstract class BuiltInType implements IObjectMappable, IHandled
+abstract class BuiltInType implements IObjectCastable, IOrmPropertyAssignable, IStringCastable
 {
 	/**
 	 * @var scalar
@@ -43,7 +43,7 @@ abstract class BuiltInType implements IObjectMappable, IHandled
 			$this->value = $value;
 		}
 		else {
-			throw new TypeCastException(Type::of($this), $value);
+			throw new TypeCastException($this, $value);
 		}
 
 		return $this;
@@ -60,17 +60,9 @@ abstract class BuiltInType implements IObjectMappable, IHandled
 	/**
 	 * @return string
 	 */
-	function toString()
-	{
-		return (string)$this->getValue();
-	}
-
-	/**
-	 * @return string
-	 */
 	function __toString()
 	{
-		return $this->toString();
+		return  (string) $this->value;
 	}
 
 	/**

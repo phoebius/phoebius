@@ -21,24 +21,26 @@
  *
  * Pattern syntax:
  *
- *  constant_value | [ predefined_value | ( predefined_value_1 | predefined_value_2 | ... ) ] :parameter_name
+ * constant_value | [ predefined_value | ( predefined_value_1 | predefined_value_2 | ... ) ] :parameter_name
  *
  * where:
- *  * constant_value - freezed chunk
- *  * predefined_value - possible chunk value the parameter should match
- *  * predefined_value_1, predefined_value_2, ... - set of possbile chunk values the parameter should match
- *  * parameter_name - the name to which the value of the chunk will be assigned to
+ *
+ * - constant_value - freezed chunk
+ * - predefined_value - possible chunk value the parameter should match
+ * - predefined_value_1, predefined_value_2, ... - set of possbile chunk values the parameter should match
+ * - parameter_name - the name to which the value of the chunk will be assigned to
  *
  * Examples:
- *  * "/" matches the root
- *  * "/blog" matches "/blog", "/blog/" AND "/blog/blah/blah"
- *  * "/blog/" matches "/blog/" only
- *  * "/:controller" matches "/<anything>", "/<anything>/" AND "/<anything>/blah/blah", and assigns "<anything>" to "controller"
- *  * "/:controller*" matches "/<anything>" (controller="<anything>"), "/blog/" (controller="<anything>") and "/<anything>/blah/blah" (controller="<anything>/blah/blah")
- *  * "/:controller/" matches "/<anything>/" and assigns "<anything>" to "controller"
- *  * "/:controller* /" is a nonsense. Will match only "/<anything>/" and nothing else.
- *  * "/blog:controller/ matches "/blog/" only.
- *  * "/:controller/(rss|html):action/" matches "/<anything>/rss/" (controller="<anything>", action="rss") and "/<anything>/html/" (controller="<anything>", action="html")
+ *
+ * - "/" matches the root
+ * - "/blog" matches "/blog", "/blog/" AND "/blog/blah/blah"
+ * - "/blog/" matches "/blog/" only
+ * - "/:controller" matches "/<anything>", "/<anything>/" AND "/<anything>/blah/blah", and assigns "<anything>" to "controller"
+ * - "/:controller*" matches "/<anything>" (controller="<anything>"), "/blog/" (controller="<anything>") and "/<anything>/blah/blah" (controller="<anything>/blah/blah")
+ * - "/:controller/" matches "/<anything>/" and assigns "<anything>" to "controller"
+ * - "/:controller* /" is a nonsense. Will match only "/<anything>/" and nothing else.
+ * - "/blog:controller/ matches "/blog/" only.
+ * - "/:controller/(rss|html):action/" matches "/<anything>/rss/" (controller="<anything>", action="rss") and "/<anything>/html/" (controller="<anything>", action="html")
  *
  * @ingroup App_Web_Routing_Rules
  */

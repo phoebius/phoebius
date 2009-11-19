@@ -17,28 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Represents the SQL ORDER BY chain
+ * Represents the list of SqlOrderExpression
+ *
  * @ingroup Dal_DB_Sql
  */
 final class SqlOrderChain extends TypedValueList implements ISqlCastable
 {
-	/**
-	 * Create an instance of {@link SqlOrderChain}
-	 * @var array of {@link SqlOrderExpression}
-	 * @return SqlOrderChain
-	 */
-	static function create(array $expressions = array())
+	function __construct(array $values = array())
 	{
-		return new self ($expressions);
-	}
-
-	/**
-	 * Adds a {@link SqlOrderExpression} order expression
-	 * @return SqlOrderChain
-	 */
-	function add(SqlOrderExpression $expression)
-	{
-		$this->append($expression);
+		parent::__construct('SqlOrderExpression', $values);
 	}
 
 	/**
@@ -94,15 +81,6 @@ final class SqlOrderChain extends TypedValueList implements ISqlCastable
 		$compiledString = 'ORDER BY ' . join(', ', $compiledSlices);
 
 		return $compiledString;
-	}
-
-	/**
-	 * Determines whether the specified value is of valid type supported by the list implementation
-	 * @return boolean
-	 */
-	protected function isValueOfValidType($value)
-	{
-		return ($value instanceof SqlOrderExpression);
 	}
 }
 

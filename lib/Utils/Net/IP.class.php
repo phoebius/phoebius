@@ -19,7 +19,7 @@
 /**
  * @ingroup Utils_Net
  */
-final class IP
+final class IP implements IStringCastable
 {
 	/**
 	 * @var integer
@@ -67,17 +67,9 @@ final class IP
 		return $this->longIP;
 	}
 
-	/**
-	 * @return string
-	 */
-	function toString()
-	{
-		return $this->getIP();
-	}
-
 	function __toString()
 	{
-		return $this->toString();
+		return $this->getIP();
 	}
 
 	/**

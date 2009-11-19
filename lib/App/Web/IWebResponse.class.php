@@ -17,37 +17,52 @@
  ************************************************************************************************/
 
 /**
+ * Response interface for application that run at web-server.
+ *
  * @ingroup App_Web
  */
 interface IWebResponse extends IAppResponse
 {
 	/**
+	 * Checks whether response headers are already sent.
+	 *
 	 * @return boolean
 	 */
 	function isHeadersSent();
 
 	/**
+	 * Gets the list of headers that are ready to be sent within the response
+	 *
 	 * @return array
 	 */
 	function getHeaders();
 
 	/**
-	 * @return IWebResponse
+	 * Appends the header to be sent to client within the response
+	 *
+	 * @return IWebResponse itself
 	 */
 	function addHeader($header, $value);
 
 	/**
+	 * Adds the list of headers to be sent to client within the response
+	 *
 	 * @return IWebResponse
 	 */
 	function addHeaders(array $headers);
 
 	/**
-	 * Not implemented
+	 * Sets the status of the respose
+	 *
 	 * @return IWebResponse
 	 */
 	function setStatus(HttpStatus $status);
 
 	/**
+	 * Sends the redirect.
+	 *
+	 * Note that this function does not close the connection and terminates the execution.
+	 *
 	 * @return void
 	 */
 	function redirect(HttpUrl $url);

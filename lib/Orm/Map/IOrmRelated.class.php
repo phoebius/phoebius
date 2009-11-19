@@ -27,7 +27,7 @@ interface IOrmRelated
 	static function map();
 
 	/**
-	 * @return OrmClass
+	 * @return IQueryable
 	 */
 	static function orm();
 }

@@ -17,10 +17,45 @@
  ************************************************************************************************/
 
 /**
- * Core primitive: basic enumeration implementation
+ * Strictly-typed enumeration implementation.
+ *
+ * If you need to create an enumeration you can strictly refer to, just extend this base
+ * class and define the consts' in a descendant.
+ *
+ * Example:
+ * @code
+ * class Color extends Enumeration
+ * {
+ * 	const RED = 'red';
+ * 	const ORANGE = 'orange';
+ * 	const BLACK = 'black';
+ * }
+ *
+ *
+ * // usage:
+ *
+ * function setColor(Color $color)
+ * {
+ * 	// do smth
+ * }
+ *
+ * $color = new Color(Color::RED);
+ * setColor($color);
+ *
+ * // compilation failure:
+ *
+ * setColor("red");
+ * setColor(Color::RED);
+ *
+ * @endcode
+ *
+ * Enumeration::$id is the reflected name of the constant defined within the child class.
+ *
+ * Enumeration::$value is the value of the constant.
+ *
  * @ingroup Core_Patterns
  */
-abstract class Enumeration implements IScalarMappable
+abstract class Enumeration implements IStringCastable
 {
 	/**
 	 * Reflection cache for all enumeration implementations. A value=>key swapped hash
@@ -96,7 +131,9 @@ abstract class Enumeration implements IScalarMappable
 	{
 		Assert::isTrue(
 			get_class($this) == get_class($toBeCompared),
-			'different enumeration types are given'
+			'different enumeration types are given (%s vs %s)',
+			(string) $this,
+			(string) $toBeCompared
 		);
 
 		return $this->id === $toBeCompared->id;
@@ -113,11 +150,14 @@ abstract class Enumeration implements IScalarMappable
 	}
 
 	/**
+	 * Object clone with the same id inside
+	 *
 	 * @return Enumeration
 	 */
 	function spawn($id)
 	{
 		$me = get_class($this);
+
 		return new $me($id);
 	}
 
@@ -128,7 +168,11 @@ abstract class Enumeration implements IScalarMappable
 	 */
 	function isIdentifiedBy($value)
 	{
-		Assert::isTrue(false !== $this->getIdByValue($value), 'no such value defined');
+		Assert::isTrue(
+			false !== $this->getIdByValue($value),
+			'unknown value %s for %s',
+			$value, get_class($this)
+		);
 
 		return $this->value === $value;
 	}
@@ -145,8 +189,7 @@ abstract class Enumeration implements IScalarMappable
 
 	/**
 	 * Compares the value of enumeration instance and the value of the specified enumeration
-	 * member, and returns true if they are equal, otherwise false. Alias for
-	 * {@link Enumeration::isIdentifiedBy()}
+	 * member, and returns true if they are equal, otherwise false. Alias for Enumeration::isIdentifiedBy()
 	 * @see Enumeration::isIdentifiedBy()
 	 * @return boolean
 	 */
@@ -157,8 +200,7 @@ abstract class Enumeration implements IScalarMappable
 
 	/**
 	 * Compares the value of enumeration instance and the value of the specified enumeration
-	 * member, and returns true if they are not equal, otherwise false. Alias for
-	 * {@link Enumeration::isNotIdentifiedBy()}
+	 * member, and returns true if they are not equal, otherwise false. Alias for Enumeration::isNotIdentifiedBy()
 	 * @see Enumeration::isNotIdentifiedBy()
 	 * @return boolean
 	 */
@@ -177,28 +219,9 @@ abstract class Enumeration implements IScalarMappable
 		$this->setValue($this->value);
 	}
 
-	/**
-	 * @return string
-	 */
 	function __toString()
 	{
-		return $this->toString();
-	}
-
-	/**
-	 * @return string
-	 */
-	function toString()
-	{
-		return $this->getValue();
-	}
-
-	/**
-	 * @return string
-	 */
-	function toScalar()
-	{
-		return $this->toString();
+		return get_class($this) . '::' .$this->value;
 	}
 
 	/**

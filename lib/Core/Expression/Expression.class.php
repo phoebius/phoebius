@@ -17,13 +17,63 @@
  ************************************************************************************************/
 
 /**
- * Helper class to access expression classes
+ * Helper class to create expression nodes (aka IExpression) of various types.
+ *
+ * Examples (and the produced SQL code):
+ * @code
+ * // "id" = 1
+ * Expression::eq("id", 1);
+ *
+ * // "id" IS NOT NULL
+ * Expression::notNull("id");
+ *
+ * @code
+ * // "type" IN ("completed", "pending")
+ * Expression::in("type", array("completed", "pending"));
+ *
+ * // "id" IN (1, 2) OR "id" IS NULL
+ * Expression::disjunction(
+ * 	Expression::inSet("id", array(1, 2),
+ * 	Expression::isNull("id")
+ * );
+ *
+ * // "cost" / 2 > "discount"
+ * Expression::gt(
+ * 	Expression::div("cost", 2),
+ * 	"discount"
+ * );
+ *
+ * // my favourite one: (checked=1) AND ( (time <2) OR (time > 10) )
+ * Expression::conjunction(
+ * 	Expression::eq("checked", 1),
+ * 	Expression::orChain(
+ * 		Expression::lt("time", 2),
+ * 		Expression::gt("time", 10)
+ * 	)
+ * ); // now this gracefully wrapped up in a bow =)
+ *
+ * // another one: WHERE (active = 1) AND (name LIKE '%alex%' OR email LIKE '%alex%')
+ * Expression::conjunction(
+ * 	Expression::eq("active", 1),
+ * 	Expression::disjunction(
+ * 		Expression::like("name", "%alex%"),
+ * 		Expression::like("email", "%alex%")
+ * 	)
+ * );
+ * @endcode
+ *
  * @ingroup Core_Expression
  */
 final class Expression extends StaticClass
 {
 	/**
-	 * Creates an instance of {@link BinaryExpression} with strict equality
+	 * Creates an instance of binary expression node, representing the construction: subject = value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" = 1
+	 * Expression::eq("id", 1);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function eq($subject, $value)
@@ -32,7 +82,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with strict equality
+	 * Creates an instance of binary expression node, representing the construction: subject != value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" != 1
+	 * Expression::neq("id", 1);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function neq($subject, $value)
@@ -41,7 +97,15 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `greater than` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject > value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" > 1
+	 * Expression::gt("id", 1);
+	 * @endcode
+	 *
+	 *
 	 * @return BinaryExpression
 	 */
 	static function gt($subject, $value)
@@ -50,7 +114,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `greater than or equals` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject >= value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" >= 1
+	 * Expression::gtEq("id", 1);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function gtEq($subject, $value)
@@ -59,7 +129,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `lower than` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject < value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" < 1
+	 * Expression::lt("id", 1);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function lt($subject, $value)
@@ -68,7 +144,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with `lower than or equals` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject <= value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" <= 1
+	 * Expression::ltEq("id", 1);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function ltEq($subject, $value)
@@ -77,7 +159,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `like` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject LIKE value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "name" LIKE "mobi%"
+	 * Expression::like("name", "mobi%");
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function like($subject, $value)
@@ -86,16 +174,28 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `like` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject NOT LIKE value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "name" NOT LIKE "mobi%"
+	 * Expression::notLike("name", "mobi%");
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function notLike($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryLogicalOperator::notIlike(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::notLike(), $value);
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `like` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject ILIKE value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "name" ILIKE "mobi%"
+	 * Expression::ilike("name", "mobi%");
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function ilike($subject, $value)
@@ -104,7 +204,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with case-insensitive `not like` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject NOT ILIKE value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "name" NOT ILIKE "mobi%"
+	 * Expression::notIlike("name", "mobi%");
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function notIlike($subject, $value)
@@ -113,7 +219,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with `similar to` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject SIMILAR TO value
 	 * @return BinaryExpression
 	 */
 	static function similar($subject, $value)
@@ -122,7 +228,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instnace of {@link BinaryExpression} with inverted `similar to` logical operator
+	 * Creates an instance of binary expression node, representing the construction: subject NOT SIMILAR TO value
 	 * @return BinaryExpression
 	 */
 	static function notSimilar($subject, $value)
@@ -131,7 +237,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with "plus" operator
+	 * Creates an instance of binary expression node, representing the construction: subject + value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "cost" + 2
+	 * Expression::add("cost", 2);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function add($subject, $value)
@@ -140,7 +252,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with "minus" operator
+	 * Creates an instance of binary expression node, representing the construction: subject - value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "cost" - 2
+	 * Expression::sub("cost", 2);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function sub($subject, $value)
@@ -149,7 +267,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with "multiply" operator
+	 * Creates an instance of binary expression node, representing the construction: subject * value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "cost" * 2
+	 * Expression::mul("cost", 2);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function mul($subject, $value)
@@ -158,7 +282,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BinaryExpression} with "division" operator
+	 * Creates an instance of binary expression node, representing the construction: subject / value
+	 *
+	 * SQL example:
+	 * @code
+	 * // "cost" / 2
+	 * Expression::div("cost", 2);
+	 * @endcode
 	 * @return BinaryExpression
 	 */
 	static function div($subject, $value)
@@ -167,7 +297,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of `not null` unary postfix expression
+	 * Creates an instance of binary expression node, representing the construction: subject NOT NOT NULL
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" IS NOT NULL
+	 * Expression::notNull("id");
+	 * @endcode
 	 * @return UnaryPostfixExpression
 	 */
 	static function notNull($subject)
@@ -176,7 +312,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of `is null` unary postfix expression
+	 * Creates an instance of binary expression node, representing the construction: subject IS NULL
+	 *
+	 * SQL example:
+	 * @code
+	 * // "id" IS NULL
+	 * Expression::isNull("id");
+	 * @endcode
 	 * @return UnaryPostfixExpression
 	 */
 	static function isNull($subject)
@@ -185,7 +327,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of `is true` unary postfix expression
+	 * Creates an instance of binary expression node, representing the construction: subject IS TRUE
+	 *
+	 * SQL example:
+	 * @code
+	 * // "hasSmth" IS TRUE
+	 * Expression::isTrue("hasSmth");
+	 * @endcode
 	 * @return UnaryPostfixExpression
 	 */
 	static function isTrue($subject)
@@ -194,7 +342,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of `is false` unary postfix expression
+	 * Creates an instance of binary expression node, representing the construction: subject IS FALSE
+	 *
+	 * SQL example:
+	 * @code
+	 * // "hasSmth" IS FALSE
+	 * Expression::isFalse("hasSmth");
+	 * @endcode
 	 * @return UnaryPostfixExpression
 	 */
 	static function isFalse($subject)
@@ -203,7 +357,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link BetweenRangeExpression}
+	 * Creates an instance of binary expression node, representing the construction: subject between A and B
+	 *
+	 * SQL example:
+	 * @code
+	 * // "price" BETWEEN 50 AND 100
+	 * Expression::between("price", 50, 100);
+	 * @endcode
 	 * @return BetweenRangeExpression
 	 */
 	static function between($subject, $from, $to)
@@ -212,9 +372,14 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Helper method to check whether the field value is in the specified set of values. Strict
-	 * equality is used in comparison
-	 * @return IDalExpression
+	 * Creates an instance of binary expression node, representing the construction: subject in set
+	 *
+	 * SQL example:
+	 * @code
+	 * // "type" IN ("completed", "pending")
+	 * Expression::in("type", array("completed", "pending"));
+	 * @endcode
+	 * @return InSetExpression
 	 */
 	static function in($subject, $set)
 	{
@@ -222,8 +387,13 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Helper method to check whether the field value is in the specified set of values. Strict
-	 * equality is used in comparison
+	 * Creates an instance of binary expression node, representing the construction: subject not in set
+	 *
+	 * SQL example:
+	 * @code
+	 * // "type" NOT IN ("completed", "pending")
+	 * Expression::notIn("type", array("completed", "pending"));
+	 * @endcode
 	 * @return IDalExpression
 	 */
 	static function notIn($subject, $set)
@@ -242,8 +412,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "MINUS" logical operator to
-	 * treat the field value as negative
+	 * Creates an instance of binary expression node, representing the construction: -subject
 	 * @return PrefixUnaryExpression
 	 */
 	static function negative($subject)
@@ -252,12 +421,20 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates a block of {@link IExpression} arguments joined with `OR` logical operator and
-	 * wrapped by {@link ExpressionChain}
+	 * Creates the disjunction chain filling it with expressions passed separately as arguments
+	 *
+	 * Example:
+	 * @code
+	 * // "id" IN (1, 2) OR "id" IS NULL
+	 * Expression::disjunction(
+	 * 	Expression::inSet("id", array(1, 2),
+	 * 	Expression::isNull("id")
+	 * );
+	 * @endcode
 	 * @param IExpression ...
 	 * @return ExpressionChain
 	 */
-	static function joinByOr()
+	static function disjunction()
 	{
 		$args = func_get_args();
 		$chain = self::orChain();
@@ -269,12 +446,20 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates a block of {@link IExpression} arguments joined with `AND` logical operator and
-	 * wrapped by {@link ExpressionChain}
+	 * Creates the conjunction chain filling it with expressions passed separately as arguments
+	 *
+	 * Example:
+	 * @code
+	 * // "id" IN (1, 2) OR "id" IS NULL
+	 * Expression::conjunction(
+	 * 	Expression::inSet("id", array(1, 2),
+	 * 	Expression::isNull("id")
+	 * );
+	 * @endcode
 	 * @param IExpression ...
 	 * @return ExpressionChain
 	 */
-	static function joinByAnd()
+	static function conjunction()
 	{
 		$args = func_get_args();
 		$chain = self::andChain();
@@ -285,7 +470,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `OR` logical operator
+	 * Disjunction chain of expressions
 	 * @return ExpressionChain
 	 */
 	static function orChain()
@@ -294,7 +479,7 @@ final class Expression extends StaticClass
 	}
 
 	/**
-	 * Creates an instance of {@link ExpressionChain} with `AND` logical operator
+	 * Conjunction chain of expressions
 	 * @return ExpressionChain
 	 */
 	static function andChain()

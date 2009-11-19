@@ -17,21 +17,29 @@
  ************************************************************************************************/
 
 /**
+ * Basic pplication infrastructure container.
+ *
  * @ingroup App
  */
 interface IAppContext
 {
 	/**
+	 * Gets the application request
+	 *
 	 * @return IAppRequest
 	 */
 	function getRequest();
 
 	/**
+	 * Gets the application response
+	 *
 	 * @return IAppResponse
 	 */
 	function getResponse();
 
 	/**
+	 * Gets the application server state
+	 *
 	 * @return IServerState
 	 */
 	function getServer();

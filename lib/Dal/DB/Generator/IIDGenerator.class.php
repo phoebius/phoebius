@@ -16,15 +16,18 @@
  *
  ************************************************************************************************/
 
-/**
- * @ingroup Core_Types
- */
-interface IReferenced
+interface IIDGenerator
 {
 	/**
-	 * @return OrmPropertyType
+	 * @return IDGeneratorType
 	 */
-	static function getRefHandler(AssociationMultiplicity $multiplicity);
+	function getType();
+
+	/**
+	 * @return mixed
+	 */
+	function generate(IdentifiableOrmEntity $entity);
+
 }
 
 ?>

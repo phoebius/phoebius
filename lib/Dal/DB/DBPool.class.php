@@ -17,24 +17,24 @@
  ************************************************************************************************/
 
 /**
- * Represents a database handle pool
+ * Represents a database pool
  * @ingroup Dal_DB
  */
 final class DBPool extends Pool
 {
 	/**
-	 * Database handle set as default
+	 * Default database
 	 * @var DB
 	 */
-	private $defaultDBHandle;
+	private $default;
 
 	/**
-	 * @var array of DB handles identified by names
+	 * @var array of named DB
 	 */
 	private $handles = array();
 
 	/**
-	 * Returns the instance of the singleton
+	 * Returns the instance of DBPool
 	 * @return DBPool
 	 */
 	static function getInstance()
@@ -43,26 +43,7 @@ final class DBPool extends Pool
 	}
 
 	/**
-	 * Gets the database handle set as default
-	 * @return DB
-	 */
-	static function getDefault()
-	{
-		return self::getInstance()->getDefaultHandle();
-	}
-
-	/**
-	 * Gets the database handle identified by name
-	 * @param string $name name to identify database handle
-	 * @return DB
-	 */
-	static function get($name)
-	{
-		return self::getInstance()->getHandle($name);
-	}
-
-	/**
-	 * Adds the database handle and identifies it by a name so it can be fetched later
+	 * Adds the database identified by name
 	 * @param string $name name to identify database handle
 	 * @param DB $db database handle itself
 	 * @param boolean $isDefault specifies wheter to set this handle as default
@@ -74,21 +55,41 @@ final class DBPool extends Pool
 	}
 
 	/**
-	 * Gets the database handle set as default
+	 * Gets the database identified by name
+	 * @param string $name name to identify database handle
 	 * @return DB
 	 */
-	function getDefaultHandle()
+	static function get($name, $connectIfDisconnected = false)
 	{
-		Assert::isTrue(
-			$this->defaultDBHandle instanceof DB,
-			'no items inside, so default item is not specified'
-		);
-
-		return $this->defaultDBHandle;
+		return self::getInstance()->getDB($name, $connectIfDisconnected);
 	}
 
 	/**
-	 * Adds the database handle and identifies it by a name so it can be fetched later
+	 * Gets the default database
+	 * @param string $name name to identify database handle
+	 * @return DB
+	 */
+	static function getDefault()
+	{
+		return self::getInstance()->getDefaultDB();
+	}
+
+	/**
+	 * Gets the default database
+	 * @return DB
+	 */
+	function getDefaultDB()
+	{
+		Assert::isTrue(
+			$this->default instanceof DB,
+			'no items inside, so default item is not specified'
+		);
+
+		return $this->default;
+	}
+
+	/**
+	 * Adds the database identified by name
 	 * @param string $name name to identify database handle
 	 * @param DB $db database handle itself
 	 * @param boolean $isDefault specifies wheter to set this handle as default
@@ -98,18 +99,18 @@ final class DBPool extends Pool
 	{
 		$this->handles[$name] = $db;
 
-		if (!$this->defaultDBHandle || $isDefault) {
-			$this->defaultDBHandle = $db;
+		if (!$this->default || $isDefault) {
+			$this->default = $db;
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Gets the database handle identified by name
+	 * Gets the database identified by name
 	 * @return DB
 	 */
-	function getHandle($name, $connectIfDisconnected = false)
+	function getDB($name, $connectIfDisconnected = false)
 	{
 		if (!isset($this->handles[$name])) {
 			throw new ArgumentException('name', 'db not found');

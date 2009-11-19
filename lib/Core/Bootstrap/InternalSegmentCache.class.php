@@ -17,8 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Implements the internal cacher to optimize bootstrapping procedures. It uses eaccelerator,
- * xcache and FS storage. If some of your classes/singletons are needed a session data between
+ * Implements the internal cacher to optimize bootstrapping procedures.
+ *
+ * It uses eaccelerator, xcache and FS storage.
+ *
+ * If some of your classes/singletons are needed a session data between
  * every script execution, just inherit this cacher and use the protected API
  * @ingroup Core_Bootstrap
  */
@@ -146,6 +149,25 @@ abstract class InternalSegmentCache
 	}
 
 	/**
+	 * @return boolean
+	 */
+	private function hasEacc()
+	{
+		return function_exists('eaccelerator_get');
+	}
+
+	/**
+	 * @return boolean
+	 */
+	private function hasXcache()
+	{
+		return
+			extension_loaded('xcache')
+			&& ini_get('xcache.var_size')
+			&& ini_get('xcache.var_slots');
+	}
+
+	/**
 	 * Actually, is is not the OOP-style to use similar methods in one, and we can divide them
 	 * by different classes, but:
 	 * 1. internal segmentation works at bootstrap, when we cannot autoload the requested classes
@@ -156,10 +178,10 @@ abstract class InternalSegmentCache
 	{
 		$cache = null;
 
-		if (function_exists('eaccelerator_get')) {
+		if ($this->hasEacc()) {
 			$cache = eaccelerator_get($this->getCacheId());
 		}
-		else if (extension_loaded('xcache')) {
+		else if ($this->hasXcache()) {
 			$id = $this->getCacheId();
 			if (xcache_isset($id)) {
 				$cache = xcache_get($id);

@@ -26,7 +26,7 @@ interface IStringCastable
 	 * Returns a string representation of an object
 	 * @return string
 	 */
-	function toString();
+	function __toString();
 }
 
 ?>

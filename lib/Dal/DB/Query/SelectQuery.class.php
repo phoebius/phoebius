@@ -259,7 +259,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 */
 	function andOrderBy(SqlOrderExpression $orderExpression)
 	{
-		$this->orderByChain->add($orderExpression);
+		$this->orderByChain->appendValue($orderExpression);
 
 		return $this;
 	}

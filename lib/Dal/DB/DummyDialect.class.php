@@ -18,6 +18,7 @@
 
 /**
  * Represents a dummy dialect
+ *
  * @ingroup Dal_DB
  */
 final class DummyDialect extends LazySingleton implements IDialect
@@ -31,19 +32,11 @@ final class DummyDialect extends LazySingleton implements IDialect
 		return LazySingleton::instance(__CLASS__);
 	}
 
-	/**
-	 * @return DBDriver
-	 */
 	function getDBDriver()
 	{
 		return new DBDriver(DBDriver::DUMMY);
 	}
 
-	/**
-	 * Quotes a string as SQL identifier
-	 * @param string $identifier
-	 * @return string
-	 */
 	function quoteIdentifier($identifier)
 	{
 		Assert::isScalar($identifier);
@@ -51,11 +44,6 @@ final class DummyDialect extends LazySingleton implements IDialect
 		return '"' . str_replace('"', '""', $identifier) . '"';
 	}
 
-	/**
-	 * Quotes a string as SQL value
-	 * @param string $value
-	 * @return string
-	 */
 	function quoteValue($value)
 	{
 		Assert::isScalarOrNull($value);
@@ -67,9 +55,6 @@ final class DummyDialect extends LazySingleton implements IDialect
 		return "'" . str_replace("'", "''", $value) . "'";
 	}
 
-	/**
-	 * @return string
-	 */
 	function getTypeRepresentation(DBType $dbType)
 	{
 		$type = $dbType->getId();
@@ -98,9 +83,6 @@ final class DummyDialect extends LazySingleton implements IDialect
 		return $type;
 	}
 
-	/**
-	 * @return array
-	 */
 	function getTableQuerySet(DBTable $table)
 	{
 		return array(

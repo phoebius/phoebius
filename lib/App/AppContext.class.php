@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Basic application infrastructure container implementation.
+ *
  * @ingroup App
  */
 class AppContext implements IAppContext
@@ -43,25 +45,16 @@ class AppContext implements IAppContext
 		$this->server = $server;
 	}
 
-	/**
-	 * @return IServerState
-	 */
 	function getServer()
 	{
 		return $this->server;
 	}
 
-	/**
-	 * @return IAppRequest
-	 */
 	function getRequest()
 	{
 		return $this->request;
 	}
 
-	/**
-	 * @return IAppResponse
-	 */
 	function getResponse()
 	{
 		return $this->response;

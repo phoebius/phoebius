@@ -17,20 +17,27 @@
  ************************************************************************************************/
 
 /**
- * Represents a custom key=>value collection
+ * Represents a custom key=>value collection.
+ *
+ * To provide a precise type check, just overwrite Collection::set().
+ *
+ * @see TypedCollection a type-safe collection implementation
+ *
  * @ingroup Core_Patterns
  */
-class Collection implements IteratorAggregate, ArrayAccess
+class Collection implements IteratorAggregate, ArrayAccess, Countable
 {
 	/**
-	 * Represents a key=>value collection
 	 * @var array
 	 */
 	private $collection = array();
 
-	function __construct(array $array = array())
+	/**
+	 * @param array set of values to be appened to a collection
+	 */
+	function __construct(array $values = array())
 	{
-		$this->append($array);
+		$this->append($values);
 	}
 
 	/**
@@ -63,6 +70,22 @@ class Collection implements IteratorAggregate, ArrayAccess
 	function offsetUnset($offset)
 	{
 		$this->drop($offset);
+	}
+
+	/**
+	 * @return int
+	 */
+	function count()
+	{
+		return sizeof($this->collection);
+	}
+
+	/**
+	 * @return int
+	 */
+	function getCount()
+	{
+		return sizeof($this->collection);
 	}
 
 	/**
@@ -153,7 +176,7 @@ class Collection implements IteratorAggregate, ArrayAccess
 	/**
 	 * @return Collection
 	 */
-	function fill(array $values)
+	function replace(array $values)
 	{
 		$this->erase()->append($values);
 

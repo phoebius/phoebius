@@ -17,13 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Represents a SQL dialect for the database
+ * Interface for accessing a database SQL dialect
+ *
  * @ingroup Dal_DB
  */
 interface IDialect
 {
 	/**
 	 * Quotes a string as SQL identifier
+	 *
 	 * @param string $identifier
 	 * @return string
 	 */
@@ -31,23 +33,30 @@ interface IDialect
 
 	/**
 	 * Quotes a string as SQL value
+	 *
 	 * @param string $value
 	 * @return string
 	 */
 	function quoteValue($value);
 
 	/**
+	 * Gets the database driver identifier
+	 *
 	 * @return DBDriver
 	 */
 	function getDBDriver();
 
 	/**
+	 * Gets the string representation of the type
+	 *
 	 * @return string
 	 */
 	function getTypeRepresentation(DBType $dbType);
 
 	/**
-	 * @return array
+	 * Gets the set of ISqlQuery queries for building a database table and associated objects
+	 *
+	 * @return array set of ISqlQuery
 	 */
 	function getTableQuerySet(DBTable $table);
 }

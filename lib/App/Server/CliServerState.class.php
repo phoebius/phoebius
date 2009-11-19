@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Wrapper over internal server state, used actually for CLI scripts.
+ *
  * @ingroup App_Server
  */
 class CliServerState implements IServerState
@@ -40,42 +42,24 @@ class CliServerState implements IServerState
 		$this->envVars = $envVars;
 	}
 
-	/**
-	 * @return array
-	 */
 	function getEnvVars()
 	{
 		return $this->envVars;
 	}
 
-	/**
-	 * @see IServerState::getArgc()
-	 *
-	 * @return integer
-	 */
 	function getArgc()
 	{
 		return $this->serverVars[CliServerStateDictionary::ARGC];
 	}
 
-	/**
-	 * @see IServerState::getArgv()
-	 *
-	 * @return array
-	 */
 	function getArgv()
 	{
 		return $this->serverVars[CliServerStateDictionary::ARGV];
 	}
 
-	/**
-	 * @see IServerState::getRequestTime()
-	 *
-	 * @return integer
-	 */
 	function getRequestTime()
 	{
-		return $this->serverVars[CliServerStateDictionary::REQUESTIME_FORMAT];
+		return $this->serverVars[CliServerStateDictionary::REQUEST_TIME];
 	}
 }
 

@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * strftime-compatible enumeration
+ * strftime()-compatible enumeration
  * @ingroup Core_Types
  */
 final class WeekDay extends Enumeration

@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Imports the variable taken from the request
+ * Gets the variable from the request and imports it as a parameter into the Trace.
  *
  * @ingroup App_Web_Routing_Rules
  */
@@ -27,22 +27,22 @@ class RequestVarImportRule implements IRewriteRule
 	 * @var string
 	 */
 	private $name;
-	
+
 	/**
 	 * @var WebRequestPart
 	 */
 	private $requestPart;
-	
+
 	/**
 	 * @var mixed|null
 	 */
 	private $defaultValue;
-	
+
 	/**
 	 * @var boolean
 	 */
 	private $isOptional;
-	
+
 	function __construct(
 		$name,
 		WebRequestPart $part = null,
@@ -52,7 +52,7 @@ class RequestVarImportRule implements IRewriteRule
 	{
 		Assert::isScalar($name);
 		Assert::isBoolean($isOptional);
-		
+
 		$this->name = $name;
 		$this->requestPart =
 			$part
@@ -61,21 +61,21 @@ class RequestVarImportRule implements IRewriteRule
 		$this->isOptional = $isOptional;
 		$this->defaultValue = $defaultValue;
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	function getParameterList($requiredOnly = true)
 	{
 		Assert::isBoolean($requiredOnly);
-		
+
 		if ($requiredOnly && $this->isOptional) {
 			return array();
 		}
-		
+
 		return array($this->name);
 	}
-	
+
 	/**
 	 * @throws RewriteException
 	 * @return array
@@ -83,7 +83,7 @@ class RequestVarImportRule implements IRewriteRule
 	function rewrite(IWebContext $webContext)
 	{
 		$request = $webContext->getRequest();
-		
+
 		if (!$request->hasVar($this->name, $this->requestPart)) {
 			if ($this->isOptional) {
 				$value = $this->defaultValue;
@@ -99,20 +99,20 @@ class RequestVarImportRule implements IRewriteRule
 		else {
 			$value = $request->getVar($this->name, $this->requestPart);
 		}
-		
+
 		return array(
 			$this->name => $value
 		);
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	function compose(SiteUrl $url, array $parameters)
 	{
 		if ($this->requestPart->is(WebRequestPart::GET)) {
-			if (isset($parameters[$this->name])) {
-				$url->addQueryArgument($this->name, $parameters[$this->name]);
+			if (array_key_exists($this->name, $parameters)) {
+				$url->addQueryArgument($this->name, (string) $parameters[$this->name]);
 			}
 			else if (!$this->isOptional) {
 				if ($this->defaultValue) {
@@ -122,7 +122,7 @@ class RequestVarImportRule implements IRewriteRule
 					// FIXME: use exception
 					Assert::isUnreachable(
 						'missing %s parameter',
-						$this->name	
+						$this->name
 					);
 				}
 			}

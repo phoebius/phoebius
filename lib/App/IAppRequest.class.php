@@ -17,6 +17,10 @@
  ************************************************************************************************/
 
 /**
+ * Basic application request interface.
+ *
+ * Contains nothing but may be extended in future to provide interface for CLI requests.
+ *
  * @ingroup App
  */
 interface IAppRequest

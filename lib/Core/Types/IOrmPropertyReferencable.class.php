@@ -17,19 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * Represents a type that can be assigned to OrmEntity property as identifier and foreign key.
+ *
  * @ingroup Core_Types
  */
-interface IGenerated
+interface IOrmPropertyReferencable
 {
 	/**
-	 * @return mixed
+	 * Gets the auxiliary type wrapper that describes the foreign key
+	 *
+	 * @return OrmPropertyType
 	 */
-	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty);
-
-	/**
-	 * @return mixed
-	 */
-	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty);
+	static function getRefHandler(AssociationMultiplicity $multiplicity);
 }
 
 ?>

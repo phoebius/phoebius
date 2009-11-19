@@ -17,7 +17,10 @@
  ************************************************************************************************/
 
 /**
- * $_SERVER-compatible dictionary
+ * Defines variables that describe the request state invoked over HTTP.
+ *
+ * This dictionary $_SERVER-compatible.
+ *
  * @ingroup App_Web
  */
 class WebRequestDictionary extends HttpUrlDictionary
@@ -26,10 +29,6 @@ class WebRequestDictionary extends HttpUrlDictionary
 	const REQUEST_METHOD = 'REQUEST_METHOD';
 	const HTTP_REFERER = 'HTTP_REFERER';
 
-	/**
-	 * Overridden
-	 * @return array
-	 */
 	protected function getDefaultValues()
 	{
 		return array (

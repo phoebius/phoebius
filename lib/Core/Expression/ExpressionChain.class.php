@@ -17,7 +17,16 @@
  ************************************************************************************************/
 
 /**
- * Represents an expression chain
+ * Represents the chain of IExpression
+ *
+ * Example:
+ * @code
+ * // "id" IN (1, 2) OR "id" IS NULL
+ * Expression::disjunction(
+ * 	Expression::inSet("id", array(1, 2),
+ * 	Expression::isNull("id")
+ * );
+ * @endcode
  * @ingroup Core_Expression
  */
 class ExpressionChain implements IExpression
@@ -33,13 +42,9 @@ class ExpressionChain implements IExpression
 	private $chain = array();
 
 	/**
-	 * @return ExpressionChain
+	 * @param ExpressionChainLogicalOperator logical operation to use when merging chain elements (conjunction or disjunction)
+	 * @param array array of IExpression
 	 */
-	static function create(ExpressionChainLogicalOperator $logicalOperator, array $elements = array())
-	{
-		return new self ($logicalOperator, $elements);
-	}
-
 	function __construct(ExpressionChainLogicalOperator $logicalOperator, array $elements = array())
 	{
 		$this->logicalOperator = $logicalOperator;
@@ -83,9 +88,6 @@ class ExpressionChain implements IExpression
 		return $this->chain;
 	}
 
-	/**
-	 * @return BinaryExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		$newChain = new self ($this->logicalOperator);
@@ -96,9 +98,6 @@ class ExpressionChain implements IExpression
 		return $newChain;
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new DalExpressionChain($this);

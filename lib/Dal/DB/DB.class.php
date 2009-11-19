@@ -17,10 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Default implementation of DAL - database abstraction layer
+ * Simple database abstraction layer.
+ *
  * @ingroup Dal_DB
  */
-abstract class DB implements IFactory
+abstract class DB
 {
 	/**
 	 * @var string|null
@@ -79,7 +80,7 @@ abstract class DB implements IFactory
 	/**
 	 * Sets the port on which the database resides
 	 * @param integer $port
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function setPort($port)
 	{
@@ -102,7 +103,7 @@ abstract class DB implements IFactory
 	/**
 	 * Overridden. Sets the encoding of the database
 	 * @param string $encoding
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function setEncoding($encoding)
 	{
@@ -124,11 +125,14 @@ abstract class DB implements IFactory
 
 	/**
 	 * Makes a connection to the database to be persistent
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function makePersistent()
 	{
-		Assert::isFalse($this->isConnected(), 'already connected');
+		Assert::isFalse(
+			$this->isConnected(),
+			'already connected - cannot switch to persistent conn'
+		);
 
 		$this->isPersistent = true;
 
@@ -137,11 +141,14 @@ abstract class DB implements IFactory
 
 	/**
 	 * Makes a connection to the database to be NOT persistent
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function makeNotPersistent()
 	{
-		Assert::isFalse($this->isConnected(), 'already connected');
+		Assert::isFalse(
+			$this->isConnected(),
+			'already connected - cannot switch to non-persistent conn'
+		);
 
 		$this->isPersistent = false;
 
@@ -160,13 +167,14 @@ abstract class DB implements IFactory
 	/**
 	 * Sets the host where the database resides
 	 * @param string $host
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function setHost($host)
 	{
 		Assert::isScalar($host);
 
 		$this->host = $host;
+
 		return $this;
 	}
 
@@ -182,7 +190,7 @@ abstract class DB implements IFactory
 	/**
 	 * Sets the name of the database
 	 * @param string $name
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function setDBName($name)
 	{
@@ -204,7 +212,7 @@ abstract class DB implements IFactory
 
 	/**
 	 * Sets the password required when authorizing to the database
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	function setPassword($password)
 	{
@@ -237,24 +245,6 @@ abstract class DB implements IFactory
 	}
 
 	/**
-	 * Not yet implemented. Gets the number of queries sent to the database
-	 * @return integer
-	 */
-	function getQueryNumber()
-	{
-		Assert::notImplemented();
-	}
-
-	/**
-	 * Not yet implemented. Gets the time spent on processing queries sent to the database
-	 * @return float
-	 */
-	function getQueryTime()
-	{
-		Assert::notImplemented();
-	}
-
-	/**
 	 * Acquires a transaction and returns it
 	 * @return Transaction
 	 */
@@ -275,7 +265,7 @@ abstract class DB implements IFactory
 	}
 
 	/**
-	 * Determines whether a database handle is connectied to a remote server
+	 * Whether a database handle is connected
 	 * @return boolean
 	 */
 	abstract function isConnected();
@@ -283,40 +273,43 @@ abstract class DB implements IFactory
 	/**
 	 * Connects to the dabase using the data specified inside handle
 	 * @throws DBConnectionException
-	 * @return DB an object itself
+	 * @return DB itself
 	 */
 	abstract function connect($force = false);
 
 	/**
 	 * Disconnects the handle from the database
-	 * @return DB an object itself
+	 * @return void
 	 */
 	abstract function disconnect();
 
 	/**
-	 * Returns the number of rows affected by the query with the specified result identifier
+	 * Returns the number of rows affected by the query sent via sendQuery()
+	 * @see DB::sendQuery()
 	 * @return integer
 	 */
-	abstract function getAffectedRowsNumber(DBQueryResultId $id);
+	abstract function getAffectedRowsNumber(DBQueryResult $result);
 
 	/**
-	 * Returns the number of rows fetched by the query with the specified result identifier
+	 * Returns the number of rows fetched by the query sent via sendQuery()
+	 * @see DB::sendQuery()
 	 * @return integer
 	 */
-	abstract function getFetchedRowsNumber(DBQueryResultId $id);
+	abstract function getFetchedRowsNumber(DBQueryResult $result);
 
 	/**
-	 * Returns the SQL dialect that conforms the database handle
+	 * Returns a SQL dialect that conforms the database
 	 * @return IDialect
 	 */
 	abstract function getDialect();
 
 	/**
-	 * Passes the query to the database and returns the resulting resource id, without fetching
+	 * Passes the query to the database and returns the query result, without fetching
 	 * the result.
-	 * @throws UniqueViolationException
 	 * @throws DBQueryException
-	 * @return DBQueryResultId
+	 * @see DB::getAffectedRowsNumber()
+	 * @see DB::getFetchedRowsNumber()
+	 * @return DBQueryResult
 	 */
 	abstract function sendQuery(ISqlQuery $query, $isAsync = false);
 
@@ -350,18 +343,10 @@ abstract class DB implements IFactory
 	abstract function getCell(ISqlSelectQuery $query);
 
 	/**
-	 * Returns next_id uid
-	 * For oracle-family databases, obtains the id by incrementing a generator
-	 * For mssql-family database makes nothing (will use LAST_INSERT_ID() and etc later on IDialect::getGeneratedValue())
-	 * MUST BE CALLED before the insert query
+	 * Gets the column value generator
+	 * @return IIDGenerator
 	 */
-	abstract function preGenerate($tableName, $columnName);
-
-	/**
-	 * MUST BE CALLED RIGHT AFTER the insert query
-	 * @return scalar
-	 */
-	abstract function getGeneratedId($tableName, $columnName);
+	abstract function getGenerator($tableName, $columnName, DBType $type);
 }
 
 ?>

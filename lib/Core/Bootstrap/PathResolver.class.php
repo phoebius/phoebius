@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Resolves the system paths to be shared betwenn application components
+ * Resolves the system paths to be shared between application components
+ * @deprecated
  * @ingroup Core_Bootstrap
  */
 final class PathResolver extends LazySingleton

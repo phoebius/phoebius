@@ -115,7 +115,7 @@ abstract class ActionBasedController extends Controller
 				return $value;
 			}
 		}
-		else if ($class->implementsInterface('IObjectMappable')) {
+		else if ($class->implementsInterface('IObjectCastable')) {
 			try {
 				return call_user_func_array(
 					array($class->name, 'cast'),

@@ -17,15 +17,16 @@
  ************************************************************************************************/
 
 /**
- * FIXME: rename
+ * Represents a boxed identifier.
+ *
+ * A boxable type is a type that can be accurately represented either as primitive or as an object
+ * of the corresponding class.
+ *
  * @ingroup Core_Types
  */
-interface IHandled
+interface IBoxableIdentifier extends IBoxable
 {
-	/**
-	 * @return OrmPropertyType
-	 */
-	static function getHandler(AssociationMultiplicity $multiplicity);
+	// nothing here
 }
 
 ?>

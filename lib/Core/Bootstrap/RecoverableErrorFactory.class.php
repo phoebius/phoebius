@@ -18,13 +18,11 @@
 
 /**
  * @see http://google.com/codesearch?hl=ru&lr=&q=lang%3Ac+package%3Aphp-5.2.1+e_recoverable_error
+ *
  * @ingroup Core_Bootstrap
  */
 class RecoverableErrorFactory extends StaticClass implements IErrorExceptionFactory
 {
-	/**
-	 * @return ErrorException
-	 */
 	static function makeException($errstr, $errno, $errfile, $errline)
 	{
 		Assert::isTrue(

@@ -17,7 +17,10 @@
  ************************************************************************************************/
 
 /**
- * $_SERVER-compatible dictionary
+ * Defines variables that describe the request URL.
+ *
+ * This dictionary $_SERVER-compatible.
+ *
  * @ingroup App_Web
  */
 class HttpUrlDictionary extends Dictionary
@@ -27,10 +30,6 @@ class HttpUrlDictionary extends Dictionary
 	const HOST = 'HTTP_HOST';
 	const HTTPS = 'HTTPS';
 
-	/**
-	 * Overridden
-	 * @return array
-	 */
 	protected function getDefaultValues()
 	{
 		return array (

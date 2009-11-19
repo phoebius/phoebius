@@ -17,27 +17,38 @@
  ************************************************************************************************/
 
 /**
+ * Interface wrapper over internal server state
+ *
  * @ingroup App_Server
  */
 interface IServerState
 {
 	/**
-	 * @return ArrayObject
+	 * @return array
 	 */
 	function getEnvVars();
 
 	/**
-	 * Aka REQUESTIME_FORMAT
+	 * Aka REQUEST_TIME
+	 *
 	 * @return integer
 	 */
 	function getRequestTime();
 
 	/**
+	 * Aka $argv.
+	 *
+	 * Gets the list of arguments passed to the script.
+	 *
 	 * @return array
 	 */
 	function getArgv();
 
 	/**
+	 * Aka $argc.
+	 *
+	 * Gets the number of arguments passed to the script.
+	 *
 	 * @return integer
 	 */
 	function getArgc();

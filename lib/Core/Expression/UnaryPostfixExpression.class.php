@@ -18,6 +18,13 @@
 
 /**
  * Represents a postfix unary expression
+ *
+ * SQL example:
+ * @code
+ * // "id" IS NOT NULL
+ * Expression::notNull("id");
+ * @endcode
+ *
  * @ingroup Core_Expression
  */
 class UnaryPostfixExpression implements IExpression
@@ -54,9 +61,6 @@ class UnaryPostfixExpression implements IExpression
 		return $this->logic;
 	}
 
-	/**
-	 * @return UnaryPostfixExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		return new self(
@@ -65,20 +69,9 @@ class UnaryPostfixExpression implements IExpression
 		);
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new UnaryPostfixDalExpression($this);
-	}
-
-	/**
-	 * @return ExpressionType
-	 */
-	function getExpressionType()
-	{
-		return new ExpressionType(ExpressionType::UNARY_POSTFIX);
 	}
 }
 

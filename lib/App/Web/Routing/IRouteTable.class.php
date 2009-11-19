@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an interface to the set of named application routes (objects of the Route class).
+ *
  * @ingroup App_Web_Routing
  */
 interface IRouteTable

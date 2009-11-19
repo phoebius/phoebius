@@ -17,24 +17,20 @@
  ************************************************************************************************/
 
 /**
+ * Implements class resolver for classes which names partially reflect the path to the file where
+ * those classes reside
+ *
  * @ingroup Core_Bootstrap
  */
 abstract class FilesystemReflectedClassResolver extends ClassResolver
 {
 	/**
-	 * Re
-	 * @param string $classname
-	 * @return string
+	 * Makes the possible path to the file containing the requested class
+	 * @param string name of the class
+	 * @return string possible path to the file containing the requested class
 	 */
 	abstract function canonizeClassName($classname);
 
-	/**
-	 * Searches for the file containing the requested class withing the specified directory
-	 * @param string $classname
-	 * @param string $rootDirectory
-	 * @return string|null returns the absolute path to the file containing the requested class
-	 * 	or NULL if such file not found
-	 */
 	protected function findFilePath($classname, $rootDirectory)
 	{
 		$subPath = $this->canonizeClassName($classname) . '.' . $this->getExtension();

@@ -17,6 +17,9 @@
  ************************************************************************************************/
 
 /**
+ * Route is an object that matches the specifically-looking request using the rules (IRewriteRule
+ * objects).
+ *
  * @ingroup App_Web_Routing
  */
 class Route

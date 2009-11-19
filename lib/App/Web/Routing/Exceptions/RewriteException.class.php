@@ -17,10 +17,6 @@
  ************************************************************************************************/
 
 /**
- *  * missing varable
- *  * variable constraint failure
- *
- *
  * @ingroup App_Web_Routing_Exceptions
  */
 class RewriteException extends StateException

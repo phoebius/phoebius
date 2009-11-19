@@ -17,11 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * Represents a type that can be assigned to OrmEntity property.
+ *
  * @ingroup Core_Types
  */
-interface IBoxed extends IObjectMappable, IScalarMappable
+interface IOrmPropertyAssignable
 {
-	//function __toString();
+	/**
+	 * Gets the auxiliary type wrapper that describes the type
+	 *
+	 * @return OrmPropertyType
+	 */
+	static function getHandler(AssociationMultiplicity $multiplicity);
 }
 
 ?>

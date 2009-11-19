@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Interface over container of HTTP wrappers.
+ *
  * @ingroup App_Web
  */
 interface IWebContext extends IAppContext

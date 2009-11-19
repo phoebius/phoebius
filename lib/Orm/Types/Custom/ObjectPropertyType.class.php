@@ -27,7 +27,7 @@ class ObjectPropertyType extends PrimitivePropertyType
 	private $type;
 
 	/**
-	 * @param $type should implement {@link IBoxed}
+	 * @param $type should implement {@link IBoxable}
 	 */
 	function __construct($type, $defaultValue = null, $isNullable = true)
 	{
@@ -35,8 +35,8 @@ class ObjectPropertyType extends PrimitivePropertyType
 			throw new OrmModelIntegrityException("{$type} not found");
 		}
 
-		if (!in_array('IBoxed', class_implements($type))) {
-			throw new OrmModelIntegrityException("{$type} should implement IBoxed");
+		if (!in_array('IBoxable', class_implements($type))) {
+			throw new OrmModelIntegrityException("{$type} should implement IBoxable");
 		}
 
 		$this->type = $type;
@@ -105,7 +105,7 @@ class ObjectPropertyType extends PrimitivePropertyType
 		return array(
 			new ScalarSqlValue(
 				$value
-					? $value->toScalar()
+					? (string) $value
 					: null
 			)
 		);

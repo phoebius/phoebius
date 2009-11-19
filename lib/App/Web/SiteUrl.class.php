@@ -17,6 +17,19 @@
  ************************************************************************************************/
 
 /**
+ * Implements the url that provides precise control of various url subparts.
+ *
+ * This class defines a set of new subparts:
+ * - base host
+ * - subdomain
+ * - base path
+ * - virtual path
+ *
+ * Schema is the following:
+ * @code
+ * http://<subdomain>.<base host></base path></virtual path>
+ * @endcode
+ *
  * @ingroup App_Web
  */
 class SiteUrl extends HttpUrl
@@ -25,20 +38,25 @@ class SiteUrl extends HttpUrl
 	private $basePath = null;
 
 	/**
+	 * Constructs a SiteUrl object from request variables
+	 *
 	 * @return SiteUrl
 	 */
 	static function import(HttpUrlDictionary $dictionary, $baseHost = null, $baseUri = '/')
 	{
 		$url = new self;
 
-		$url->setBaseHost($baseHost);
+		if ($baseHost) {
+			$url->setBaseHost($baseHost);
+		}
+
 		$url->setBasePath($baseUri);
 
 		$url
 			->setScheme(
 				$dictionary->getField(HttpUrlDictionary::HTTPS)
-					? "https"
-					: "http"
+					? 'https'
+					: 'http'
 			)
 			->setHost($dictionary->getField(HttpUrlDictionary::HOST))
 			->setPort($dictionary->getField(HttpUrlDictionary::PORT));
@@ -73,10 +91,6 @@ class SiteUrl extends HttpUrl
 		return $url;
 	}
 
-	/**
-	 * @param string $host
-	 * @return SiteUrl an object itself
-	 */
 	function setHost($host)
 	{
 		parent::setHost($host);
@@ -89,12 +103,14 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
+	 * Gets the subdomain - a left part of the host with stripped base host
+	 *
 	 * @return string
 	 */
 	function getSubdomain()
 	{
 		if ($this->baseHost) {
-			return substr($this->host, 0, strlen($this->baseHost));
+			return substr($this->host, 0, -(1 + strlen($this->baseHost)));
 		}
 		else {
 			return $this->host;
@@ -102,29 +118,33 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
-	 * @return SiteUrl
+	 * Sets the subdomain prepending it to the base host
+	 *
+	 * @return SiteUrl itself
 	 */
 	function setSubdomain($subdomain = null)
 	{
 		Assert::isScalarOrNull($subdomain);
-		
+
 		$host =
 			$subdomain
 				? $subdomain . '.' . $this->baseHost
 				: $this->baseHost;
-				
+
 		$this->setHost($host);
 
 		return $this;
 	}
 
 	/**
-	 * @param string $baseHost
+	 * Sets the base host
+	 *
+	 * @param string
 	 * @return SiteUrl an object itself
 	 */
-	function setBaseHost($baseHost = null)
+	function setBaseHost($baseHost)
 	{
-		Assert::isScalarOrNull($baseHost);
+		Assert::isScalar($baseHost);
 
 		$this->baseHost = $baseHost;
 
@@ -132,6 +152,8 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
+	 * Gets the base host
+	 *
 	 * @return string|null
 	 */
 	function getBaseHost()
@@ -140,6 +162,8 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
+	 * Gets the base path - a path between host and virtual path
+	 *
 	 * @return string
 	 */
 	function getBasePath()
@@ -148,18 +172,28 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
+	 * Sets the base path
+	 *
 	 * @return SiteUrl an object itself
 	 */
 	function setBasePath($basePath = '/')
 	{
 		Assert::isScalar($basePath);
 
-		$this->basePath = trim($basePath, '/');
+		$basePath = '/' . ltrim($basePath, '/');
+
+		if ($basePath == '/') {
+			$basePath = null;
+		}
+
+		$this->basePath = $basePath;
 
 		return $this;
 	}
 
 	/**
+	 * Gets the virtual path.
+	 *
 	 * @return string
 	 */
 	function getVirtualPath()
@@ -171,6 +205,7 @@ class SiteUrl extends HttpUrl
 		}
 
 		$prefix = substr($path, 0, strlen($this->basePath));
+
 		if ($this->basePath == $prefix) {
 			$path = substr($path, strlen($this->basePath));
 		}
@@ -179,24 +214,30 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
+	 * Sets the virtual path.
+	 *
 	 * @return SiteUrl
 	 */
 	function setVirtualPath($path)
 	{
-		$this->setPath(
-			$this->basePath . '/' . ltrim($path, '/')
-		);
+		$path = $this->basePath .  '/' . ltrim($path, '/');
+
+		$this->setPath($path);
 
 		return $this;
 	}
 
 	/**
+	 * Clones the SiteUrl object and erases virtual path and subdomain leaving base host and
+	 * base path untouched.
+	 *
 	 * @return SiteUrl
 	 */
 	function spawnBase()
 	{
 		$clone = clone $this;
-		$clone->setPath('/');
+
+		$clone->setVirtualPath('/');
 		$clone->setSubdomain(null);
 
 		return $clone;

@@ -81,6 +81,5 @@ Container works like a typical property except that:
 	name			CDATA #REQUIRED
 	type			CDATA #REQUIRED
 	refs			CDATA "id"
-	db-columns		CDATA #IMPLIED
 >
 

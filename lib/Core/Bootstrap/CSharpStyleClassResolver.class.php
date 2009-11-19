@@ -44,6 +44,10 @@ final class CSharpStyleClassResolver extends ClassResolver
 	 */
 	private $allowPreScan = false;
 
+	/**
+	 * @param boolean whether to use include path or not
+	 * @param boolean whether to allow pre-scanning technique or not. PreScan is important for huge and distributed class locations
+	 */
 	function __construct($useIncludePath = true, $allowPreScan = false)
 	{
 		Assert::isBoolean($allowPreScan);
@@ -64,13 +68,6 @@ final class CSharpStyleClassResolver extends ClassResolver
 		return new self ($useIncludePath, $allowPreScan);
 	}
 
-	/**
-	 * Searches for the file containing the requested class withing the specified directory
-	 * @param string $classname
-	 * @param string $rootDirectory
-	 * @return string|null returns the absolute path to the file containing the requested class
-	 * 	or NULL if such file not found
-	 */
 	protected function findFilePath($classname, $rootDirectory)
 	{
 		// USE PRE CACHE

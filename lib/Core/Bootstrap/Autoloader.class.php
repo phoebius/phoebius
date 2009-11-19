@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Just-in-time entity assembing. Finds a file containing the requested class, loads it and puts
+ * Just-in-time entity assembler. Finds a file containing the requested class, loads it and puts
  * to a cache.
  *
  * @ingroup Core_Bootstrap
@@ -155,10 +155,6 @@ final class Autoloader extends LazySingleton implements IAutoloader
 		return sha1($hash);
 	}
 
-	/**
-	 * Registers an object as class autoloader
-	 * @return Autoloader
-	 */
 	function register()
 	{
 		spl_autoload_register(array($this, 'loadClass'));
@@ -166,10 +162,6 @@ final class Autoloader extends LazySingleton implements IAutoloader
 		return $this;
 	}
 
-	/**
-	 * Unregisters the object autoload
-	 * @return Autoloader
-	 */
 	function unregister()
 	{
 		spl_autoload_unregister(array($this, 'loadClass'));

@@ -17,6 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * LIFO route chain implementation.
+ *
+ * Aggregates routes and lookups the first route that matches the request without an explicit
+ * RouteException.
+ *
+ * Use ChainedRouter::route() for filling the chain with your own common application-wide routes.
+ *
+ * Example:
+ * @code
+ * $router->route("blogEntry", "/blog:controller/entry:action/?id");
+ * @endcode
+ *
  * @ingroup App_Web_Routing
  */
 class ChainedRouter implements IRouteTable, IRouter
@@ -45,7 +57,7 @@ class ChainedRouter implements IRouteTable, IRouter
 	{
 		$this->defaultDispatcher = $dispatcher;
 	}
-	
+
 	/**
 	 * @return IRouteDispatcher
 	 */
@@ -53,14 +65,16 @@ class ChainedRouter implements IRouteTable, IRouter
 	{
 		return $this->defaultDispatcher;
 	}
-	
+
 	/**
 	 * Smart route assembler.
+	 *
 	 * Accepts the name of the route to be assembled, URI to be used as a template for the rules.
+	 *
 	 * Example:
-	 * <code>
-	 * $this->route("blogEntry", "/blog:controller/entry:action/?id");
-	 * </code>
+	 * @code
+	 * $router->route("blogEntry", "/blog:controller/entry:action/?id");
+	 * @endcode
 	 *
 	 * In future, the third parameter will be allowed to contain various objects that will be
 	 * smartly mapped to appropriate rules.
@@ -68,25 +82,25 @@ class ChainedRouter implements IRouteTable, IRouter
 	 * @param string $name name of the route
 	 * @param string $uri URI that will be used as request variables template
 	 * @param array $parameters array of parameters to be appended to Trace
-	 * @return ChainedRouter
+	 * @return ChainedRouter itself
 	 */
 	function route($name, $uri, array $parameters = array())
 	{
 		Assert::isScalar($name);
 		Assert::isScalar($uri);
-		
+
 		$rules = array();
-		
+
 		$parsedUrlPattern = parse_url($uri);
-		
+
 		if (isset($parsedUrlPattern['path'])) {
 			$rules[] = new PathRewriteRule($parsedUrlPattern['path']);
 		}
-		
+
 		if (isset($parsedUrlPattern['query'])) {
 			$queryStringVariables = array();
 			parse_str($parsedUrlPattern['query'], $queryStringVariables);
-			
+
 			foreach ($queryStringVariables as $qsVar => $qsValue) {
 				$rules[] = new RequestVarImportRule(
 					$qsVar,
@@ -96,16 +110,16 @@ class ChainedRouter implements IRouteTable, IRouter
 				);
 			}
 		}
-		
+
 		foreach ($parameters as $parameter => $value) {
 			$rules[] = new ParameterImportRule($parameter, $value);
 		}
-		
+
 		$this->addRoute($name, new Route($this->defaultDispatcher, $rules));
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @return Trace|null
 	 */
@@ -129,7 +143,7 @@ class ChainedRouter implements IRouteTable, IRouter
 
 		return $trace;
 	}
-	
+
 	/**
 	 * @return Trace
 	 */

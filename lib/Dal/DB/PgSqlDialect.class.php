@@ -111,15 +111,6 @@ class PgSqlDialect extends LazySingleton implements IDialect
 	}
 
 	/**
-	 * Gets the string that is used to concatenate database objects
-	 * @return string
-	 */
-	function getConcatenationOperator()
-	{
-		return '||';
-	}
-
-	/**
 	 * FIXME: cut out basic type representation casted to a base DbDialect class
 	 * @return string
 	 */

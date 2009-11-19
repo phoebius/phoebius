@@ -65,8 +65,10 @@ class AssociationPropertyType extends OrmPropertyType
 		$this->container = $container;
 
 		Assert::isTrue(
-			Type::of($identifier->getType())->isChildOf(new Type('IReferenced'))
-			// TODO: clean up
+			TypeUtils::isChild(
+				$identifier->getType(),
+				'IOrmPropertyReferencable'
+			)
 		);
 
 		$this->identifierType = call_user_func(

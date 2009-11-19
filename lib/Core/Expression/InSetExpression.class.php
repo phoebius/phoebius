@@ -18,6 +18,13 @@
 
 /**
  * Represents the IN expression used in query logic
+ *
+ * SQL example:
+ * @code
+ * // "type" IN ("completed", "pending")
+ * Expression::in("type", array("completed", "pending"));
+ * @endcode
+ *
  * @ingroup Core_Expression
  */
 class InSetExpression implements IExpression
@@ -37,6 +44,11 @@ class InSetExpression implements IExpression
 	 */
 	private $logic;
 
+	/**
+	 * @param mixed expression subject
+	 * @param array set of values the subject should match
+	 * @param InSetLogicalOperator|null matching operator
+	 */
 	function __construct($subject, array $set, InSetLogicalOperator $logic = null)
 	{
 		$this->subject = $subject;
@@ -71,9 +83,6 @@ class InSetExpression implements IExpression
 		return $this->logic;
 	}
 
-	/**
-	 * @return InSetExpression
-	 */
 	function toExpression(IExpressionSubjectConverter $converter)
 	{
 		return new self(
@@ -96,20 +105,9 @@ class InSetExpression implements IExpression
 		return $set;
 	}
 
-	/**
-	 * @return BinaryDalExpression
-	 */
 	function toDalExpression()
 	{
 		return new InSetDalExpression($this);
-	}
-
-	/**
-	 * @return ExpressionType
-	 */
-	function getExpressionType()
-	{
-		return new ExpressionType(ExpressionType::IN_SET);
 	}
 }
 

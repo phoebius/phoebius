@@ -365,7 +365,7 @@ final class Assert extends StaticClass
 
 	/**
 	 * Checks if assertion is boolean
-	 * @param mixed $assertion
+	 * @param mixed
 	 * @param string $message optional string to be printed when assertion check fails
 	 * @return void
 	 */

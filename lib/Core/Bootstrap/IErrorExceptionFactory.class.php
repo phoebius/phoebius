@@ -17,11 +17,15 @@
  ************************************************************************************************/
 
 /**
+ * Factory for producing exceptions that wrap PHP errors.
+ *
  * @ingroup Core_Bootstrap
  */
 interface IErrorExceptionFactory
 {
 	/**
+	 * Converts error to exception
+	 *
 	 * @return ErrorException
 	 */
 	static function makeException($errstr, $errno, $errfile, $errline);

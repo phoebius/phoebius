@@ -17,6 +17,10 @@
  ************************************************************************************************/
 
 /**
+ * Interface for handling Trace object.
+ *
+ * Gets the request handler that corresponds the route taken from IRouter.
+ *
  * @ingroup App_Web_Routing
  */
 interface IRouteDispatcher

@@ -17,11 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Represents the PostgreSQL database handle
+ * Represents the PostgreSQL DAL
+ *
  * @ingroup Dal_DB
  */
 class PgSqlDB extends DB
 {
+	/**
+	 * @var PgSqlDialect|null
+	 */
+	private $dialect;
+
 	/**
 	 * @var array
 	 */
@@ -33,6 +39,11 @@ class PgSqlDB extends DB
 	private $link = null;
 
 	/**
+	 * @var array of DBQueryResult
+	 */
+	private $queryResults = array();
+
+	/**
 	 * @return PgSqlDB
 	 */
 	static function create()
@@ -40,11 +51,6 @@ class PgSqlDB extends DB
 		return new self;
 	}
 
-	/**
-	 * Connects to the database using the data specified inside handle
-	 * @throws DBConnectionException
-	 * @return PgSqlDB an object itself
-	 */
 	function connect($force = false)
 	{
 		if ($this->isConnected() && !$force) {
@@ -106,10 +112,6 @@ class PgSqlDB extends DB
 		return $this;
 	}
 
-	/**
-	 * Disconnects the handle from the database
-	 * @return PgSqlDB an object itself
-	 */
 	function disconnect()
 	{
 		if ($this->isConnected()) {
@@ -126,42 +128,35 @@ class PgSqlDB extends DB
 		return $this;
 	}
 
-	/**
-	 * Returns the number of rows affected by the query with the specified result identifier
-	 * @return integer
-	 */
-	function getAffectedRowsNumber(DBQueryResultId $id)
+	function getAffectedRowsNumber(DBQueryResult $result)
 	{
-		Assert::isTrue($id->isValid($this));
+		Assert::isTrue(
+			isset($this->queryResults[spl_object_hash($result)]),
+			'unknown DBQueryResult'
+		);
 
-		return pg_affected_rows($id->getResultId());
+		return pg_affected_rows($result->getResource());
 	}
 
-	/**
-	 * Returns the number of rows fetched by the query with the specified result identifier
-	 * @return integer
-	 */
-	function getFetchedRowsNumber(DBQueryResultId $id)
+	function getFetchedRowsNumber(DBQueryResult $result)
 	{
-		Assert::isTrue($id->isValid($this));
+		Assert::isTrue(
+			isset($this->queryResults[spl_object_hash($result)]),
+			'unknown DBQueryResult'
+		);
 
-		return pg_num_rows($id->getResultId());
+		return pg_num_rows($result->getResource());
 	}
 
-	/**
-	 * Returns the SQL dialect that conforms the database handle
-	 * @return IDialect
-	 */
 	function getDialect()
 	{
-		return PgSqlDialect::getInstance();
+		if (!$this->dialect) {
+			$this->dialect = PgSqlDialect::getInstance();
+		}
+
+		return $this->dialect;
 	}
 
-	/**
-	 * Overridden. Sets the encoding of the database
-	 * @param string $encoding
-	 * @return PgSqlDB
-	 */
 	function setEncoding($encoding)
 	{
 		parent::setEncoding($encoding);
@@ -169,52 +164,33 @@ class PgSqlDB extends DB
 		if ($this->isConnected()) {
 			$result = pg_set_client_encoding($this->link, $encoding);
 
-			Assert::isFalse($result == -1, "invalid encoding `{$encoding}` is specified");
+			Assert::isFalse(
+				$result == -1,
+				'invalid encoding `%s` is specified',
+				$encoding
+			);
 		}
+
 
 		return $this;
 	}
 
-	/**
-	 * Passes the query to the database and returns the resulting resource id, without fetching
-	 * the result.
-	 * @throws UniqueViolationException
-	 * @throws PgSqlQueryException
-	 * @return DBQueryResultId
-	 */
 	function sendQuery(ISqlQuery $query, $isAsync = false)
 	{
-		try {
-			$resource = $this->performQuery(
-				$query,
-				(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_SEVERITY_VERBOSE) == 0
-					? $isAsync
-					: false
-			);
-		}
-		catch (PgSqlQueryException $e) {
-			// If query is async and it fails, we should alert about it as loud as possible
-			Assert::isFalse(
-				$isAsync,
-				'Async query failed with code %s (%s) and message %s. The query itself: %s',
-				$e->getSystemMessage()->getErrorCode(),
-				$e->getSystemMessage()->getErrorDescription(),
-				$e->getMessage(),
-				$query->toDialectString($this->getDialect())
-			);
+		$resource = $this->performQuery(
+			$query,
+			(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_SEVERITY_VERBOSE) == 0
+				? $isAsync
+				: false
+		);
 
-			throw $e;
-		}
+		$result = new DBQueryResult($this, $resource);
 
-		return new DBQueryResultId($this, $resource);
+		$this->queryResults[spl_object_hash($result)] = true;
+
+		return $result;
 	}
 
-	/**
-	 * Passes the query to the database and fetches a single-row result as an array representing
-	 * a row
-	 * @throws RowNotFoundException
-	 * @return array
-	 */
 	function getRow(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -234,11 +210,6 @@ class PgSqlDB extends DB
 		return $row;
 	}
 
-	/**
-	 * Passes the query to the database and fetches the first field of each row from a set of rows.
-	 * Returns the array representing the set of column values, or empty array if no rows found.
-	 * @return array
-	 */
 	function getColumn(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -259,11 +230,6 @@ class PgSqlDB extends DB
 		}
 	}
 
-	/**
-	 * Passes the query to the database and fetches the first field from a single-row result
-	 * @throws CellNotFoundException
-	 * @return scalar
-	 */
 	function getCell(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -281,11 +247,6 @@ class PgSqlDB extends DB
 		}
 	}
 
-	/**
-	 * Passes the query to the database and fetches the set of resulting rows. If nothing to
-	 * fetch, empty array is returned
-	 * @return array
-	 */
 	function getRows(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -314,6 +275,7 @@ class PgSqlDB extends DB
 	{
 		Assert::isBoolean($isAsync);
 
+		// TODO ISqlQuery should generate its own hash by itself
 		$queryAsString = $query->toDialectString($this->getDialect());
 		$statementId = md5($queryAsString);
 
@@ -324,7 +286,7 @@ class PgSqlDB extends DB
 			if (PGSQL_COMMAND_OK != pg_result_status($result, PGSQL_STATUS_LONG))
 			{
 				$errorCode = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
-				// We generate a uniq statement id for each query so prepared statement
+				// We generate a unique statement id for each query so prepared statement
 				// duplication occcurs here only within the persistent connection
 				// (because prepared statements are shared between different clients
 				// that use the same connection)
@@ -347,8 +309,7 @@ class PgSqlDB extends DB
 	}
 
 	/**
-	 * @throws PgSqlQueryException
-	 * @throws UniqueViolationException
+	 * @throws DBQueryException
 	 * @param ISqlQUery $query
 	 * @param boolean $isAsync
 	 * @return resource
@@ -388,42 +349,27 @@ class PgSqlDB extends DB
 		return $result;
 	}
 
-	/**
-	 * Determines whether a database handle is connectied to a remote server
-	 * @return boolean
-	 */
 	function isConnected()
 	{
 		return is_resource($this->link);
 	}
 
-	private $generatedIds = array();
-
 	/**
-	 * @return int|null
+	 * @todo replace seq with `RETURNING` syntax
 	 */
-	function preGenerate($tableName, $columnName)
+	function getGenerator($tableName, $columnName, DBType $type)
 	{
-		$this->generatedIds[$tableName.$columnName] = $this->getCell(
+		$query =
 			SelectQuery::create()
 				->getExpr(
 					SqlFunction::create('nextval')->addArg(
 						new ScalarSqlValue(
-							PgSqlDialect::getInstance()->getSequenceName($tableName, $columnName)
+							$this->getDialect()->getSequenceName($tableName, $columnName)
 						)
 					)
-				)
-		);
+				);
 
-		return $this->generatedIds[$tableName.$columnName];
-	}
-
-	/**
-	 * @return scalar
-	 */
-	function getGeneratedId($tableName, $columnName)
-	{
-		return $this->generatedIds[$tableName.$columnName];
+		return new SequenceGenerator($this, $query);
 	}
 }
 

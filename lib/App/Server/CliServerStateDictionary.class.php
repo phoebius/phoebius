@@ -17,14 +17,19 @@
  ************************************************************************************************/
 
 /**
- * $_SERVER-compatible dictionary
+ * Defines variables that describe the state of the server that hosts the application.
+ *
+ * This dictionary can be used for running CLI applications.
+ *
+ * This dictionary $_SERVER-compatible.
+ *
  * @ingroup App_Server
  */
 class CliServerStateDictionary extends Dictionary
 {
 	const ARGV = 'argv';
 	const ARGC = 'argc';
-	const REQUESTIME_FORMAT = 'REQUESTIME_FORMAT';
+	const REQUEST_TIME = 'REQUEST_TIME';
 }
 
 ?>

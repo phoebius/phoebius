@@ -17,27 +17,44 @@
  ************************************************************************************************/
 
 /**
+ * Type-safe collection
+ *  *
  * @ingroup Core_Patterns
  */
 abstract class TypedCollection extends Collection
 {
-	/**
-	 * Determines whether the specified value is of valid type supported by the collection
-	 * implementation
-	 * @return boolean
-	 */
-	abstract protected function isValueOfValidType($value);
+	private $type;
 
 	/**
-	 * @return Collection
+	 * @param $type name of a type
+	 * @param $array initial values to be imported to the collection
 	 */
-	function addPair($key, $value)
+	function __construct($type, array $array = array())
 	{
-		if (!$this->isValueOfValidType($value)) {
-			throw new ArgumentException('value', 'not of expected type');
-		}
+		$this->type =
+			is_object($type)
+				? get_class($type)
+				: $type;
 
-		return parent::addPair($key, $value);
+		parent::__construct($array);
+	}
+
+	/**
+	 * @return TypedCollection
+	 */
+	function set($key, $value)
+	{
+		Assert::isTrue(
+			($value instanceof $this->type),
+			'wrong type passed to %s, expected %s but %s found',
+			get_class($this),
+			$this->type,
+			gettype($value)
+		);
+
+		parent::set($key, $value);
+
+		return $this;
 	}
 }
 

@@ -554,7 +554,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return DB
 	 */
-	private function getDB()
+	function getDB()
 	{
 		return $this->db->connect(false);
 	}

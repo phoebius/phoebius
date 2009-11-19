@@ -43,7 +43,7 @@ final class Timestamp extends Date
 			return new self($value);
 		}
 		catch (ArgumentException $e) {
-			throw new TypeCastException(new Type(__CLASS__), $value);
+			throw new TypeCastException(__CLASS__, $value);
 		}
 	}
 

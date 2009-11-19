@@ -17,12 +17,16 @@
  ************************************************************************************************/
 
 /**
+ * Interface for writing data to a source.
+ *
  * @ingroup Utils_Stream
  */
 interface IOutput
 {
 	/**
-	 * @return IOutput
+	 * Writes the string to the source.
+	 *
+	 * @return IOutput itself
 	 */
 	function write($buffer);
 }

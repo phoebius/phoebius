@@ -17,6 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * Represents a temp file.
+ *
+ * @todo file is unlinked on object destruction (in case when $keepAfterShutdown = false). This is
+ * 		not good behaviour - we should drop the file using register_shutdown_function
+ *
  * @ingroup Core_FS
  */
 class TempFile implements IOutput
@@ -32,13 +37,8 @@ class TempFile implements IOutput
 	private $path;
 
 	/**
-	 * @return TempFile
+	 * @param boolean whether to keep the file after application termination or not
 	 */
-	static function create($keepAfterShutdown = false)
-	{
-		return new self ($keepAfterShutdown);
-	}
-
 	function __construct($keepAfterShutdown = false)
 	{
 		$this->path = FSUtils::getTempFilename(__CLASS__);

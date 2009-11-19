@@ -17,22 +17,22 @@
  ************************************************************************************************/
 
 /**
+ * Represents the expression tree node.
+ *
  * @ingroup Core_Expression
  */
 interface IExpression
 {
 	/**
-	 * @obsolete
-	 * @return ExpressionType
-	 */
-	//function getExpressionType();
-
-	/**
+	 * Creates a clone of expression passing the subject thru the IExpressionSubjectConverter
+	 *
 	 * @return IExpression
 	 */
 	function toExpression(IExpressionSubjectConverter $converter);
 
 	/**
+	 * Converts the expression to IDalExpression.
+	 *
 	 * @return IDalExpression
 	 */
 	function toDalExpression();

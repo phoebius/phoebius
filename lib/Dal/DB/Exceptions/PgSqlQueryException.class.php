@@ -41,7 +41,7 @@ final class PgSqlQueryException extends DBQueryException
 	 */
 	function getSystemMessage()
 	{
-		return PgSqlError::create($this->sqlState);
+		return new PgSqlError($this->sqlState);
 	}
 }
 

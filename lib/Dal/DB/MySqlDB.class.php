@@ -17,15 +17,23 @@
  ************************************************************************************************/
 
 /**
+ * Represents the MySQL DAL
+ *
  * @ingroup Dal_DB
  */
 class MySqlDB extends DB
 {
 	/**
-	 * For mysql_affected_rows
-	 * @var DBQueryResultId
+	 * For mysql_affected_rows()
+	 *
+	 * @var DBQueryResult
 	 */
 	private $latestQueryResultId;
+
+	/**
+	 * @var array of DBQueryResult
+	 */
+	private $queryResults = array();
 
 	/**
 	 * @var resource|null
@@ -45,17 +53,11 @@ class MySqlDB extends DB
 		return new self;
 	}
 
-	/**
-	 * Connects to the database using the data specified inside handle
-	 * @throws DBConnectionException
-	 * @return MySqlDB an object itself
-	 */
 	function connect($force = false)
 	{
 		if ($this->isConnected() && !$force) {
 			return $this;
 		}
-
 
 		$connectionArguments = array(
 			$this->getHost(),
@@ -92,10 +94,6 @@ class MySqlDB extends DB
 		return $this;
 	}
 
-	/**
-	 * Disconnects the handle from the database
-	 * @return MySqlDB an object itself
-	 */
 	function disconnect()
 	{
 		if ($this->isConnected()) {
@@ -107,54 +105,41 @@ class MySqlDB extends DB
 			}
 
 			$this->link = null;
+			$this->latestQueryResultId = null;
 		}
 
 		return $this;
 	}
 
-	/**
-	 * Returns the number of rows affected by the query with the specified result identifier
-	 * @return integer
-	 */
-	function getAffectedRowsNumber(DBQueryResultId $id)
+	function getAffectedRowsNumber(DBQueryResult $result)
 	{
 		Assert::isTrue(
-			$this->latestQueryResultId === $id,
-			'MySql can get the number of affected rows ONLY for the latest query send to the server'
+			$this->latestQueryResultId === $result,
+			'affected rows number can be obtained only for the latest sent query'
 		);
 
 		return mysql_affected_rows($this->link);
 	}
 
-	/**
-	 * Returns the number of rows fetched by the query with the specified result identifier
-	 * @return integer
-	 */
-	function getFetchedRowsNumber(DBQueryResultId $id)
+	function getFetchedRowsNumber(DBQueryResult $result)
 	{
-		Assert::isTrue($id->isValid($this));
+		Assert::isTrue(
+			isset($this->queryResults[spl_object_hash($result)]),
+			'unknown DBQueryResult'
+		);
 
-		return mysql_num_rows($id->getResultId());
+		return mysql_num_rows($result->getResource());
 	}
 
-	/**
-	 * Returns the SQL dialect that conforms the database handle
-	 * @return IDialect
-	 */
 	function getDialect()
 	{
 		if (!$this->myDialect) {
-			$this->myDialect = new MySqlDialect($this);
+			$this->myDialect = new MySqlDialect($this->link);
 		}
 
 		return $this->myDialect;
 	}
 
-	/**
-	 * Overridden. Sets the encoding of the database
-	 * @param string $encoding
-	 * @return MySqlDB
-	 */
 	function setEncoding($encoding)
 	{
 		parent::setEncoding($encoding);
@@ -172,24 +157,17 @@ class MySqlDB extends DB
 		return $this;
 	}
 
-	/**
-	 * Passes the query to the database and returns the resulting resource id, without fetching
-	 * the result.
-	 * @throws UniqueViolationException
-	 * @throws DBQueryException
-	 * @return DBQueryResultId
-	 */
 	function sendQuery(ISqlQuery $query, $isAsync = false)
 	{
-		return $this->latestQueryResultId = new DBQueryResultId($this, $this->performQuery($query, $isAsync));
+		$resource = $this->performQuery($query, $isAsync);
+
+		$this->latestQueryResultId = new DBQueryResult($this, $resource);
+
+		$this->queryResults[spl_object_hash($this->latestQueryResultId)] = true;
+
+		return $resource;
 	}
 
-	/**
-	 * Passes the query to the database and fetches a single-row result as an array representing
-	 * a row
-	 * @throws RowNotFoundException
-	 * @return array
-	 */
 	function getRow(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -209,11 +187,6 @@ class MySqlDB extends DB
 		return $row;
 	}
 
-	/**
-	 * Passes the query to the database and fetches the first field of each row from a set of rows.
-	 * Returns the array representing the set of column values, or empty array if no rows found.
-	 * @return array
-	 */
 	function getColumn(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -234,11 +207,6 @@ class MySqlDB extends DB
 		}
 	}
 
-	/**
-	 * Passes the query to the database and fetches the first field from a single-row result
-	 * @throws CellNotFoundException
-	 * @return scalar
-	 */
 	function getCell(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -256,11 +224,6 @@ class MySqlDB extends DB
 		}
 	}
 
-	/**
-	 * Passes the query to the database and fetches the set of resulting rows. If nothing to
-	 * fetch, empty array is returned
-	 * @return array
-	 */
 	function getRows(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
@@ -283,7 +246,6 @@ class MySqlDB extends DB
 
 	/**
 	 * @throws DBQueryException
-	 * @throws UniqueViolationException
 	 * @param ISqlQUery $query
 	 * @param boolean $isAsync
 	 * @return resource
@@ -313,48 +275,22 @@ class MySqlDB extends DB
 		return $result;
 	}
 
-	/**
-	 * Determines whether a database handle is connectied to a remote server
-	 * @return boolean
-	 */
 	function isConnected()
 	{
 		return is_resource($this->link);
 	}
 
-	private $insertIdHook;
-
-	/**
-	 * @return int|null
-	 */
-	function preGenerate($tableName, $columnName)
+	function getGenerator($tableName, $columnName, DBType $type)
 	{
-		$this->insertIdHook = $tableName.$columnName;
-
-		return null;
+		return new LastInsertIdGenerator($this);
 	}
 
 	/**
-	 * @return scalar
+	 * @return int
 	 */
-	function getGeneratedId($tableName, $columnName)
+	function getLastInsertId()
 	{
-		Assert::isTrue(
-			$this->insertIdHook == $tableName.$columnName,
-			'wrong ID generation order: can achieve an ID for %s only',
-			$this->insertIdHook
-		);
-
 		return mysql_insert_id($this->link);
-	}
-
-	/**
-	 * For MySqlDialect
-	 * @return resource
-	 */
-	function getLink()
-	{
-		return $this->link;
 	}
 }
 

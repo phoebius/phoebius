@@ -17,8 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Implements a class resolving mechanism used to search finles containing the requested classes
- * to be autoloaded
+ * Implements a class resolving mechanism used to search files containing the requested classes
  * @ingroup Core_Bootstrap
  */
 abstract class ClassResolver extends InternalSegmentCache implements IClassResolver
@@ -33,13 +32,16 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 
 	/**
 	 * Searches for the file containing the requested class withing the specified directory
-	 * @param string $classname
-	 * @param string $rootDirectory
-	 * @return string|null returns the absolute path to the file containing the requested class
+	 * @param string class to be found
+	 * @param string directory to be looked up
+	 * @return string|null absolute path to the file containing the requested class
 	 * 	or NULL if such file not found
 	 */
 	abstract protected function findFilePath($classname, $rootDirectory);
 
+	/**
+	 * @param boolean whether to use include path. Default it true.
+	 */
 	function __construct($useIncludePath = true)
 	{
 		Assert::isBoolean($useIncludePath);
@@ -58,23 +60,11 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 		return $this;
 	}
 
-	/**
-	 * Gets the path to a file containing the requested class. If path is not found, NULL
-	 * is returned
-	 * @param string $classname
-	 * @return string|null returns the absolute path to the file containing the requested class
-	 * 	or NULL if such file not found
-	 */
 	function getClassPath($classname, $useCacheOnly = false)
 	{
 		return $this->resolveClassPath($classname, true, $useCacheOnly);
 	}
 
-	/**
-	 * Searches for the file containing the requested class, and loads it to the scope
-	 * @param string $classname
-	 * @return boolean whether or not the file was successfully found and loaded
-	 */
 	function loadClassFile($classname, $useCacheOnly = false)
 	{
 		$classpath = $this->resolveClassPath($classname, false, $useCacheOnly);

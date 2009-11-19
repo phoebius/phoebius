@@ -24,7 +24,7 @@ final class TypeUtils extends StaticClass
 {
 	/**
 	 * Determines whether the value is integer
-	 * @param mixed $value
+	 * @param mixed
 	 * @return boolean
 	 */
 	static function isInteger($value)
@@ -46,16 +46,52 @@ final class TypeUtils extends StaticClass
 			|| in_array($value, array(0, 1, 'f', 't', 'false', 'true'))
 		);
 	}
-
 	/**
+	 * @param string|object
 	 * @return boolean
 	 */
-	static function isInherits($class, $type)
+	static function isExists($object)
 	{
-		return (
-			   in_array($type, class_implements($class))
-			|| in_array($type, class_parents($class))
+		$name = self::resolveName($object);
+
+		return
+			class_exists($name, true)
+			|| interface_exists($name, true);
+	}
+
+	/**
+	 * @param string|object
+	 * @return boolean
+	 */
+	static function isChild($child, $parent)
+	{
+		$child = self::resolveName($child);
+		$parent = self::resolveName($parent);
+
+		Assert::isTrue(
+			self::isExists($child),
+			'unknown type %s',
+			$child
 		);
+
+		Assert::isTrue(
+			self::isExists($parent),
+			'unknown type %s',
+			$parent
+		);
+
+		return (
+			   in_array($parent, class_implements($child))
+			|| in_array($parent, class_parents($child))
+		);
+	}
+
+	private static function resolveName($object)
+	{
+		return
+			is_object($object)
+				? get_class($object)
+				: $object;
 	}
 }
 

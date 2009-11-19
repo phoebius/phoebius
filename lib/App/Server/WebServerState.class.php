@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Encapsulates the state of a web-server.
+ *
  * @ingroup App_Server
  */
 class WebServerState extends CliServerState implements IWebServerState
@@ -33,8 +35,8 @@ class WebServerState extends CliServerState implements IWebServerState
 	private $serverVars = array();
 
 	/**
-	 * @param WebServerStateDictionary $dictionary
-	 * @param array $envVars optinal set of environment variables
+	 * @param WebServerStateDictionary dictionary of state variables
+	 * @param array optinal set of environment variables
 	 */
 	function __construct(
 			WebServerStateDictionary $dictionary,
@@ -47,10 +49,15 @@ class WebServerState extends CliServerState implements IWebServerState
 	}
 
 	/**
-	 * TODO: add custom fields for hashing
+	 * Gets the unique hash for the current client who invoked the request.
+	 *
+	 * @param boolean whether to fasten the resulting hash to IP-address of the client of not. Default is true.
+	 *
+	 * @todo add ability to define custom values that affect the uniqueness of the resulting hash
+	 *
 	 * @return string
 	 */
-	function getClientHash($useIps = true, $length = 40)
+	function getClientHash($useIps = true)
 	{
 		$items = array();
 
@@ -76,14 +83,12 @@ class WebServerState extends CliServerState implements IWebServerState
 
 		$string = join('', $items);
 
-		if ($length > 40) {
-			$length = 40;
-		}
-
-		return substr(sha1($string), 0, $length);
+		return sha1($string);
 	}
 
 	/**
+	 * Tries to resolve the actual client IP.
+	 *
 	 * @return IP
 	 */
 	function getActualClientIP()
@@ -105,7 +110,9 @@ class WebServerState extends CliServerState implements IWebServerState
 	}
 
 	/**
-	 * @return array of {@link IP}
+	 * Gets the set of all possible client's IP-addresses used for dispatching the request.
+	 *
+	 * @return array of IP
 	 */
 	function getAllClientIPs()
 	{
@@ -127,32 +134,16 @@ class WebServerState extends CliServerState implements IWebServerState
 		return $ips;
 	}
 
-	/**
-	 * @see IServerState::getInvokedScript()
-	 *
-	 * @return string
-	 */
 	function getInvokedScriptFilename()
 	{
 		return $this->serverVars[WebServerStateDictionary::SCRIPT_FILENAME];
 	}
 
-	/**
-	 * @see IWebServerState::getDocumentRoot()
-	 *
-	 * @return string
-	 */
 	function getDocumentRoot()
 	{
 		return $this->serverVars[WebServerStateDictionary::DOCUMENT_ROOT];
 	}
 
-	/**
-	 * @see IWebServerState::getHeader()
-	 *
-	 * @param string $header
-	 * @return string
-	 */
 	function getHeader($header)
 	{
 		Assert::isScalar($header);
@@ -165,52 +156,26 @@ class WebServerState extends CliServerState implements IWebServerState
 		throw new ArgumentException('header', 'header not recognized');
 	}
 
-	/**
-	 * @see IWebServerState::getHeaders()
-	 *
-	 * @return array
-	 */
 	function getHeaders()
 	{
-		// FIXME: move this call to WebServerStateDictionary as a default
 		return getallheaders();
 	}
 
-	/**
-	 * @see IWebServerState::getRemoteAddress()
-	 *
-	 * @return IP
-	 */
 	function getRemoteAddress()
 	{
 		return new IP($this->serverVars[WebServerStateDictionary::REMOTE_ADDR]);
 	}
 
-	/**
-	 * @see IWebServerState::getRemotePort()
-	 *
-	 * @return integer
-	 */
 	function getRemotePort()
 	{
 		return $this->serverVars[WebServerStateDictionary::REMOTE_PORT];
 	}
 
-	/**
-	 * @see IWebServerState::getServerAddr()
-	 *
-	 * @return IP
-	 */
 	function getServerAddress()
 	{
 		return new IP($this->serverVars[WebServerStateDictionary::SERVER_ADDR]);
 	}
 
-	/**
-	 * @see IWebServerState::getServerPort()
-	 *
-	 * @return integer
-	 */
 	function getServerPort()
 	{
 		return $this->serverVars[WebServerStateDictionary::SERVER_PORT];

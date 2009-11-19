@@ -22,11 +22,23 @@
  */
 final class DBDriver extends Enumeration
 {
+	/**
+	 * Defines MySQL
+	 */
 	const MYSQL = 'MySql';
+
+	/**
+	 * Defines PostgreSQL
+	 */
 	const PGSQL = 'PgSql';
+
+	/**
+	 * Defines dummy stub
+	 */
 	const DUMMY = 'Dummy';
 
 	/**
+	 * Gets MySQL identifier
 	 * @return DBDriver
 	 */
 	static function mysql()
@@ -35,6 +47,7 @@ final class DBDriver extends Enumeration
 	}
 
 	/**
+	 * Gets PostgreSQL identifier
 	 * @return DBDriver
 	 */
 	static function pgsql()

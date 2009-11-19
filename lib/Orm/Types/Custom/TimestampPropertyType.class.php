@@ -29,7 +29,7 @@ final class TimestampPropertyType extends ObjectPropertyType
 	/**
 	 * @return array
 	 */
-	function toRawValue($value)
+	function makeRawValue($value)
 	{
 		return array (
 			new ScalarSqlValue(

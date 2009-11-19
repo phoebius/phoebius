@@ -19,7 +19,7 @@
 /**
  * @ingroup Core_Types_Complex
  */
-final class Time implements IBoxed
+final class Time implements IBoxable
 {
 	/**
 	 * @var int
@@ -167,17 +167,14 @@ final class Time implements IBoxed
 	/**
 	 * @return string
 	 */
-	function toString($delimiter = ':')
+	function toFormattedString($delimiter = ':')
 	{
 		return join($delimiter, array($this->hour, $this->minute, $this->second));
 	}
 
-	/**
-	 * @return scalar
-	 */
-	function toScalar()
+	function __toString()
 	{
-		return $this->toString();
+		return $this->toFormattedString();
 	}
 
 	/**
@@ -185,7 +182,7 @@ final class Time implements IBoxed
 	 */
 	function getValue()
 	{
-		return $this->toString();
+		return $this->toFormattedString();
 	}
 
 	/**

@@ -17,10 +17,26 @@
  ************************************************************************************************/
 
 /**
- * Represents a strict key=>value collection used for flexible mock-objects instantiation
+ * Represents a strict collection of predefined named fields
+ *
+ * Field names are imported from the child's class constants.
+ *
+ * Example:
+ * @code
+ * HttpRequestDictionary extends Dictionary
+ * {
+ * 	const URL = 'HTTP_URL';
+ * 	const REFERER = 'HTTP_REFERER';
+ * }
+ *
+ * $dict = new HttpRequestDictionary($_SERVER);
+ * echo $dict[HttpRequestDictionary::URL];
+ *
+ * @endcode
+ *
  * @ingroup Core_Patterns
  */
-abstract class Dictionary
+abstract class Dictionary implements ArrayAccess
 {
 	/**
 	 * @var array
@@ -31,33 +47,25 @@ abstract class Dictionary
 	 * @param array $values
 	 * @param boolean $supressMissing
 	 */
-	final function __construct(array $values, $supressMissing = true)
+	final function __construct(array $values)
 	{
 		$this->readFields();
-		$this->import($values, $supressMissing);
+		$this->import($values);
 	}
 
 	/**
 	 * @return Dictionary an object itself
 	 */
-	function import(array $values, $supressMissing = false)
+	private function import(array $values)
 	{
-		Assert::isBoolean($supressMissing);
-
 		$defaultValues = $this->getDefaultValues();
 
-		foreach ($this->fields as $name => $value) {
-			// use array_key_exists here instead of isset
-			// because initial values can be null
-			if (!array_key_exists($name, $values)) {
-				if (array_key_exists($name, $defaultValues)) {
-					$values[$name] = $defaultValues[$name];
-				}
-				else {
-					Assert::isTrue($supressMissing, '%s not defined', $name);
-
-					$values[$name] = $value;
-				}
+		foreach (array_keys($this->fields) as $name) {
+			if (!isset($values[$name])) {
+				$values[$name] =
+					isset($defaultValues[$name])
+						? $defaultValues[$name]
+						: null;
 			}
 
 			$this->fields[$name] = $values[$name];
@@ -71,7 +79,11 @@ abstract class Dictionary
 	 */
 	function getField($name)
 	{
-		Assert::hasIndex($this->fields, $name);
+		Assert::hasIndex(
+			$this->fields, $name,
+			'unknown field %s for %s',
+			$name, get_class($this)
+		);
 
 		return $this->fields[$name];
 	}
@@ -93,16 +105,43 @@ abstract class Dictionary
 	}
 
 	/**
-	 * @return Dictionary
+	 * Defines an interface for easy access to dictionary fields
+	 *
+	 * @return boolean
 	 */
-	function spawn(Dictionary $parent)
+	function offsetExists($offset)
 	{
-		$me = get_class($this);
-		return new $me(
-			array_merge(
-				$this->getFields(), $parent->getFields()
-			)
-		);
+		return array_key_exists($this->fields[$offset]);
+	}
+
+	/**
+	 * Defines an interface for easy access to dictionary fields
+	 *
+	 * @return mixed
+	 */
+	function offsetGet($offset)
+	{
+		return $this->getField($offset);
+	}
+
+	/**
+	 * Not implemented, and won't be.
+	 *
+	 * @return void
+	 */
+	function offsetSet($offset, $value)
+	{
+		Assert::isUnreachable('dictionary fields are read-only');
+	}
+
+	/**
+	 * Not implemented, and won't be.
+	 *
+	 * @return void
+	 */
+	function offsetUnset($offset)
+	{
+		Assert::isUnreachable('dictionary fields are read-only');
 	}
 
 	/**

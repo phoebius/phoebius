@@ -26,23 +26,13 @@ final class PrefixUnaryLogicalOperator extends LogicalOperator
 	const MINUS	= '-';
 
 	/**
-	 * Creates an instance of {@link PrefixUnaryLogicalOperator}
-	 * @param string $id one of the class constants
-	 * @return PrefixUnaryLogicalOperator
-	 */
-	static function create($id)
-	{
-		return new self($id);
-	}
-
-	/**
 	 * Creates an instance of {@link PrefixUnaryLogicalOperator} with {@link PrefixUnaryLogicalOperator::NOT}
 	 * value
 	 * @return PrefixUnaryLogicalOperator
 	 */
 	static function not()
 	{
-		return self::create(self::NOT);
+		return new self (self::NOT);
 	}
 
 	/**
@@ -52,7 +42,7 @@ final class PrefixUnaryLogicalOperator extends LogicalOperator
 	 */
 	static function minus()
 	{
-		return self::create(self::MINUS);
+		return new self (self::MINUS);
 	}
 
 }

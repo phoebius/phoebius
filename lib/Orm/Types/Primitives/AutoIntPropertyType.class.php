@@ -19,16 +19,16 @@
 /**
  * @ingroup Orm_Types
  */
-final class AutoIntPropertyType extends IntegerPropertyType implements IHandled, IReferenced, IGenerated
+final class AutoIntPropertyType
+		extends IntegerPropertyType
+		implements IOrmPropertyReferencable, IOrmPropertyAssignable, IOrmEntityIdGenerator
 {
 	/**
 	 * @return AutoIntPropertyType
 	 */
 	static function getHandler(AssociationMultiplicity $multiplicity)
 	{
-		return new self (
-			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
-		);
+		return new self;
 	}
 
 	/**
@@ -42,9 +42,41 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 		);
 	}
 
-	function __construct($isNullable)
+	function __construct()
 	{
-		parent::__construct(null, $isNullable);
+		parent::__construct(null, true);
+	}
+
+	function generate(IdentifiableOrmEntity $entity)
+	{
+		$orm = call_user_func(array(get_class($entity), 'orm'));
+		$identifier = $orm->getLogicalSchema()->getIdentifier();
+
+		Assert::isTrue(
+			$identifier->getType() === $this,
+			'plz pass the corresponding entity'
+		);
+
+		$fields = $identifier->getDBFields();
+		$types = $this->getDBFields();
+
+		// *Important*
+		// We use dirty hack to obtain RdbmsDao because IOrmEntityAccessor
+		// does not provide (and should not provide!) an API to access the database
+		// because IOrmEntityAccessor is a limited interface to an abstract storage.
+		// In most cases this type would be used for databases so we can use this hack here.
+		$dao = call_user_func(array(get_class($entity), 'dao'));
+		Assert::isTrue($dao instanceof RdbmsDao);
+
+		$db = $dao->getDB();
+
+		$generator = $db->getGenerator(
+			$orm->getPhysicalSchema()->getDBTableName(),
+			reset ($fields),
+			reset ($types)
+		);
+
+		return new PropertyValueGenerator($this, $generator);
 	}
 
 	/**
@@ -80,9 +112,6 @@ final class AutoIntPropertyType extends IntegerPropertyType implements IHandled,
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
-			$this->isNullable()
-				? 'true'
-				: 'false'
 		);
 	}
 }

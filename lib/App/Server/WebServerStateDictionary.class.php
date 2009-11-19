@@ -17,7 +17,10 @@
  ************************************************************************************************/
 
 /**
- * $_SERVER-compatible dictionary
+ * Defines variables that describe the state of the application web-server.
+ *
+ * This dictionary $_SERVER-compatible.
+ *
  * @ingroup App_Server
  */
 class WebServerStateDictionary extends CliServerStateDictionary

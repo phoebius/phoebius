@@ -17,16 +17,44 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types
+ * @ingroup
  */
-interface IObjectMappable
+final class PropertyValueGenerator implements IIDGenerator
 {
 	/**
-	 * @param scalar $value
-	 * @return IObjectMappable
-	 * @throws TypeCastException
+	 * @var OrmPropertyType
 	 */
-	static function cast($value);
+	private $type;
+
+	/**
+	 * @var IIDGenerator
+	 */
+	private $generator;
+
+	function __construct(OrmPropertyType $type, IIDGenerator $actualGenerator)
+	{
+		$this->type = $type;
+		$this->generator = $actualGenerator;
+	}
+
+	function getType()
+	{
+		return $this->generator->getType();
+	}
+
+	function generate(IdentifiableOrmEntity $entity)
+	{
+		$value = $this->generator->generate($entity);
+
+		if (!is_null($value)) {
+			$value = $this->type->makeValue(
+				array($value),
+				new FetchStrategy(FetchStrategy::CASCADE)
+			);
+		}
+
+		return $value;
+	}
 }
 
 ?>

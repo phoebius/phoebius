@@ -17,10 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Represents a list of values of similar type
+ * Represents a list of values of similar type.
+ *
+ * To provide a precise type check, just overwrite ValueList::appendValue() and ValueList::prependValue()
+ *
+ * @see TypedValueList as type-safe value list
+ *
  * @ingroup Core_Patterns
  */
-class ValueList
+class ValueList implements IteratorAggregate, Countable
 {
 	/**
 	 * @var array of values
@@ -28,15 +33,32 @@ class ValueList
 	private $values = array();
 
 	/**
-	 * @param array $initialValues list of initial values to be imported
+	 * @param array list of initial values to be imported
 	 */
-	function __construct(array $initialValues = array())
+	function __construct(array $values = array())
 	{
-		$this->appendList($initialValues);
+		$this->append($values);
 	}
 
 	/**
-	 * Gets the number of values in list
+	 * @return int
+	 */
+	function count()
+	{
+		return sizeof($this->values);
+	}
+
+	/**
+	 * @see IteratorAggregate::getIterator()
+	 * @return ArrayIterator
+	 */
+	function getIterator()
+	{
+		return new ArrayIterator($this->values);
+	}
+
+	/**
+	 * Gets the number of values in the list
 	 * @return integer
 	 */
 	function getCount()
@@ -45,62 +67,64 @@ class ValueList
 	}
 
 	/**
-	 * Appends a list of values to the already added values
-	 * @param array $values
-	 * @return ValueList an object itself
-	 */
-	function appendList(array $values)
-	{
-		foreach ($values as $value) {
-			$this->append($value);
-		}
-
-		return $this;
-	}
-
-	/**
+	 * Appends the value to the list
+	 *
 	 * @return ValueList
 	 */
-	function append($value)
+	function appendValue($value)
 	{
-		Assert::isTrue($this->isValueOfValidType($value));
-
 		$this->values[] = $value;
 
 		return $this;
 	}
 
 	/**
+	 * Prepends the value to the list
+	 *
 	 * @return ValueList
 	 */
-	function prepend($value)
+	function prependValue($value)
 	{
-		Assert::isTrue($this->isValueOfValidType($value));
-
 		array_unshift($this->values, $value);
 
 		return $this;
 	}
 
 	/**
-	 * Replaces a list of already added scalar values with the new value list
-	 * @param array $set set of values
+	 * Appends a list of values to the already added values
+	 * @param array
 	 * @return ValueList an object itself
 	 */
-	function replaceList(array $values)
+	function append(array $values)
 	{
-		$this
-			->dropList()
-			->appendList($values);
+		foreach ($values as $value) {
+			$this->appendValue($value);
+		}
 
 		return $this;
 	}
 
 	/**
-	 * Drops a list of already added values
-	 * @return ValueList an object itself
+	 * Replaces the list of already added values with the new value list
+	 *
+	 * @param array new value list
+	 * @return ValueList itself
 	 */
-	function dropList()
+	function replace(array $values)
+	{
+		$this
+			->drop()
+			->append($values);
+
+		return $this;
+	}
+
+	/**
+	 * Drops the list of already added values
+	 *
+	 * @return ValueList itself
+	 */
+	function drop()
 	{
 		$this->values = array();
 
@@ -109,6 +133,7 @@ class ValueList
 
 	/**
 	 * Returns the list of values
+	 *
 	 * @return array
 	 */
 	function getList()
@@ -122,6 +147,14 @@ class ValueList
 	function toArray()
 	{
 		return $this->values;
+	}
+
+	/**
+	 * @return array
+	 */
+	function toArrayObject()
+	{
+		return new ArrayObject($this->values);
 	}
 }
 

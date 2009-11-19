@@ -51,8 +51,8 @@ abstract class LazySingleton implements ISingleton
 
 	/**
 	 * Returns the single instance of the singleton (which is created at first request)
-	 * @param string $className classname
-	 * @return LazySingleton object itself
+	 * @param string classname
+	 * @return object
 	 */
 	protected static function instance($className)
 	{

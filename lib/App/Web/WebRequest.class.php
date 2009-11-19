@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Encapsulates the request invoked over HTTP
+ *
  * @ingroup App_Web
  */
 final class WebRequest extends AppRequest implements ArrayAccess
@@ -27,7 +29,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 		WebRequestPart::COOKIE => array(),
 		WebRequestPart::FILES => array(),
 	);
-	
+
 	private $allVars = array();
 
 	/**
@@ -54,15 +56,20 @@ final class WebRequest extends AppRequest implements ArrayAccess
 		$this->dictionary = $dictonary->getFields();
 
 		$this->httpUrl = SiteUrl::import($dictonary, $baseHost, $baseUri);
-		
+
 		$this->vars = array(
 			WebRequestPart::GET => $getVars,
 			WebRequestPart::POST => $postVars,
 			WebRequestPart::COOKIE => $cookieVars,
-			WebRequestPart::FILES => $filesVars,	
+			WebRequestPart::FILES => $filesVars,
 		);
-		
-		$this->regenerateAllVars();
+
+		$this->allVars = call_user_func_array(
+			'array_merge',
+			array(
+				$filesVars, $cookieVars, $postVars, $getVars
+			)
+		);
 	}
 
 	function __clone()
@@ -72,6 +79,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the request method.
+	 *
 	 * @return RequestMethod
 	 */
 	function getRequestMethod()
@@ -80,7 +89,9 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
-	 * @return string
+	 * Gets the HTTP protocol
+	 *
+	 * @return string eigher HTTP/1.0 or HTTP/1.1
 	 */
 	function getProtocol()
 	{
@@ -88,6 +99,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the HTTP referer, if any
+	 *
 	 * @return HttpUrl|null
 	 */
 	function getHttpReferer()
@@ -101,6 +114,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Specifies whether request is secured and passed over HTTPS protocol.
+	 *
 	 * @return boolean
 	 */
 	function isSecured()
@@ -109,7 +124,9 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
-	 * @return HttpUrl|null
+	 * Gets the request URL
+	 *
+	 * @return SiteUrl|null
 	 */
 	function getHttpUrl()
 	{
@@ -117,6 +134,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the set of variables passed via the query string
+	 *
 	 * @return array
 	 */
 	function getGetVars()
@@ -125,6 +144,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the set of variables passed via POST part of the request
+	 *
 	 * @return array
 	 */
 	function getPostVars()
@@ -133,6 +154,8 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the set of variables that passed via cookies
+	 *
 	 * @return array
 	 */
 	function getCookieVars()
@@ -141,14 +164,18 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	}
 
 	/**
+	 * Gets the set of variables that described as incoming files
+	 *
 	 * @return array
 	 */
 	function getFilesVars()
 	{
 		return $this->filesVars;
 	}
-	
+
 	/**
+	 * Determines whether variable is set in any of the request part
+	 *
 	 * @return boolean
 	 */
 	function hasVar($variableName, WebRequestPart $part = null)
@@ -157,14 +184,15 @@ final class WebRequest extends AppRequest implements ArrayAccess
 			$part
 				? $this->vars[$part->getValue()]
 				: $this->allVars;
-				
-		return isset(
-			$vars[$variableName]			
-		);
+
+		return isset($vars[$variableName]);
 	}
 
 	/**
-	 * @return ArgumentException
+	 * Gets the variable from the specified request part
+	 *
+	 * @throws ArgumentException if such variable does not exist
+	 * @return scalar
 	 */
 	function getVar($variableName, WebRequestPart $part = null)
 	{
@@ -172,52 +200,54 @@ final class WebRequest extends AppRequest implements ArrayAccess
 			$part
 				? $this->vars[$part->getValue()]
 				: $this->allVars;
-		
+
 		if (isset($variableName, $vars)) {
 			return $vars[$variableName];
 		}
-		
+
 		throw new ArgumentException('variableName', 'argument is not defined');
 	}
-	
+
 	/**
+	 * Defines an interface for easy access to request variable. Variable is looked up within
+	 * all request parts.
+	 *
 	 * @return boolean
 	 */
 	function offsetExists($offset)
 	{
 		return isset($this->allVars[$offset]);
 	}
-	
+
 	/**
+	 * Defines an interface for easy access to request variable. Variable is looked up within
+	 * all request parts.
+	 *
 	 * @return mixed
 	 */
 	function offsetGet($offset)
 	{
 		return $this->allVars[$offset];
 	}
-	
+
 	/**
+	 * Not implemented, and won't be.
+	 *
 	 * @return void
 	 */
 	function offsetSet($offset, $value)
 	{
 		Assert::isUnreachable('request arguments are read-only');
 	}
-	
+
 	/**
+	 * Not implemented, and won't be.
+	 *
 	 * @return void
 	 */
 	function offsetUnset($offset)
 	{
 		Assert::isUnreachable('request arguments are read-only');
-	}
-
-	/**
-	 * @return void
-	 */
-	private function regenerateAllVars()
-	{
-		$this->allVars = call_user_func_array('array_merge', array_reverse($this->vars));
 	}
 }
 

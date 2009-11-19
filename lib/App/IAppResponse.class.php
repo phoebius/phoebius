@@ -17,14 +17,27 @@
  ************************************************************************************************/
 
 /**
+ * Basic application response interface
+ *
  * @ingroup App
  */
 interface IAppResponse extends IOutput
 {
 	/**
+	 * Finishes the request by passing the response to the client and closes a connection.
+	 *
+	 * This can be useful when the script should do a task that does not depend on the response.
+	 *
 	 * @return void
 	 */
 	function finish();
+
+	/**
+	 * Checks whether response is finished.
+	 *
+	 * @return boolean
+	 */
+	function isFinished();
 }
 
 ?>

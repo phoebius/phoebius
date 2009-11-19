@@ -17,24 +17,38 @@
  ************************************************************************************************/
 
 /**
+ * Application infrastructure initializer.
+ *
+ * Grabs the standart incoming request, wraps it with appropriate objects handles the request
+ * by passing those objects to the corresponding route.
+ *
+ * index.php example:
+ * @code
+ * $app = new SiteApplication(new ChainedRouter);
+ * $app->run();
+ * @endcode
+ *
  * @ingroup App_Web
  */
-abstract class SiteApplication
+class SiteApplication
 {
 	/**
 	 * @var IRouter
 	 */
 	private $router;
-	
+
 	/**
 	 * @var WebContext
 	 */
 	private $webContext;
-	
+
+	/**
+	 * @param IRouter router to use when handling the request. See ChainedRouter as basic impl.
+	 */
 	function __construct(IRouter $router)
 	{
 		$this->router = $router;
-		
+
 		$request = new WebRequest(
 			new WebRequestDictionary($_SERVER), $_GET, $_POST, $_COOKIE, $_FILES
 		);
@@ -44,7 +58,7 @@ abstract class SiteApplication
 			new WebServerState(new WebServerStateDictionary($_SERVER))
 		);
 	}
-	
+
 	/**
 	 * @return IRouter
 	 */
@@ -52,8 +66,10 @@ abstract class SiteApplication
 	{
 		return $this->router;
 	}
-	
+
 	/**
+	 * Runs the application.
+	 *
 	 * @return void
 	 */
 	function run()
@@ -72,34 +88,62 @@ abstract class SiteApplication
 			$this->handle500($e);
 		}
 	}
-	
+
+	/**
+	 * Handles the situation when the application failed to found the corresponding route
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
 	protected function handle404(Trace $trace)
 	{
-		$this->webContext->getResponse()->setStatus(new HttpStatus(HttpStatus::STATUS_404));
-		
+		$this->webContext->getResponse()->setStatus(new HttpStatus(HttpStatus::CODE_404));
+
 		$this->router->getFallbackTrace($trace);
 	}
-	
+
+	/**
+	 * Handles the abnormal application failover
+	 *
+	 * @return void
+	 */
 	protected function handle500(Exception $e)
 	{
 		$response = $this->webContext->getResponse();
-		$request = $this->webContext->getRequest();
-		
-		$response->setStatus(new HttpStatus(HttpStatus::STATUS_500));
-		
+
+		$response->setStatus(new HttpStatus(HttpStatus::CODE_500));
+
+		$clname = get_class($e);
+
 		$out = <<<EOT
 	<h1>Internal Server Error</h1>
-	{$e->getMessage()}
+	{$clname} : {$e->getMessage()}
 	<hr />
 	<h2>Call Stack</h2>
 	<pre>{$e->getTraceAsString()}</pre>
 EOT;
-		
+
 		$response->write($out)->finish();
 
 		if (defined('BUGS_EMAIL')) {
-			
-			$message = <<<EOT
+			$this->notify500(BUGS_EMAIL, $e);
+		}
+	}
+
+	/**
+	 * Notify about abnormal application failover
+	 *
+	 * @return void
+	 */
+	protected function notify500($email, Exception $e)
+	{
+		//
+		// TODO log this
+		//
+
+		$request = $this->webContext->getRequest();
+
+		$message = <<<EOT
 Crash at {$request->getHttpUrl()->getHost()}:
 {$e->getMessage()}
 
@@ -108,13 +152,12 @@ Request method: {$request->getRequestMethod()}
 
 {$e->getTraceAsString()}
 EOT;
-			
-			mail(
-				BUGS_EMAIL,
-				PHOEBIUS_SHORT_PRODUCT_NAME. "crash at {$request->getHttpUrl()->getHost()} (" . get_class($e) . ")",
-				$message
-			);
-		}
+
+		mail(
+			$email,
+			PHOEBIUS_SHORT_PRODUCT_NAME. "crash at {$request->getHttpUrl()->getHost()} (" . get_class($e) . ")",
+			$message
+		);
 	}
 }
 

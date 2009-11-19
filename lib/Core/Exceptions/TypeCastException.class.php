@@ -23,7 +23,7 @@
 class TypeCastException extends ArgumentTypeException
 {
 	/**
-	 * @var Type
+	 * @var string
 	 */
 	private $type;
 
@@ -32,22 +32,15 @@ class TypeCastException extends ArgumentTypeException
 	 */
 	private $value;
 
-	function __construct(Type $failedType, $value, $message = 'type cast failed')
+	function __construct($type, $value, $message = 'type cast failed')
 	{
-		Assert::isTrue($failedType->isChildOf(new Type('IObjectMappable')));
-
-		parent::__construct('value', $failedType->getName(), $message);
-
-		$this->type = $failedType;
+		$this->type =
+			is_object($type)
+				? get_class($type)
+				: $type;
 		$this->value = $value;
-	}
 
-	/**
-	 * @return Type
-	 */
-	function getFailedType()
-	{
-		return $this->type;
+		parent::__construct('value', $this->type, $message);
 	}
 
 	/**

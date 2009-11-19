@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * This rule simply imports the specified key=value pairs as parameters into the Trace.
+ *
  * @ingroup App_Web_Routing_Rules
  */
 class ParameterImportRule implements IRewriteRule

@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Rewrite rule aggregator.
+ *
  * @ingroup App_Web_Routing_Rules
  */
 class RewriteRuleChain implements IRewriteRule

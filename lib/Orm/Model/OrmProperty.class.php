@@ -47,22 +47,11 @@ class OrmProperty implements IOrmProperty
 	private $dbFields = array();
 
 	/**
-	 * @return OrmProperty
-	 */
-	static function create(
-			$name,
-			OrmPropertyType $type,
-			OrmPropertyVisibility $visibility,
-			$isUnique = false
-		)
-	{
-		return new self ($name, $type, $visibility, $isUnique);
-	}
-
-	/**
-	 * @param scalar $name property name
-	 * @param IPropertyMappable $type type of a property
-	 * @param boolean $isUnique
+	 * @param string name of the property
+	 * @param array list of database field names
+	 * @param OrmPropertyType property type
+	 * @param false property visibility
+	 * @param boolean whether the property unique or not
 	 */
 	function __construct(
 			$name,
@@ -94,7 +83,7 @@ class OrmProperty implements IOrmProperty
 		Assert::isTrue(
 			sizeof($fields)
 			== sizeof($this->type->getDBFields()),
-			'wrong DB column count for the specified type'
+			'wrong DB field count'
 		);
 
 		$this->dbFields = $fields;
