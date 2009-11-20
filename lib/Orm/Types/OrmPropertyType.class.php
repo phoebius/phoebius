@@ -19,27 +19,53 @@
 /**
  * @ingroup Orm_Types
  */
-abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructurized
+abstract class OrmPropertyType
 {
 	/**
-	 * @return string
+	 * @return string|null
 	 */
 	abstract function getImplClass();
 
 	/**
-	 * @return mixed
+	 * @return mixed native value
 	 */
-	function getDefaultValue()
-	{
-		Assert::isUnreachable('no default value');
-	}
+	abstract function assemble(DBValueArray $values, FetchStrategy $fetchStrategy);
+
+	/**
+	 * @return SqlValueArray
+	 */
+	abstract function disassemble($value);
 
 	/**
 	 * @return boolean
 	 */
-	function hasDefaultValue()
+	abstract function isNullable();
+
+	/**
+	 * Returns an array of ISqlType for the property
+	 * @return SqlTypeArray
+	 */
+	abstract function getSqlTypes();
+
+	/**
+	 * @return integer
+	 */
+	abstract function getColumnCount();
+
+	/**
+	 * @param array of DBValueArray
+	 * @param FetchStrategy
+	 * @return array of native values
+	 */
+	function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
 	{
-		return false;
+		$yield = array();
+
+		foreach ($valueSet as $values) {
+			$yield = $this->assemble($values, $fetchStrategy);
+		}
+
+		return $yield;
 	}
 
 	/**
@@ -51,7 +77,7 @@ abstract class OrmPropertyType implements IPropertyMappable, IPropertyStructuriz
 			'new ',
 			get_class($this),
 			'(',
-			join(',', $this->getCtorArgumentsPhpCode()),
+				join(', ', $this->getCtorArgumentsPhpCode()),
 			')'
 		));
 	}

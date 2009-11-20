@@ -16,17 +16,9 @@
  *
  ************************************************************************************************/
 
-/**
- * Stores the information about physical structure of a property
- * @ingroup Orm_Model
- */
-interface IPropertyStructurized
+interface ISqlType extends ISqlCastable
 {
-	/**
-	 * Returns an array (or an associative array) of {@link DBType} for the property
-	 * @return array of {@link DBType}
-	 */
-	function getDBFields();
+	// nothing here
 }
 
 ?>

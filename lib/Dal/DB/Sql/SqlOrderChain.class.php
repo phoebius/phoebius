@@ -21,7 +21,7 @@
  *
  * @ingroup Dal_DB_Sql
  */
-final class SqlOrderChain extends TypedValueList implements ISqlCastable
+final class SqlOrderChain extends TypedValueArray implements ISqlCastable
 {
 	function __construct(array $values = array())
 	{

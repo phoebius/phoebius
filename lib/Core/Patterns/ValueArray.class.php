@@ -17,15 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Represents a list of values of similar type.
+ * Represents a array of values of similar type.
  *
- * To provide a precise type check, just overwrite ValueList::appendValue() and ValueList::prependValue()
+ * To provide a precise type check, just overwrite ValueArray::append() and ValueArray::prepend()
  *
- * @see TypedValueList as type-safe value list
+ * @see TypedValueArray as type-safe value list
  *
  * @ingroup Core_Patterns
  */
-class ValueList implements IteratorAggregate, Countable
+class ValueArray implements IteratorAggregate, Countable
 {
 	/**
 	 * @var array of values
@@ -37,7 +37,37 @@ class ValueList implements IteratorAggregate, Countable
 	 */
 	function __construct(array $values = array())
 	{
-		$this->append($values);
+		$this->merge($values);
+	}
+
+	/**
+	 * Gets the first element of the array
+	 *
+	 * @throws StateException in case when empty
+	 * @return mixed
+	 */
+	function getFirst()
+	{
+		if (!sizeof ($this->values)) {
+			throw new StateException('empty array');
+		}
+
+		return reset($this->values);
+	}
+
+	/**
+	 * Gets the last element of the array
+	 *
+	 * @throws StateException in case when empty
+	 * @return mixed
+	 */
+	function getLast()
+	{
+		if (!sizeof ($this->values)) {
+			throw new StateException('empty array');
+		}
+
+		return end($this->values);
 	}
 
 	/**
@@ -69,9 +99,9 @@ class ValueList implements IteratorAggregate, Countable
 	/**
 	 * Appends the value to the list
 	 *
-	 * @return ValueList
+	 * @return ValueArray
 	 */
-	function appendValue($value)
+	function append($value)
 	{
 		$this->values[] = $value;
 
@@ -81,9 +111,9 @@ class ValueList implements IteratorAggregate, Countable
 	/**
 	 * Prepends the value to the list
 	 *
-	 * @return ValueList
+	 * @return ValueArray
 	 */
-	function prependValue($value)
+	function prepend($value)
 	{
 		array_unshift($this->values, $value);
 
@@ -93,9 +123,9 @@ class ValueList implements IteratorAggregate, Countable
 	/**
 	 * Appends a list of values to the already added values
 	 * @param array
-	 * @return ValueList an object itself
+	 * @return ValueArray an object itself
 	 */
-	function append(array $values)
+	function merge(array $values)
 	{
 		foreach ($values as $value) {
 			$this->appendValue($value);
@@ -108,12 +138,12 @@ class ValueList implements IteratorAggregate, Countable
 	 * Replaces the list of already added values with the new value list
 	 *
 	 * @param array new value list
-	 * @return ValueList itself
+	 * @return ValueArray itself
 	 */
 	function replace(array $values)
 	{
 		$this
-			->drop()
+			->erase()
 			->append($values);
 
 		return $this;
@@ -122,9 +152,9 @@ class ValueList implements IteratorAggregate, Countable
 	/**
 	 * Drops the list of already added values
 	 *
-	 * @return ValueList itself
+	 * @return ValueArray itself
 	 */
-	function drop()
+	function erase()
 	{
 		$this->values = array();
 

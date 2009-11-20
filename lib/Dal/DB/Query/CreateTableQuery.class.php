@@ -31,14 +31,6 @@ class CreateTableQuery implements ISqlQuery
 	 */
 	private $commaSeparatedQueryParts = array();
 
-	/**
-	 * @return CreateTableQuery
-	 */
-	static function create(DBTable $table)
-	{
-		return new self ($table);
-	}
-
 	function __construct(DBTable $table)
 	{
 		$this->table = $table;

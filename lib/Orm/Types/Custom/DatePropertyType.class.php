@@ -28,7 +28,7 @@ final class DatePropertyType extends ObjectPropertyType
 
 	/**
 	 * @param Date $logicalValue
-	 * @return SqlValueList
+	 * @return SqlValueArray
 	 */
 	function makeRawValue($logicalValue)
 	{

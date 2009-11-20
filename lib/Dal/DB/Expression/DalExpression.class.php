@@ -308,7 +308,7 @@ final class DalExpression extends StaticClass
 	 * equality is used in comparison
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $set representing a set of values, In most cases,
-	 * 	{@link SqlValueList} is needed here, but can also be used other Sql-compatible
+	 * 	{@link SqlValueArray} is needed here, but can also be used other Sql-compatible
 	 * 	expressions, like {@link SelectQuery}
 	 * @return InSetDalExpression
 	 */
@@ -322,7 +322,7 @@ final class DalExpression extends StaticClass
 	 * equality is used in comparison
 	 * @param SqlColumn $field
 	 * @param ISqlValueExpression $set representing a set of values, In most cases,
-	 * 	{@link SqlValueList} is needed here, but can also be used other Sql-compatible
+	 * 	{@link SqlValueArray} is needed here, but can also be used other Sql-compatible
 	 * 	expressions, like {@link SelectQuery}
 	 * @return InSetDalExpression
 	 */

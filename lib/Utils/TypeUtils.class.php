@@ -23,6 +23,25 @@
 final class TypeUtils extends StaticClass
 {
 	/**
+	 * Get string representation of the type
+	 *
+	 * @param mixed
+	 * @return string
+	 */
+	static function getName($value)
+	{
+		if (is_null($value)) {
+			return 'NULL';
+		}
+
+		if (is_object($value)) {
+			return get_class($value);
+		}
+
+		return gettype($value);
+	}
+
+	/**
 	 * Determines whether the value is integer
 	 * @param mixed
 	 * @return boolean

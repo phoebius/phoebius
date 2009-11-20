@@ -17,13 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Represents an object that can be casted to SQL dialect string
+ * Contract to cast the object to a unified SQL string
+ *
  * @ingroup Dal_DB_Sql
  */
 interface ISqlCastable
 {
 	/**
-	 * Casts an object to the SQL dialect string
+	 * Represents the object as unified SQL string
+	 *
 	 * @return string
 	 */
 	function toDialectString(IDialect $dialect);

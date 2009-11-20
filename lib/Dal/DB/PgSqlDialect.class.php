@@ -210,9 +210,7 @@ class PgSqlDialect extends LazySingleton implements IDialect
 
 		return array_merge(
 			$preQueries,
-			array(
-				CreateTableQuery::create($table)
-			),
+			array(new CreateTableQuery($table)),
 			$postQueries
 		);
 	}

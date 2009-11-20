@@ -17,11 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Type-safe collection
+ * Type-safe array
  *
  * @ingroup Core_Patterns
  */
-abstract class TypedValueList extends ValueList
+abstract class TypedValueArray extends ValueArray
 {
 	private $type;
 
@@ -36,10 +36,16 @@ abstract class TypedValueList extends ValueList
 				? get_class($type)
 				: $type;
 
+		Assert::isScalar(
+			TypeUtils::isExists($this->type),
+			'unknown type %s',
+			TypeUtils::getName($type)
+		);
+
 		parent::__construct($array);
 	}
 
-	function appendValue($value)
+	function append($value)
 	{
 		Assert::isTrue(
 			($value instanceof $this->type),
@@ -49,12 +55,12 @@ abstract class TypedValueList extends ValueList
 			gettype($value)
 		);
 
-		parent::appendValue($value);
+		parent::append($value);
 
 		return $this;
 	}
 
-	function prependValue($value)
+	function prepend($value)
 	{
 		Assert::isTrue(
 			($value instanceof $this->type),
@@ -64,7 +70,7 @@ abstract class TypedValueList extends ValueList
 			gettype($value)
 		);
 
-		parent::prependValue($value);
+		parent::prepend($value);
 
 		return $this;
 	}

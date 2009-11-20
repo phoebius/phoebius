@@ -47,15 +47,6 @@ class DBTable
 		return new self;
 	}
 
-	function __clone()
-	{
-		$columns = $this->columns;
-		$constraints = $this->constraints;
-
-		$this->dropColumns()->addColumns($columns);
-		$this->dropConstraints()->addConstraints($constraints);
-	}
-
 	function __sleep()
 	{
 		return array (
@@ -189,7 +180,7 @@ class DBTable
 	}
 
 	/**
-	 * @return array of {@link DBConstraint}
+	 * @return array of DBConstraint
 	 */
 	function getConstraints()
 	{
@@ -207,7 +198,7 @@ class DBTable
 	}
 
 	/**
-	 * @return array of {@link IQuery}
+	 * @return array of ISqlQuery
 	 */
 	function toQueries(IDialect $dialect)
 	{

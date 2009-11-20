@@ -20,7 +20,7 @@
  * Represents the list of SqlValue
  * @ingroup Dal_DB_Sql
  */
-class SqlValueList extends TypedValueList implements ISqlValueExpression
+class SqlValueArray extends TypedValueArray implements ISqlValueExpression
 {
 	function __construct(array $values = array())
 	{

@@ -16,51 +16,46 @@
  *
  ************************************************************************************************/
 
-/**
- * Maps physical value to logical value, and vice versa.
- * @ingroup Orm_Model
- */
-interface IPropertyMappable
+class PrimitiveSqlType implements ISqlType
 {
 	/**
-	 * @return mixed
+	 * @var DBType
 	 */
-	function makeValue(array $rawValue, FetchStrategy $fetchStrategy);
+	private $dbType;
 
 	/**
-	 * @return array
+	 * @var ISqlValueExpression|null
 	 */
-	function makeValueSet(array $rawValueSet, FetchStrategy $fetchStrategy);
+	private $defaultValue;
+
+	function __construct(DBType $dbType, ISqlValueExpression $defaultValue = null)
+	{
+		$this->dbType = $dbType;
+		$this->defaultValue = $defaultValue;
+	}
 
 	/**
-	 * @return array
+	 * @return ISqlValueExpression|null
 	 */
-	function makeRawValue($value);
+	function getDefaultValue()
+	{
+		return $this->defaultValue;
+	}
 
 	/**
-	 * @return boolean
+	 * @return PrimitiveSqlType
 	 */
-	function isNullable();
+	function setDefaultValue(ISqlValueExpression $defaultValue = null)
+	{
+		$this->defaultValue = $defaultValue;
 
-	/**
-	 * @return boolean
-	 */
-	function hasDefaultValue();
+		return $this;
+	}
 
-	/**
-	 * @throws OrmModelPropertyException if property cannot have the default value
-	 * @return mixed
-	 */
-	function getDefaultValue();
-
-//	/**
-//	 * @return IEntityPropertyExpression
-//	 */
-//	function getEntityPropertyExpression(
-//			$table,
-//			OrmProperty $ormProperty,
-//			IExpression $expression
-//	);
+	function toDialectString(IDialect $dialect)
+	{
+		return $dialect->getTypeRepresenation($this->dbType);
+	}
 }
 
 ?>

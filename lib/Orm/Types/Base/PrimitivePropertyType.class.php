@@ -19,101 +19,73 @@
 /**
  * @ingroup Orm_Types
  */
-abstract class PrimitivePropertyType extends OrmPropertyType
+final class PrimitivePropertyType extends OrmPropertyType
 {
 	/**
-	 * @var boolean
+	 * @var DBType
 	 */
-	private $isNullable;
+	private $type;
 
-	/**
-	 * @var mixed|null
-	 */
-	private $defaultValue;
-
-	function __construct($defaultValue = null, $isNullable = false)
+	function __construct(DBType $type)
 	{
-		Assert::isBoolean($isNullable);
-
-		$this->isNullable = $isNullable;
-		$this->defaultValue = $defaultValue;
+		$this->type = $type;
 	}
 
-	/**
-	 * @return mixed
-	 */
-	function makeValue(array $rawValue, FetchStrategy $fetchStrategy)
+	function getImplClass()
 	{
-		return reset($rawValue);
+		return null;
 	}
 
-	/**
-	 * @return array
-	 */
-	function makeRawValue($value)
+	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	{
+		Assert::isTrue($values->count() == 1);
+
+		return $values->getFirst();
+	}
+
+	function disassemble($value)
 	{
 		if (is_null($value)) {
-			if ($this->hasDefaultValue()) {
-				$value = $this->getDefaultValue();
-			}
-			else {
-				if (!$this->isNullable()) {
-					throw new OrmModelIntegrityException('property cannot be null');
-				}
+			if (!$this->isNullable()) {
+				throw new OrmModelIntegrityException('property cannot be null');
 			}
 		}
 
-		return array(
-			new ScalarSqlValue($value)
+		return new SqlValueArray(
+			array(new ScalarSqlValue($value))
 		);
 	}
 
-	/**
-	 * @return array
-	 */
-	function makeValueSet(array $rawValueSet, FetchStrategy $fetchStrategy)
-	{
-		$values = array();
-
-		foreach ($rawValueSet as $rawValue) {
-			$values[] = $this->makeValue($rawValue, $fetchStrategy);
-		}
-
-		return $values;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getDefaultValue()
-	{
-		return $this->defaultValue;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function hasDefaultValue()
-	{
-		return !is_null($this->defaultValue);
-	}
-
-	/**
-	 * @return boolean
-	 */
 	function isNullable()
 	{
-		return $this->isNullable;
+		return $this->type->isNullable();
+	}
+
+	function getSqlTypes()
+	{
+		return new SqlTypeArray(
+			array(
+				$this->type
+			)
+		);
+	}
+
+	function getColumnCount()
+	{
+		return 1;
 	}
 
 	protected function getCtorArgumentsPhpCode()
 	{
-		return array(
-			'null',
-			$this->isNullable
-				? 'true'
-				: 'false'
-		);
+		return
+			'new DBType('. join(', ', array(
+				'DBType::' . $this->type->getId(),
+				$this->isNullable() ? 'true' : 'false',
+				$this->type->getSize(),
+				$this->type->getPrecision(),
+				$this->type->getScale(),
+				$this->type->isGenerated() ? 'true' : 'false',
+			)) . ')';
 	}
 }
 

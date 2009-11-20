@@ -29,23 +29,15 @@ class DBColumn
 	 * @var string
 	 */
 	private $name;
-
 	/**
-	 * @var ISqlValueExpression
-	 */
-	private $defaultValue;
-
-	/**
-	 * @var DBType
+	 * @var ISqlType
 	 */
 	private $type;
 
-	/**
-	 * @return DBColumn
-	 */
-	static function create()
+	function __construct($name, ISqlType $type)
 	{
-		return new self;
+		$this->setName($name);
+		$this->setType($type);
 	}
 
 	/**
@@ -69,7 +61,7 @@ class DBColumn
 	}
 
 	/**
-	 * @return DBType
+	 * @return ISqlType
 	 */
 	function getType()
 	{
@@ -79,27 +71,9 @@ class DBColumn
 	/**
 	 * @return DBColumn
 	 */
-	function setType(DBType $type)
+	function setType(ISqlType $type)
 	{
 		$this->type = $type;
-
-		return $this;
-	}
-
-	/**
-	 * @return ISqlValueExpression
-	 */
-	function getDefaultValue()
-	{
-		return $this->defaultValue;
-	}
-
-	/**
-	 * @return ISqlValueExpression
-	 */
-	function setDefaultValue(ISqlValueExpression $defaultValue = null)
-	{
-		$this->defaultValue = $defaultValue;
 
 		return $this;
 	}

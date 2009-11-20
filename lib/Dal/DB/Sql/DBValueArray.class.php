@@ -16,32 +16,34 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents the list of ISqlValueExpression
- * @ingroup Dal_DB_Sql
- * @see ISqlValueExpression
- */
-class SqlValueExpressionList extends TypedValueArray implements ISqlCastable
+class DBValueArray extends ValueArray
 {
-	function __construct(array $values = array())
+	function append($value)
 	{
-		parent::__construct('ISqlValueExpression', $values);
+		Assert::isTrue(
+			is_scalar($value) || is_null($value),
+			'wrong %s member type: string or null is expected, but %s provided',
+			__CLASS__,
+			TypeUtils::getName($value)
+		);
+
+		parent::append($value);
+
+		return $this;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
-	function toDialectString(IDialect $dialect)
+	function prepend($value)
 	{
-		$compiledSlices = array();
-		foreach ($this->getList() as $element) {
-			$compiledSlices[] = $element->toDialectString($dialect);
-		}
+		Assert::isTrue(
+			is_scalar($value) || is_null($value),
+			'wrong %s member type: string or null is expected, but %s provided',
+			__CLASS__,
+			TypeUtils::getName($value)
+		);
 
-		$compiledString = join(', ', $compiledSlices);
+		parent::prepend($value);
 
-		return $compiledString;
+		return $this;
 	}
 }
 

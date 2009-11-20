@@ -20,7 +20,7 @@
  * Represents a list of fields, that can be casted to SQL value set
  * @ingroup Dal_DB_Sql
  */
-class SqlFieldList extends ValueList implements ISqlCastable
+class SqlFieldList extends ValueArray implements ISqlCastable
 {
 	function toDialectString(IDialect $dialect)
 	{
