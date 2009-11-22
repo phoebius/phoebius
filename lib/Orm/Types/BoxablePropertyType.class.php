@@ -19,28 +19,55 @@
 /**
  * @ingroup Orm_Types
  */
-final class PrimitivePropertyType extends OrmPropertyType
+class BoxablePropertyType extends PrimitivePropertyType
 {
 	/**
 	 * @var DBType
 	 */
-	private $type;
+	private $dbType;
 
-	function __construct(DBType $type)
+	/**
+	 * @var string
+	 */
+	private $boxableType;
+
+	function __construct($boxableType, DBType $dbType)
 	{
-		$this->type = $type;
+		Assert::isTrue(
+			TypeUtils::isChild($boxableType, 'IBoxable')
+		);
+
+		$this->boxableType = $boxableType;
+		$this->dbType = $dbType;
+
+		parent::__construct($dbType, $dbType->isNullable());
 	}
 
 	function getImplClass()
 	{
-		return null;
+		return $this->boxableType;
 	}
 
 	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
 	{
 		Assert::isTrue($values->count() == 1);
 
-		return $values->getFirst();
+		$value = $values->getFirst();
+
+		if (is_null($value) && $this->isNullable()) {
+			return null;
+		}
+		else {
+			try {
+				return call_user_func_array(
+					array($this->boxableType, 'cast'),
+					array($value)
+				);
+			}
+			catch (TypeCastException $e) {
+				Assert::isUnreachable('wrong `%s` cast to %s', $value, $this->boxableType);
+			}
+		}
 	}
 
 	function disassemble($value)
@@ -52,40 +79,23 @@ final class PrimitivePropertyType extends OrmPropertyType
 		}
 
 		return new SqlValueArray(
-			array(new ScalarSqlValue($value))
+			array(new ScalarSqlValue($value->getValue()))
 		);
-	}
-
-	function isNullable()
-	{
-		return $this->type->isNullable();
-	}
-
-	function getSqlTypes()
-	{
-		return new SqlTypeArray(
-			array(
-				$this->type
-			)
-		);
-	}
-
-	function getColumnCount()
-	{
-		return 1;
 	}
 
 	protected function getCtorArgumentsPhpCode()
 	{
-		return
+		return array(
+			'\'' . $this->boxableType . '\'',
 			'new DBType('. join(', ', array(
-				'DBType::' . $this->type->getId(),
+				'DBType::' . $this->dbType->getId(),
 				$this->isNullable() ? 'true' : 'false',
-				$this->type->getSize(),
-				$this->type->getPrecision(),
-				$this->type->getScale(),
-				$this->type->isGenerated() ? 'true' : 'false',
-			)) . ')';
+				$this->dbType->getSize(),
+				$this->dbType->getPrecision(),
+				$this->dbType->getScale(),
+				$this->dbType->isGenerated() ? 'true' : 'false',
+			)) . ')'
+		);
 	}
 }
 

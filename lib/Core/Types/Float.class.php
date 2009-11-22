@@ -17,44 +17,35 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Model
+ * Represents a box for float
+ *
+ * @ingroup Core_Types
  */
-interface IOrmProperty
+final class Float extends Decimal
 {
-	/**
-	 * @return string
-	 */
-	function getGetter();
+	static function cast($value)
+	{
+		return new self ($value);
+	}
 
-	/**
-	 * @return string
-	 */
-	function getSetter();
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
+	{
+		$type = new DBType(
+			DBType::FLOAT,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
+		);
 
-	/**
-	 * @return string
-	 */
-	function getName();
+		return $type->getOrmPropertyType();
+	}
 
-	/**
-	 * @return boolean
-	 */
-	function isUnique();
-
-	/**
-	 * @return OrmPropertyType
-	 */
-	function getType();
-
-	/**
-	 * @return OrmPropertyVisibility
-	 */
-	function getVisibility();
-
-	/**
-	 * @return array of columnName
-	 */
-	function getDBFields();
+	function getValue()
+	{
+		return (float) parent::getValue();
+	}
 }
 
 ?>

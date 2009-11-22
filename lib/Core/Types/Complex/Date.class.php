@@ -17,11 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Represents a date
+ *
+ * @see Timestamp for date+time wrapper
+ *
  * @ingroup Core_Types_Complex
  */
-class Date implements IOrmPropertyAssignable, IBoxable
+class Date implements IBoxable, IOrmPropertyAssignable
 {
 	/**
+	 * unix timestamp representation
+	 *
 	 * @var int
 	 */
 	protected $int;
@@ -42,37 +48,41 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	private $day;
 
 	/**
+	 * Static constructor of a Date object
+	 *
+	 * @param int $input unix timestamp or textual representation of the date
+	 *
 	 * @return Date
 	 */
-	static function create($value = null)
+	static function create($input)
 	{
-		return new self($value);
+		return new self ($input);
 	}
 
-	/**
-	 * @return Date
-	 */
 	static function cast($value)
 	{
-		try {
-			return new self($value);
-		}
-		catch (ArgumentException $e) {
-			throw new TypeCastException(new Type(__CLASS__), $value);
-		}
+		return new self ($value);
 	}
 
-	/**
-	 * @return OrmPropertyType
-	 */
-	static function getHandler(AssociationMultiplicity $multiplicity)
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
 	{
-		return new DatePropertyType(
-			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
+		$type = new DBType(
+			DBType::DATE,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
 		);
+
+		return $type->getOrmPropertyType();
 	}
 
 	/**
+	 * Creates a Date object that represents current application date
+	 *
+	 * Alias for Date::now()
+	 *
 	 * @return Date
 	 */
 	static function today()
@@ -81,7 +91,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * Alias for Date::today()
+	 * Creates a Date object that represents current application date
+	 *
 	 * @return Date
 	 */
 	static function now()
@@ -90,7 +101,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * Returns the number of days between two dates. Result can be negative if left > right
+	 * Gets the number of days between two dates. Result can be negative if left > right
+	 *
 	 * @return int
 	 */
 	static function dayDifference(Date $left, Date $right)
@@ -102,10 +114,14 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * 0 - if equals
-	 * 1 - if left > right
-	 * -1 - if left < right
-	 * @return int
+	 * Compares to dates.
+	 *
+	 * Returns:
+	 * - 0 if dates are equal
+	 * - 1 if left Date > right Date
+	 * - -1 if left Date < right Date
+	 *
+	 * @return int 0 if dates are eq; "1" if left Date > right Date; "-1" if left Date < right Date
 	 */
 	static function compare(Date $left, Date $right)
 	{
@@ -122,29 +138,25 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * @param $value int (unix timestamp) or string (string representation of a date)
+	 * @param mixed $input unix timestamp or textual representation of the date
 	 */
-	function __construct($value = null)
+	function __construct($input)
 	{
-		$this->setValue($value);
-	}
-
-	private function setValue($value = null)
-	{
-		if (!$value) {
-			$value = time();
-		}
-
 		// not a unix timestamp
-		if (!is_int($value) && !is_numeric($value)) {
-			$value = strtotime($value);
+		if (!is_int($input) && !is_numeric($input)) {
+			$input = strtotime($input);
 		}
 
-		$this->import($value);
+		$this->import($input);
 	}
 
 	/**
-	 * Returns the number of days between two dates. Result can be negative if left > right
+	 * Gets the number of days between current Date objcet and the specified Date.
+	 *
+	 * If Date is not specified, current Date is taken (see Date::now()).
+	 *
+	 * Result can be negative if current Date object > the specified Date.
+	 *
 	 * @return int
 	 */
 	function getPassedDays(Date $to = null)
@@ -158,6 +170,15 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the Date representing the first day of the current week.
+	 *
+	 * Current week is the week which covers the current Date object.
+	 *
+	 * By default, the first day of week is presented by WeekDay::monday(). but can be set
+	 * explicitly.
+	 *
+	 * @param WeekDay $weekStart the first day of week; WeekDay::monday() is default
+	 *
 	 * @return Date
 	 */
 	function getFirstDayOfWeek(WeekDay $weekStart = null)
@@ -172,6 +193,15 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the Date representing the last day of the current week.
+	 *
+	 * Current week is the week which covers the current Date object.
+	 *
+	 * By default, the first day of week is presented by WeekDay::monday(). but can be set
+	 * explicitly.
+	 *
+	 * @param WeekDay $weekStart the first day of week; WeekDay::monday() is default
+	 *
 	 * @return Date
 	 */
 	function getLastDayOfWeek(WeekDay $weekStart = null)
@@ -186,6 +216,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the number of days in a current month.
+	 *
 	 * @return int
 	 */
 	function getDaysCountInMonth()
@@ -194,11 +226,13 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Determines whether the dates are equal or not.
+	 *
 	 * @return boolean
 	 */
 	function equals(Date $date)
 	{
-		return (boolean) (
+		return (
 			   $this->year == $date->year
 			&& $this->month == $date->month
 			&& $this->day == $date->day
@@ -206,6 +240,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the unix timestamp representing the beginning of the current day.
+	 *
 	 * @return int
 	 */
 	function getDayStartStamp()
@@ -220,6 +256,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the unix timestamp representing the end of the current day
+	 *
 	 * @return int
 	 */
 	function getDayEndStamp()
@@ -234,8 +272,17 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * @throws ArgumentException
-	 * @return Date an object itself
+	 * Modifies the current day with even any english textual representation.
+	 *
+	 * Modification is applied relative to the current Date.
+	 *
+	 * @see strtotime() reference to learn more about allowed modification
+	 *
+	 * @param string $modification textual representaion of modification to be applied to the Date
+	 *
+	 * @throws ArgumentException if modification faield
+	 *
+	 * @return Date itself
 	 */
 	function modify($string)
 	{
@@ -252,6 +299,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the Date's year
+	 *
 	 * @return int
 	 */
 	function getYear()
@@ -260,6 +309,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the Date's month number
+	 *
 	 * @return int
 	 */
 	function getMonth()
@@ -268,6 +319,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the Date's day of the month
+	 *
 	 * @return int
 	 */
 	function getDay()
@@ -276,7 +329,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * Week number
+	 * Gets the Date's week number
+	 *
 	 * @return int
 	 */
 	function getWeek()
@@ -285,6 +339,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the WeekDay represented by the current date
+	 *
 	 * @return WeekDay
 	 */
 	function getWeekDay()
@@ -293,6 +349,8 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
+	 * Gets the unix representation of the Date
+	 *
 	 * @return int
 	 */
 	function getStamp()
@@ -300,18 +358,21 @@ class Date implements IOrmPropertyAssignable, IBoxable
 		return $this->int;
 	}
 
-	/**
-	 * @return int
-	 */
 	function getValue()
 	{
-		return $this->getStamp();
+		return $this->toFormattedString();
 	}
 
 	/**
+	 * Gets the textual representation of the current Date.
+	 *
+	 * Object transformation codes are taken from PHP's date() codes.
+	 *
+	 * @see date() manual
+	 *
 	 * @return string
 	 */
-	function toFormattedString($format = 'd-m-Y')
+	function toFormattedString($format = 'Y/m/d')
 	{
 		return date($format, $this->int);
 	}
@@ -322,9 +383,9 @@ class Date implements IOrmPropertyAssignable, IBoxable
 	}
 
 	/**
-	 * Overridden. Imports date represented as unix timestamp value filling in dependant helper
-	 * properties
-	 * @throws TypeCastException
+	 * Imports date represented as unix timestamp value filling in dependant helper fields
+	 *
+	 * @throws TypeCastException if unix timestamp is wrong
 	 * @return void
 	 */
 	protected function import($int)
@@ -339,11 +400,16 @@ class Date implements IOrmPropertyAssignable, IBoxable
 			}
 		}
 
-		throw new ArgumentException('int', 'specified string is not valid date');
+		throw new TypeCastException(__CLASS__, 'specified string is not a valid date');
 	}
 
 	/**
-	 * clone + modify
+	 * Clones the current Date and optionally modifies the resulting Date.
+	 *
+	 * @param string $modification modification to be applied to the resulting object
+	 *
+	 * @see Date::modify()
+	 *
 	 * @return Date
 	 */
 	function spawn($modification = null)

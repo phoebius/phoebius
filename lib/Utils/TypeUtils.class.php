@@ -65,6 +65,7 @@ final class TypeUtils extends StaticClass
 			|| in_array($value, array(0, 1, 'f', 't', 'false', 'true'))
 		);
 	}
+
 	/**
 	 * @param string|object
 	 * @return boolean

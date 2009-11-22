@@ -27,12 +27,12 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 	private $name;
 
 	/**
-	 * @var array of {@link IOrmProperty}
+	 * @var array of {@link OrmProperty}
 	 */
     private $properties = array();
 
 	/**
-	 * @var IOrmProperty|null
+	 * @var OrmProperty|null
 	 */
 	private $identifier;
 

@@ -24,7 +24,7 @@ interface IOrmEntityIdGenerator
 	/**
 	 * @return IIDGenerator
 	 */
-	function generate(IdentifiableOrmEntity $entity);
+	function getIdGenerator(IdentifiableOrmEntity $entity);
 }
 
 ?>

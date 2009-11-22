@@ -17,42 +17,19 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types_BuiltIn
+ * Represents a composite identifier.
+ *
+ * A composite type is a type that can be accurately represented either as primitive or as an object
+ * of the corresponding class.
+ *
+ * The most important functionality of the implemenation of this contract is that the implementation
+ * always produces a unique key for the instance.
+ *
+ * @ingroup Core_Types
  */
-abstract class Decimal extends Numeric
+interface ICompositeIdentifier extends IStringCastable
 {
-	/**
-	 * @return Decimal
-	 */
-	static function create($value)
-	{
-		return new self ($value);
-	}
-
-	/**
-	 * @return Decimal
-	 */
-	static function cast($value)
-	{
-		return new self ($value);
-	}
-
-	/**
-	 * @return boolean
-	 */
-	protected function isValidValue($value)
-	{
-		if (strlen((string)$value) > 0 && $value{0} == '+') {
-			$value = substr($value, 1);
-			if (empty($value)) {
-				$value = 0;
-			}
-		}
-
-		return
-			// http://www.php.net/manual/en/function.is-numeric.php#76094
-			((string)(float)$value) === (preg_replace('/([\.]0*)$/', '', (string)$value));
-	}
+	// nothing here
 }
 
 ?>

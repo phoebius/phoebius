@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types_BuiltIn
+ * Represents a fundamental type abstract box
+ *
+ * @ingroup Core_Types
  */
-abstract class BuiltInType implements IObjectCastable, IOrmPropertyAssignable, IStringCastable
+abstract class Primitive implements IBoxable, IOrmPropertyAssignable
 {
 	/**
 	 * @var scalar
@@ -27,7 +29,8 @@ abstract class BuiltInType implements IObjectCastable, IOrmPropertyAssignable, I
 	private $value;
 
 	/**
-	 * @param scalar $value
+	 * @throws TypeCastException
+	 * @param scalar $value value to be wrapped
 	 */
 	function __construct($value)
 	{
@@ -35,6 +38,8 @@ abstract class BuiltInType implements IObjectCastable, IOrmPropertyAssignable, I
 	}
 
 	/**
+	 * Sets the internal value
+	 *
 	 * @return BuiltInType
 	 */
 	function setValue($value)
@@ -49,23 +54,19 @@ abstract class BuiltInType implements IObjectCastable, IOrmPropertyAssignable, I
 		return $this;
 	}
 
-	/**
-	 * @return scalar
-	 */
 	function getValue()
 	{
 		return $this->value;
 	}
 
-	/**
-	 * @return string
-	 */
 	function __toString()
 	{
-		return  (string) $this->value;
+		return (string) $this->value;
 	}
 
 	/**
+	 * Checks whether the primitive value is suitable for wrapping with this class
+	 *
 	 * @return boolean
 	 */
 	protected function isValidValue($value)

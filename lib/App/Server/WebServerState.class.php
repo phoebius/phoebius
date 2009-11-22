@@ -35,7 +35,7 @@ class WebServerState extends CliServerState implements IWebServerState
 	private $serverVars = array();
 
 	/**
-	 * @param WebServerStateDictionary dictionary of state variables
+	 * @param WebServerStateDictionary $dictionary dictionary of state variables
 	 * @param array optinal set of environment variables
 	 */
 	function __construct(

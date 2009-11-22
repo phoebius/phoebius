@@ -17,23 +17,6 @@
  *************************************************************************************************
 -->
 
-<!-- 
-Future releases:
-================
- + Property type settings
- 	<property name="counter" type="Integer">
-	 	<typeSettings>
-	 		<typeSetting name="size">11</typeSetting>
-	 	</typeSettings>
-	 </property>
- 	<property name="money" type="Float">
-	 	<typeSettings>
-	 		<typeSetting name="precition">10</typeSetting>
-	 		<typeSetting name="scale">5</typeSetting>
-	 	</typeSettings>
-	 </property>
--->
-
 <!ELEMENT domain (entities*)>
 <!ATTLIST domain
 	db-schema		CDATA #IMPLIED
@@ -55,10 +38,34 @@ Future releases:
 <!ELEMENT identifier EMPTY>
 <!ATTLIST identifier
 	name			CDATA "id"
-	type			CDATA "AutoIntPropertyType"
+	type			CDATA "int32 isNullable=false isGenerated=true"
 	db-columns		CDATA #IMPLIED
 >
 
+<!-- 
+= "Type" attribute syntax =
+== a reference to DBType ==
+ type="DBType::TYPENAME param1='value' param2='value'"
+ e.g.
+ type="DBType::STRING size='255' isNullable=true"
+ or a raw value of DBType constant:
+ type="varchar size='255' isNullable=true"
+ 
+== a reference to ISqlType/IOrmPropertyType class ==
+ type="ClassName ctor-arg1='value' ctor-arg2='value'"
+ e.g.
+ type="DBType id='string' size='255' isNullable=true"
+ or
+ type="RawSqlType definition='int8[][] NOT NULL'"
+ or
+ type="ArrayPropertyType baseType='int8'"
+ 
+== a reference to IOrmPropertyAssignable implemetor ==
+ type="Integer"
+ 
+== a reference to the type defined within project domain (nested refs are allowed)
+ type="Class"
+-->
 <!ELEMENT property EMPTY>
 <!ATTLIST property
 	name			CDATA #REQUIRED

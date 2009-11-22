@@ -106,7 +106,7 @@ final class WeekDay extends Enumeration
 		)
 	{
 		foreach ($weekendDays as $weekEndDay) {
-			if ($this->isEqual($weekEndDay)) {
+			if ($this->is($weekEndDay)) {
 				return true;
 			}
 		}

@@ -17,44 +17,41 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types_BuiltIn
+ * Represents a box for signed integer
+ *
+ * @ingroup Core_Types
  */
-final class Float extends Decimal
+class Integer extends Decimal
 {
-	/**
-	 * @return Float
-	 */
-	static function create($value)
-	{
-		return new self ($value);
-	}
-
-	/**
-	 * @return Float
-	 */
 	static function cast($value)
 	{
 		return new self ($value);
 	}
 
-	/**
-	 * @return OrmPropertyType
-	 */
-	static function getHandler(AssociationMultiplicity $multiplicity)
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
 	{
-		return new FloatPropertyType(
-			null,
-			null,
-			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
+		$type = new DBType(
+			DBType::INT32,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
 		);
+
+		return $type->getOrmPropertyType();
 	}
 
-	/**
-	 * @return float
-	 */
 	function getValue()
 	{
-		return (float) parent::getValue();
+		return (int) parent::getValue();
+	}
+
+	protected function isValidValue($value)
+	{
+		return
+			   parent::isValidValue($value)
+			&& TypeUtils::isInteger($value);
 	}
 }
 

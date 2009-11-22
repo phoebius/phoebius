@@ -17,37 +17,41 @@
  ************************************************************************************************/
 
 /**
+ * 1:* relation implementation
  * @ingroup Orm_Types
  */
-class BooleanPropertyType extends PrimitivePropertyType
+class OneToManyContainerPropertyType extends ContainerPropertyType
 {
-	private $trueIdentifiers = array('1', 't', 'true', 1);
-
 	/**
-	 * @return mixed
+	 * @var OrmProperty
 	 */
-	function makeValue(array $rawValue, FetchStrategy $fetchStrategy)
+	private $encapsulantProperty;
+
+	function __construct(
+			IQueryable $container,
+			IQueryable $encapsulant,
+			OrmProperty $encapsulantProperty
+		)
 	{
-		$stringableValue = reset($rawValue);
-		return in_array($stringableValue, $this->trueIdentifiers, true);
+		$this->encapsulantProperty = $encapsulantProperty;
+
+		parent::__construct($container, $encapsulant);
 	}
 
 	/**
-	 * @return string
+	 * @return OrmProperty
 	 */
-	function getImplClass()
+	function getEncapsulantProperty()
 	{
-		return 'Boolean';
+		return $this->encapsulantProperty;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getDBFields()
+	protected function getCtorArgumentsPhpCode()
 	{
-		return array (
-			DBType::create(DBType::BOOLEAN)
-				->setIsNullable($this->isNullable())
+		return array(
+			$this->getContainer()->getLogicalSchema()->getEntityName() . '::orm()',
+			$this->getEncapsulant()->getLogicalSchema()->getEntityName() . '::orm()',
+			$this->getEncapsulant()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulantProperty->getName() . '\')',
 		);
 	}
 }

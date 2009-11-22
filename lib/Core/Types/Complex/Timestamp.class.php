@@ -17,6 +17,10 @@
  ************************************************************************************************/
 
 /**
+ * Represents a date and a time
+ *
+ * @see Date for representing date only
+ *
  * @ingroup Core_Types_Complex
  */
 final class Timestamp extends Date
@@ -27,60 +31,77 @@ final class Timestamp extends Date
 	private $time;
 
 	/**
+	 * Static constructor of a Timestamp object
+	 *
+	 * @param int $input unix timestamp or textual representation of the date
+	 *
 	 * @return Timestamp
 	 */
-	static function create($value = null)
+	static function create($input)
 	{
-		return new self($value);
+		return new self ($input);
 	}
 
-	/**
-	 * @return Date
-	 */
 	static function cast($value)
 	{
-		try {
-			return new self($value);
-		}
-		catch (ArgumentException $e) {
-			throw new TypeCastException(__CLASS__, $value);
-		}
+		return new self ($value);
 	}
 
-	/**
-	 * @return OrmPropertyType
-	 */
-	static function getHandler(AssociationMultiplicity $multiplicity)
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
 	{
-		return new TimestampPropertyType(
-			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
+		$type = new DBType(
+			DBType::DATETIME,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
 		);
+
+		return $type->getOrmPropertyType();
 	}
 
 	/**
+	 * Creates a Timestamp object that represents current application date and time
+	 *
 	 * @return Timestamp
 	 */
 	static function now()
 	{
-		return new self(time());
+		return new self (time());
 	}
 
+	/**
+	 * Gets the hours of the Timestamp object
+	 *
+	 * @return int
+	 */
 	function getHour()
 	{
 		return $this->time->getHour();
 	}
 
+	/**
+	 * Gets the minutes of the Timestamp object
+	 *
+	 * @return int
+	 */
 	function getMinute()
 	{
 		return $this->time->getMinute();
 	}
 
+	/**
+	 * Gets the seconds of the Timestamp object
+	 */
 	function getSecond()
 	{
 		return $this->time->getSecond();
 	}
 
 	/**
+	 * Gets the Time object
+	 *
 	 * @return Time
 	 */
 	function getTime()
@@ -88,44 +109,21 @@ final class Timestamp extends Date
 		return $this->time;
 	}
 
-	/**
-	 * @return Timestamp
-	 */
-	function setTime(Time $time)
-	{
-		$this->import(
-			mktime(
-				$time->getHour(),
-				$time->getMinute(),
-				$time->getSecond(),
-				$this->getMonth(),
-				$this->getDay(),
-				$this->getYear()
-			)
-		);
-
-		return $this;
-	}
-
 	function equals(Date $timestamp)
 	{
-		return ($this->getStamp() == $timestamp->getStamp());
+		return ($this->int == $timestamp->int);
 	}
 
-	/**
-	 * @return string
-	 */
-	function toFormattedString($format = 'd-m-Y H:i:s')
+	function toFormattedString($format = 'Y/m/d H:i:s')
 	{
 		return parent::toFormattedString($format);
 	}
 
 	protected function import($int)
 	{
-		parent::import($int);
-
-		$this->int = $int;
 		$this->time = new Time($int);
+
+		parent::import($int);
 	}
 }
 

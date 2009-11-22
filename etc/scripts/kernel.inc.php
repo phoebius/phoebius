@@ -127,7 +127,6 @@ if (!isset($_ENV['TZ'])) {
 // inside separate file, that possibly can be used both by Autoloader
 $classes = array
 (
-	'ISingleton' => 'Core/Patterns',
 	'IAutoloader' => 'Core/Bootstrap',
 	'StaticClass' => 'Core/Patterns',
 	'LazySingleton' => 'Core/Patterns',
@@ -136,8 +135,6 @@ $classes = array
 	'IClassResolver' => 'Core/Bootstrap',
 	'ClassResolver' => 'Core/Bootstrap',
 	'CSharpStyleClassResolver' => 'Core/Bootstrap',
-	'FilesystemReflectedClassResolver' => 'Core/Bootstrap',
-	'PearStyleClassResolver' => 'Core/Bootstrap',
 	'PathResolver' => 'Core/Bootstrap',
 	'Autoloader' => 'Core/Bootstrap',
 	'Exceptionizer' => 'Core/Bootstrap',

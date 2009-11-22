@@ -28,7 +28,7 @@ interface IOrmPropertyReferencable
 	 *
 	 * @return OrmPropertyType
 	 */
-	static function getRefHandler(AssociationMultiplicity $multiplicity);
+	function getReferenceType(AssociationMultiplicity $multiplicity);
 }
 
 ?>

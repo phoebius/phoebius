@@ -17,11 +17,13 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Exceptions
+ * Represents a box for string type (any scalar, actually)
+ *
+ * @ingroup Core_Types
  */
-class OutOfRangeException extends ArgumentException
+class String extends Scalar
 {
-	// nothing here
+	// nothing - scalar is enough to represent the string
 }
 
 ?>

@@ -19,36 +19,43 @@
 /**
  * @ingroup Orm_Types
  */
-final class AutoIntPropertyType
-		extends IntegerPropertyType
-		implements IOrmPropertyReferencable, IOrmPropertyAssignable, IOrmEntityIdGenerator
+final class FundamentalPropertyType
+	extends PrimitivePropertyType
+	implements IOrmPropertyReferencable, IOrmEntityIdGenerator
 {
 	/**
-	 * @return AutoIntPropertyType
+	 * @var DBType
 	 */
-	static function getHandler(AssociationMultiplicity $multiplicity)
+	private $type;
+
+	function __construct(DBType $type)
 	{
-		return new self;
+		$this->type = $type;
+
+		parent::__construct($type, $type->isNullable());
 	}
 
-	/**
-	 * @return IntegerPropertyType
-	 */
-	static function getRefHandler(AssociationMultiplicity $multiplicity)
+	function getReferenceType(AssociationMultiplicity $multiplicity)
 	{
-		return new IntegerPropertyType(
-			null,
+		$type = clone $this->type;
+
+		if ($type->canBeGenerated()) {
+			$type->setGenerated(false);
+		}
+
+		$type->setIsNullable(
 			$multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
 		);
+
+		return new self ($type);
 	}
 
-	function __construct()
+	function getIdGenerator(IdentifiableOrmEntity $entity)
 	{
-		parent::__construct(null, true);
-	}
+		Assert::isTrue(
+			$this->type->isGenerated()
+		);
 
-	function generate(IdentifiableOrmEntity $entity)
-	{
 		$orm = call_user_func(array(get_class($entity), 'orm'));
 		$identifier = $orm->getLogicalSchema()->getIdentifier();
 
@@ -58,7 +65,6 @@ final class AutoIntPropertyType
 		);
 
 		$fields = $identifier->getDBFields();
-		$types = $this->getDBFields();
 
 		// *Important*
 		// We use dirty hack to obtain RdbmsDao because IOrmEntityAccessor
@@ -72,46 +78,40 @@ final class AutoIntPropertyType
 
 		$generator = $db->getGenerator(
 			$orm->getPhysicalSchema()->getDBTableName(),
-			reset ($fields),
-			reset ($types)
+			reset ($fields)
 		);
 
 		return new PropertyValueGenerator($this, $generator);
 	}
 
-	/**
-	 * @return array
-	 */
-	function getDBFields()
+	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
 	{
-		return array (
-			DBType::create(DBType::INTEGER)
-				->setGenerated(true)
-				->setIsNullable($this->isNullable())
-		);
-	}
+		$value = parent::assemble($values, $fetchStrategy);
 
-	/**
-	 * @return void
-	 */
-	function preGenerate(DB $db, $tableName, OrmProperty $ormProperty)
-	{
-		$fields = $ormProperty->getDBFields();
-		return $db->preGenerate($tableName, reset($fields));
-	}
+		if (!is_null($value)) {
+			if ($this->type->is(DBType::BOOLEAN)) {
+				// Assume the most dbs represent their booleans from this set of values
+				// so no matter to provide a separate PropertyType that handles boolean value.
+				$value = in_array(
+					$value, array('t', 'true', '1', 1, true)
+				);
+			}
+		}
 
-	/**
-	 * @return mixed
-	 */
-	function getGeneratedId(DB $db, $tableName, OrmProperty $ormProperty)
-	{
-		$fields = $ormProperty->getDBFields();
-		return $db->getGeneratedId($tableName, reset($fields));
+		return $value;
 	}
 
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
+			'new DBType('. join(', ', array(
+				'DBType::' . $this->type->getId(),
+				$this->isNullable() ? 'true' : 'false',
+				$this->type->getSize(),
+				$this->type->getPrecision(),
+				$this->type->getScale(),
+				$this->type->isGenerated() ? 'true' : 'false',
+			)) . ')'
 		);
 	}
 }

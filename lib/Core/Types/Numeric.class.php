@@ -16,6 +16,36 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents a box for numeric primitives
+ *
+ * @ingroup Core_Types
+ */
+abstract class Numeric extends Scalar
+{
+	static function cast($value)
+	{
+		return new self ($value);
+	}
 
+	function setValue($value)
+	{
+		if (is_string($value)) {
+			$value = str_replace(',', '.', $value);
+			$value = str_replace(' ', '', $value);
+		}
+
+		parent::setValue($value);
+
+		return $this;
+	}
+
+	protected function isValidValue($value)
+	{
+		return
+			   parent::isValidValue($value)
+			&& is_numeric($value);
+	}
+}
 
 ?>

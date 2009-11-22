@@ -112,6 +112,10 @@ EOT;
 	 */
 	private function buildContainerGetter(OrmProperty $ormProperty)
 	{
+		Assert::notImplemented(
+			'container SHOULD generate code returning filled EntityQuery'
+		);
+
 		$propertyName = $ormProperty->getName();
 		$capitalizedPropertyName = ucfirst($ormProperty->getName());
 
@@ -147,8 +151,7 @@ EOT;
 
 		if ($visibility->is(OrmPropertyVisibility::TRANSPARENT)) {
 			if ($ormProperty->getType() instanceof ContainerPropertyType) {
-				//TODO containers are not supported yet
-				//$this->buildContainerGetter($ormProperty);
+				$this->buildContainerGetter($ormProperty);
 			}
 
 			return;
@@ -158,17 +161,15 @@ EOT;
 		$capitalizedPropertyName = ucfirst($ormProperty->getName());
 		$isNullable = $ormProperty->getType()->isNullable();
 		$typeImpl = $ormProperty->getType()->getImplClass();
-		$isObjective = (
-				class_exists($typeImpl)
-				&& TypeUtils::isChild($typeImpl, 'BuiltInType')
-			)
-				? false
-				: true;
 
 		$actualType =
-			$isObjective
+			$typeImpl
 				? $typeImpl
-				: strtolower($typeImpl);
+				: 'scalar';
+
+			if ($isNullable) {
+				$actualType .= '|null';
+			}
 
 		// make property itself
 		$this->classProperties[] = <<<EOT
@@ -180,39 +181,24 @@ EOT;
 
 		// make setter
 		if ($visibility->isSettable()) {
-			if (!$isObjective) {
-				$typeHint = '/* ' . $typeImpl . ' */';
-
-				if ($isNullable) {
-					$setterBody = <<<EOT
-is_null(\${$propertyName}) ? null : {$typeImpl}::cast(\${$propertyName})->getValue()
-EOT;
-				}
-				else {
-					$setterBody = <<<EOT
-{$typeImpl}::cast(\${$propertyName})->getValue()
-EOT;
-				}
-			}
-			else {
-				$typeHint = $typeImpl;
-				$setterBody = '$' . $propertyName;
-			}
-
 			$defaulValue =
 				$isNullable
 					? ' = null'
 					: '';
 
+			if ($typeImpl) {
+				$typeImpl .= ' ';
+			}
+
 			$this->classMethods[] = <<<EOT
 	/**
 	 * @param {$actualType} {$propertyName}
 	 * @throws ArgumentException
-	 * @return {$this->ormClass->getName()} an object itself
+	 * @return {$this->ormClass->getName()} itself
 	 */
-	function set{$capitalizedPropertyName}({$typeHint} \${$propertyName}{$defaulValue})
+	function set{$capitalizedPropertyName}({$typeImpl}\${$propertyName}{$defaulValue})
 	{
-		\$this->{$propertyName} = {$setterBody};
+		\$this->{$propertyName} = \${$propertyName}
 
 		return \$this;
 	}

@@ -20,7 +20,7 @@
  * Controller for lazy singletons, version 3
  * @ingroup Core_Patterns
  */
-abstract class LazySingleton implements ISingleton
+abstract class LazySingleton
 {
 	private static $objectInstances = array();
 

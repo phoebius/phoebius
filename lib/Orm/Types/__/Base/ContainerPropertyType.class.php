@@ -22,6 +22,13 @@
 abstract class ContainerPropertyType extends OrmPropertyType
 {
 	/**
+	 * Readonly
+	 *
+	 * @var SqlTypeArray
+	 */
+	private static $sqlTypes;
+
+	/**
 	 * @var IQueryable
 	 */
 	private $container;
@@ -38,14 +45,43 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	{
 		$this->container = $container;
 		$this->encapsulant = $encapsulant;
+
+		self::$sqlTypes = new SqlTypeArray;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getDBFields()
+	final function getSqlTypes()
 	{
-		return array();
+		return self::$sqlTypes;
+	}
+
+	final function getColumnCount()
+	{
+		return 0;
+	}
+
+	final function getImplClass()
+	{
+		return null;
+	}
+
+	final function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	{
+		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+	}
+
+	final function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
+	{
+		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+	}
+
+	final function disassemble($value)
+	{
+		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+	}
+
+	final function isNullable()
+	{
+		return false;
 	}
 
 	/**
@@ -62,38 +98,6 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	function getContainer()
 	{
 		return $this->container;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function makeValue(array $rawValue, FetchStrategy $fetchStrategy)
-	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
-	}
-
-	/**
-	 * @return array
-	 */
-	function makeValueSet(array $rawValueSet, FetchStrategy $fetchStrategy)
-	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
-	}
-
-	/**
-	 * @return array
-	 */
-	function makeRawValue($value)
-	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function isNullable()
-	{
-		return false;
 	}
 }
 

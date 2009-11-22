@@ -17,19 +17,30 @@
  ************************************************************************************************/
 
 /**
- * For future mappings. Orm.Map will map those primitve property types with SQL types via
- * DB dialect provider
- * @see NHibernate/Dialect/TypeNames.cs NHibernate.Dialect.TypeNames
- * @see NHibernate/Dialect/PostgreSQLDialect.cs NHibernate.Dialect.PostgreSQLDialect
- * @ingroup Orm_Types
+ * Represents a box for decimal primitives (float, integer, etc)
+ *
+ * @ingroup Core_Types
  */
-class MappablePrimitive extends Enumeration
+abstract class Decimal extends Numeric
 {
-	const STRING = 'string';
-	const INTEGER = 'integer';
-	const FLOAT = 'float';
-	const NUMERIC = 'numeric';
-	const BOOLEAN = 'boolean';
+	static function cast($value)
+	{
+		return new self ($value);
+	}
+
+	protected function isValidValue($value)
+	{
+		if (strlen((string)$value) > 0 && $value{0} == '+') {
+			$value = substr($value, 1);
+			if (empty($value)) {
+				$value = 0;
+			}
+		}
+
+		return
+			// http://www.php.net/manual/en/function.is-numeric.php#76094
+			((string)(float)$value) === (preg_replace('/(\.0*)$/', '', (string)$value));
+	}
 }
 
 ?>

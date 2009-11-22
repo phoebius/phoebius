@@ -20,7 +20,7 @@
  * 0:1, 1:1 relation implementation
  * @ingroup Orm_Types
  */
-class AssociationPropertyType extends OrmPropertyType
+final class AssociationPropertyType extends OrmPropertyType
 {
 	/**
 	 * @var IQueryable
@@ -30,7 +30,7 @@ class AssociationPropertyType extends OrmPropertyType
 	/**
 	 * @var OrmPropertyType
 	 */
-	private $identifierType;
+	private $fkType;
 
 	/**
 	 * @var AssociationMultiplicity
@@ -57,8 +57,7 @@ class AssociationPropertyType extends OrmPropertyType
 
 		if (!$identifier) {
 			throw new OrmModelIntegrityException(
-				'Cannot associate to an entity %s without id',
-				$container->getLogicalSchema()->getEntityName()
+				'Cannot associate to an entity '.$container->getLogicalSchema()->getEntityName().' without id'
 			);
 		}
 
@@ -71,23 +70,9 @@ class AssociationPropertyType extends OrmPropertyType
 			)
 		);
 
-		$this->identifierType = call_user_func(
-			array(
-				get_class($identifier->getType()),
-				'getRefHandler',
-			),
-			$multiplicity
-		);
+		$this->fkType = $identifier->getType()->getReferenceType($multiplicity);
 		$this->multiplicity = $multiplicity;
 		$this->action = $action;
-	}
-
-	/**
-	 * @return string
-	 */
-	function getImplClass()
-	{
-		return $this->container->getLogicalSchema()->getEntityName();
 	}
 
 	/**
@@ -114,21 +99,15 @@ class AssociationPropertyType extends OrmPropertyType
 		return $this->container;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getDBFields()
+	function getImplClass()
 	{
-		return $this->identifierType->getDBFields();
+		return $this->container->getLogicalSchema()->getEntityName();
 	}
 
-	/**
-	 * @return mixed
-	 */
-	function makeValue(array $rawValue, FetchStrategy $fetchStrategy)
+	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
 	{
 		try {
-			$id = $this->identifierType->makeValue($rawValue, $fetchStrategy);
+			$id = $this->fkType->assemble($values, $fetchStrategy);
 		}
 		catch (OrmModelIntegrityException $e) {
 			$id = null;
@@ -154,15 +133,13 @@ class AssociationPropertyType extends OrmPropertyType
 		return $entity;
 	}
 
-	/**
-	 * @return array
-	 */
-	function makeValueSet(array $rawValueSet, FetchStrategy $fetchStrategy)
+	function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
 	{
 		$ids = array();
-		foreach ($rawValueSet as $rawValue) {
+
+		foreach ($valueSet as $dbValueArray) {
 			try {
-				$ids[] = $this->identifierType->makeValue($rawValue, $fetchStrategy);
+				$ids[] = $this->fkType->assemble($dbValueArray, $fetchStrategy);
 			}
 			catch (OrmModelIntegrityException $e) {
 				if (!$this->isNullable()) {
@@ -190,22 +167,35 @@ class AssociationPropertyType extends OrmPropertyType
 		else {
 			$toFetch = array();
 
-			foreach ($ids as $id) {
+			foreach ($ids as $key => $id) {
 				if (!is_null($id)) {
 					$toFetch[] = $id;
 				}
 			}
 
 			$entities = $dao->getByIds($toFetch);
+
+			$toReturn = array();
+			reset($entities);
+
+			foreach ($ids as $id) {
+				if ($id) {
+					$toReturn[] = current($entities);
+
+					next ($entities);
+				}
+				else {
+					$toReturn[] = null;
+				}
+			}
+
+			$entities = $toReturn;
 		}
 
 		return $entities;
 	}
 
-	/**
-	 * @return array
-	 */
-	function makeRawValue($value)
+	function disassemble($value)
 	{
 		if (is_null($value)) {
 			if (!$this->isNullable()) {
@@ -214,7 +204,7 @@ class AssociationPropertyType extends OrmPropertyType
 		}
 
 		return
-			$this->identifierType->makeRawValue(
+			$this->fkType->disassemble(
 				is_null($value)
 					? null
 					: (
@@ -225,12 +215,19 @@ class AssociationPropertyType extends OrmPropertyType
 			);
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isNullable()
 	{
 		return $this->multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE);
+	}
+
+	function getSqlTypes()
+	{
+		return $this->fkType->getSqlTypes();
+	}
+
+	function getColumnCount()
+	{
+		return $this->fkType->getColumnCount();
 	}
 
 	protected function getCtorArgumentsPhpCode()

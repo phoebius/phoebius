@@ -19,63 +19,68 @@
 /**
  * @ingroup Orm_Types
  */
-class FloatPropertyType extends PrimitivePropertyType
+abstract class PrimitivePropertyType extends OrmPropertyType
 {
 	/**
-	 * @var integer|null
+	 * @var ISqlType
 	 */
-	private $precision;
-
-	function __construct($precision = null, $defaultValue = null, $isNullable = false)
-	{
-		if (!is_null($precision)) {
-			Assert::isPositiveInteger($precision);
-		}
-
-		$this->precision = $precision;
-
-		parent::__construct($defaultValue, $isNullable);
-	}
+	private $type;
 
 	/**
-	 * @return string
+	 * @var boolean
 	 */
+	private $isNullable;
+
+	function __construct(ISqlType $type, $isNullable = true)
+	{
+		Assert::isBoolean($isNullable);
+
+		$this->type = $type;
+		$this->isNullable = $isNullable;
+	}
+
 	function getImplClass()
 	{
-		return 'Float';
+		return null;
 	}
 
-	/**
-	 * @return integer|null
-	 */
-	function getPrecision()
+	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
 	{
-		return $this->precision;
+		Assert::isTrue($values->count() == 1);
+
+		return $values->getFirst();
 	}
 
-	/**
-	 * @return array
-	 */
-	function getDBFields()
+	function disassemble($value)
 	{
-		return array (
-			DBType::create(DBType::FLOAT)
-				->setPrecision($this->precision)
-				->setIsNullable($this->isNullable())
+		if (is_null($value)) {
+			if (!$this->isNullable()) {
+				throw new OrmModelIntegrityException('property cannot be null');
+			}
+		}
+
+		return new SqlValueArray(
+			array(new ScalarSqlValue($value))
 		);
 	}
 
-	protected function getCtorArgumentsPhpCode()
+	function isNullable()
 	{
-		return array(
-			is_null($this->precision)
-				? 'null'
-				: $this->precision,
-			'null',
-			$this->isNullable()
-				? 'true'
-				: 'false'
+		return $this->isNullable;
+	}
+
+	function getSqlTypes()
+	{
+		return new SqlTypeArray(
+			array(
+				$this->type
+			)
 		);
+	}
+
+	function getColumnCount()
+	{
+		return 1;
 	}
 }
 

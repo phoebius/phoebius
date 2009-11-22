@@ -17,46 +17,57 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types_BuiltIn
+ * Represents a box for primitive boolean
+ *
+ * @ingroup Core_Types
  */
-abstract class Numeric extends Scalar
+final class Boolean extends Scalar
 {
-	/**
-	 * @return Numeric
-	 */
-	static function create($value)
-	{
-		return new self ($value);
-	}
-
-	/**
-	 * @return Numeric
-	 */
 	static function cast($value)
 	{
 		return new self ($value);
 	}
 
-	/**
-	 * @return BuiltInType
-	 */
-	function setValue($value)
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
 	{
-		if (is_scalar($value)) {
-			$value = str_replace(',', '.', $value);
-		}
+		$type = new DBType(
+			DBType::BOOLEAN,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
+		);
 
-		return parent::setValue($value);
+		return $type->getOrmPropertyType();
 	}
 
-	/**
-	 * @return boolean
-	 */
+	function setValue($value)
+	{
+		if (!is_bool($value)) {
+			if (in_array($value, array (1, 'true', 't'))) {
+				$value = true;
+			}
+			else if (in_array($value, array (0, 'false', 'f'))) {
+				$value = false;
+			}
+			else {
+				throw new TypeCastException(
+					$this,
+					$value,
+					'not an Boolean value specified'
+				);
+			}
+		}
+
+		parent::setValue($value);
+
+		return $this;
+	}
+
 	protected function isValidValue($value)
 	{
-		return
-			   parent::isValidValue($value)
-			&& is_numeric($value);
+		return is_bool($value);
 	}
 }
 

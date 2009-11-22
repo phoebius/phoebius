@@ -34,19 +34,19 @@ interface ILogicallySchematic
 	function getNewEntity();
 
 	/**
-	 * @return IOrmProperty|null
+	 * @return OrmProperty|null
 	 */
 	function getIdentifier();
 
 	/**
-	 * Gets the set of propertyName => IOrmProperty
+	 * Gets the set of propertyName => OrmProperty
 	 * @return array
 	 */
 	function getProperties();
 
 	/**
 	 * @throws ArgumentException
-	 * @return IOrmProperty
+	 * @return OrmProperty
 	 */
 	function getProperty($name);
 }

@@ -19,35 +19,36 @@
 /**
  * @ingroup Dal_DB
  */
-class MySqlDialect implements IDialect
+class MySqlDialect extends Dialect
 {
 	private static $baseTypes = array(
-		DbType::SMALL_INTEGER   => 'smallint',
-		DbType::INTEGER         => 'int',
-		DbType::BIG_INTEGER     => 'bigint',
+		// primitive
+		//DBType::BOOLEAN => 'TINYINT', // handled manually
 
-		/**
-		 * Arbitrary Precision number
-		 * Postgresql manual: 8.1.2. Arbitrary Precision Numbers
-		 */
-		DbType::NUMERIC         => 'double',
+		// integers
+		DBType::INT16 => 'MEDIUMINT',
+		DBType::INT32 => 'INTEGER',
+		DBType::INT64 => 'BIGINT',
 
-		/**
-		 * floating point number
-		 * Postgresql manual: 8.1.3. Floating-Point Types
-		 */
-		DbType::FLOAT           => 'float',
+		// unsigned integers
+		DBType::UINT16 => 'MEDIUMINT UNSIGNED',
+		DBType::UINT32 => 'INTEGER UNSIGNED',
+		DBType::UINT64 => 'BIGINT UNSIGNED',
 
-		DbType::STRING          => 'varchar',
-		DbType::BOOLEAN         => 'tinyint',
+		// floating-point
+		DBType::CURRENCY => 'MONEY',
+		DBType::DECIMAL => 'NUMERIC',
+		DBType::FLOAT => 'decimal',
 
-		DbType::DATE            => 'date',
-		DbType::TIME            => 'time',
-		DbType::DATETIME        => 'timestamp',
+		// string
+		DBType::BINARY => 'BLOB',
+		DBType::CHAR => 'CHAR',
+		DBType::VARCHAR => 'VARCHAR',
 
-		DbType::INTERVAL        => null,
-
-		DbType::BINARY          => null,
+		// date and time
+		DBType::DATE => 'DATE',
+		DBType::TIME => 'TIME',
+		DBType::DATETIME => 'DATETIME',
 	);
 
 	/**
@@ -61,21 +62,17 @@ class MySqlDialect implements IDialect
 	function __construct($link = null)
 	{
 		$this->link = $link;
+
+		foreach (self::$baseTypes as $baseType => $impl) {
+			$this->registerType($baseType, $impl);
+		}
 	}
 
-	/**
-	 * @return DBDriver
-	 */
 	function getDBDriver()
 	{
 		return DBDriver::mysql();
 	}
 
-	/**
-	 * Quotes a string as SQL identifier
-	 * @param string $identifier
-	 * @return string
-	 */
 	function quoteIdentifier($identifier)
 	{
 		Assert::isScalar(
@@ -87,11 +84,6 @@ class MySqlDialect implements IDialect
 		return '`' . str_replace('`', '\\`', $identifier)  . '`';
 	}
 
-	/**
-	 * Quotes a string as SQL value
-	 * @param string $value
-	 * @return string
-	 */
 	function quoteValue($value)
 	{
 		Assert::isScalarOrNull(
@@ -107,60 +99,69 @@ class MySqlDialect implements IDialect
 		return '\'' . mysql_real_escape_string($value, $this->link) . '\'';
 	}
 
-	/**
-	 * FIXME: cut out basic type representation casted to a base DbDialect class
-	 * @return string
-	 */
 	function getTypeRepresentation(DBType $dbType)
 	{
-		Assert::isTrue(
-			isset(
-				self::$baseTypes[$dbType->getValue()]
-			)
-		);
-
-		$type = self::$baseTypes[$dbType->getValue()];
-
-		if ($dbType->hasSize() && ($size = $dbType->getSize())) {
-			$type .= '(' . $size . ')';
-		}
-		else if ($dbType->is(DBType::STRING)) {
-			$type = 'text';
-		}
-		else if ($dbType->is(DBType::BOOLEAN)) {
-			$type = 'tinyint(1) UNSIGNED';
-		}
-		else if ($dbType->hasPrecision() && ($precision = $dbType->getPrecision())) {
-			$type .= '(' . $precision;
-			if ($dbType->hasScale() && ($scale = $dbType->getScale())) {
-				$type .= ',' . $scale;
+		switch ($dbType->getValue()) {
+			case DBType::BOOLEAN: {
+				return $this->compute('TINYINT(1) UNSIGNED', $dbType->isNullable());
 			}
 
-			$type .= ')';
+			case DBType::BINARY: {
+				$size = $dbType->getSize();
+
+				if ($size < 65535) {
+					$customType = 'BLOB';
+				}
+				else if ($size < 16777215) {
+					$customType = 'MEDIUMBLOB';
+				}
+				else {
+					$customType = 'LONGTBLOB';
+				}
+
+				return $this->compute($customType, $dbType->isNullable());
+			}
+
+			case DBType::VARCHAR: {
+				$size = $dbType->getSize();
+
+				if (!$size) {
+					$dbType->setSize(255);
+				}
+				else {
+					if ($size < 255) {
+						 break;
+					}
+					else if ($size < 65535) {
+						$customType = 'TEXT';
+					}
+					else if ($size < 16777215) {
+						$customType = 'MEDIUMTEXT';
+					}
+					else {
+						$customType = 'LONGTEXT';
+					}
+
+					return $this->compute($customType, $dbType->isNullable());
+				}
+			}
 		}
 
-		if ($dbType->isUnsigned()) {
-			$type .= ' UNSIGNED';
-		}
+		$type = parent::getTypeRepresentation($dbType);
 
-		if ($dbType->isNotNullable()) {
-			$type .= ' NOT NULL';
-		}
-
-		if ($dbType->isGenerated()) {
-			$autoIncrementingTypes = array(DBType::SMALL_INTEGER, DBType::INTEGER, DBType::BIG_INTEGER);
-
-			if (in_array($dbType->getValue(), $autoIncrementingTypes)) {
-				$type .= ' AUTO_INCREMENT';
+		switch ($dbType->getValue()) {
+			case DBType::UINT16:
+			case DBType::UINT32:
+			case DBType::UINT64: {
+				if ($dbType->isGenerated()) {
+					$type .= ' AUTO_INCREMENT';
+				}
 			}
 		}
 
 		return $type;
 	}
 
-	/**
-	 * @return array
-	 */
 	function getTableQuerySet(DBTable $table)
 	{
 		$table = clone $table;
@@ -168,13 +169,6 @@ class MySqlDialect implements IDialect
 		$queries = array(
 			CreateTableQuery::create($table)
 		);
-
-		foreach ($table->getColumns() as $column) {
-			if ($column->getType()->isGenerated()) {
-				// AUTO_INCREMENT
-				$column->setDefaultValue(null);
-			}
-		}
 
 		foreach ($table->getConstraints() as $constraint) {
 			$columns = array();

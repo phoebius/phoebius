@@ -20,58 +20,50 @@
  * Represents a dialect that conforms PostgreSql SQL syntax
  * @ingroup Dal_DB
  */
-class PgSqlDialect extends LazySingleton implements IDialect
+class PgSqlDialect extends Dialect
 {
 	private static $baseTypes = array(
-		DbType::SMALL_INTEGER   => 'smallint',
-		DbType::INTEGER         => 'integer',
-		DbType::BIG_INTEGER     => 'bigint',
+		// primitive
+		DBType::BOOLEAN => 'boolean',
 
-		/**
-		 * Arbitrary Precision number
-		 * Postgresql manual: 8.1.2. Arbitrary Precision Numbers
-		 */
-		DbType::NUMERIC         => 'numeric',
+		// integers
+		DBType::INT16 => 'int2',
+		DBType::INT32 => 'int4',
+		DBType::INT64 => 'int8',
 
-		/**
-		 * floating point number
-		 * Postgresql manual: 8.1.3. Floating-Point Types
-		 */
-		DbType::FLOAT           => 'float',
+		// unsigned integers
+		DBType::UINT16 => 'int2',
+		DBType::UINT32 => 'int4',
+		DBType::UINT64 => 'int8',
 
-		DbType::STRING          => 'character varying',
-		DbType::BOOLEAN         => 'boolean',
+		// floating-point
+		DBType::CURRENCY => 'decimal',
+		DBType::DECIMAL => 'decimal',
+		DBType::FLOAT => 'float',
 
-		DbType::DATE            => 'date',
-		DbType::TIME            => 'time',
-		DbType::DATETIME        => 'timestamp',
+		// string
+		DBType::BINARY => 'binary',
+		DBType::CHAR => 'char',
+		DBType::VARCHAR => 'character varying',
 
-		DbType::INTERVAL        => 'interval',
-
-		DbType::BINARY          => 'binary',
+		// date and time
+		DBType::DATE => 'date',
+		DBType::TIME => 'time',
+		DBType::DATETIME => 'datetime',
 	);
 
-	/**
-	 * @return PgSqlDialect
-	 */
-	static function getInstance()
+	function __construct()
 	{
-		return LazySingleton::instance(__CLASS__);
+		foreach (self::$baseTypes as $baseType => $impl) {
+			$this->registerType($baseType, $impl);
+		}
 	}
 
-	/**
-	 * @return DBDriver
-	 */
 	function getDBDriver()
 	{
 		return DBDriver::pgsql();
 	}
 
-	/**
-	 * Quotes a string as SQL identifier
-	 * @param string $identifier
-	 * @return string
-	 */
 	function quoteIdentifier($identifier)
 	{
 		Assert::isScalar(
@@ -83,11 +75,6 @@ class PgSqlDialect extends LazySingleton implements IDialect
 		return '"' . str_replace('"', '""', $identifier) . '"';
 	}
 
-	/**
-	 * Quotes a string as SQL value
-	 * @param string $value
-	 * @return string
-	 */
 	function quoteValue($value)
 	{
 		Assert::isScalarOrNull(
@@ -110,48 +97,6 @@ class PgSqlDialect extends LazySingleton implements IDialect
 		return "'" . pg_escape_string($value)  . "'";
 	}
 
-	/**
-	 * FIXME: cut out basic type representation casted to a base DbDialect class
-	 * @return string
-	 */
-	function getTypeRepresentation(DBType $dbType)
-	{
-		$type = self::$baseTypes[$dbType->getValue()];
-
-		if ($dbType->hasSize() && ($size = $dbType->getSize())) {
-			//$type .= '(' . $size . ')';
-		}
-		else if ($dbType->hasPrecision() && ($precision = $dbType->getPrecision())) {
-			$type .= '(' . $precision;
-			if ($dbType->hasScale() && ($scale = $dbType->getScale())) {
-				$type .= ',' . $scale;
-			}
-
-			$type .= ')';
-		}
-
-		if ($dbType->hasTimezone()) {
-			$type .= ' ' . ($dbType->withTimezeone() ? 'with' : 'without') . ' time zone';
-		}
-
-		if ($dbType->isNotNullable()) {
-			$type .= ' NOT NULL';
-		}
-
-		return $type;
-	}
-
-	/**
-	 * @return string
-	 */
-	function getSequenceName($tableName, $columnName)
-	{
-		return $tableName . '_' . $columnName . '_sq';
-	}
-
-	/**
-	 * @return array
-	 */
 	function getTableQuerySet(DBTable $table)
 	{
 		$table = clone $table;
@@ -160,7 +105,8 @@ class PgSqlDialect extends LazySingleton implements IDialect
 		$postQueries = array();
 
 		foreach ($table->getColumns() as $column) {
-			if ($column->getType()->isGenerated()) {
+			$type = $column->getType();
+			if ($type instanceof DBType && $type->isGenerated()) {
 				$sqName = $this->getSequenceName($table->getName(), $column->getName());
 
 				$preQueries[] = new PlainQuery(
@@ -213,6 +159,16 @@ class PgSqlDialect extends LazySingleton implements IDialect
 			array(new CreateTableQuery($table)),
 			$postQueries
 		);
+	}
+
+	/**
+	 * Generates the name of the seq
+	 *
+	 * @return string
+	 */
+	function getSequenceName($tableName, $columnName)
+	{
+		return $tableName . '_' . $columnName . '_sq';
 	}
 }
 

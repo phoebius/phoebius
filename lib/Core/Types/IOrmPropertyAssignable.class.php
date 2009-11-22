@@ -28,7 +28,7 @@ interface IOrmPropertyAssignable
 	 *
 	 * @return OrmPropertyType
 	 */
-	static function getHandler(AssociationMultiplicity $multiplicity);
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity);
 }
 
 ?>

@@ -19,7 +19,7 @@
 /**
  * @ingroup Orm_Model
  */
-class OrmProperty implements IOrmProperty
+class OrmProperty
 {
 	/**
 	 * @var string
@@ -150,7 +150,7 @@ class OrmProperty implements IOrmProperty
 	/**
 	 * @return array of columnName
 	 */
-	function getDBFields()
+	function ___rename___getDBFields()
 	{
 		return $this->dbFields;
 	}

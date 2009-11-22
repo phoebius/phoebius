@@ -17,16 +17,29 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Core_Types_BuiltIn
+ * Represens a box for any scalar
+ *
+ * @ingroup Core_Types
  */
-class String extends Scalar
+class Scalar extends Primitive
 {
-	/**
-	 * @return Scalar
-	 */
 	static function cast($value)
 	{
 		return new self ($value);
+	}
+
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
+	{
+		$type = new DBType(
+			DBType::VARCHAR,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
+		);
+
+		return $type->getOrmPropertyType();
 	}
 }
 

@@ -17,72 +17,76 @@
  ************************************************************************************************/
 
 /**
+ * Represents a time
+ *
  * @ingroup Core_Types_Complex
  */
-final class Time implements IBoxable
+final class Time implements IBoxable, IOrmPropertyAssignable
 {
-	/**
-	 * @var int
-	 */
 	private $hour = '00';
-
-	/**
-	 * @var int
-	 */
 	private $minute = '00';
-
-	/**
-	 * @var int
-	 */
 	private $second = '00';
 
 	/**
 	 * @return Time
 	**/
-	static function create($input = null)
+	static function create($input)
 	{
 		return new self ($input);
 	}
 
-	/**
-	 * @return Date
-	 */
 	static function cast($value)
 	{
-		try {
-			return new self($value);
-		}
-		catch (ArgumentException $e) {
-			throw new TypeCastException(new Type(__CLASS__), $value);
-		}
+		return new self ($value);
+	}
+
+	static function getOrmPropertyType(AssociationMultiplicity $multiplicity)
+	{
+		$type = new DBType(
+			DBType::TIME,
+			/* is nullable */$multiplicity->isNullable(),
+			/* size */null,
+			/* precision */null,
+			/* scale */null,
+			/* is generated */false
+		);
+
+		return $type->getOrmPropertyType();
 	}
 
 	/**
-	 * @return Date
+	 * Creates a Time object that represents current application time
+	 *
+	 * @return Time
 	 */
 	static function now()
 	{
-		return new self(time());
+		return new self (time());
 	}
 
-	function __construct($input = null)
+	/**
+	 * @param mixed $input unix timestamp or textual representation of the time
+	 */
+	function __construct($input)
 	{
-		$this->setValue($input);
+		$this->setTimeString($input);
 	}
 
-	// currently supports '01:23:45', '012345', '1234', '12'
-	private function setValue($input = null)
+	private function setTimeString($input)
 	{
-		if (!$input) {
-			$input = time();
-		}
-
-		if (strlen((string)$input) > 8 && TypeUtils::isInteger($input)) {
+		// HH:MM:SS, HHMMSS
+		if (strlen((string)$input) > strlen('000000') && TypeUtils::isInteger($input)) {
 			// unix timestamp
 			list ($this->hour, $this->minute, $this->second) = explode(':', date('H:i:s', $input));
 		}
 		else {
-			$chunks = preg_split('/[^\d]+/', $input);
+			if (preg_match('/[^\d]/', $input)) {
+				$chunks = preg_split('/[^\d]+/', $input);
+			}
+			else {
+				Assert::notImplemented('"HHMMSS" syntax not implemented in the Time parser');
+			}
+
 			$setters = array('hour', 'minute', 'second');
 
 			foreach ($chunks as $k => $v)
@@ -92,20 +96,29 @@ final class Time implements IBoxable
 		}
 	}
 
+	/**
+	 * Gets the hours of the Time object
+	 *
+	 * @return int
+	 */
 	function getHour()
 	{
 		return (int) $this->hour;
 	}
 
 	/**
-	 * @return Time
-	**/
+	 * Sets the hours of the Time object
+	 *
+	 * @param int $hour hours to set
+	 *
+	 * @return Time itself
+	 */
 	function setHour($hour)
 	{
 		$hour = (int) $hour;
 
 		if ((0 > $hour) || ($hour > 23)) {
-			throw new OutOfRangeException('hour');
+			throw new ArgumentException('hour');
 		}
 
 		$this->hour = sprintf('%02d', $hour);
@@ -113,20 +126,29 @@ final class Time implements IBoxable
 		return $this;
 	}
 
+	/**
+	 * Gets the minutes of the Time object
+	 *
+	 * @return int
+	 */
 	function getMinute()
 	{
 		return (int) $this->minute;
 	}
 
 	/**
-	 * @return Time
-	**/
+	 * Sets the minutes of the Time objet
+	 *
+	 * @param int $minute minutes to set
+	 *
+	 * @return Time itself
+	 */
 	function setMinute($minute)
 	{
 		$minute = (int) $minute;
 
 		if ((0 > $minute) || ($minute > 59)) {
-			throw new OutOfRangeException('minute');
+			throw new ArgumentException('minute');
 		}
 
 		$this->minute = sprintf('%02d', $minute);
@@ -134,21 +156,29 @@ final class Time implements IBoxable
 		return $this;
 	}
 
+	/**
+	 * Gets the seconds of the Time object
+	 *
+	 * @return int
+	 */
 	function getSecond()
 	{
 		return (int) $this->second;
 	}
 
 	/**
+	 * Sets the seconds of the time object
+	 *
+	 * @param int $second seconds to set
+	 *
 	 * @return Time
-	**/
+	 */
 	function setSecond($second)
 	{
 		$second = (int) $second;
 
-
 		if ((0 > $second) || ($second > 59)) {
-			throw new OutOfRangeException('second');
+			throw new ArgumentException('second');
 		}
 
 		$this->second = sprintf('%02d', $second);
@@ -177,15 +207,14 @@ final class Time implements IBoxable
 		return $this->toFormattedString();
 	}
 
-	/**
-	 * @return string
-	 */
 	function getValue()
 	{
 		return $this->toFormattedString();
 	}
 
 	/**
+	 * Represents the Time object in a whole number of minutes
+	 *
 	 * @return int
 	 */
 	function toMinutes()
@@ -197,6 +226,8 @@ final class Time implements IBoxable
 	}
 
 	/**
+	 * Represents the Time object in a whole number of seconds
+	 *
 	 * @return int
 	 */
 	function toSeconds()

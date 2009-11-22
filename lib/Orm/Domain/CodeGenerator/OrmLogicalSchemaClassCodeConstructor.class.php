@@ -134,7 +134,7 @@ EOL;
 
 		$this->classMethods[] = <<<EOL
 	/**
-	 * @return IOrmProperty|null
+	 * @return OrmProperty|null
 	 */
 	function getIdentifier()
 	{
@@ -144,7 +144,7 @@ EOL;
 
 		$this->classMethods[] = <<<EOL
 	/**
-	 * Gets the set of {@link IOrmProperty}
+	 * Gets the set of {@link OrmProperty}
 	 * @return array
 	 */
 	function getProperties()
@@ -155,7 +155,7 @@ EOL;
 
 		$this->classMethods[] = <<<EOL
 	/**
-	 * @return IOrmProperty
+	 * @return OrmProperty
 	 */
 	function getProperty(\$name)
 	{

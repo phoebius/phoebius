@@ -47,6 +47,14 @@ final class AssociationMultiplicity extends Enumeration
 	{
 		return new self (self::EXACTLY_ONE);
 	}
+
+	/**
+	 * @return boolean
+	 */
+	function isNullable()
+	{
+		return $this->is(self::ZERO_OR_ONE);
+	}
 }
 
 ?>

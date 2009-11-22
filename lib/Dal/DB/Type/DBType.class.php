@@ -52,9 +52,6 @@ final class DBType extends Enumeration implements ISqlType
 	const TIME = 'time';
 	const DATETIME = 'datetime';
 
-	// for raw implementation
-	const OBJECT = 'object';
-
 	private $hasSize = array(
 		self::VARCHAR, self::CHAR, self::BINARY
 	);
@@ -77,6 +74,21 @@ final class DBType extends Enumeration implements ISqlType
 	private $size;
 	private $precision;
 	private $scale;
+
+	/**
+	 * @return DBType
+	 */
+	static function create(
+			$id,
+			$isNullable = false,
+			$size = null,
+			$precision = null,
+			$scale = null,
+			$isGenerated = false
+		)
+	{
+		return new self ($id, $isNullable, $size, $precision, $scale, $isGenerated);
+	}
 
 	function __construct(
 			$id,
@@ -110,7 +122,7 @@ final class DBType extends Enumeration implements ISqlType
 	/**
 	 * @return OrmPropertyType
 	 */
-	function getPropertyType()
+	function getOrmPropertyType()
 	{
 		switch ($this->getValue()) {
 			case self::DATE: {
@@ -122,11 +134,8 @@ final class DBType extends Enumeration implements ISqlType
 			case self::DATETIME: {
 				return new BoxablePropertyType('Timestamp', $this);
 			}
-			case self::OBJECT: {
-				Assert::isUnreachable('DBType::OBJECT should not be used directly');
-			}
-			default: {
-				return new PrimitivePropertyType($this);
+			default: { // booleans' special case is handled internally
+				return new FundamentalPropertyType($this);
 			}
 		}
 	}
