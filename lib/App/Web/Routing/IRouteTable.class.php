@@ -24,6 +24,9 @@
 interface IRouteTable
 {
 	/**
+	 * Gets the named Route
+	 *
+	 * @param string $name name of the Route
 	 * @throws ArgumentException if named route not found
 	 * @return Route
 	 */

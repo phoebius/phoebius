@@ -17,11 +17,6 @@
  ************************************************************************************************/
 
 /**
- * @example SelectQuery.php
- * Using SelectQuery
- */
-
-/**
  * Represents a simple select query
  * @ingroup Dal_DB_Query
  * @todo open a wider public API for creating nested joins (specify {@link SqlJoinMethod} manually

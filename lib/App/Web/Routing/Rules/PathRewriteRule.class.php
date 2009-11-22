@@ -21,7 +21,9 @@
  *
  * Pattern syntax:
  *
+ * @code
  * constant_value | [ predefined_value | ( predefined_value_1 | predefined_value_2 | ... ) ] :parameter_name
+ * @endcode
  *
  * where:
  *
@@ -57,7 +59,7 @@ class PathRewriteRule implements IRewriteRule
 	private $chunkRewriters = array();
 
 	/**
-	 * @param string $pattern
+	 * @param string $pattern pattern to use
 	 */
 	function __construct($pattern)
 	{
@@ -65,7 +67,11 @@ class PathRewriteRule implements IRewriteRule
 	}
 
 	/**
-	 * @return PathRewriteRule an object itself
+	 * Sets the new URL pattern to use
+	 *
+	 * @param string $pattern pattern to set
+	 *
+	 * @return PathRewriteRule itself
 	 */
 	function setPattern($pattern)
 	{
@@ -79,6 +85,8 @@ class PathRewriteRule implements IRewriteRule
 	}
 
 	/**
+	 * Gets the used URL pattern
+	 *
 	 * @return string
 	 */
 	function getPattern()
@@ -86,9 +94,6 @@ class PathRewriteRule implements IRewriteRule
 		return $this->urlPattern;
 	}
 
-	/**
-	 * @return void
-	 */
 	function compose(SiteUrl $url, array $parameters)
 	{
 		$pathChunks = array();
@@ -129,9 +134,7 @@ class PathRewriteRule implements IRewriteRule
 			join('/', $pathChunks)
 		);
 	}
-	/**
-	 * @return array
-	 */
+
 	function getParameterList($requiredOnly = true)
 	{
 		$yield = array();
@@ -151,10 +154,6 @@ class PathRewriteRule implements IRewriteRule
 		return $yield;
 	}
 
-	/**
-	 * @throws RewriteException
-	 * @return array
-	 */
 	function rewrite(IWebContext $webContext)
 	{
 		$pathChunks = explode('/', $webContext->getRequest()->getHttpUrl()->getVirtualPath());
@@ -191,14 +190,14 @@ class PathRewriteRule implements IRewriteRule
 					$webContext
 				);
 			}
-			
+
 			if (($name = $chunkRewriter->getName())) {
 				$parameters[$name] = $pathChunk;
 			}
 
 			next($pathChunks);
 		}
-		
+
 		return $parameters;
 	}
 

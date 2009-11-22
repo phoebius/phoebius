@@ -42,6 +42,15 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	private $dictionary = array();
 
+	/**
+	 * @param WebRequestDictionary $dictonary
+	 * @param array $getVars request's $_GET
+	 * @param array $postVars request's $_POST
+	 * @param array $cookieVars request's $_COOKIE
+	 * @param array $filesVars request's $_FILES
+	 * @param string|null $baseHost optional base host for request's request url (SiteUrl)
+	 * @param string $baseUri optional base uri
+	 */
 	function __construct(
 				WebRequestDictionary $dictonary,
 				array $getVars,
@@ -75,7 +84,6 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	function __clone()
 	{
 		$this->httpUrl = clone $this->httpUrl;
-		$this->dictionary = clone $this->dictionary;
 	}
 
 	/**
@@ -176,6 +184,10 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	/**
 	 * Determines whether variable is set in any of the request part
 	 *
+	 * @param string $variableName name of the variable to be retreived from the request
+	 * @param WebRequestPart $part optional specification of request scope where variable should
+	 * 			be looked up
+	 *
 	 * @return boolean
 	 */
 	function hasVar($variableName, WebRequestPart $part = null)
@@ -192,6 +204,9 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 * Gets the variable from the specified request part
 	 *
 	 * @throws ArgumentException if such variable does not exist
+	 * @param string $variableName name of the variable to be retreived from the request
+	 * @param WebRequestPart $part optional specification of request scope where variable should
+	 * 			be looked up
 	 * @return scalar
 	 */
 	function getVar($variableName, WebRequestPart $part = null)

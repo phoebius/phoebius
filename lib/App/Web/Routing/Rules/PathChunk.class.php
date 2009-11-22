@@ -22,7 +22,7 @@
  * @ingroup App_Web_Routing_Rules
  * @internal
  */
-class PathChunk
+final class PathChunk
 {
 	const PARAMETER_PLACEHOLDER = ':';
 	const DEFAULT_VALUE_DELIMITER = '|';

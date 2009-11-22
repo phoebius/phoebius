@@ -43,11 +43,18 @@ class RequestVarImportRule implements IRewriteRule
 	 */
 	private $isOptional;
 
+	/**
+	 * @param string $name name of the varible to import
+	 * @param WebRequestPart $part part of the request to look up. Default is GET
+	 * @param boolean $isOptional whether parameter is optional
+	 * @param mixed $defaultValue parameter's default value to use in case when variable is
+	 * 			not presented within the IWebContext
+	 */
 	function __construct(
-		$name,
-		WebRequestPart $part = null,
-		$isOptional = false,
-		$defaultValue = null
+			$name,
+			WebRequestPart $part = null,
+			$isOptional = false,
+			$defaultValue = null
 		)
 	{
 		Assert::isScalar($name);
@@ -62,9 +69,6 @@ class RequestVarImportRule implements IRewriteRule
 		$this->defaultValue = $defaultValue;
 	}
 
-	/**
-	 * @return array
-	 */
 	function getParameterList($requiredOnly = true)
 	{
 		Assert::isBoolean($requiredOnly);
@@ -76,10 +80,6 @@ class RequestVarImportRule implements IRewriteRule
 		return array($this->name);
 	}
 
-	/**
-	 * @throws RewriteException
-	 * @return array
-	 */
 	function rewrite(IWebContext $webContext)
 	{
 		$request = $webContext->getRequest();
@@ -105,9 +105,6 @@ class RequestVarImportRule implements IRewriteRule
 		);
 	}
 
-	/**
-	 * @return void
-	 */
 	function compose(SiteUrl $url, array $parameters)
 	{
 		if ($this->requestPart->is(WebRequestPart::GET)) {

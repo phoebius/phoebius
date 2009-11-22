@@ -19,7 +19,7 @@
 /**
  * Encapsulates the request part where the request variable can reside.
  *
- * @warning This is not the request part (GET, POST, etc).
+ * @warning This is not the request part (GET, POST, etc), see WebRequestMethod.
  *
  * @ingroup App_Web
  */

@@ -24,14 +24,22 @@
 interface IRouter
 {
 	/**
-	 * @return Trace
+	 * Gets the Trace that can handle IWebContext, or null if no Route found that matches the IWebContext
+	 *
+	 * @param IWebContext $webContext the route should be matched against
+	 *
+	 * @return Trace|null
 	 */
 	function getTrace(IWebContext $webContext);
-	
+
 	/**
+	 * Gets the Trace suitable for situation when the matched Trace was unable to handle the IWebContext
+	 *
+	 * @param Trace $parentTrace trace that was unable to handle the IWebContext
+	 *
 	 * @return Trace
 	 */
 	function getFallbackTrace(Trace $parentTrace);
-}	
+}
 
 ?>

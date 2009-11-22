@@ -61,6 +61,7 @@ interface IWebServerState extends IServerState
 	/**
 	 * Gets the request header identified by header name.
 	 *
+	 * @param string $header header name
 	 * @throws ArgumentException thrown when no header found by the specified name
 	 * @return string
 	 */

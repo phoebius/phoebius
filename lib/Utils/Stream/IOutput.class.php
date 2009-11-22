@@ -26,9 +26,10 @@ interface IOutput
 	/**
 	 * Writes the string to the source.
 	 *
+	 * @param string $string string to be appended to the source
 	 * @return IOutput itself
 	 */
-	function write($buffer);
+	function write($string);
 }
 
 ?>

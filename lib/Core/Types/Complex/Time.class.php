@@ -29,7 +29,7 @@ final class Time implements IBoxable, IOrmPropertyAssignable
 
 	/**
 	 * @return Time
-	**/
+	 */
 	static function create($input)
 	{
 		return new self ($input);

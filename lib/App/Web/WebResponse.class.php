@@ -36,7 +36,7 @@ class WebResponse implements IWebResponse
 	private $isFinished = false;
 
 	/**
-	 * @param WebResponse *MAY* now about the request to provide accure results
+	 * @param WebRequest $request WebResponse *MAY* now about the request to provide accure results
 	 */
 	function __construct(WebRequest $request = null)
 	{
@@ -58,7 +58,9 @@ class WebResponse implements IWebResponse
 	/**
 	 * Writes the contents of the file to the response.
 	 *
-	 * @return WebResponse an object itself
+	 * This method is WebResponse::write() optimized for files.
+	 *
+	 * @return WebResponse itself
 	 */
 	function writeFile($filepath)
 	{
@@ -99,8 +101,7 @@ class WebResponse implements IWebResponse
 
 	function addHeaders(array $headers)
 	{
-		foreach ($headers as $header => $value)
-		{
+		foreach ($headers as $header => $value) {
 			$this->addHeader($header, $value);
 		}
 
@@ -123,6 +124,8 @@ class WebResponse implements IWebResponse
 		}
 
 		//header('Content-Length: 0');
+		// FIXME 1. Allow explicit set of Content-Length (by default it should be 0)
+		// FIXME 2. Introduct HttpStatus for 302 and 303 status codes and use setStatus() wrt overridden behaviour
 		header('Location: ' . ((string) $url), true, $status);
 
 		$this->finish();

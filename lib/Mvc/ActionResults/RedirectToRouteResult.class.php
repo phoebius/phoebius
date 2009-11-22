@@ -24,7 +24,14 @@ class RedirectToRouteResult extends RedirectResult
 {
 	function __construct($routeName, array $parameters = array(), Trace $trace)
 	{
-		parent::__construct($trace->getUrl($routeName, $parameters));
+		$url = $trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
+
+		$trace
+			->getRouteTable()
+			->getRoute($routeName)
+			->compose($url, $parameters);
+
+		parent::__construct($url);
 	}
 }
 

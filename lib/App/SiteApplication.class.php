@@ -19,14 +19,16 @@
 /**
  * Application infrastructure initializer.
  *
- * Grabs the standart incoming request, wraps it with appropriate objects handles the request
+ * Grabs the standart incoming request, wraps it with appropriate objects, and handles the request
  * by passing those objects to the corresponding route.
  *
- * index.php example:
+ * Consider index.php example:
  * @code
  * $app = new SiteApplication(new ChainedRouter);
  * $app->run();
  * @endcode
+ *
+ * The best practise is to implement your own SiteApplication class by extending this one
  *
  * @ingroup App_Web
  */
@@ -60,6 +62,8 @@ class SiteApplication
 	}
 
 	/**
+	 * Gets the application router
+	 *
 	 * @return IRouter
 	 */
 	function getRouter()
@@ -92,7 +96,8 @@ class SiteApplication
 	/**
 	 * Handles the situation when the application failed to found the corresponding route
 	 *
-	 * @throws Exception
+	 * @throws Exception in case of application fault
+	 * @param Trace $trace trace failed to be handled
 	 * @return void
 	 */
 	protected function handle404(Trace $trace)
@@ -103,8 +108,9 @@ class SiteApplication
 	}
 
 	/**
-	 * Handles the abnormal application failover
+	 * The failover stub. Handles the application fault
 	 *
+	 * @param Exception $e uncaught exception that caused fault
 	 * @return void
 	 */
 	protected function handle500(Exception $e)
@@ -131,8 +137,10 @@ EOT;
 	}
 
 	/**
-	 * Notify about abnormal application failover
+	 * Notify about the fault
 	 *
+	 * @param string $email address to be notified about the fault
+	 * @param Exception $e uncaught exception that caused application fault
 	 * @return void
 	 */
 	protected function notify500($email, Exception $e)

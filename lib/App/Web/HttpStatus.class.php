@@ -25,7 +25,14 @@
  */
 final class HttpStatus extends Enumeration
 {
+	/**
+	 * "Not Found" status
+	 */
 	const CODE_404 = 404;
+
+	/**
+	 * "Internal Server Error" status
+	 */
 	const CODE_500 = 500;
 
 	private static $statusMessages = array(

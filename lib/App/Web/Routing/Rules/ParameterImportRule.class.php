@@ -17,66 +17,64 @@
  ************************************************************************************************/
 
 /**
- * This rule simply imports the specified key=value pairs as parameters into the Trace.
+ * Imports the specified readonly key=value pairs as parameters into the Trace.
  *
  * @ingroup App_Web_Routing_Rules
  */
-class ParameterImportRule implements IRewriteRule
+final class ParameterImportRule implements IRewriteRule
 {
 	/**
 	 * @var string
 	 */
 	private $name;
-	
+
 	/**
 	 * @var mixed
 	 */
 	private $value;
-	
+
 	/**
+	 * Produces a set of ParameterImportRule
+	 *
+	 * @param array $parameters key=>value set of parameters
+	 *
 	 * @return array array of ParameterImportRule
 	 */
 	static function multiple(array $parameters)
 	{
 		$rules = array();
-		
+
 		foreach ($parameters as $parameter => $value) {
-			$rules[] = new self($parameter, $value);
+			$rules[] = new self ($parameter, $value);
 		}
-		
+
 		return $rules;
 	}
-	
+
+	/**
+	 * @param string $name name of the parameter to import to a Trace
+	 * @param mixed $value value of the parameter to import to a Trace
+	 */
 	function __construct($name, $value)
 	{
 		Assert::isScalar($name);
-		
+
 		$this->name = $name;
 		$this->value = $value;
 	}
-	
-	/**
-	 * @return array
-	 */
+
 	function getParameterList($requiredOnly = true)
 	{
 		return array();
 	}
-	
-	/**
-	 * @throws RewriteException
-	 * @return array
-	 */
+
 	function rewrite(IWebContext $webContext)
 	{
 		return array(
 			$this->name => $this->value
 		);
 	}
-	
-	/**
-	 * @return void
-	 */
+
 	function compose(SiteUrl $url, array $parameters)
 	{
 		// nothing

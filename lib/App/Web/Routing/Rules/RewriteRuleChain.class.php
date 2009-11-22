@@ -17,17 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Rewrite rule aggregator.
+ * Represents the chain of IRewriteRule
  *
  * @ingroup App_Web_Routing_Rules
  */
 class RewriteRuleChain implements IRewriteRule
 {
-	/**
-	 * @var array of {@link IRewriteRule}
-	 */
 	private $rules = array();
 
+	/**
+	 * @param array $rules initial set of rules
+	 */
 	function __construct(array $rules = array())
 	{
 		foreach ($rules as $rule) {
@@ -36,7 +36,11 @@ class RewriteRuleChain implements IRewriteRule
 	}
 
 	/**
-	 * @return RewriteRuleChain an object itself
+	 * Appends the rule to the chain
+	 *
+	 * @param IRewriteRule rule to append to the chain
+	 *
+	 * @return RewriteRuleChain itself
 	 */
 	function addRule(IRewriteRule $rule)
 	{
@@ -45,9 +49,6 @@ class RewriteRuleChain implements IRewriteRule
 		return $this;
 	}
 
-	/**
-	 * @return array
-	 */
 	function rewrite(IWebContext $webContext)
 	{
 		$yield = array();
@@ -62,9 +63,6 @@ class RewriteRuleChain implements IRewriteRule
 		return $yield;
 	}
 
-	/**
-	 * @return void
-	 */
 	function compose(SiteUrl $url, array $parameters)
 	{
 		foreach ($this->rules as $rule) {
@@ -72,9 +70,6 @@ class RewriteRuleChain implements IRewriteRule
 		}
 	}
 
-	/**
-	 * @return array
-	 */
 	function getParameterList($requiredOnly = true)
 	{
 		$yield = array();

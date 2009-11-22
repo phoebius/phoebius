@@ -36,16 +36,16 @@ class WebServerState extends CliServerState implements IWebServerState
 
 	/**
 	 * @param WebServerStateDictionary $dictionary dictionary of state variables
-	 * @param array optinal set of environment variables
+	 * @param array $envVars $optinal set of environment variables
 	 */
 	function __construct(
 			WebServerStateDictionary $dictionary,
 			array $envVars = array()
 		)
 	{
-		parent::__construct($dictionary, $envVars);
-
 		$this->serverVars = $dictionary->getFields();
+
+		parent::__construct($dictionary, $envVars);
 	}
 
 	/**

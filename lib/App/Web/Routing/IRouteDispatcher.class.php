@@ -17,16 +17,16 @@
  ************************************************************************************************/
 
 /**
- * Interface for handling Trace object.
- *
- * Gets the request handler that corresponds the route taken from IRouter.
+ * Interface for handling a Trace object.
  *
  * @ingroup App_Web_Routing
  */
 interface IRouteDispatcher
 {
 	/**
-	 * @throws TraceException
+	 * @param Trace $trace to handle
+	 * @throws TraceException when Trace cannot be handled and should be treated as wrong
+	 * @throws Exception unhandled application fault
 	 * @return void
 	 */
 	function handle(Trace $trace);

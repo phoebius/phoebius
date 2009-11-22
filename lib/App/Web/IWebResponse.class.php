@@ -40,6 +40,8 @@ interface IWebResponse extends IAppResponse
 	/**
 	 * Appends the header to be sent to client within the response
 	 *
+	 * @param string $header name of the header
+	 * @param string $value value of the header
 	 * @return IWebResponse itself
 	 */
 	function addHeader($header, $value);
@@ -47,12 +49,16 @@ interface IWebResponse extends IAppResponse
 	/**
 	 * Adds the list of headers to be sent to client within the response
 	 *
+	 * @param array $headers associative key=>value array of headers, where key is the name of the header
+	 *
 	 * @return IWebResponse
 	 */
 	function addHeaders(array $headers);
 
 	/**
 	 * Sets the status of the respose
+	 *
+	 * @param HttpStatus $status status to be set
 	 *
 	 * @return IWebResponse
 	 */
@@ -62,6 +68,8 @@ interface IWebResponse extends IAppResponse
 	 * Sends the redirect.
 	 *
 	 * Note that this function does not close the connection and terminates the execution.
+	 *
+	 * @param HttpUrl $url the redirection dest.
 	 *
 	 * @return void
 	 */

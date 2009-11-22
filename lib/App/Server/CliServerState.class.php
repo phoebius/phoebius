@@ -33,6 +33,10 @@ class CliServerState implements IServerState
 	 */
 	private $envVars = array();
 
+	/**
+	 * @param CliServerStateDictionary $dictionary dictionary of state variables
+	 * @param array $envVars $optinal set of environment variables
+	 */
 	function __construct(
 			CliServerStateDictionary $dictionary,
 			array $envVars = array()

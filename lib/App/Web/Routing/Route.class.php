@@ -17,25 +17,35 @@
  ************************************************************************************************/
 
 /**
- * Route is an object that matches the specifically-looking request using the rules (IRewriteRule
- * objects).
+ * Route is an object that matches an IWebContext using the rules (IRewriteRule objects)
+ * producing Trace.
+ *
+ * Each Route stores an IRouteDispatcher that is allowed to handle the produced Trace.
+ *
+ * Important to note, that Route is bi-directional: it can convert a matched IWebContext to
+ * a Trace and produce valid HttpUrl (as an important parth of IWebContext0 from a Trace.
+ * See Route::trace() and Route::compose() methods correspondingly
  *
  * @ingroup App_Web_Routing
  */
 class Route
 {
-	private $urlPattern;
-
 	/**
 	 * @var IRouteDispatcher
 	 */
 	private $dispatcher;
 
 	/**
-	 * @var array of {@link IRewriteRule}
+	 * @var array of IRewriteRule
 	 */
 	private $rules = array();
 
+	/**
+	 * @param IRouteDispatcher $dispatcher object that is responsible for handling the Trace that
+	 * 			that is produced by the Rouet
+	 * @param array $rules array of IRewriteRule that can produce the Trace according to
+	 * 			an IWebContext passed in
+	 */
 	function __construct(
 			IRouteDispatcher $dispatcher,
 			array $rules = array()
@@ -49,12 +59,19 @@ class Route
 	}
 
 	/**
-	 * @return Trace
+	 * Tries to match an IWebContext by passing it thru the set or IRewriteRule rules and
+	 * produce a Trace.
+	 *
+	 * @param IRouteTable $routeTable a table of routes
+	 * @param IWebContext $webContext context to be iterated over the rules
+	 * @param Trace $parentTrace optional Trace which's failure cascaded producing another Trace
+	 *
+	 * @throws RouteException in case when routing failed because of mismatch of an IWebContext
+	 * @return Trace a newly created Trace
 	 */
-	function from(Trace $trace)
+	function trace(IRouteTable $routeTable, IWebContext $webContext, Trace $parentTrace = null)
 	{
-		$webContext = $trace->getWebContext();
-		$trace = $trace->spawnNested();
+		$trace = new Trace($this, $routeTable, $webContext, $parentTrace);
 
 		$this->fillTrace($trace, $webContext);
 
@@ -62,19 +79,11 @@ class Route
 	}
 
 	/**
-	 * @throws RouteException
-	 * @return Trace
-	 */
-	function trace(IRouteTable $routeTable, WebContext $webContext)
-	{
-		$trace = new Trace($this, $routeTable, $webContext);
-
-		$this->fillTrace($trace, $webContext);
-
-		return $trace;
-	}
-
-	/**
+	 * Composes a HttpUrl object with parameters produced on matching the IWebContext
+	 *
+	 * @param HttpUrl $url an object to tune
+	 * @param array $parameters parameters to pass to the rules
+	 *
 	 * @return void
 	 */
 	function compose(HttpUrl $url, array $parameters = array())
@@ -85,6 +94,9 @@ class Route
 	}
 
 	/**
+	 * Gets the list of (required) parameters that are accepted for Route::compose() when
+	 * tuning the HttpUrl
+	 *
 	 * @return array
 	 */
 	function getParameterList($requiredOnly = true)
@@ -102,6 +114,8 @@ class Route
 	}
 
 	/**
+	 * Gets the dispatcher object that can handle Trace produced when tracing the Route
+	 *
 	 * @return IRouteDispatcher
 	 */
 	function getDispacher()
@@ -110,19 +124,9 @@ class Route
 	}
 
 	/**
-	 * @return Route
-	 */
-	protected function addRule(IRewriteRule $rule)
-	{
-		$this->rules[] = $rule;
-
-		return $this;
-	}
-
-	/**
 	 * @return void
 	 */
-	private function fillTrace(Trace $trace, WebContext $webContext)
+	private function fillTrace(Trace $trace, IWebContext $webContext)
 	{
 		foreach ($this->rules as $rule) {
 			try {

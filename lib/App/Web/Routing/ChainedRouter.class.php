@@ -34,7 +34,7 @@
 class ChainedRouter implements IRouteTable, IRouter
 {
 	/**
-	 * @var array of name => {@link Route}
+	 * @var array of name=>Route
 	 */
 	private $routes = array();
 
@@ -44,21 +44,26 @@ class ChainedRouter implements IRouteTable, IRouter
 	private $fallbackRoute;
 
 	/**
-	 * @var array of {@link Route}
+	 * @var array of Route
 	 */
 	private $chain = array();
 
 	/**
-	 * @var IRouteDispatcher|null
+	 * @var IRouteDispatcher
 	 */
-	private $defaultDispatcher = null;
+	private $defaultDispatcher;
 
+	/**
+	 * @param IRouteDispatcher $dispatcher a default dispatcher for routes
+	 */
 	function __construct(IRouteDispatcher $dispatcher)
 	{
 		$this->defaultDispatcher = $dispatcher;
 	}
 
 	/**
+	 * Gets the default dispatcher for newly created routes
+	 *
 	 * @return IRouteDispatcher
 	 */
 	function getDefaultDispatcher()
@@ -120,9 +125,6 @@ class ChainedRouter implements IRouteTable, IRouter
 		return $this;
 	}
 
-	/**
-	 * @return Trace|null
-	 */
 	function getTrace(IWebContext $webContext)
 	{
 		$trace = null;
@@ -144,18 +146,20 @@ class ChainedRouter implements IRouteTable, IRouter
 		return $trace;
 	}
 
-	/**
-	 * @return Trace
-	 */
 	function getFallbackTrace(Trace $parentTrace)
 	{
 		Assert::isNotEmpty($this->fallbackRoute, 'fallback route not found');
 
-		return $this->fallbackRoute->from($parentTrace);
+		return $this->fallbackRoute->trace($this, $parentTrace->getWebContext(), $parentTrace);
 	}
 
 	/**
-	 * @return ChainedRouter an object itself
+	 * Appends the Route to the chain
+	 *
+	 * @param string $name name of the Route to append
+	 * @param Route $route route object to append
+	 *
+	 * @return ChainedRouter itself
 	 */
 	function addRoute($name, Route $route)
 	{
@@ -165,7 +169,11 @@ class ChainedRouter implements IRouteTable, IRouter
 	}
 
 	/**
-	 * @return ChainedRouter
+	 * Sets the fallback Route.
+	 *
+	 * Fallback Route will be used to handle situation when no Route matched an IWebContext
+	 *
+	 * @return ChainedRouter itself
 	 */
 	function setFallbackRoute(Route $route)
 	{
@@ -175,7 +183,11 @@ class ChainedRouter implements IRouteTable, IRouter
 	}
 
 	/**
-	 * @return ChainedRouter an object itself
+	 * Appends the set of named routes to the chain.
+	 *
+	 * @param array $routes an associative array of Route object, where key is the name of the Route
+	 *
+	 * @return ChainedRouter itself
 	 */
 	function addRoutes(array $routes)
 	{
@@ -187,7 +199,12 @@ class ChainedRouter implements IRouteTable, IRouter
 	}
 
 	/**
-	 * @return ChainedRouter
+	 * Appends the Route to the chain
+	 *
+	 * @param string $name name of the Route to append
+	 * @param Route $route route object to append
+	 *
+	 * @return ChainedRouter itself
 	 */
 	function appendRoute($name, Route $route)
 	{
@@ -201,7 +218,12 @@ class ChainedRouter implements IRouteTable, IRouter
 	}
 
 	/**
-	 * @return ChainedRouter
+	 * Prepends the Route to the chain
+	 *
+	 * @param string $name name of the Route to append
+	 * @param Route $route route object to append
+	 *
+	 * @return ChainedRouter itself
 	 */
 	function prependRoute($name, Route $route)
 	{
@@ -214,10 +236,6 @@ class ChainedRouter implements IRouteTable, IRouter
 		return $this;
 	}
 
-	/**
-	 * @throws ArgumentException
-	 * @return Route
-	 */
 	function getRoute($name)
 	{
 		Assert::isScalar($name);

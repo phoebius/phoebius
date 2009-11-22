@@ -40,6 +40,10 @@ class SiteUrl extends HttpUrl
 	/**
 	 * Constructs a SiteUrl object from request variables
 	 *
+	 * @param HttpUrlDictionary $dictionary dictionary of values to be used in building the SiteUrl
+	 * @param string $baseHost optional host to be treated as base host
+	 * @param string $baseUri optional uri to be treated as base uri
+	 *
 	 * @return SiteUrl
 	 */
 	static function import(HttpUrlDictionary $dictionary, $baseHost = null, $baseUri = '/')
@@ -120,6 +124,9 @@ class SiteUrl extends HttpUrl
 	/**
 	 * Sets the subdomain prepending it to the base host
 	 *
+	 * @param string|null $subdomain host to be treated as subdomain, or NULL if need
+	 * 			to drop the subdomain
+	 *
 	 * @return SiteUrl itself
 	 */
 	function setSubdomain($subdomain = null)
@@ -139,7 +146,7 @@ class SiteUrl extends HttpUrl
 	/**
 	 * Sets the base host
 	 *
-	 * @param string
+	 * @param string $baseHost host to be treated as base host
 	 * @return SiteUrl an object itself
 	 */
 	function setBaseHost($baseHost)
@@ -173,6 +180,8 @@ class SiteUrl extends HttpUrl
 
 	/**
 	 * Sets the base path
+	 *
+	 * @param string $basePath path to be treated as base uri
 	 *
 	 * @return SiteUrl an object itself
 	 */
@@ -214,7 +223,9 @@ class SiteUrl extends HttpUrl
 	}
 
 	/**
-	 * Sets the virtual path.
+	 * Sets the virtual path
+	 *
+	 * @param string $path path to be presented after base uri
 	 *
 	 * @return SiteUrl
 	 */
