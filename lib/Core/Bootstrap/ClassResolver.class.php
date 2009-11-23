@@ -80,7 +80,9 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 					unset($this->foundClasspaths[$classname]);
 					$this->uncache($classname);
 
-					if ($classpath = $this->resolveClassPath($classname, true, false)) {
+					$classpath = $this->resolveClassPath($classname, true, false);
+
+					if ($classpath) {
 						include $classpath;
 
 						return true;

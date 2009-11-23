@@ -30,10 +30,10 @@ class UpdateQuery implements ISqlQuery
 	/**
 	 * @var SqlFieldValueCollection
 	 */
-	private $fields;
+	private $get;
 
 	/**
-	 * @var IDalExpression
+	 * @var IExpression
 	 */
 	private $entityQuery;
 
@@ -45,7 +45,7 @@ class UpdateQuery implements ISqlQuery
 	static function create(
 			$tableName,
 			SqlFieldValueCollection $fvc = null,
-			IDalExpression $expression = null
+			IExpression $expression = null
 		)
 	{
 		return new self ($tableName, $fvc, $expression);
@@ -57,7 +57,7 @@ class UpdateQuery implements ISqlQuery
 	function __construct(
 			$tableName,
 			SqlFieldValueCollection $fvc = null,
-			IDalExpression $expression = null
+			IExpression $expression = null
 		)
 	{
 		Assert::isScalar($tableName);
@@ -100,7 +100,7 @@ class UpdateQuery implements ISqlQuery
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setExpression(IDalExpression $logic)
+	function setExpression(IExpression $logic)
 	{
 		$this->entityQuery = $logic;
 
@@ -108,8 +108,8 @@ class UpdateQuery implements ISqlQuery
 	}
 
 	/**
-	 * Gets the query condition or null if {@link IDalExpression} is not set
-	 * @return IDalExpression|null
+	 * Gets the query condition or null if IExpression is not set
+	 * @return IExpression|null
 	 */
 	function getExpression()
 	{

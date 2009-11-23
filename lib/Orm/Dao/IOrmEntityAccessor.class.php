@@ -53,12 +53,12 @@ interface IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getBy(IDalExpression $condition);
+	function getBy(IExpression $condition);
 
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListBy(IDalExpression $condition);
+	function getListBy(IExpression $condition);
 
 	/**
 	 * @throws OrmEntityNotFoundException
@@ -100,7 +100,7 @@ interface IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropBy(IDalExpression $condition);
+	function dropBy(IExpression $condition);
 
 	/**
 	 * @return boolean

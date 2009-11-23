@@ -30,7 +30,7 @@ class InsertQuery implements ISqlQuery
 	/**
 	 * @var SqlFieldValueCollection
 	 */
-	private $fields;
+	private $get;
 
 	/**
 	 * Creates an instance of {@link DeleteQuery}

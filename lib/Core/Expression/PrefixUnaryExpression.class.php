@@ -21,7 +21,7 @@
  *
  * @ingroup Core_Expression
  */
-class PrefixUnaryExpression implements IExpression
+class PrefixUnaryExpression implements ISubjective
 {
 	/**
 	 * @var mixed
@@ -59,17 +59,26 @@ class PrefixUnaryExpression implements IExpression
 		return $this->logic;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
 		return new self(
 			$this->logic,
-			$converter->convert($this->subject, $this)
+			$object->subject($this->subject, $this)
 		);
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new PrefixUnaryDalExpression($this);
+		$compiledSlices = array();
+
+		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = ')';
+
+		$compiledString = join(' ', $compiledSlices);
+
+		return $compiledString;
 	}
 }
 

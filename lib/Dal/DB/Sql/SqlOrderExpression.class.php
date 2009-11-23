@@ -25,7 +25,7 @@ class SqlOrderExpression implements ISqlCastable
 	/**
 	 * @var ISqlValueExpression
 	 */
-	private $expression;
+	private $condition;
 
 	/**
 	 * @var SqlOrderDirection

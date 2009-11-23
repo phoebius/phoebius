@@ -180,7 +180,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				);
 			}
 
-			$newFetched = $this->getListBy($this->getDalExpression($fetchExpression));
+			$newFetched = $this->getListBy($this->toExpression($fetchExpression));
 
 			foreach ($newFetched as $entity) {
 				unset ($toFetch[spl_object_hash($entity)]);
@@ -212,7 +212,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getBy(IDalExpression $condition)
+	function getBy(IExpression $condition)
 	{
 		return $this->getByQuery(
 			$this->getSelectQuery()->setExpression($condition)
@@ -222,7 +222,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListBy(IDalExpression $condition)
+	function getListBy(IExpression $condition)
 	{
 		return $this->getListByQuery(
 			$this->getSelectQuery()->setExpression($condition)
@@ -341,7 +341,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
 				->setExpression(
-					$this->getDalExpression(
+					$this->getExpression(
 						Expression::eq(
 							$this->identifier,
 							$id
@@ -381,7 +381,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
 				->setExpression(
-					$this->getDalExpression($expression)
+					$this->getExpression($expression)
 				)
 		);
 
@@ -391,7 +391,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropBy(IDalExpression $condition)
+	function dropBy(IExpression $condition)
 	{
 		$affected = $this->sendQuery(
 			DeleteQuery::create($this->physicalSchema->getDBTableName())
@@ -434,13 +434,15 @@ class RdbmsDao implements IOrmEntityAccessor
 	}
 
 	/**
-	 * @return IDalExpression
+	 * @return IExpression
 	 */
-	private function getDalExpression(IExpression $expression)
+	private function getExpression(IExpression $expression)
 	{
+		Assert::notImplemented();
+
 		return EntityQuery::create($this->entity)
 			->where($expression)
-			->toDalExpression();
+			->toExpression();
 	}
 
 	/**
@@ -478,7 +480,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				new UpdateQuery(
 					$this->physicalSchema->getDBTableName(),
 					$fvc,
-					$this->getDalExpression(
+					$this->getExpression(
 						Expression::eq($this->identifier, $entity->_getId())
 					)
 				)

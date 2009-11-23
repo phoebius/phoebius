@@ -41,7 +41,7 @@
  *
  * @ingroup Orm_Expression
  */
-final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter //, IDalExpression
+final class EntityQuery implements ISqlSelectQuery, ISubjectivity
 {
 	/**
 	 * @var array of Property{name,path} => EntityQuery
@@ -81,10 +81,10 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	/**
 	 * @var array of ISqlValueExpression
 	 */
-	private $groupByExpressions = array();
+	private $groups = array();
 
 	/**
-	 * @var IDalExpression
+	 * @var IExpression
 	 */
 	private $having;
 
@@ -349,7 +349,7 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	}
 
 	/**
-	 * FIXME: IExpression->IDalExpression now only supports one-field properties
+	 * FIXME: IExpression->IExpression now only supports one-field properties
 	 * @see Expression/IExpressionSubjectConverter#convert($subject, $object)
 	 */
 	function convert($subject, IExpression $object)
@@ -433,9 +433,9 @@ final class EntityQuery implements ISqlSelectQuery, IExpressionSubjectConverter 
 	}
 
 	/**
-	 * @return IDalExpression
+	 * @return IExpression
 	 */
-	function toDalExpression()
+	function toExpression()
 	{
 		return $this->expressionChain->toDalExpression();
 	}

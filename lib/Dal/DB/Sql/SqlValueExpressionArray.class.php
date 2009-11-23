@@ -17,30 +17,23 @@
  ************************************************************************************************/
 
 /**
- * Represents a unary prefix expression
- * @ingroup Dal_DB_Expression
+ * Represents the list of ISqlValueExpression
+ * @ingroup Dal_DB_Sql
+ * @see ISqlValueExpression
  */
-class PrefixUnaryDalExpression implements IDalExpression
+class SqlValueExpressionArray extends TypedValueArray implements ISqlCastable
 {
 	/**
-	 * @var ISqlCastable
+	 * @return SqlValueExpressionArray
 	 */
-	private $subject;
-
-	/**
-	 * @var PrefixUnaryLogicalOperator
-	 */
-	private $logic;
-
-	/**
-	 * @param PrefixUnaryLogicalOperator $logic
-	 * @param ISqlValueExpression $subject probably, {@link SqlColumn}, but can be either
-	 * 	{@link SelectQuery} or any other sql expression
-	 */
-	function __construct(PrefixUnaryExpression $expression)
+	static function create(array $values = array())
 	{
-		$this->subject = $expression->getSubject();
-		$this->logic = $expression->getLogicalOperator();
+		return new self ($values);
+	}
+
+	function __construct(array $values = array())
+	{
+		parent::__construct('ISqlValueExpression', $values);
 	}
 
 	/**
@@ -50,13 +43,11 @@ class PrefixUnaryDalExpression implements IDalExpression
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();
+		foreach ($this->getList() as $element) {
+			$compiledSlices[] = $element->toDialectString($dialect);
+		}
 
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
-		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->subject->toDialectString($dialect);
-		$compiledSlices[] = ')';
-
-		$compiledString = join(' ', $compiledSlices);
+		$compiledString = join(', ', $compiledSlices);
 
 		return $compiledString;
 	}

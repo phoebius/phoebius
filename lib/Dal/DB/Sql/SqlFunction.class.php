@@ -26,7 +26,7 @@
  *
  * @ingroup Dal_DB_Sql
  */
-final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
+final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 {
 	/**
 	 * func (ALL expression)
@@ -55,7 +55,7 @@ final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
 	private $aggregate;
 
 	/**
-	 * @var SqlValueExpressionList
+	 * @var SqlValueExpressionArray
 	 */
 	private $args;
 
@@ -77,7 +77,7 @@ final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
 		Assert::isScalar($name);
 
 		$this->name = $name;
-		$this->args = new SqlValueExpressionList();
+		$this->args = new SqlValueExpressionArray();
 	}
 
 	/**
@@ -90,8 +90,8 @@ final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
 	}
 
 	/**
-	 * Returns the arguments set represented as {@link SqlValueExpressionList}
-	 * @return SqlValueExpressionList
+	 * Returns the arguments set represented as {@link SqlValueExpressionArray}
+	 * @return SqlValueExpressionArray
 	 */
 	function getArgs()
 	{
@@ -102,7 +102,7 @@ final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
 	 * Sets the new set of arguments
 	 * @return SqlFunction an object itself
 	*/
-	function setArgs(SqlValueExpressionList $args)
+	function setArgs(SqlValueExpressionArray $args)
 	{
 		$this->args = $args;
 
@@ -126,7 +126,7 @@ final class SqlFunction implements ISqlValueExpression, ISelectQuerySource
 	 */
 	function dropArgs()
 	{
-		$this->setArgs(new SqlValueExpressionList());
+		$this->setArgs(new SqlValueExpressionArray());
 
 		return $this;
 	}

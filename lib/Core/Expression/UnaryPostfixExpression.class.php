@@ -27,7 +27,7 @@
  *
  * @ingroup Core_Expression
  */
-class UnaryPostfixExpression implements IExpression
+class UnaryPostfixExpression implements ISubjective
 {
 	/**
 	 * @var mixed
@@ -61,17 +61,26 @@ class UnaryPostfixExpression implements IExpression
 		return $this->logic;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
-		return new self(
-			$converter->convert($this->subject, $this),
+		return new self (
+			$object->subject($this->subject, $this),
 			$this->logic
 		);
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new UnaryPostfixDalExpression($this);
+		$compiledSlices = array();
+
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = ')';
+		$compiledSlices[] = $this->logic->toDialectString($dialect);
+
+		$compiledString = join(' ', $compiledSlices);
+
+		return $compiledString;
 	}
 }
 

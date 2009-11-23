@@ -26,7 +26,7 @@
  * @endcode
  * @ingroup Core_Expression
  */
-class BetweenRangeExpression implements IExpression
+class BetweenRangeExpression implements ISubjective
 {
 	/**
 	 * @var mixed
@@ -74,18 +74,32 @@ class BetweenRangeExpression implements IExpression
 		return $this->to;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
-		return new self(
-			$converter->convert($this->subject, $this),
-			$converter->convert($this->from, $this),
-			$converter->convert($this->to, $this)
+		return new self (
+			$object->convert($this->subject, $this),
+			$object->convert($this->from, $this),
+			$object->convert($this->to, $this)
 		);
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new BetweenRangeDalExpression($this);
+		$compiledSlices = array();
+
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = 'BETWEEN';
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->from->toDialectString($dialect);
+		$compiledSlices[] = ')';
+		$compiledSlices[] = 'AND';
+		$compiledSlices[] = '(';
+		$compiledSlices[] =  $this->to->toDialectString($dialect);
+		$compiledSlices[] = ')';
+
+		$compiledString = join(' ', $compiledSlices);
+
+		return $compiledString;
 	}
 }
 

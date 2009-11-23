@@ -21,11 +21,17 @@
  *
  * To provide a precise type check, just overwrite ValueArray::append() and ValueArray::prepend()
  *
+ * Collection supports array-like assigments:
+ * @code
+ * $array = new ValueArray;
+ * $array[] = "someval"; // same as $array->append("someval2");
+ * @endcode
+ *
  * @see TypedValueArray as type-safe value list
  *
  * @ingroup Core_Patterns
  */
-class ValueArray implements IteratorAggregate, Countable
+class ValueArray implements IteratorAggregate, Countable, ArrayAccess
 {
 	/**
 	 * @var array of values
@@ -68,6 +74,15 @@ class ValueArray implements IteratorAggregate, Countable
 		}
 
 		return end($this->values);
+	}
+
+	/**
+	 * Determines whether the array is empty
+	 * @return boolean
+	 */
+	function isEmpty()
+	{
+		return $this->count() == 0;
 	}
 
 	/**
@@ -189,6 +204,31 @@ class ValueArray implements IteratorAggregate, Countable
 	function toArrayObject()
 	{
 		return new ArrayObject($this->values);
+	}
+
+	function offsetExists($offset)
+	{
+		Assert::notImplemented('not implemented, and won\'t be');
+	}
+
+	function offsetGet($offset)
+	{
+		Assert::notImplemented('not implemented, and won\'t be');
+	}
+
+	function offsetSet($offset, $value)
+	{
+		Assert::isEmpty(
+			$offset,
+			'that\'s not an associative array! Do not use indexed when setting the value'
+		);
+
+		$this->append($value);
+	}
+
+	function offsetUnset($offset)
+	{
+		Assert::notImplemented('not implemented, and won\'t be');
 	}
 }
 

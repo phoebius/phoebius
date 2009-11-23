@@ -64,10 +64,6 @@ final class SqlOrderChain extends TypedValueArray implements ISqlCastable
 		return $this;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();

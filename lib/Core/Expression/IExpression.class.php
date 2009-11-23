@@ -21,21 +21,9 @@
  *
  * @ingroup Core_Expression
  */
-interface IExpression
+interface IExpression extends ISqlValueExpression
 {
-	/**
-	 * Creates a clone of expression passing the subject thru the IExpressionSubjectConverter
-	 *
-	 * @return IExpression
-	 */
-	function toExpression(IExpressionSubjectConverter $converter);
-
-	/**
-	 * Converts the expression to IDalExpression.
-	 *
-	 * @return IDalExpression
-	 */
-	function toDalExpression();
+	// nothing here yet.
 }
 
 ?>

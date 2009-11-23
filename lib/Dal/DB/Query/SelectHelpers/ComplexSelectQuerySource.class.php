@@ -24,25 +24,20 @@
 class ComplexSelectQuerySource extends SelectQuerySource
 {
 	/**
-	 * @var IDalExpression
+	 * @var IExpression
 	 */
 	private $source;
 
 	/**
-	 * @param ISelectQuerySource $tableName
+	 * @param ISqlSelectable $tableName
 	 * @param string $alias
 	 */
-	function __construct(ISelectQuerySource $source, $alias = null)
+	function __construct(ISqlSelectable $source, $alias = null)
 	{
 		$this->source = $source;
 		$this->setAlias($alias);
 	}
 
-	/**
-	 * Casts the source itself to the sql-compatible string using the {@link IDialect}
-	 * specified
-	 * @return string
-	 */
 	protected function getCastedSourceExpression(IDialect $dialect)
 	{
 		$sourceSlices = array();

@@ -24,17 +24,17 @@
 class SqlConditionalJoin extends SqlJoin
 {
 	/**
-	 * @var IDalExpression
+	 * @var IExpression
 	 */
-	private $expression;
+	private $condition;
 
 	/**
 	 * @param string $tableName
 	 * @param string|null
 	 * @param SqlJoinMethod $joinMethod
-	 * @param IDalExpression $condition
+	 * @param IExpression $condition
 	 */
-	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, IDalExpression $expression)
+	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, IExpression $expression)
 	{
 		parent::__construct($tableName, $alias, $joinMethod);
 

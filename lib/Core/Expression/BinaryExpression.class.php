@@ -27,7 +27,7 @@
  *
  * @ingroup Core_Expression
  */
-class BinaryExpression implements IExpression
+class BinaryExpression implements ISubjective
 {
 	/**
 	 * @var mixed
@@ -75,18 +75,30 @@ class BinaryExpression implements IExpression
 		return $this->logic;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
-		return new self(
-			$converter->convert($this->subject, $this),
+		return new self (
+			$object->subject($this->subject, $this),
 			$this->logic,
-			$converter->convert($this->value, $this)
+			$object->subject($this->value, $this)
 		);
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new BinaryDalExpression($this);
+		$compiledSlices = array();
+
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = ')';
+		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->value->toDialectString($dialect);
+		$compiledSlices[] = ')';
+
+		$compiledString = join(' ', $compiledSlices);
+
+		return $compiledString;
 	}
 }
 

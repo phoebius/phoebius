@@ -21,7 +21,7 @@
  * @ingroup Dal_DB_Query
  * @internal
  */
-abstract class SelectQuerySource implements ISqlCastable
+abstract class SelectQuerySource
 {
 	/**
 	 * @var string|null

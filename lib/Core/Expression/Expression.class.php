@@ -394,7 +394,7 @@ final class Expression extends StaticClass
 	 * // "type" NOT IN ("completed", "pending")
 	 * Expression::notIn("type", array("completed", "pending"));
 	 * @endcode
-	 * @return IDalExpression
+	 * @return InSetExpression
 	 */
 	static function notIn($subject, $set)
 	{

@@ -19,57 +19,66 @@
 /**
  * Represents a simple select query
  * @ingroup Dal_DB_Query
- * @todo open a wider public API for creating nested joins (specify {@link SqlJoinMethod} manually
  */
-class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQuerySource
+class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectable
 {
 	/**
-	 * @var array of ISelectiveExpression
-	 */
-	private $fields = array();
-
-	/**
-	 * @var array of SelectQuerySource
-	 */
-	private $sources = array();
-
-	/**
-	 * @var IDalExpression|null
-	 */
-	private $expression;
-
-	/**
-	 * @var SqlOrderChain
-	 */
-	private $orderByChain;
-
-	/**
-	 * @var array of ISqlValueExpression
-	 */
-	private $groupByExpressions = array();
-
-	/**
-	 * @var IDalExpression
-	 */
-	private $having;
-
-	/**
-	 * @var integer
-	 */
-	private $limit = 0;
-
-	/**
-	 * @var offset
-	 */
-	private $offset = 0;
-
-	/**
+	 * SELECT DISTINCT
 	 * @var boolean
 	 */
 	private $distinct;
 
 	/**
-	 * Creates an instance of {@link SelectQuery} class
+	 * SELECT ... FROM
+	 * @var SqlValueExpressionArray
+	 */
+	private $get;
+
+	/**
+	 * FROM ...
+	 * @var SqlValueExpressionArray
+	 */
+	private $sources;
+
+	/**
+	 * WHERE ...
+	 * @var IExpression|null
+	 */
+	private $condition;
+
+	/**
+	 * ORDER BY ...
+	 * @var SqlOrderChain
+	 */
+	private $order;
+
+	/**
+	 * GROUP BY ...
+	 * @var SqlValueExpressionArray
+	 */
+	private $groups;
+
+	/**
+	 * HAVING ...
+	 * @var IExpression|null
+	 */
+	private $having;
+
+	/**
+	 * LIMIT ...
+	 * @var integer
+	 */
+	private $limit = 0;
+
+	/**
+	 * OFFSET ...
+	 * @var offset
+	 */
+	private $offset = 0;
+
+	/**
+	 * Creates an instance of SelectQuery class
+	 *
 	 * @return SelectQuery
 	 */
 	static function create()
@@ -79,7 +88,18 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 
 	function __construct()
 	{
-		$this->orderByChain = new SqlOrderChain();
+		$this->get = new SqlValueExpressionArray;
+		$this->sources = new SqlValueExpressionArray;
+		$this->order = new SqlOrderChain;
+		$this->groups = new SqlValueExpressionArray;
+	}
+
+	function __clone()
+	{
+		$this->get = clone $this->get;
+		$this->sources = clone $this->sources;
+		$this->order = clone $this->order;
+		$this->groups = clone $this->groups;
 	}
 
 	/**
@@ -96,42 +116,36 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	 * Sets the query condition (for "WHERE" clause)
 	 * @return SelectQuery
 	 */
-	function setExpression(IDalExpression $logic)
+	function setCondition(IExpression $condition)
 	{
-		$this->expression = $logic;
+		$this->condition = $condition;
 
 		return $this;
 	}
 
 	/**
 	 * Gets the query condition (i.e. "WHERE" clause) or NULL if not yet set
-	 * @return IDalExpression|null
+	 * @return IExpression|null
 	 */
-	function getExpression()
+	function getCondition()
 	{
-		return $this->expression;
+		return $this->condition;
 	}
 
 	/**
-	 * Sets a scalar aliased field to be fetched by a query
-	 * @param string $fieldName
-	 * @param string $alias
-	 * @param string $tableName
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery itself
 	 */
-	function get($fieldName, $alias = null, $tableName = null)
+	function get(ISqlValueExpression $expression)
 	{
-		Assert::isScalarOrNull($alias);
-
-		$this->fields[] = array(new SqlColumn($fieldName, $tableName), $alias);
+		$this->get->append($expression);
 
 		return $this;
 	}
 
 	/**
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery itself
 	 */
-	function getFields(array $fields)
+	function getMultiple(array $fields)
 	{
 		foreach ($fields as $field) {
 			$this->get($field);
@@ -141,95 +155,56 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	}
 
 	/**
-	 * Sets the expression to be fetched by a query
-	 * @param ISqlValueExpression $expression
-	 * @param scalar $alias
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery
 	 */
-	function getExpr(ISqlValueExpression $expression, $alias = null)
+	function from($table, $alias = null)
 	{
-		Assert::isScalarOrNull($alias);
-
-		$this->fields[] = array($expression, $alias);
+		$this->addSource(new TableSelectQuerySource($table, $alias));
 
 		return $this;
 	}
 
 	/**
-	 * Sets the source to which the select query should be applied
-	 * @param scalar $tableName
-	 * @param scalar $tableAlias
 	 * @return SelectQuery
 	 */
-	function from($tableName, $tableAlias = null)
+	function addSource(SelectQuerySource $source)
 	{
-		$this->sources[] = new TableSelectQuerySource($tableName, $tableAlias);
+		$this->sources->append($source);
 
 		return $this;
 	}
 
 	/**
-	 * Sets the complex source to which the select query should be applied
-	 * @param ISelectQuerySource $target
-	 * @param scalar $alias
 	 * @return SelectQuery
 	 */
-	function fromComplex(ISelectQuerySource $target, $alias = null)
-	{
-		$this->sources[] = new ComplexSelectQuerySource($target, $alias);
-
-		return $this;
-	}
-
 	function join(SqlJoin $join)
 	{
-		Assert::isNotEmpty($this->sources, 'set any target before joining');
+		Assert::isTrue(!$this->sources->isEmpty(), 'set any target before joining');
 
-		end($this->sources)->join($join);
+		$this->sources->getLast()->join($join);
 
 		return $this;
 	}
 
 	/**
-	 * Drops grouping schema and adds a grouping element
-	 * @param ISqlValueExpression $expression
-	 * @return SelectQuery an object itself
+	 * @param SqlOrderExpression ...
+	 * @return SelectQuery itself
 	 */
 	function groupBy(ISqlValueExpression $expression)
 	{
-		$this->dropGroupBy()->andGroupBy($expression);
-
-		return $this;
-	}
-
-	/**
-	 * Adds a grouping element
-	 * @param ISqlValueExpression $expression
-	 * @return SelectQuery an object itself
-	 */
-	function andGroupBy(ISqlValueExpression $expression)
-	{
-		$this->groupByExpressions[] = $expression;
-
-		return $this;
-	}
-
-	/**
-	 * Drops a grouping list
-	 * @return SelectQuery an object itself
-	 */
-	function dropGroupBy()
-	{
-		$this->groupByExpressions = array();
+		$expressions = func_get_args();
+		foreach ($expressions as $expression) {
+			$this->groups->append($expression);
+		}
 
 		return $this;
 	}
 
 	/**
 	 * Adds a having for logical expression
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery itself
 	 */
-	function having(IDalExpression $expression)
+	function having(IExpression $expression = null)
 	{
 		$this->having = $expression;
 
@@ -237,44 +212,19 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 	}
 
 	/**
-	 * Drops ORDERBY list and adds an order expression
-	 * @return SelectQuery an object itself
+	 * @param SqlOrderExpression ...
+	 * @return SelectQuery itself
 	 */
-	function orderBy(SqlOrderExpression $orderExpression)
+	function orderBy(SqlOrderExpression $expression)
 	{
-		$this->dropOrderBy();
-		$this->orderByChain->add($orderExpression);
+		$expressions = func_get_args();
+		foreach ($expressions as $expression) {
+			$this->order->add($expression);
+		}
 
 		return $this;
 	}
 
-	/**
-	 * Adds an order expression
-	 * @return SelectQuery an object itself
-	 */
-	function andOrderBy(SqlOrderExpression $orderExpression)
-	{
-		$this->orderByChain->appendValue($orderExpression);
-
-		return $this;
-	}
-
-	/**
-	 * Drops the set of order expressions
-	 * @return SelectQuery an object itself
-	 */
-	function dropOrderBy()
-	{
-		$this->orderByChain->dropList();
-
-		return $this;
-	}
-
-	/**
-	 * Sets a limit for row selection
-	 * @param integer $limit positive integer
-	 * @return SelectQuery an object itself
-	 */
 	function setLimit($limit)
 	{
 		Assert::isPositiveInteger($limit);
@@ -295,7 +245,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 
 	/**
 	 * Drops a row selection limit
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery itself
 	 */
 	function dropLimit()
 	{
@@ -328,7 +278,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 
 	/**
 	 * Drops a row selection offset
-	 * @return SelectQuery an object itself
+	 * @return SelectQuery itself
 	 */
 	function dropOffset()
 	{
@@ -337,10 +287,6 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		return $this;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$querySlices = array();
@@ -349,38 +295,34 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		if ($this->distinct) {
 			$querySlices[] = 'DISTINCT';
 		}
-		$querySlices[] = $this->compileFields($dialect);
 
-		if (!empty($this->sources)) {
+		$querySlices[] = $this->get->toDialectString($dialect);
+
+		if (!$this->sources->isEmpty()) {
 			$querySlices[] = 'FROM';
-			$querySlices[] = $this->compileTargets($dialect);
+			$querySlices[] = $this->sources->toDialectString($dialect);
 		}
 
 		// WHERE
-		if ($this->expression) {
-			$expressionAsString = $this->expression->toDialectString($dialect);
-			if (!empty($expressionAsString)) {
-				$querySlices[] = 'WHERE';
-				$querySlices[] = $expressionAsString;
-			}
+		if ($this->condition) {
+			$querySlices[] = 'WHERE';
+			$querySlices[] =  $this->condition->toDialectString($dialect);
 		}
 
 		// GROUP BY
-		if (!empty($this->groupByExpressions)) {
+		if (!$this->groups->isEmpty()) {
 			$querySlices[] = 'GROUP BY';
-			foreach ($this->groupByExpressions as $groupByExpression) {
-				$querySlices[] = $groupByExpression->toDialectString($dialect);
-			}
+			$querySlices[] = $this->groups->toDialectString($dialect);
 		}
 
 		// HAVING
-		if (!empty($this->having)) {
+		if ($this->having) {
 			$querySlices[] = 'HAVING';
 			$querySlices[] = $this->having->toDialectString($dialect);
 		}
 
-		if ($this->orderByChain->getCount()) {
-			$querySlices[] = $this->orderByChain->toDialectString($dialect);
+		if (!$this->order->isEmpty()) {
+			$querySlices[] = $this->order->toDialectString($dialect);
 		}
 
 		if ($this->limit) {
@@ -397,55 +339,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISelectQueryS
 		return $queryString;
 	}
 
-	/**
-	 * @see ISqlQuery::getCastedParameters()
-	 *
-	 * @param IDialect $dialect
-	 * @return array
-	 */
 	function getCastedParameters(IDialect $dialect)
 	{
 		return array ();
 	}
-
-	/**
-	 * @return string
-	 */
-	private function compileTargets(IDialect $dialect)
-	{
-		$compiledTargets = array();
-		foreach ($this->sources as $target) {
-			$compiledTargets[] =  $target->toDialectString($dialect);
-		}
-
-		$compiledTargetsString = join(', ', $compiledTargets);
-		return $compiledTargetsString;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function compileFields(IDialect $dialect)
-	{
-		$compiledFieldList = array();
-		foreach ($this->fields as $field) {
-			$compiledField = array();
-			$fieldObject = reset($field);
-			$compiledField[] = $fieldObject->toDialectString($dialect);
-
-			$alias = end($field);
-			if (!empty($alias)) {
-				$compiledField[] = 'AS';
-				$compiledField[] = $dialect->quoteIdentifier($alias);
-			}
-
-			$compiledFieldList[] = join(' ', $compiledField);
-		}
-
-		$compiledFieldString = join(', ', $compiledFieldList);
-		return $compiledFieldString;
-	}
-
 }
 
 ?>

@@ -17,12 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Represents a complex queriable data source for the {@link SelectQuery}
- * @ingroup Dal_DB_Query
+ *
+ * @ingroup Core_Expression
  */
-interface ISelectQuerySource extends ISqlCastable
+interface ISubjectivity
 {
-	//nothing here
+	/**
+	 * @param mixed $subject subject to convert
+	 * @param ISubjective $object subject container
+	 * @return mixed converted subject
+	 */
+	function subject($subject, ISubjective $object = null);
 }
 
 ?>

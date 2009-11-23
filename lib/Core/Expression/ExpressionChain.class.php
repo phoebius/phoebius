@@ -29,7 +29,7 @@
  * @endcode
  * @ingroup Core_Expression
  */
-class ExpressionChain implements IExpression
+class ExpressionChain implements ISubjective
 {
 	/**
 	 * @var ExpressionChainLogicalOperator
@@ -55,7 +55,7 @@ class ExpressionChain implements IExpression
 
 	/**
 	 * Adds the expression to the expression chain
-	 * @return DalExpressionChain
+	 * @return ExpressionChain
 	 */
 	function add(IExpression $expression)
 	{
@@ -88,19 +88,38 @@ class ExpressionChain implements IExpression
 		return $this->chain;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
 		$newChain = new self ($this->logicalOperator);
 		foreach ($this->chain as $item) {
-			$newChain->chain[] = $item->toExpression($converter);
+			$newChain->chain[] = $item->toSubjected($object);
 		}
 
 		return $newChain;
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new DalExpressionChain($this);
+		if (!empty($this->chain)) {
+			$slices = array();
+
+			foreach ($this->chain as $expression) {
+				$sqlExpression = $expression->toDialectString($dialect);
+
+				if (empty($sqlExpression)) {
+					continue;
+				}
+
+				$slices[] = ' ( ' . $sqlExpression . ' ) ';
+			}
+
+			$out = join($this->logicalOperator->toDialectString($dialect), $slices);
+
+			return $out;
+		}
+
+		//nothin'
+		return '';
 	}
 }
 

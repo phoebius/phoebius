@@ -17,32 +17,12 @@
  ************************************************************************************************/
 
 /**
- * Represents the list of ISqlValueExpression
- * @ingroup Dal_DB_Sql
- * @see ISqlValueExpression
+ * Represents a complex queriable data source for the {@link SelectQuery}
+ * @ingroup Dal_DB_Query
  */
-class SqlValueExpressionList extends TypedValueArray implements ISqlCastable
+interface ISqlSelectable extends ISqlCastable
 {
-	function __construct(array $values = array())
-	{
-		parent::__construct('ISqlValueExpression', $values);
-	}
-
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
-	function toDialectString(IDialect $dialect)
-	{
-		$compiledSlices = array();
-		foreach ($this->getList() as $element) {
-			$compiledSlices[] = $element->toDialectString($dialect);
-		}
-
-		$compiledString = join(', ', $compiledSlices);
-
-		return $compiledString;
-	}
+	//nothing here
 }
 
 ?>

@@ -16,13 +16,12 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents the interface for the expression classes, that are used to make query conditions
- * @ingroup Dal_DB_Expression
- */
-interface IDalExpression extends ISqlValueExpression
+interface ISubjective extends IExpression
 {
-	// nothing here, used to separate logic classes only
+	/**
+	 * @return ISubjective
+	 */
+	function toSubjected(ISubjectivity $object);
 }
 
 ?>

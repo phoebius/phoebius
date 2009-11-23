@@ -28,7 +28,7 @@ class DeleteQuery implements ISqlQuery
 	private $tableName;
 
 	/**
-	 * @var IDalExpression
+	 * @var IExpression
 	 */
 	private $entityQuery;
 
@@ -37,7 +37,7 @@ class DeleteQuery implements ISqlQuery
 	 * @param string $table
 	 * @return DeleteQuery
 	 */
-	static function create($table, IDalExpression $expression = null)
+	static function create($table, IExpression $expression = null)
 	{
 		return new self($table, $expression);
 	}
@@ -45,7 +45,7 @@ class DeleteQuery implements ISqlQuery
 	/**
 	 * @param string $table
 	 */
-	function __construct($tableName, IDalExpression $expression = null)
+	function __construct($tableName, IExpression $expression = null)
 	{
 		Assert::isScalar($tableName);
 
@@ -57,7 +57,7 @@ class DeleteQuery implements ISqlQuery
 	 * Sets the query condition to fill the `WHERE` clause
 	 * @return DeleteQuery an object itself
 	 */
-	function setExpression(IDalExpression $expression = null)
+	function setExpression(IExpression $expression = null)
 	{
 		$this->entityQuery = $expression;
 
@@ -65,8 +65,8 @@ class DeleteQuery implements ISqlQuery
 	}
 
 	/**
-	 * Gets the query condition or null if {@link IDalExpression} is not set
-	 * @return IDalExpression|null
+	 * Gets the query condition or null if IExpression is not set
+	 * @return IExpression|null
 	 */
 	function getExpression()
 	{

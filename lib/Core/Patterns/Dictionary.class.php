@@ -40,7 +40,7 @@ abstract class Dictionary implements ArrayAccess
 	/**
 	 * @var array
 	 */
-	private $fields = array();
+	private $get = array();
 
 	/**
 	 * @param array $values values to be set to the dictionary

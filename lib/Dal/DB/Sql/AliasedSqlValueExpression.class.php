@@ -16,21 +16,27 @@
  *
  ************************************************************************************************/
 
-/**
- * Describes the expression subject converter.
- *
- * This converter is used to
- *
- * @ingroup Core_Expression
- */
-interface IExpressionSubjectConverter
+final class AliasedSqlValueExpression implements ISqlValueExpression
 {
-	/**
-	 * @param mixed subject to convert
-	 * @param IExpression subject container
-	 * @return mixed converted subject
-	 */
-	function convert($subject, IExpression $object);
+	private $expr;
+	private $alias;
+
+	function __construct(ISqlValueExpression $expr, $alias = null)
+	{
+		$this->expr = $expr;
+		$this->alias = $alias;
+	}
+
+	function toDialectString(IDialect $dialect)
+	{
+		$sql = $this->expr->toDialectString($dialect);
+
+		if ($this->alias) {
+			$sql .= ' AS ' . $dialect->quoteIdentifier($this->alias);
+		}
+
+		return $sql;
+	}
 }
 
 ?>

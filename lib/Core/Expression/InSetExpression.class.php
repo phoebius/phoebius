@@ -27,7 +27,7 @@
  *
  * @ingroup Core_Expression
  */
-class InSetExpression implements IExpression
+class InSetExpression implements ISubjective
 {
 	/**
 	 * @var mixed
@@ -83,11 +83,11 @@ class InSetExpression implements IExpression
 		return $this->logic;
 	}
 
-	function toExpression(IExpressionSubjectConverter $converter)
+	function toSubjected(ISubjectivity $object)
 	{
-		return new self(
-			$converter->convert($this->subject, $this),
-			$this->convertSet($converter),
+		return new self (
+			$object->subject($this->subject, $this),
+			$this->convertSet($object),
 			$this->logic
 		);
 	}
@@ -95,19 +95,31 @@ class InSetExpression implements IExpression
 	/**
 	 * @return array
 	 */
-	private function convertSet(IExpressionSubjectConverter $converter)
+	private function convertSet(ISubjectivity $object)
 	{
 		$set = array();
 		foreach ($this->set as $item) {
-			$set[] = $converter->convert($item);
+			$set[] = $object->subject($item);
 		}
 
 		return $set;
 	}
 
-	function toDalExpression()
+	function toDialectString(IDialect $dialect)
 	{
-		return new InSetDalExpression($this);
+		$compiledSlices = array();
+
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = ')';
+		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = '(';
+		$compiledSlices[] = SqlValueArray::create($this->set)->toDialectString($dialect);
+		$compiledSlices[] = ')';
+
+		$compiledString = join(' ', $compiledSlices);
+
+		return $compiledString;
 	}
 }
 
