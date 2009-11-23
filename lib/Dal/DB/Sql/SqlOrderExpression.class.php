@@ -55,7 +55,7 @@ class SqlOrderExpression implements ISqlCastable
 	 */
 	function isAsc()
 	{
-		return $this->direction->isIdentifiedBy(SqlOrderDirection::ASC);
+		return $this->direction->is(SqlOrderDirection::ASC);
 	}
 
 	/**
@@ -64,7 +64,7 @@ class SqlOrderExpression implements ISqlCastable
 	 */
 	function isDesc()
 	{
-		return $this->direction->isIdentifiedBy(SqlOrderDirection::DESC);
+		return $this->direction->is(SqlOrderDirection::DESC);
 	}
 
 	/**

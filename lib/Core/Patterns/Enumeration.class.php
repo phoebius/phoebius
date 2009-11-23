@@ -91,7 +91,7 @@ abstract class Enumeration implements IStringCastable
 	}
 
 	/**
-	 * Returns the value for the corresponding identifier set inside this enumeration
+	 * Returns the value for the corresponding identifier
 	 * @return scalar
 	 */
 	function getValue()
@@ -101,7 +101,8 @@ abstract class Enumeration implements IStringCastable
 
 	/**
 	 * Sets the new enumeration value. Value is one the constants defined inside enumeration
-	 * @return Enumeration
+	 * @param scalar $value one of the final class constants specified
+	 * @return Enumeration itself
 	 */
 	function setValue($value)
 	{
@@ -125,32 +126,18 @@ abstract class Enumeration implements IStringCastable
 	/**
 	 * Compares the values of two enumeration instances and return true if they are equal,
 	 * otherwise false
+	 * @param Enumeration $object enumeration to compare to
 	 * @return boolean
 	 */
-	function isEqual(Enumeration $toBeCompared)
+	function equals(Enumeration $object)
 	{
-		Assert::isTrue(
-			get_class($this) == get_class($toBeCompared),
-			'different enumeration types are given (%s vs %s)',
-			(string) $this,
-			(string) $toBeCompared
-		);
-
-		return $this->id === $toBeCompared->id;
+		return
+			get_class($this) == get_class($object)
+			&& $this->id === $object->id;
 	}
 
 	/**
-	 * Compares the values of two enumeration instances and returns true if they are not equal,
-	 * otherwise false
-	 * @return boolean
-	 */
-	function isNotEqual(Enumeration $toBeCompared)
-	{
-		return !$this->equal($toBeCompared);
-	}
-
-	/**
-	 * Object clone with the same id inside
+	 * Clones the enumeration with the same id inside
 	 *
 	 * @return Enumeration
 	 */
@@ -158,15 +145,17 @@ abstract class Enumeration implements IStringCastable
 	{
 		$me = get_class($this);
 
-		return new $me($id);
+		return new $me ($id);
 	}
 
 	/**
 	 * Compares the value of enumeration instance and the value of the specified enumeration
 	 * member, and returns true if they are equal, otherwise false
+	 * @param scalar $value one of the final class constants specified
+	 *
 	 * @return boolean
 	 */
-	function isIdentifiedBy($value)
+	function is($value)
 	{
 		Assert::isTrue(
 			false !== $this->getIdByValue($value),
@@ -180,33 +169,12 @@ abstract class Enumeration implements IStringCastable
 	/**
 	 * Compares the value of enumeration instance and the value of the specified enumeration
 	 * member, and returns true if they are not equal, otherwise false
-	 * @return boolean
-	 */
-	function isNotIdentifiedBy($value)
-	{
-		return !$this->isIdentifiedBy($value);
-	}
-
-	/**
-	 * Compares the value of enumeration instance and the value of the specified enumeration
-	 * member, and returns true if they are equal, otherwise false. Alias for Enumeration::isIdentifiedBy()
-	 * @see Enumeration::isIdentifiedBy()
-	 * @return boolean
-	 */
-	function is($value)
-	{
-		return $this->isIdentifiedBy($value);
-	}
-
-	/**
-	 * Compares the value of enumeration instance and the value of the specified enumeration
-	 * member, and returns true if they are not equal, otherwise false. Alias for Enumeration::isNotIdentifiedBy()
-	 * @see Enumeration::isNotIdentifiedBy()
+	 * @param scalar $value one of the final class constants specified
 	 * @return boolean
 	 */
 	function isNot($value)
 	{
-		return $this->isNotIdentifiedBy($value);
+		return !$this->is($value);
 	}
 
 	function __sleep()

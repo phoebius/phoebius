@@ -26,8 +26,8 @@ abstract class TypedValueArray extends ValueArray
 	private $type;
 
 	/**
-	 * @param $type name of a type
-	 * @param $array initial values to be imported to the value list
+	 * @param string $type name of a type
+	 * @param array $array initial values to be imported to the value list
 	 */
 	function __construct($type, array $array = array())
 	{

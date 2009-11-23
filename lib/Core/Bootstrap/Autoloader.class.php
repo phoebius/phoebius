@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Just-in-time entity assembler. Finds a file containing the requested class, loads it and puts
+ * Just-in-time cached class autoloaded. Finds a file containing the requested class, loads it and puts
  * to a cache.
  *
  * @ingroup Core_Bootstrap
@@ -243,8 +243,6 @@ final class Autoloader extends LazySingleton implements IAutoloader
 	private function invokeResolvers($classname, $useCacheOnly)
 	{
 		Assert::isBoolean($useCacheOnly);
-
-		reset($this->resolvers);
 
 		foreach ($this->resolvers as $resolver) {
 			$result = $resolver->loadClassFile($classname, $useCacheOnly);

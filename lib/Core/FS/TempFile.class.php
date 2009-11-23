@@ -49,6 +49,8 @@ class TempFile implements IOutput
 	}
 
 	/**
+	 * Gets the path to temporary file
+	 *
 	 * @return string
 	 */
 	function getPath()
@@ -56,9 +58,6 @@ class TempFile implements IOutput
 		return $this->path;
 	}
 
-	/**
-	 * @return IOutput
-	 */
 	function write($buffer)
 	{
 		file_put_contents($this->path, $buffer, FILE_APPEND);
@@ -67,6 +66,8 @@ class TempFile implements IOutput
 	}
 
 	/**
+	 * Erases the contents of the temporary file
+	 *
 	 * @return TempFile
 	 */
 	function erase()
@@ -78,6 +79,7 @@ class TempFile implements IOutput
 
 	/**
 	 * Unlinks the temporary file
+	 *
 	 * @return void
 	 */
 	function unlink()
@@ -90,6 +92,7 @@ class TempFile implements IOutput
 
 	/**
 	 * Path to the file
+	 *
 	 * @return string
 	 */
 	function __toString()

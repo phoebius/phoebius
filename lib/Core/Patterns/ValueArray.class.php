@@ -71,6 +71,8 @@ class ValueArray implements IteratorAggregate, Countable
 	}
 
 	/**
+	 * Gets the number of elements in the array
+	 *
 	 * @return int
 	 */
 	function count()
@@ -88,7 +90,7 @@ class ValueArray implements IteratorAggregate, Countable
 	}
 
 	/**
-	 * Gets the number of values in the list
+	 * Gets the number of elements in the array
 	 * @return integer
 	 */
 	function getCount()
@@ -99,6 +101,7 @@ class ValueArray implements IteratorAggregate, Countable
 	/**
 	 * Appends the value to the list
 	 *
+	 * @param mixed $value value to append to the array
 	 * @return ValueArray
 	 */
 	function append($value)
@@ -111,6 +114,7 @@ class ValueArray implements IteratorAggregate, Countable
 	/**
 	 * Prepends the value to the list
 	 *
+	 * @param mixed $value value to prepend to the array
 	 * @return ValueArray
 	 */
 	function prepend($value)
@@ -121,8 +125,8 @@ class ValueArray implements IteratorAggregate, Countable
 	}
 
 	/**
-	 * Appends a list of values to the already added values
-	 * @param array
+	 * Appends the list of values to the array
+	 * @param array $values values to be appened to array
 	 * @return ValueArray an object itself
 	 */
 	function merge(array $values)
@@ -135,9 +139,9 @@ class ValueArray implements IteratorAggregate, Countable
 	}
 
 	/**
-	 * Replaces the list of already added values with the new value list
+	 * Erases the array and append the list of values to the array
 	 *
-	 * @param array new value list
+	 * @param array $values values to be appened to array
 	 * @return ValueArray itself
 	 */
 	function replace(array $values)

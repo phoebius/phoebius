@@ -26,8 +26,8 @@ abstract class TypedCollection extends Collection
 	private $type;
 
 	/**
-	 * @param $type name of a type
-	 * @param $array initial values to be imported to the collection
+	 * @param string $type name of a type
+	 * @param array $array initial values to be imported to the collection
 	 */
 	function __construct($type, array $array = array())
 	{
@@ -39,9 +39,6 @@ abstract class TypedCollection extends Collection
 		parent::__construct($array);
 	}
 
-	/**
-	 * @return TypedCollection
-	 */
 	function set($key, $value)
 	{
 		Assert::isTrue(

@@ -30,8 +30,7 @@
  * }
  *
  * $dict = new HttpRequestDictionary($_SERVER);
- * echo $dict[HttpRequestDictionary::URL];
- *
+ * echo $dict[HttpRequestDictionary::REFERER];
  * @endcode
  *
  * @ingroup Core_Patterns
@@ -44,8 +43,7 @@ abstract class Dictionary implements ArrayAccess
 	private $fields = array();
 
 	/**
-	 * @param array $values
-	 * @param boolean $supressMissing
+	 * @param array $values values to be set to the dictionary
 	 */
 	final function __construct(array $values)
 	{
@@ -54,28 +52,10 @@ abstract class Dictionary implements ArrayAccess
 	}
 
 	/**
-	 * @return Dictionary an object itself
-	 */
-	private function import(array $values)
-	{
-		$defaultValues = $this->getDefaultValues();
-
-		foreach (array_keys($this->fields) as $name) {
-			if (!isset($values[$name])) {
-				$values[$name] =
-					isset($defaultValues[$name])
-						? $defaultValues[$name]
-						: null;
-			}
-
-			$this->fields[$name] = $values[$name];
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return mixed
+	 * Gets the field value
+	 *
+	 * @param string $name name of the field
+	 * @return mixed value of the field
 	 */
 	function getField($name)
 	{
@@ -89,6 +69,8 @@ abstract class Dictionary implements ArrayAccess
 	}
 
 	/**
+	 * Gets the name=>value associative array of fields
+	 *
 	 * @return array
 	 */
 	function getFields()
@@ -97,6 +79,8 @@ abstract class Dictionary implements ArrayAccess
 	}
 
 	/**
+	 * Gets the list of field names
+	 *
 	 * @return array
 	 */
 	function getFieldNames()
@@ -145,7 +129,7 @@ abstract class Dictionary implements ArrayAccess
 	}
 
 	/**
-	 * Overridden
+	 * Default values to be set to dictionary fields in case when fields are not presented
 	 * @return array
 	 */
 	protected function getDefaultValues()
@@ -163,6 +147,27 @@ abstract class Dictionary implements ArrayAccess
 		foreach ($enumerationClass->getConstants() as $name) {
 			$this->fields[$name] = null;
 		}
+	}
+
+	/**
+	 * @return Dictionary an object itself
+	 */
+	private function import(array $values)
+	{
+		$defaultValues = $this->getDefaultValues();
+
+		foreach (array_keys($this->fields) as $name) {
+			if (!isset($values[$name])) {
+				$values[$name] =
+					isset($defaultValues[$name])
+						? $defaultValues[$name]
+						: null;
+			}
+
+			$this->fields[$name] = $values[$name];
+		}
+
+		return $this;
 	}
 }
 

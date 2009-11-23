@@ -40,39 +40,29 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 		$this->append($values);
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function offsetExists($offset)
 	{
 		return $this->has($offset);
 	}
 
-	/**
-	 * @return mixed
-	 */
 	function offsetGet($offset)
 	{
 		return $this->get($offset);
 	}
 
-	/**
-	 * @return void
-	 */
 	function offsetSet($offset, $value)
 	{
 		$this->set($offset, $value);
 	}
 
-	/**
-	 * @return void
-	 */
 	function offsetUnset($offset)
 	{
 		$this->drop($offset);
 	}
 
 	/**
+	 * Gets the number of elements in the collection
+	 *
 	 * @return int
 	 */
 	function count()
@@ -81,6 +71,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Gets the number of elements in the collection
+	 *
 	 * @return int
 	 */
 	function getCount()
@@ -89,6 +81,9 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Determines whether the element is presented in the collection
+	 *
+	 * @param string $key name of the element
 	 * @return boolean
 	 */
 	function has($key)
@@ -97,6 +92,9 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Gets the element by it's name
+	 *
+	 * @param string $key name of the element
 	 * @return mixed
 	 */
 	function get($key)
@@ -105,6 +103,9 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Sets the element
+	 * @param string $key name of the element
+	 * $param mixed $value value of the element
 	 * @return Collection
 	 */
 	function set($key, $value)
@@ -115,6 +116,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Drops all the elements of the collection
+	 *
 	 * @return Collection
 	 */
 	function drop($key)
@@ -125,6 +128,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Gets the names of all elements presented in the collection
+	 *
 	 * @return array
 	 */
 	function getKeys()
@@ -133,6 +138,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Gets the values of all elements presented in the collection
+	 *
 	 * @return array
 	 */
 	function getValues()
@@ -140,16 +147,16 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 		return array_values($this->collection);
 	}
 
-	/**
-	 * @see IteratorAggregate::getIterator()
-	 * @return ArrayIterator
-	 */
 	function getIterator()
 	{
 		return new ArrayIterator($this->collection);
 	}
 
 	/**
+	 * Merge the collection with the specified
+	 *
+	 * @param Collection $collection collection to be merged
+	 *
 	 * @return Collection
 	 */
 	function merge(Collection $collection)
@@ -160,6 +167,10 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Appends the key=>value associative array to the collection
+	 *
+	 * @param array $value a key=>value  associative array to be appended
+	 *
 	 * @return Collection
 	 */
 	function append(array $values)
@@ -174,6 +185,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Replaces the existing elements of the collection with a set of new one
+	 *
 	 * @return Collection
 	 */
 	function replace(array $values)
@@ -184,6 +197,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Drops all the elements presented in a collection
+	 *
 	 * @return Collection
 	 */
 	function erase()
@@ -194,6 +209,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Presents collection as an array
+	 *
 	 * @return array
 	 */
 	function toArray()
@@ -202,6 +219,8 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	}
 
 	/**
+	 * Presents collection as an ArrayObject
+	 *
 	 * @return ArrayObject
 	 */
 	function toArrayObject()
@@ -212,6 +231,7 @@ class Collection implements IteratorAggregate, ArrayAccess, Countable
 	/**
 	 * Copies an object.
 	 * If the list of keys is specified then only those keys will be presented in a spawned object
+	 * @param array $copy optional limit of keys to be copied to the new Collection
 	 * @return Collection
 	 */
 	function spawn(array $copy = null)
