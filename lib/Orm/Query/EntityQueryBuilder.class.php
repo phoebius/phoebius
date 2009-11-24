@@ -131,6 +131,13 @@ final class EntityQueryBuilder implements ISubjectivity
 		return new SqlValue((string) $subject);
 	}
 
+	function addId($id)
+	{
+		$this->registeredIds[$id] = true;
+
+		return $this;
+	}
+
 	private function hasId($subject)
 	{
 		if (isset($this->registeredIds[$subject])) {
