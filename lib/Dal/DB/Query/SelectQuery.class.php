@@ -48,7 +48,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 
 	/**
 	 * ORDER BY ...
-	 * @var SqlOrderChain
+	 * @var OrderChain
 	 */
 	private $order;
 
@@ -204,7 +204,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * @param SqlOrderExpression ...
+	 * @param ISqlValueExpression ...
 	 * @return SelectQuery itself
 	 */
 	function groupBy(ISqlValueExpression $expression)
@@ -229,10 +229,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * @param SqlOrderExpression ...
+	 * @param OrderBy ...
 	 * @return SelectQuery itself
 	 */
-	function orderBy(SqlOrderExpression $expression)
+	function orderBy(OrderBy $expression)
 	{
 		$expressions = func_get_args();
 		foreach ($expressions as $expression) {

@@ -32,6 +32,22 @@ final class OrderBy implements ISubjective, ISqlCastable
 	 */
 	private $direction;
 
+	/**
+	 * @return OrderBy
+	 */
+	static function asc($expression)
+	{
+		return new self ($expression, OrderDirection::asc());
+	}
+
+	/**
+	 * @return OrderBy
+	 */
+	static function desc($expression)
+	{
+		return new self ($expression, OrderDirection::desc());
+	}
+
 	function __construct($expression, OrderDirection $direction = null)
 	{
 		$this->expression = $expression;
@@ -73,7 +89,7 @@ final class OrderBy implements ISubjective, ISqlCastable
 	 * Sets the direction of order expression to ASC
 	 * @return OrderBy an object itself
 	 */
-	function asc()
+	function setAsc()
 	{
 		$this->direction->setValue(OrderDirection::ASC);
 
@@ -84,7 +100,7 @@ final class OrderBy implements ISubjective, ISqlCastable
 	 * Sets the direction of order expression to DESC
 	 * @return OrderBy an object itself
 	 */
-	function desc()
+	function setDesc()
 	{
 		$this->direction->setValue(OrderDirection::DESC);
 

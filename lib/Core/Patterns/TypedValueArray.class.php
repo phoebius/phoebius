@@ -46,7 +46,7 @@ abstract class TypedValueArray extends ValueArray
 			gettype($value)
 		);
 
-		parent::fillJoins($value);
+		parent::append($value);
 
 		return $this;
 	}

@@ -27,8 +27,7 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 	const DESC = 'DESC';
 
 	/**
-	 * Creates an instance of {@link SqlOrderDirection}
-	 * @return SqlOrderDirection
+	 * @return OrderDirection
 	 */
 	static function create($id)
 	{
@@ -36,7 +35,7 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 	}
 
 	/**
-	 * @return SqlOrderDirection
+	 * @return OrderDirection
 	 */
 	static function asc()
 	{
@@ -44,7 +43,7 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 	}
 
 	/**
-	 * @return SqlOrderDirection
+	 * @return OrderDirection
 	 */
 	static function desc()
 	{
@@ -52,7 +51,7 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 	}
 
 	/**
-	 * @return SqlOrderDirection
+	 * @return OrderDirection
 	 */
 	static function none()
 	{
