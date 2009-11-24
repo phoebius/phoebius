@@ -18,18 +18,20 @@
 
 final class AliasedSqlValueExpression implements ISqlValueExpression
 {
-	private $expr;
+	private $expression;
 	private $alias;
 
-	function __construct(ISqlValueExpression $expr, $alias = null)
+	function __construct(ISqlValueExpression $expression, $alias = null)
 	{
-		$this->expr = $expr;
+		Assert::isScalarOrNull($alias);
+
+		$this->expression = $expression;
 		$this->alias = $alias;
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
-		$sql = $this->expr->toDialectString($dialect);
+		$sql = $this->expression->toDialectString($dialect);
 
 		if ($this->alias) {
 			$sql .= ' AS ' . $dialect->quoteIdentifier($this->alias);

@@ -19,25 +19,15 @@
 /**
  * @ingroup Dal_DB_Sql
  */
-class SqlIdentifier implements ISqlCastable
+final class SqlIdentifier implements ISqlValueExpression
 {
 	private $id;
 
 	function __construct($id)
 	{
-		$this->setId($id);
-	}
-
-	/**
-	 * @return SqlIdentifier
-	 */
-	function setId($id)
-	{
 		Assert::isScalar($id);
 
 		$this->id = $id;
-
-		return $this;
 	}
 
 	/**

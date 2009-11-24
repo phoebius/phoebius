@@ -20,7 +20,7 @@
  * Represents a simple select query
  * @ingroup Dal_DB_Query
  */
-class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectable
+class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 {
 	/**
 	 * SELECT DISTINCT
@@ -90,7 +90,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectabl
 	{
 		$this->get = new SqlValueExpressionArray;
 		$this->sources = new SqlValueExpressionArray;
-		$this->order = new SqlOrderChain;
+		$this->order = new OrderChain;
 		$this->groups = new SqlValueExpressionArray;
 	}
 
@@ -119,6 +119,16 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectabl
 	function setCondition(IExpression $condition)
 	{
 		$this->condition = $condition;
+
+		return $this;
+	}
+
+	/**
+	 * Alias for SelectQuery::setCondition()
+	 */
+	function where(IExpression $condition)
+	{
+		$this->setCondition($condition);
 
 		return $this;
 	}
@@ -159,7 +169,14 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectabl
 	 */
 	function from($table, $alias = null)
 	{
-		$this->addSource(new TableSelectQuerySource($table, $alias));
+		$this->addSource(
+			new SelectQuerySource(
+				new AliasedSqlValueExpression(
+					new SqlIdentifier($table),
+					$alias
+				)
+			)
+		);
 
 		return $this;
 	}
@@ -179,7 +196,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression, ISqlSelectabl
 	 */
 	function join(SqlJoin $join)
 	{
-		Assert::isTrue(!$this->sources->isEmpty(), 'set any target before joining');
+		Assert::isFalse($this->sources->isEmpty(), 'set any source before joining');
 
 		$this->sources->getLast()->join($join);
 

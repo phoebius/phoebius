@@ -17,17 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Represents a postfix unary expression
+ * Represents binary expression
  *
  * SQL example:
  * @code
- * // "id" IS NOT NULL
- * Expression::notNull("id");
+ * // "id" = 1
+ * Expression::eq("id", 1);
  * @endcode
  *
  * @ingroup Core_Expression
  */
-class UnaryPostfixExpression implements ISubjective
+class BinaryExpression implements ISubjective, IExpression
 {
 	/**
 	 * @var mixed
@@ -35,14 +35,20 @@ class UnaryPostfixExpression implements ISubjective
 	private $subject;
 
 	/**
-	 * @var UnaryPostfixLogicalOperator
+	 * @var mixed
+	 */
+	private $value;
+
+	/**
+	 * @var BinaryLogicalOperator
 	 */
 	private $logic;
 
-	function __construct($subject, UnaryPostfixLogicalOperator $logic)
+	function __construct($subject, BinaryLogicalOperator $logic, $value)
 	{
 		$this->subject = $subject;
 		$this->logic = $logic;
+		$this->value = $value;
 	}
 
 	/**
@@ -54,7 +60,15 @@ class UnaryPostfixExpression implements ISubjective
 	}
 
 	/**
-	 * @return UnaryPostfixLogicalOperator
+	 * @return mixed
+	 */
+	function getValue()
+	{
+		return $this->value;
+	}
+
+	/**
+	 * @return BinaryLogicalOperator
 	 */
 	function getLogicalOperator()
 	{
@@ -65,7 +79,8 @@ class UnaryPostfixExpression implements ISubjective
 	{
 		return new self (
 			$object->subject($this->subject, $this),
-			$this->logic
+			$this->logic,
+			$object->subject($this->value, $this)
 		);
 	}
 
@@ -77,6 +92,9 @@ class UnaryPostfixExpression implements ISubjective
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->value->toDialectString($dialect);
+		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);
 

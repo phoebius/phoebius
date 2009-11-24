@@ -21,7 +21,7 @@
  *
  * @ingroup Core_Expression
  */
-interface IExpression extends ISqlValueExpression
+interface IExpression extends ISubjective, ISqlCastable
 {
 	// nothing here yet.
 }

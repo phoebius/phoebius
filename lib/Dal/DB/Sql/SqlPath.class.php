@@ -19,43 +19,20 @@
 /**
  * @ingroup Dal_DB_Sql
  */
-class SqlPath implements ISqlCastable
+final class SqlPath implements ISqlCastable
 {
 	private $path = array();
 
-	function __construct(array $path)
+	function __construct()
 	{
-		$this->setPath($path);
-	}
+		$args = func_get_args();
 
-	/**
-	 * @return SqlPath
-	 */
-	function addPathChunk($pathChunk)
-	{
-		Assert::isScalar($pathChunk);
-
-		$this->path[] = $pathChunk;
-
-		return $this;
-	}
-
-	/**
-	 * @return SqlPath
-	 */
-	function setPath(array $path)
-	{
-		if (empty($path)) {
-			throw new ArgumentException('path', 'cannot be empty');
+		if (sizeof($args) == 1) {
+			$this->path = explode('.', $args[0]);
 		}
-
-		$this->path = array();
-
-		foreach ($path as $pathChunk) {
-			$this->addPathChunk($pathChunk);
+		else if (sizeof($args) > 1) {
+			$this->path = $args;
 		}
-
-		return $this;
 	}
 
 	/**

@@ -16,13 +16,16 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents a complex queriable data source for the {@link SelectQuery}
- * @ingroup Dal_DB_Query
- */
-interface ISqlSelectable extends ISqlCastable
+final class DistinctCountProjection extends CountProjection
 {
-	//nothing here
+	protected function getSqlFunction(EntityQuery $entityQuery)
+	{
+		$sqlFunction = parent::getSqlFunction($entityQuery);
+
+		$sqlFunction->aggregateDistinct();
+
+		return $sqlFunction;
+	}
 }
 
 ?>

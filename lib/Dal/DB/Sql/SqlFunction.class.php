@@ -17,16 +17,11 @@
  ************************************************************************************************/
 
 /**
- * @example SqlFunction.php
- * Using a SqlFunction
- */
-
-/**
  * Sql function wrapper
  *
  * @ingroup Dal_DB_Sql
  */
-final class SqlFunction implements ISqlValueExpression, ISqlSelectable
+class SqlFunction implements ISqlValueExpression, ISqlSelectable, ISubjective
 {
 	/**
 	 * func (ALL expression)
@@ -55,18 +50,22 @@ final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 	private $aggregate;
 
 	/**
-	 * @var SqlValueExpressionArray
+	 * @var arrau
 	 */
 	private $args;
 
 	/**
-	 * Creates an instance of {@link SqlFunction}
-	 * @param string $name
 	 * @return SqlFunction
 	 */
 	static function create($name)
 	{
-		return new self ($name);
+		$args = func_get_args();
+		array_shift($args);
+
+		$me = new self ($name);
+		$me->args = $args;
+
+		return $me;
 	}
 
 	/**
@@ -76,8 +75,11 @@ final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 	{
 		Assert::isScalar($name);
 
+		$args = func_get_args();
+		array_shift($args);
+
 		$this->name = $name;
-		$this->args = new SqlValueExpressionArray();
+		$this->args = $args;
 	}
 
 	/**
@@ -96,39 +98,6 @@ final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 	function getArgs()
 	{
 		return $this->args;
-	}
-
-	/**
-	 * Sets the new set of arguments
-	 * @return SqlFunction an object itself
-	*/
-	function setArgs(SqlValueExpressionArray $args)
-	{
-		$this->args = $args;
-
-		return $this;
-	}
-
-	/**
-	 * Adds an arg
-	 * @return SqlFunction an object itself
-	 */
-	function addArg(ISqlValueExpression $arg)
-	{
-		$this->args->add($arg);
-
-		return $this;
-	}
-
-	/**
-	 * Drops a set of arguments
-	 * @return SqlFunction an object itself
-	 */
-	function dropArgs()
-	{
-		$this->setArgs(new SqlValueExpressionArray());
-
-		return $this;
 	}
 
 	/**
@@ -175,12 +144,14 @@ final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 	{
 		$compiledSlices = array();
 
+		$args = new SqlValueExpressionArray($this->args);
+
 		$compiledSlices[] = $this->name;
 		$compiledSlices[] = '(';
 
 		if ($this->aggregate == self::AGGREGATE_WITH_NULLS) {
-			Assert::isEmpty(
-				$this->args->getList(),
+			Assert::isTrue(
+				$args->isEmpty(),
 				'drop out arguments when aggregating rows with nulls'
 			);
 
@@ -188,29 +159,41 @@ final class SqlFunction implements ISqlValueExpression, ISqlSelectable
 		}
 		else {
 			if ($this->aggregate == self::AGGREGATE_ALL) {
-				Assert::isNotEmpty(
-					$this->args->getList(),
+				Assert::isFalse(
+					$args->isEmpty(),
 					'set an aggregation expression as an argument'
 				);
 
 				$compiledSlices[] = 'ALL';
 			}
 			else if ($this->aggregate == self::AGGREGATE_DISTINCT) {
-				Assert::isNotEmpty(
-					$this->args->getList(),
+				Assert::isFalse(
+					$args->isEmpty(),
 					'set an aggregation expression as an argument'
 				);
 
 				$compiledSlices[] = 'DISTINCT';
 			}
 
-			$compiledSlices[] = $this->args->toDialectString($dialect);
+			$compiledSlices[] = $args->toDialectString($dialect);
 		}
 
 		$compiledSlices[] = ')';
 
 		$compiledFunctionCall = join(' ', $compiledSlices);
+
 		return $compiledFunctionCall;
+	}
+
+	function toSubjected(ISubjectivity $object)
+	{
+		$clone = new self ($this->name);
+
+		foreach ($this->args as $arg) {
+			$clone->args[] = $object->subject($arg, $this);
+		}
+
+		return $clone;
 	}
 }
 

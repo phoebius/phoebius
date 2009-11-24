@@ -29,7 +29,7 @@
  * @endcode
  * @ingroup Core_Expression
  */
-class ExpressionChain implements ISubjective
+class ExpressionChain implements ISubjective, IExpression
 {
 	/**
 	 * @var ExpressionChainLogicalOperator
@@ -118,7 +118,6 @@ class ExpressionChain implements ISubjective
 			return $out;
 		}
 
-		//nothin'
 		return '';
 	}
 }

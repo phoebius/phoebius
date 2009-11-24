@@ -31,16 +31,7 @@ abstract class TypedValueArray extends ValueArray
 	 */
 	function __construct($type, array $array = array())
 	{
-		$this->type =
-			is_object($type)
-				? get_class($type)
-				: $type;
-
-		Assert::isScalar(
-			TypeUtils::isExists($this->type),
-			'unknown type %s',
-			TypeUtils::getName($type)
-		);
+		$this->setType($type);
 
 		parent::__construct($array);
 	}
@@ -55,7 +46,7 @@ abstract class TypedValueArray extends ValueArray
 			gettype($value)
 		);
 
-		parent::append($value);
+		parent::fillJoins($value);
 
 		return $this;
 	}
@@ -73,6 +64,20 @@ abstract class TypedValueArray extends ValueArray
 		parent::prepend($value);
 
 		return $this;
+	}
+
+	protected function setType($type)
+	{
+		$this->type =
+			is_object($type)
+				? get_class($type)
+				: $type;
+
+		Assert::isScalar(
+			TypeUtils::isExists($this->type),
+			'unknown type %s',
+			TypeUtils::getName($type)
+		);
 	}
 }
 

@@ -22,7 +22,7 @@
 // E.g.: get_user_by_id ( '1' )
 $functionCall =
 	SqlFunction::create('get_user_by_id')
-		->addArg(new ScalarSqlValue(1));
+		->addArg(new SqlValue(1));
 
 // Call of aggregate function
 // E.g.: count ( DISTINCT "id" )

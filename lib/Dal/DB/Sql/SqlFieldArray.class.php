@@ -17,23 +17,21 @@
  ************************************************************************************************/
 
 /**
- * Represents a scalar sql value
+ * Represents a list of fields, that can be casted to SQL value set
  * @ingroup Dal_DB_Sql
  */
-class ScalarSqlValue extends SqlValue
+class SqlFieldArray extends ValueArray implements ISqlCastable
 {
-	/**
-	 * Sets the value to be casted to SQL value
-	 * @param scalar $value
-	 * @return ScalarSqlValue an object itself
-	 */
-	function setValue($value = null)
+	function toDialectString(IDialect $dialect)
 	{
-		Assert::isScalarOrNull($value);
+		$quotedFields = array();
+		foreach ($this->getList() as $field) {
+			$quotedFields[] = $dialect->quoteIdentifier($field);
+		}
 
-		parent::setValue($value);
+		$joinedFields = join(', ', $quotedFields);
 
-		return $this;
+		return $joinedFields;
 	}
 }
 

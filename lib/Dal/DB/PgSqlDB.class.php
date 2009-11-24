@@ -363,7 +363,7 @@ class PgSqlDB extends DB
 			SelectQuery::create()
 				->getExpr(
 					SqlFunction::create('nextval')->addArg(
-						new ScalarSqlValue(
+						new SqlValue(
 							$this->getDialect()->getSequenceName($tableName, $columnName)
 						)
 					)

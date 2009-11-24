@@ -120,17 +120,12 @@ class PgSqlDialect extends Dialect
 					'ALTER SEQUENCE %s OWNED BY %s;',
 					array(
 						new SqlIdentifier($sqName),
-						new SqlPath(
-							array(
-								$table->getName(),
-								$column->getName()
-							)
-						)
+						new SqlPath($table->getName(), $column->getName())
 					)
 				);
 
 				$column->setDefaultValue(
-					SqlFunction::create('nextval')->addArg(new ScalarSqlValue($sqName))
+					SqlFunction::create('nextval')->addArg(new SqlValue($sqName))
 				);
 			}
 		}

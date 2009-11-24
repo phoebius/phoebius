@@ -24,7 +24,7 @@
 class SqlSimpleJoin extends SqlJoin
 {
 	/**
-	 * @var SqlFieldList
+	 * @var SqlFieldArray
 	 */
 	private $identicalColumns;
 
@@ -32,9 +32,9 @@ class SqlSimpleJoin extends SqlJoin
 	 * @param string $tableName
 	 * @param string|null
 	 * @param SqlJoinMethod $joinMethod
-	 * @param SqlFieldList $identicalColumns set of column names that should be used in joining
+	 * @param SqlFieldArray $identicalColumns set of column names that should be used in joining
 	 */
-	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, SqlFieldList $identicalColumns)
+	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, SqlFieldArray $identicalColumns)
 	{
 		$this->identicalColumns = $identicalColumns;
 

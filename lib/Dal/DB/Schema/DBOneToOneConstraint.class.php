@@ -92,7 +92,7 @@ class DBOneToOneConstraint extends DBConstraint
 	{
 		return
 			  'FOREIGN KEY ('
-			. SqlFieldList::create(array_keys($this->columns))->toDialectString($dialect)
+			. SqlFieldArray::create(array_keys($this->columns))->toDialectString($dialect)
 			. ')'
 			. ' REFERENCES ' . $dialect->quoteIdentifier($this->referencedTable->getName())
 			. ' ON DELETE ' .$this->associationBreakAction->toDialectString($dialect)

@@ -16,56 +16,34 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents an ORDER BY direction
- * @ingroup Dal_DB_Sql
- */
-final class SqlOrderDirection extends Enumeration implements ISqlCastable
+class DBValueArray extends ValueArray
 {
-	const NONE = '';
-	const ASC = 'ASC';
-	const DESC = 'DESC';
-
-	/**
-	 * Creates an instance of {@link SqlOrderDirection}
-	 * @return SqlOrderDirection
-	 */
-	static function create($id)
+	function append($value)
 	{
-		return new self($id);
+		Assert::isTrue(
+			is_scalar($value) || is_null($value),
+			'wrong %s member type: string or null is expected, but %s provided',
+			__CLASS__,
+			TypeUtils::getName($value)
+		);
+
+		parent::fillJoins($value);
+
+		return $this;
 	}
 
-	/**
-	 * @return SqlOrderDirection
-	 */
-	static function asc()
+	function prepend($value)
 	{
-		return new self(self::ASC);
-	}
+		Assert::isTrue(
+			is_scalar($value) || is_null($value),
+			'wrong %s member type: string or null is expected, but %s provided',
+			__CLASS__,
+			TypeUtils::getName($value)
+		);
 
-	/**
-	 * @return SqlOrderDirection
-	 */
-	static function desc()
-	{
-		return new self(self::DESC);
-	}
+		parent::prepend($value);
 
-	/**
-	 * @return SqlOrderDirection
-	 */
-	static function none()
-	{
-		return new self(self::NONE);
-	}
-
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
-	function toDialectString(IDialect $dialect)
-	{
-		return $this->getValue();
+		return $this;
 	}
 }
 

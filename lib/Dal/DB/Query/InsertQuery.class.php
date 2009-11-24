@@ -129,7 +129,7 @@ class InsertQuery implements ISqlQuery
 	 */
 	private function getCompiledFields(IDialect $dialect)
 	{
-		$list = new SqlFieldList($this->fields->getKeys());
+		$list = new SqlFieldArray($this->fields->getKeys());
 
 		return $list->toDialectString($dialect);
 	}

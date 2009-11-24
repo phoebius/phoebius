@@ -54,7 +54,7 @@ class Route
 		$this->dispatcher = $dispatcher;
 
 		foreach ($rules as $rule) {
-			$this->addRule($rule);
+			$rules[] = $rule;
 		}
 	}
 

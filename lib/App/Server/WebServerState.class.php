@@ -101,7 +101,7 @@ class WebServerState extends CliServerState implements IWebServerState
 					return new IP($envVars[$field]);
 				}
 				catch (ArgumentException $e) {
-					//nothin', justa skip due the passed IP is not an IP
+					//nothing, just skip due the passed IP is not an IP
 				}
 			}
 		}
@@ -126,7 +126,7 @@ class WebServerState extends CliServerState implements IWebServerState
 					$ips[] = new IP($envVars[$field]);
 				}
 				catch (ArgumentException $e) {
-					//nothin' (c) R. Plant
+					//nothing
 				}
 			}
 		}

@@ -16,7 +16,7 @@
  *
  ************************************************************************************************/
 
-interface ISubjective extends IExpression
+interface ISubjective
 {
 	/**
 	 * @return ISubjective

@@ -17,36 +17,38 @@
  ************************************************************************************************/
 
 /**
- * Represetns an order expression
+ * Represents an order expression
  * @ingroup Dal_DB_Sql
  */
-class SqlOrderExpression implements ISqlCastable
+final class OrderBy implements ISubjective, ISqlCastable
 {
 	/**
-	 * @var ISqlValueExpression
+	 * @var mixed
 	 */
-	private $condition;
+	private $expression;
 
 	/**
-	 * @var SqlOrderDirection
+	 * @var OrderDirection
 	 */
 	private $direction;
 
-	/**
-	 * Creates an instance of {@link SqlOrderExpression}
-	 * @return SqlOrderExpression
-	 */
-	static function create(ISqlValueExpression $field, SqlOrderDirection $direction = null)
+	function __construct($expression, OrderDirection $direction = null)
 	{
-		return new self ($field, $direction);
+		$this->expression = $expression;
+		$this->direction =
+			$direction
+				? $direction
+				: OrderDirection::none();
 	}
 
-	function __construct(ISqlValueExpression $field, SqlOrderDirection $direction = null)
+	function getExpression()
 	{
-		$this->expression = $field;
-		$this->direction = $direction
-			? $direction
-			: SqlOrderDirection::none();
+		return $this->expression;
+	}
+
+	function getDirection()
+	{
+		return $this->direction;
 	}
 
 	/**
@@ -55,7 +57,7 @@ class SqlOrderExpression implements ISqlCastable
 	 */
 	function isAsc()
 	{
-		return $this->direction->is(SqlOrderDirection::ASC);
+		return $this->direction->is(OrderDirection::ASC);
 	}
 
 	/**
@@ -64,69 +66,60 @@ class SqlOrderExpression implements ISqlCastable
 	 */
 	function isDesc()
 	{
-		return $this->direction->is(SqlOrderDirection::DESC);
+		return $this->direction->is(OrderDirection::DESC);
 	}
 
 	/**
 	 * Sets the direction of order expression to ASC
-	 * @return SqlOrderExpression an object itself
+	 * @return OrderBy an object itself
 	 */
 	function asc()
 	{
-		$this->direction->setValue(SqlOrderDirection::ASC);
+		$this->direction->setValue(OrderDirection::ASC);
 
 		return $this;
 	}
 
 	/**
 	 * Sets the direction of order expression to DESC
-	 * @return SqlOrderExpression an object itself
+	 * @return OrderBy an object itself
 	 */
 	function desc()
 	{
-		$this->direction->setValue(SqlOrderDirection::DESC);
+		$this->direction->setValue(OrderDirection::DESC);
 
 		return $this;
 	}
 
 	/**
 	 * Drops the direction of order expression to the default
-	 * @return SqlOrderExpression an object itself
+	 * @return OrderBy an object itself
 	 */
 	function none()
 	{
-		$this->direction->setValue(SqlOrderDirection::NONE);
+		$this->direction->setValue(OrderDirection::NONE);
 
 		return $this;
 	}
 
-	/**
-	 * Reverts the direction of order expression. ASC becomes DESC, DESC and NONE becomes ASC
-	 * @return SqlOrderExpression an object itself
-	 */
-	function revert()
+	function toSubjected(ISubjectivity $object)
 	{
-		$this->direction->setValue(
-			$this->isAsc()
-				? SqlOrderDirection::DESC
-				: SqlOrderDirection::ASC
+		return new self(
+			$object->subject($this->expression),
+			new OrderDirection($this->direction->getValue())
 		);
-
-		return $this;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		return
-			  $this->expression->toDialectString($dialect)
-			. ' '
-			. $this->direction->toDialectString($dialect);
+			  $this->getExpression()->toDialectString($dialect)
+			. (
+				$this->direction->isNot(OrderDirection::NONE)
+					? ' ' . $this->getDirection()->toDialectString($dialect)
+					: ''
+			);
 	}
-
 }
 
 ?>

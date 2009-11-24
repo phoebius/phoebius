@@ -31,7 +31,7 @@ $selectQuery =
 		->having(
 			Expression::eq(
 				new SqlColumn('sex'),
-				new ScalarSqlValue('male')
+				new SqlValue('male')
 			)
 		);
 

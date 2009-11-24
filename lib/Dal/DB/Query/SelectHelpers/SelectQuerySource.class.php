@@ -21,45 +21,21 @@
  * @ingroup Dal_DB_Query
  * @internal
  */
-abstract class SelectQuerySource
+final class SelectQuerySource implements ISqlValueExpression
 {
-	/**
-	 * @var string|null
-	 */
-	private $alias = null;
-
 	/**
 	 * @var array
 	 */
 	private $joins = array();
 
 	/**
-	 * Casts the source itself to the sql-compatible string using the {@link IDialect}
-	 * specified
-	 * @return string
+	 * @var ISqlValueExpression
 	 */
-	abstract protected function getCastedSourceExpression(IDialect $dialect);
+	private $source;
 
-	/**
-	 * Gets the alias of the target, or NULL if not set
-	 * @return scalar|null
-	 */
-	function getAlias()
+	function __construct(ISqlValueExpression $source)
 	{
-		return $this->alias;
-	}
-
-	/**
-	 * Sets the alias of the target
-	 * @return SelectQuerySource
-	 */
-	function setAlias($alias = null)
-	{
-		Assert::isScalarOrNull($alias);
-
-		$this->alias = $alias;
-
-		return $this;
+		$this->source = $source;
 	}
 
 	/**
@@ -90,13 +66,7 @@ abstract class SelectQuerySource
 	{
 		$compiledSlices = array();
 
-		$compiledSlices[] = $this->getCastedSourceExpression($dialect);
-
-		if (($alias = $this->getAlias())) {
-			$compiledSlices[] = 'AS';
-			$compiledSlices[] = $dialect->quoteIdentifier($alias);
-		}
-
+		$compiledSlices[] = $this->source->toDialectString($dialect);
 		$compiledSlices[] = $this->compileJoins($dialect);
 
 		$compiledString = join(' ', $compiledSlices);

@@ -16,22 +16,20 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents a list of fields, that can be casted to SQL value set
- * @ingroup Dal_DB_Sql
- */
-class SqlFieldList extends ValueArray implements ISqlCastable
+final class HavingProjection implements IProjection
 {
-	function toDialectString(IDialect $dialect)
+	private $expression;
+
+	function __construct(IExpression $expression)
 	{
-		$quotedFields = array();
-		foreach ($this->getList() as $field) {
-			$quotedFields[] = $dialect->quoteIdentifier($field);
-		}
+		$this->expression = $expression;
+	}
 
-		$joinedFields = join(', ', $quotedFields);
-
-		return $joinedFields;
+	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	{
+		$selectQuery->having(
+			$this->expression->toSubjected($entityQuery)
+		);
 	}
 }
 

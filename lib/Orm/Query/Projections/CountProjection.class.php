@@ -16,38 +16,33 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents table as a data source where the {@link SelectQuery} should be applied
- * @ingroup Dal_DB_Query
- * @internal
- */
-class TableSelectQuerySource extends SelectQuerySource
+class CountProjection extends AggrProjection
 {
-	/**
-	 * @var string
-	 */
-	private $tableName;
+	private $lookupProperty;
 
-	/**
-	 * @param string $tableName
-	 * @param string $alias
-	 */
-	function __construct($tableName, $tableAlias = null)
+	function __construct($property = null, $alias = null)
 	{
-		Assert::isScalar($tableName);
+		$this->lookupProperty = null === $property;
 
-		$this->tableName = $tableName;
-		$this->setAlias($tableAlias);
+		parent::__construct('COUNT', $property ? $property : 'id', $alias);
 	}
 
 	/**
-	 * Casts the source itself to the sql-compatible string using the {@link IDialect}
-	 * specified
-	 * @return string
+	 * @return ISqlValueExpression
 	 */
-	protected function getCastedSourceExpression(IDialect $dialect)
+	protected function getValueExpression(EntityQuery $entityQuery)
 	{
-		return $dialect->quoteIdentifier($this->tableName);
+		if ($this->lookupProperty) {
+			return
+				new AliasedSqlValueExpression(
+					$entityQuery->subject(
+						$entityQuery->getEntity()->getLogicalSchema()->getIdentifier()
+					),
+					$this->alias
+				);
+		}
+
+		return parent::getValueExpression($entityQuery);
 	}
 }
 

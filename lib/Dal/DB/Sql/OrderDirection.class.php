@@ -17,26 +17,55 @@
  ************************************************************************************************/
 
 /**
- * Represents the list of SqlValue
+ * Represents an ORDER BY direction
  * @ingroup Dal_DB_Sql
  */
-class SqlValueArray extends TypedValueArray implements ISqlCastable
+final class OrderDirection extends Enumeration implements ISqlCastable
 {
-	function __construct(array $values = array())
+	const NONE = '';
+	const ASC = 'ASC';
+	const DESC = 'DESC';
+
+	/**
+	 * Creates an instance of {@link SqlOrderDirection}
+	 * @return SqlOrderDirection
+	 */
+	static function create($id)
 	{
-		parent::__construct('SqlValue', $values);
+		return new self($id);
 	}
 
+	/**
+	 * @return SqlOrderDirection
+	 */
+	static function asc()
+	{
+		return new self(self::ASC);
+	}
+
+	/**
+	 * @return SqlOrderDirection
+	 */
+	static function desc()
+	{
+		return new self(self::DESC);
+	}
+
+	/**
+	 * @return SqlOrderDirection
+	 */
+	static function none()
+	{
+		return new self(self::NONE);
+	}
+
+	/**
+	 * Casts an object to the SQL dialect string
+	 * @return string
+	 */
 	function toDialectString(IDialect $dialect)
 	{
-		$quotedValues = array();
-		foreach ($this->getList() as $value) {
-			$quotedValues[] = $value->toDialectString($dialect);
-		}
-
-		$joinedValues = join(', ', $quotedValues);
-
-		return $joinedValues;
+		return $this->getValue();
 	}
 }
 

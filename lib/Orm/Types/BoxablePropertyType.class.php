@@ -79,7 +79,7 @@ class BoxablePropertyType extends PrimitivePropertyType
 		}
 
 		return new SqlValueArray(
-			array(new ScalarSqlValue($value->getValue()))
+			array(new SqlValue($value->getValue()))
 		);
 	}
 

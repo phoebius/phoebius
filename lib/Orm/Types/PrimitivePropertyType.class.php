@@ -60,7 +60,7 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 		}
 
 		return new SqlValueArray(
-			array(new ScalarSqlValue($value))
+			array(new SqlValue($value))
 		);
 	}
 

@@ -113,7 +113,7 @@ class DBUniqueConstraint extends DBConstraint
 
 	private function getFieldList(IDialect $dialect)
 	{
-		return SqlFieldList::create(array_keys($this->columns))->toDialectString($dialect);
+		return SqlFieldArray::create(array_keys($this->columns))->toDialectString($dialect);
 	}
 }
 

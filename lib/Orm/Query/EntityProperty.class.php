@@ -22,35 +22,27 @@
 final class EntityProperty
 {
 	/**
-	 * @var EntityQuery
+	 * @var string
 	 */
-	private $entityQuery;
+	private $owner;
 
 	/**
 	 * @var OrmProperty
 	 */
 	private $property;
 
-	/**
-	 * @return EntityExpression
-	 */
-	static function create(EntityQuery $entityQuery, OrmProperty $property)
+	function __construct($owner, OrmProperty $property)
 	{
-		return new self ($entityQuery, $property);
-	}
-
-	function __construct(EntityQuery $entityQuery, OrmProperty $property)
-	{
-		$this->entityQuery = $entityQuery;
+		$this->owner = $owner;
 		$this->property = $property;
 	}
 
 	/**
 	 * @return EntityQuery
 	 */
-	function getEntityQuery()
+	function getOwner()
 	{
-		return $this->entityQuery;
+		return $this->owner;
 	}
 
 	/**
@@ -62,20 +54,20 @@ final class EntityProperty
 	}
 
 	/**
-	 * @return array
+	 * @return SqlColumn
 	 */
-	function getSqlColumns()
+	function getSqlColumn()
 	{
-		$yield = array();
+		$fields = $this->property->getDBFields();
 
-		foreach ($this->property->getDBFields() as $key) {
-			$yield[] = new SqlColumn(
-				$key,
-				$this->entityQuery->getAlias()
-			);
-		}
+		Assert::isTrue(
+			sizeof($fields) == 1,
+			'single-field properties are supported'
+		);
 
-		return $yield;
+		$field = reset($fields);
+
+		return new SqlColumn($field, $this->owner);
 	}
 }
 

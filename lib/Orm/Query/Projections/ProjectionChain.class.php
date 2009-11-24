@@ -16,34 +16,29 @@
  *
  ************************************************************************************************/
 
-class DBValueArray extends ValueArray
+final class ProjectionChain extends TypedValueArray implements IProjection
 {
-	function append($value)
+	function __construct(array $array = array())
 	{
-		Assert::isTrue(
-			is_scalar($value) || is_null($value),
-			'wrong %s member type: string or null is expected, but %s provided',
-			__CLASS__,
-			TypeUtils::getName($value)
-		);
-
-		parent::append($value);
-
-		return $this;
+		parent::__construct('IProjection', $array);
 	}
 
-	function prepend($value)
+	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
 	{
-		Assert::isTrue(
-			is_scalar($value) || is_null($value),
-			'wrong %s member type: string or null is expected, but %s provided',
-			__CLASS__,
-			TypeUtils::getName($value)
-		);
+		foreach ($this->toArray() as $projection) {
+			$projection->fill($selectQuery, $entityQuery);
+		}
+	}
 
-		parent::prepend($value);
+	function __clone()
+	{
+		$elements = $this->toArray();
 
-		return $this;
+		$this->erase();
+
+		foreach ($elements as $element) {
+			$this->append(clone $element);
+		}
 	}
 }
 

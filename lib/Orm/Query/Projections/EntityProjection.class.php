@@ -16,27 +16,30 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents the list of SqlValue
- * @ingroup Dal_DB_Sql
- */
-class SqlValueArray extends TypedValueArray implements ISqlCastable
+class EntityProjection implements IProjection
 {
-	function __construct(array $values = array())
+	/**
+	 * @var IQueryable
+	 */
+	private $entity;
+
+	function __construct(IQueryable $entity)
 	{
-		parent::__construct('SqlValue', $values);
+		$this->entity = $entity;
 	}
 
-	function toDialectString(IDialect $dialect)
+	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
 	{
-		$quotedValues = array();
-		foreach ($this->getList() as $value) {
-			$quotedValues[] = $value->toDialectString($dialect);
+		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
+			$this->injectField($selectQuery, $field);
 		}
+	}
 
-		$joinedValues = join(', ', $quotedValues);
-
-		return $joinedValues;
+	protected function injectField(SelectQuery $selectQuery, $field, EntityQuery $entityQuery)
+	{
+		$selectQuery->get(
+			new SqlColumn($field, $entityQuery->getAlias())
+		);
 	}
 }
 

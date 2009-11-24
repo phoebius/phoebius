@@ -17,30 +17,30 @@
  ************************************************************************************************/
 
 /**
- * Represents the list of SqlOrderExpression
+ * Represents a chain order by expressions
  *
  * @ingroup Dal_DB_Sql
  */
-final class SqlOrderChain extends TypedValueArray implements ISqlCastable
+class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 {
 	function __construct(array $values = array())
 	{
-		parent::__construct('SqlOrderExpression', $values);
+		parent::__construct('OrderBy', $values);
 	}
 
 	/**
 	 * Drops the ascending logic in all order expressions and sets the ASC logic to the last one
 	 * expression
-	 * @return SqlOrderChain an object itself
+	 * @return OrderChain an object itself
 	 */
 	function asc()
 	{
-		if ($this->getCount()) {
+		if (!$this->isEmpty()) {
 			foreach ($this->getList() as $expression) {
 				$expression->setNone();
 			}
 
-			end($this->getList())->setAsc();
+			$this->getLast()->setAsc();
 		}
 
 		return $this;
@@ -49,34 +49,40 @@ final class SqlOrderChain extends TypedValueArray implements ISqlCastable
 	/**
 	 * Drops the ascending logic in all order expressions and sets the DESC logic to the last one
 	 * expression
-	 * @return SqlOrderChain
+	 * @return OrderChain
 	 */
 	function desc()
 	{
-		if ($this->getCount()) {
-			foreach ($this->getList() as $expression) {
+		if (!$this->isEmpty()) {
+			foreach ($this->toArray() as $expression) {
 				$expression->setNone();
 			}
 
-			end($this->getList())->setDesc();
+			$this->getLast()->setDesc();
 		}
 
 		return $this;
 	}
 
-	function toDialectString(IDialect $dialect)
+	function toSubjected(ISubjectivity $object)
 	{
-		$compiledSlices = array();
+		$me = new self;
 
-		if ($this->getCount() > 0) {
-			foreach($this->getList() as $orderByExpression) {
-				$compiledSlices[] = $orderByExpression->toDialectString($dialect);
-			}
+		foreach ($this as $elt) {
+			$me->append($elt->toSubjected($object));
 		}
 
-		$compiledString = 'ORDER BY ' . join(', ', $compiledSlices);
+		return $me;
+	}
 
-		return $compiledString;
+	function toDialectString(IDialect $dialect)
+	{
+		if (!$this->isEmpty()) {
+			return
+				'ORDER BY '
+				. SqlValueExpressionArray::create($this->toArray())
+					->toDialectString($dialect);
+		}
 	}
 }
 

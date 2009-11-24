@@ -16,39 +16,11 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents expression as a data source where the {@link SelectQuery} should be applied
- * @ingroup Dal_DB_Query
- * @internal
- */
-class ComplexSelectQuerySource extends SelectQuerySource
+final class GroupByEntityProjection extends EntityProjection
 {
-	/**
-	 * @var IExpression
-	 */
-	private $source;
-
-	/**
-	 * @param ISqlSelectable $tableName
-	 * @param string $alias
-	 */
-	function __construct(ISqlSelectable $source, $alias = null)
+	protected function injectField(SelectQuery $selectQuery, $field)
 	{
-		$this->source = $source;
-		$this->setAlias($alias);
-	}
-
-	protected function getCastedSourceExpression(IDialect $dialect)
-	{
-		$sourceSlices = array();
-
-		$sourceSlices[] = '(';
-		$sourceSlices[] = $this->source->toDialectString($dialect);
-		$sourceSlices[] = ')';
-
-		$compiledSourceString = join(' ', $sourceSlices);
-
-		return $compiledSourceString;
+		$selectQuery->groupBy(new SqlIdentifier($field));
 	}
 }
 

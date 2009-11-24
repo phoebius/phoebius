@@ -16,27 +16,42 @@
  *
  ************************************************************************************************/
 
-/**
- * Represents the list of SqlValue
- * @ingroup Dal_DB_Sql
- */
-class SqlValueArray extends TypedValueArray implements ISqlCastable
+class RawProjection implements IProjection
 {
-	function __construct(array $values = array())
+	private $expression;
+	private $alias;
+
+	function __construct($expression, $alias = null)
 	{
-		parent::__construct('SqlValue', $values);
+		$this->expression = $expression;
+		$this->alias = $alias;
 	}
 
-	function toDialectString(IDialect $dialect)
+	function getExpression()
 	{
-		$quotedValues = array();
-		foreach ($this->getList() as $value) {
-			$quotedValues[] = $value->toDialectString($dialect);
-		}
+		return $this->expression;
+	}
 
-		$joinedValues = join(', ', $quotedValues);
+	function getAlias()
+	{
+		return $this->alias;
+	}
 
-		return $joinedValues;
+	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	{
+		$selectQuery->get($this->getValueExpression($entityQuery));
+	}
+
+	/**
+	 * @return ISqlValueExpression
+	 */
+	protected function getValueExpression(EntityQuery $entityQuery)
+	{
+		return
+			new AliasedSqlValueExpression(
+				$entityQuery->subject($this->getExpression()),
+				$this->getAlias()
+			);
 	}
 }
 

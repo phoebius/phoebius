@@ -17,11 +17,16 @@
  ************************************************************************************************/
 
 /**
- * Represents a unary prefix expression.
+ * Represents an range expression
  *
+ * SQL example:
+ * @code
+ * // "price" BETWEEN 50 AND 100
+ * Expression::between("price", 50, 100);
+ * @endcode
  * @ingroup Core_Expression
  */
-class PrefixUnaryExpression implements ISubjective
+class BetweenRangeExpression implements ISubjective, IExpression
 {
 	/**
 	 * @var mixed
@@ -29,18 +34,20 @@ class PrefixUnaryExpression implements ISubjective
 	private $subject;
 
 	/**
-	 * @var PrefixUnaryLogicalOperator
+	 * @var mixed
 	 */
-	private $logic;
+	private $from;
 
 	/**
-	 * @param PrefixUnaryLogicalOperator
-	 * @param mixed
+	 * @var mixed
 	 */
-	function __construct(PrefixUnaryLogicalOperator $logic, $subject)
+	private $to;
+
+	function __construct($subject, $from, $to)
 	{
-		$this->logic = $logic;
 		$this->subject = $subject;
+		$this->from = $from;
+		$this->to = $to;
 	}
 
 	/**
@@ -52,18 +59,27 @@ class PrefixUnaryExpression implements ISubjective
 	}
 
 	/**
-	 * @return PrefixUnaryLogicalOperator
+	 * @return mixed
 	 */
-	function getLogicalOperator()
+	function getFrom()
 	{
-		return $this->logic;
+		return $this->from;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	function getTo()
+	{
+		return $this->to;
 	}
 
 	function toSubjected(ISubjectivity $object)
 	{
-		return new self(
-			$this->logic,
-			$object->subject($this->subject, $this)
+		return new self (
+			$object->convert($this->subject, $this),
+			$object->convert($this->from, $this),
+			$object->convert($this->to, $this)
 		);
 	}
 
@@ -71,9 +87,14 @@ class PrefixUnaryExpression implements ISubjective
 	{
 		$compiledSlices = array();
 
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
-		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
+		$compiledSlices[] = 'BETWEEN';
+		$compiledSlices[] = '(';
+		$compiledSlices[] = $this->from->toDialectString($dialect);
+		$compiledSlices[] = ')';
+		$compiledSlices[] = 'AND';
+		$compiledSlices[] = '(';
+		$compiledSlices[] =  $this->to->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);

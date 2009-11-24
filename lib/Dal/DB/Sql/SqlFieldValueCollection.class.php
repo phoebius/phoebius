@@ -21,7 +21,7 @@
  * its belonging to a table
  * @ingroup Dal_DB_Sql
  */
-class SqlFieldValueCollection extends TypedCollection implements ISqlCastable
+final class SqlFieldValueCollection extends TypedCollection implements ISqlCastable
 {
 	/**
 	 * @param array set of value to be appened to collection

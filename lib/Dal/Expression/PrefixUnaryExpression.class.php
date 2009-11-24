@@ -17,17 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents binary expression
- *
- * SQL example:
- * @code
- * // "id" = 1
- * Expression::eq("id", 1);
- * @endcode
+ * Represents a unary prefix expression.
  *
  * @ingroup Core_Expression
  */
-class BinaryExpression implements ISubjective
+class PrefixUnaryExpression implements ISubjective, IExpression
 {
 	/**
 	 * @var mixed
@@ -35,20 +29,18 @@ class BinaryExpression implements ISubjective
 	private $subject;
 
 	/**
-	 * @var mixed
-	 */
-	private $value;
-
-	/**
-	 * @var BinaryLogicalOperator
+	 * @var PrefixUnaryLogicalOperator
 	 */
 	private $logic;
 
-	function __construct($subject, BinaryLogicalOperator $logic, $value)
+	/**
+	 * @param PrefixUnaryLogicalOperator
+	 * @param mixed
+	 */
+	function __construct(PrefixUnaryLogicalOperator $logic, $subject)
 	{
-		$this->subject = $subject;
 		$this->logic = $logic;
-		$this->value = $value;
+		$this->subject = $subject;
 	}
 
 	/**
@@ -60,15 +52,7 @@ class BinaryExpression implements ISubjective
 	}
 
 	/**
-	 * @return mixed
-	 */
-	function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
-	 * @return BinaryLogicalOperator
+	 * @return PrefixUnaryLogicalOperator
 	 */
 	function getLogicalOperator()
 	{
@@ -77,10 +61,9 @@ class BinaryExpression implements ISubjective
 
 	function toSubjected(ISubjectivity $object)
 	{
-		return new self (
-			$object->subject($this->subject, $this),
+		return new self(
 			$this->logic,
-			$object->subject($this->value, $this)
+			$object->subject($this->subject, $this)
 		);
 	}
 
@@ -88,12 +71,9 @@ class BinaryExpression implements ISubjective
 	{
 		$compiledSlices = array();
 
-		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->subject->toDialectString($dialect);
-		$compiledSlices[] = ')';
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
 		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->value->toDialectString($dialect);
+		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);
