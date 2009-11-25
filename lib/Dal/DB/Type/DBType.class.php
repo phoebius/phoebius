@@ -52,19 +52,19 @@ final class DBType extends Enumeration implements ISqlType
 	const TIME = 'time';
 	const DATETIME = 'datetime';
 
-	private $hasSize = array(
+	private static $hasSize = array(
 		self::VARCHAR, self::CHAR, self::BINARY
 	);
 
-	private $hasPrecision = array(
+	private static $hasPrecision = array(
 		self::CURRENCY, self::DECIMAL, self::FLOAT
 	);
 
-	private $hasScale = array(
+	private static $hasScale = array(
 		self::CURRENCY, self::DECIMAL
 	);
 
-	private $canBeGenerated = array(
+	private static $canBeGenerated = array(
 		self::UINT16, self::UINT32, self::UINT64
 	);
 
@@ -80,26 +80,43 @@ final class DBType extends Enumeration implements ISqlType
 	 */
 	static function create(
 			$id,
-			$isNullable = false,
+			$nullable = false,
 			$size = null,
 			$precision = null,
 			$scale = null,
-			$isGenerated = false
+			$generated = false
 		)
 	{
-		return new self ($id, $isNullable, $size, $precision, $scale, $isGenerated);
+		return new self ($id, $nullable, $size, $precision, $scale, $generated);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	static function hasMember($id)
+	{
+		try {
+			new self ($id);
+
+			return true;
+		}
+		catch (Exception $e) {
+			return false;
+		}
 	}
 
 	function __construct(
 			$id,
-			$isNullable = false,
+			$nullable = false,
 			$size = null,
 			$precision = null,
 			$scale = null,
-			$isGenerated = false
+			$generated = false
 		)
 	{
-		$this->setIsNullable($isNullable);
+		parent::__construct($id);
+
+		$this->setIsNullable($nullable);
 
 		if ($this->canHaveSize()) {
 			$this->setSize($size);
@@ -113,10 +130,8 @@ final class DBType extends Enumeration implements ISqlType
 		}
 
 		if ($this->canBeGenerated()) {
-			$this->setGenerated($isGenerated);
+			$this->setGenerated($generated);
 		}
-
-		parent::__construct($id);
 	}
 
 	/**
@@ -165,10 +180,7 @@ final class DBType extends Enumeration implements ISqlType
 	 */
 	function getSize()
 	{
-		return
-			$this->canHaveSize()
-				? $this->size
-				: null;
+		return $this->size;
 	}
 
 	/**
@@ -176,10 +188,7 @@ final class DBType extends Enumeration implements ISqlType
 	 */
 	function getPrecision()
 	{
-		return
-			$this->canHavePrecision()
-				? $this->precision
-				: null;
+		return $this->precision;
 	}
 
 	/**
@@ -187,10 +196,7 @@ final class DBType extends Enumeration implements ISqlType
 	 */
 	function getScale()
 	{
-		return
-			$this->canHaveScale()
-				? $this->scale
-				: null;
+		return $this->scale;
 	}
 
 	/**
@@ -198,10 +204,7 @@ final class DBType extends Enumeration implements ISqlType
 	 */
 	function isGenerated()
 	{
-		return
-			$this->canBeGenerated() && $this->isGenerated
-				? true
-				: false;
+		return $this->isGenerated;
 	}
 
 	/**
@@ -297,6 +300,21 @@ final class DBType extends Enumeration implements ISqlType
 	function toDialectString(IDialect $dialect)
 	{
 		return $dialect->getTypeRepresentation($this);
+	}
+
+	function toPhpCodeCall()
+	{
+		return
+			'new DBType('.
+				join(', ', array(
+					'DBType::' . $this->getId(),
+					$this->isNullable ? 'true' : 'false',
+					null != $this->size ? $this->size : 'null',
+					null != $this->precision ? $this->precision : 'null',
+					null != $this->scale ? $this->scale : 'null',
+					$this->isGenerated ? 'true' : 'false',
+				))
+			. ')';
 	}
 }
 

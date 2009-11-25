@@ -30,7 +30,7 @@ class EntityProjection implements IProjection
 
 	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
 	{
-		foreach ($this->entity->getPhysicalSchema()->getDBFields() as $field) {
+		foreach ($this->entity->getPhysicalSchema()->getFields() as $field) {
 			$this->injectField($selectQuery, $field);
 		}
 	}

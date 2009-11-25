@@ -111,7 +111,7 @@ abstract class Enumeration implements IStringCastable
 		if (!$id) {
 			Assert::isNotNull(
 				$id,
-				'unknown value given for %s: %s',
+				'unknown value given for %s: `%s`',
 				get_class($this),
 				$value
 			);

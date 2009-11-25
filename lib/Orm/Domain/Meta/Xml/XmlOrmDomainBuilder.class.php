@@ -17,7 +17,6 @@
  ************************************************************************************************/
 
 /**
- * FIXME: cut resolving functionality to a base class
  * @ingroup Orm_Domain_Meta
  */
 class XmlOrmDomainBuilder implements IOrmDomainBuilder
@@ -58,11 +57,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		$this->ormDomain = $ormDomain;
 		$this->xmlFilename = $xmlFilename;
-		$this->dtdFilename = str_replace(
-			'\\',
-			'/',
-			$dtdFilename
-		);
+		$this->dtdFilename = str_replace('\\', '/', $dtdFilename);
 	}
 
 	/**
@@ -94,15 +89,12 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		$xmlContents = file_get_contents($this->xmlFilename);
 
 		try {
-//			$this->recorder->putInfoLine('Loading XML definition ' . $this->xmlFilename . '...');
 			$this->xmlElement = new SimpleXMLElement(
 				$this->fixDtdPath($xmlContents),
 				LIBXML_DTDATTR | LIBXML_DTDLOAD | LIBXML_DTDVALID
 			);
-//			$this->recorder->putMsg(' done.');
 		}
 		catch (ExecutionContextException $e) {
-//			$this->recorder->putError(' failed.');
 			$xmlError = libxml_get_last_error();
 			throw new OrmModelDefinitionException(
 				$xmlError->message . ' in ' . $this->xmlFilename . ':' . $xmlError->line
@@ -145,14 +137,10 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			$this->ormDomain->setDbSchema((string) $this->xmlElement['db-schema']);
 		}
 
-		foreach ($this->getChildNodeSet($this->xmlElement->entities, 'entity') as $entity) {
-//			$this->recorder->putInfoLine('Creating new entity:');
+		foreach ($this->xmlElement->entities->entity as $entity) {
 			$class = $this->generateEntity($entity);
 
 			$this->ormDomain->addClass($class);
-//			$this->recorder->putMsgLine($class->getName() . ' added to domain.');
-
-//			$this->recorder->putInfoLine('Resolving ' . $class->getName() . ' identifier...');
 
 			// process an identifier (if specified). However, entity CAN BE identifierless
 			if (isset($entity->properties->identifier)) {
@@ -160,11 +148,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				// we should generate an identifier (if any) before properties
 				// because type juggling depends on the identifier availabilty
 				$class->addIdentifier($id);
-
-//				$this->recorder->putMsg(' done.');
-			}
-			else {
-//				$this->recorder->putWarning(' entity is identifierless.');
 			}
 
 			// collect props and containers for further processing
@@ -173,8 +156,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			$classEntities[$name] = $class;
 			$classProperties[$name] = $this->getChildNodeSet($entity->properties, 'property');
 			$classContainers[$name] = $this->getChildNodeSet($entity->properties, 'container');
-
-//			$this->recorder->putLine();
 		}
 
 		// firsly, we process props as they can have one-to-one associations only
@@ -183,7 +164,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		}
 
 		// for now we can process containers
-//		$this->recorder->putWarningLine('Containers are not generated for now');
 		foreach ($classContainers as $name => $containers) {
 			$this->obtainClassContainers($classEntities[$name], $containers);
 		}
@@ -194,16 +174,9 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 */
 	private function obtainClassProperties(OrmClass $class, array $properties)
 	{
-		if (!empty($properties)) {
-//			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' properties:');
-			foreach ($properties as $property) {
-				$property = $this->generateProperty($property);
-				$class->addProperty($property);
-			}
-//			$this->recorder->putLine();
-		}
-		else {
-//			$this->recorder->putInfoLine('No properties for ' . $class->getName());
+		foreach ($properties as $property) {
+			$property = $this->generateProperty($property);
+			$class->addProperty($property);
 		}
 	}
 
@@ -212,16 +185,9 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 */
 	private function obtainClassContainers(OrmClass $class, array $containers)
 	{
-		if (!empty($containers)) {
-//			$this->recorder->putInfoLine('Obtaining ' . $class->getName() . ' containers:');
-			foreach ($containers as $container) {
-				$container = $this->generateContainer($class, $container);
-				$class->addProperty($container);
-			}
-//			$this->recorder->putLine();
-		}
-		else {
-//			$this->recorder->putInfoLine('No containers for ' . $class->getName());
+		foreach ($containers as $container) {
+			$container = $this->generateContainer($class, $container);
+			$class->addProperty($container);
 		}
 	}
 
@@ -255,18 +221,17 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 */
 	private function generateIdentifier(SimpleXMLElement $xmlIdentifier)
 	{
-		$type = $this->resolvePropertyType(
+		$type = $this->getPropertyType(
 			(string) $xmlIdentifier['type'],
-			AssociationMultiplicity::zeroOrOne()
+			AssociationMultiplicity::exactlyOne(),
+			$this->getTypeParameters($xmlIdentifier)
 		);
-
-		// FIXME: reject associations, accept only mappable types
 
 		$identifier = new OrmProperty(
 			(string) $xmlIdentifier['name'],
 			isset($xmlIdentifier['db-columns'])
-				? $this->getDBFields($xmlIdentifier['db-columns'])
-				: $this->generateDBFields((string) $xmlIdentifier['name'], $type),
+				? $this->getFields($xmlIdentifier['db-columns'])
+				: $this->makeFields((string) $xmlIdentifier['name'], $type),
 			$type,
 			OrmPropertyVisibility::full(),
 			false
@@ -278,21 +243,21 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	/**
 	 * @return array
 	 */
-	private function getDBFields($columnsList)
+	private function getFields($fieldsList)
 	{
-		$columns = explode(',', $columnsList);
+		$fields = explode(' ', $fieldsList);
 		$yield = array();
-		foreach ($columns as $column) {
-			$column = trim($column);
-			if ($column) {
-				$yield[] = $column;
+		foreach ($fields as $field) {
+			$field = trim($field);
+			if ($field) {
+				$yield[] = $field;
 			}
 		}
 
 		return $yield;
 	}
 
-	private function generateDBFields($propertyName, OrmPropertyType $ormPropertyTpe)
+	private function makeFields($propertyName, OrmPropertyType $ormPropertyTpe)
 	{
 		$fields = array();
 
@@ -304,7 +269,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			)
 		);
 
-		foreach (array_keys($ormPropertyTpe->getDBFields()) as $key) {
+		foreach (array_keys($ormPropertyTpe->getSqlTypes()) as $key) {
 			$fields[] = (
 				$propertyPrefix
 				. (
@@ -318,29 +283,41 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		return $fields;
 	}
 
+	private function getTypeParameters(SimpleXMLElement $property)
+	{
+		$parameters = array();
+
+		foreach ($property->attributes() as $key=>$value) {
+			$parameters[$key] = $this->castMethodArg((string) $value);
+		}
+
+		foreach ($property->param as $param) {
+			$parameters[(string) $param['name']] = $this->castMethodArg((string) $param['value']);
+		}
+
+		return $parameters;
+	}
+
 	/**
 	 * @return OrmProperty
 	 */
 	private function generateProperty(SimpleXMLElement $xmlProperty)
 	{
-//		$this->recorder->putInfoLine('Generating ' . ((string) $xmlProperty['name']) . ' property...');
-
-		$type = $this->resolvePropertyType(
+		$type = $this->getPropertyType(
 			(string) $xmlProperty['type'],
-			new AssociationMultiplicity((string) $xmlProperty['multiplicity'])
+			new AssociationMultiplicity((string) $xmlProperty['multiplicity']),
+			$this->getTypeParameters($xmlProperty)
 		);
 
 		$property = new OrmProperty(
 			(string) $xmlProperty['name'],
 			isset($xmlProperty['db-columns'])
-				? $this->getDBFields($xmlProperty['db-columns'])
-				: $this->generateDBFields((string) $xmlProperty['name'], $type),
+				? $this->getFields($xmlProperty['db-columns'])
+				: $this->makeFields((string) $xmlProperty['name'], $type),
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			$xmlProperty['unique'] == 'true'
 		);
-
-//		$this->recorder->putMsg(' done.');
 
 		return $property;
 	}
@@ -350,15 +327,18 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 */
 	private function generateContainer(OrmClass $type, SimpleXMLElement $xmlContainer)
 	{
-		// acceptable types: OneToManyContainerPropertyType, ManyToManyContainerPropertyType
-
-//		$this->recorder->putInfoLine('Generating ' . ((string) $xmlContainer['name']) . ' container...');
+		$referredTypeName = (string)$xmlContainer['type'];
 
 		try {
-			$referredType = $this->ormDomain->getClass((string)$xmlContainer['type']);
+			$referredType = $this->ormDomain->getClass($referredTypeName);
 		}
 		catch (OrmModelIntegrityException $e) {
-			throw new OrmModelIntegrityException('Reference to unknown entity ' . ((string)$xmlContainer['type']));
+			if (class_exists($referredTypeName, true) && TypeUtils::isChild($referredTypeName, 'IDaoRelated')) {
+				$referredType = call_user_func(array($referredTypeName, 'orm'));
+			}
+			else {
+				throw new OrmModelIntegrityException('Reference to unknown entity ' . $referredTypeName);
+			}
 		}
 
 		try { // one-to-many
@@ -383,19 +363,15 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				$this->ormDomain->addClass($proxy);
 			}
 
-			// FIXME: check whether type and referenced type are identifiable and id property types implement IOrmPropertyReferencable
-			// FIXME: check whether those properties are already set
-
-			$type_id_name = '___mtm_' . $type->getDBTableName();
 			try {
 				$mtmType = new AssociationPropertyType(
-						$type,
-						AssociationMultiplicity::exactlyOne(),
-						AssociationBreakAction::cascade()
-					);
+					$type,
+					AssociationMultiplicity::exactlyOne(),
+					AssociationBreakAction::cascade()
+				);
 				$type_property = new OrmProperty(
 					$type->getEntityName(),
-					$this->generateDBFields($type_id_name, $mtmType),
+					$this->makeFields($type->getTable(), $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full()
 				);
@@ -408,7 +384,6 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				$type_property = $proxy->getProperty($type->getEntityName());
 			}
 
-			$referredType_id_name = '___mtm_' . $referredType->getDBTableName();
 			try {
 				$mtmType =
 					new AssociationPropertyType(
@@ -418,7 +393,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 					);
 				$referredType_property = new OrmProperty(
 					$referredType->getEntityName(),
-					$this->generateDBFields($referredType_id_name, $mtmType),
+					$this->makeFields($referredType->getTable(), $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full()
 				);
@@ -438,11 +413,9 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			);
 		}
 
-//		$this->recorder->putMsg(' done.');
-
 		$property = new OrmProperty(
 			(string) $xmlContainer['name'],
-			array (),
+			array(),
 			$propertyType,
 			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
 			false
@@ -450,7 +423,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 
 		if (isset($xmlContainer['db-columns'])) {
 			$property->setDBColumnNames(
-				$this->getDBFields($xmlContainer['db-columns'])
+				$this->getFields($xmlContainer['db-columns'])
 			);
 		}
 
@@ -458,22 +431,21 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	}
 
 	/**
+	 * Resolution order:
+	 *  - IDaoRelated (check a class existance within the global scope and withing the domain scope) --> AssociationPropertyType
+	 *  - IOrmRelated --> CompositionPropertyType (not implemented)
+	 *  - IOrmPropertyAssignable --> IOrmPropertyAssignable::getOrmProperty()
+	 *  - IBoxable --> BoxablePropertyType
+	 *  - DBType
+	 *  - any type with public ctor
 	 * @return OrmPropertyType
 	 */
-	private function resolvePropertyType($name, AssociationMultiplicity $multiplicity)
+	private function getPropertyType($name, AssociationMultiplicity $multiplicity, array $parameters = array())
 	{
-		// resolve order:
-		// {$typeName} : IOrmPropertyAssignable (--> IOrmPropertyAssignable::getHandler())
-		// {$typeName} : IBoxable (--> ObjectPropertyType)
-		// {$typeName} : IDaoRelated
-		// {$typeName} : IOrmRelated
-		// ... not implemented yet. Possibly create an enumeration
-
 		if ($this->ormDomain->classExists($name)) {
 			$class = $this->ormDomain->getClass($name);
 
 			if ($class->hasDao() && $class->getIdentifier()) {
-				// map via db foreign key
 				return new AssociationPropertyType(
 					$class,
 					$multiplicity,
@@ -481,68 +453,116 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				);
 			}
 			else {
-				// map via injecting the fields
-				// currently unsupported. Needed to implement EntityPropertyType
-				Assert::notImplemented(
-					'for now only identifiable DAOized entities can be referenced; %s is daoless or (and) identifierless entity',
-					$name
+				throw new OrmModelIntegrityException(
+					'composite type is not implemented, use dao-related identifierable types'
 				);
 			}
 		}
-		else if (class_exists($name, true)) {
-			$interfaces = class_implements($name);
+		else if (DBType::hasMember($name)) {
+			$parameters['id'] = $name;
 
-			// type resolves handler by itself
-			if (in_array('IOrmPropertyAssignable', $interfaces)) {
-				return call_user_func(
-					array(
-						$name, 'getHandler'
-					),
-					$multiplicity
-				);
+			if (!isset($parameters['nullable'])) {
+				$parameters['nullable'] =
+					$multiplicity->isNullable()
+						? 'true'
+						: 'false';
 			}
-			// type can be wrapped automatically
-			else if (in_array('IBoxable', $interfaces)) {
-				return new ObjectPropertyType(
-					$name,
-					/* defaultValue */ null,
-					/* isNullable */ $multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE)
-				);
-			}
-			// 1:1 entity mapping using the identifier
-			else if (
-					in_array('IDaoRelated', $interfaces)
-					&& call_user_func(array($name, 'orm'))->hasDao()
-				) {
+
+			$dbType = $this->makeObject('DBType', $parameters);
+			return $dbType->getOrmPropertyType();
+		}
+		else if (class_exists($name, true)) {
+			if (TypeUtils::isChild($name, 'IDaoRelated')) {
 				return new AssociationPropertyType(
-				// new EntityWrap('EntityName'), EntityWrap implements IQueryable
-					call_user_func(
-						array($name, 'orm')
-					),
+					call_user_func(array($name, 'orm')),
 					$multiplicity,
 					AssociationBreakAction::cascade()
 				);
 			}
-			// entity injection
-			else if (in_array('IOrmRelated', $interfaces)) {
-				Assert::notImplemented(
-					'for now only identifiable DAOized entities can be referenced; %s is daoless or (and) identifierless entity',
-					$name
+			else if (TypeUtils::isChild($name, 'IOrmRelated')) {
+				throw new OrmModelIntegrityException(
+					'composite type is not implemented, use dao-related identifierable types'
 				);
 			}
-			// nothing for now
-			else {
-				throw new OrmModelDefinitionException('handle type failure (failed '.$name.' type)');
+			else if (TypeUtils::isChild($name, 'IOrmPropertyAssignable')) {
+				return
+					call_user_func(
+						array($name, 'getOrmPropertyType'),
+						$multiplicity
+					);
 			}
+			else if (TypeUtils::isChild($name, 'IBoxable')) {
+				$parameters['id'] = DBType::VARCHAR;
+				if (!isset($parameters['nullable'])) {
+					$parameters['nullable'] =
+						$multiplicity->isNullable()
+							? 'true'
+							: 'false';
+				}
+
+				return
+					new BoxablePropertyType(
+						$name,  $this->makeObject('DBType', $parameters)
+					);
+			}
+			else {
+				$this->makeObject($name, $parameters);
+			}
+		}
+
+		throw new OrmModelIntegrityException(
+			'do not know how to map ' . $name
+		);
+	}
+
+	private function makeObject($name, array $attributes)
+	{
+		$class = new ReflectionClass($name);
+
+		$args = $this->getMethodArgs($class->getConstructor(), $attributes);
+
+		return $class->newInstanceArgs($args);
+	}
+
+	private function getMethodArgs(ReflectionMethod $rm, array $attributes)
+	{
+		$yield = array();
+		foreach ($rm->getParameters() as $parameter) {
+
+			if (isset($attributes[$parameter->name])) {
+				$yield[] = $this->castMethodArg($attributes[$parameter->name]);
+			}
+			else {
+				// check for default values
+				$yield[] = $this->getValue($parameter);
+			}
+		}
+
+		return $yield;
+	}
+
+	private function castMethodArg($value)
+	{
+		switch (strtolower($value)) {
+			case '':
+			case 'null': return null;
+			case 'true': return true;
+			case 'false':return false;
+			default: return $value;
 		}
 	}
 
-	/**
-	 * @return OrmProperty
-	 */
-	private function resolveContainerType()
+	private function getValue(ReflectionParameter $rp)
 	{
-		Assert::notImplemented('containers are not implemented for now');
+		if ($rp->isDefaultValueAvailable()) {
+			return $rp->getDefaultValue();
+		}
+		else if ($rp->isArray()) {
+			return array ();
+		}
+		else if ($rp->allowsNull()) {
+			return null;
+		}
 	}
 
 	/**
@@ -554,7 +574,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	}
 
 	/**
-	 * sxml requires strict unix-like path, so it should be fixed manually within xml
+	 * Xml requires strict unix-like path, so it should be fixed manually within xml
 	 * @return string
 	 */
 	private function fixDtdPath($xmlContents)

@@ -22,13 +22,6 @@
 abstract class ContainerPropertyType extends OrmPropertyType
 {
 	/**
-	 * Readonly
-	 *
-	 * @var SqlTypeArray
-	 */
-	private static $sqlTypes;
-
-	/**
 	 * @var IQueryable
 	 */
 	private $container;
@@ -45,13 +38,11 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	{
 		$this->container = $container;
 		$this->encapsulant = $encapsulant;
-
-		self::$sqlTypes = new SqlTypeArray;
 	}
 
 	final function getSqlTypes()
 	{
-		return self::$sqlTypes;
+		return array ();
 	}
 
 	final function getColumnCount()

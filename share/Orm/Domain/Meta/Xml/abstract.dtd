@@ -28,65 +28,79 @@
 <!ATTLIST entity
 	name			ID #REQUIRED
 	has-dao			(true|false) "true"
-	db-schema		CDATA #IMPLIED
-	db-table		CDATA #IMPLIED
+	db-schema		NMTOKEN #IMPLIED
+	db-table		NMTOKEN #IMPLIED
 >
 
 <!ELEMENT properties (identifier?, property*, container*)>
 
-<!-- If entity is identifierless then entity.has-dao should be specified explicitly -->
-<!ELEMENT identifier EMPTY>
-<!ATTLIST identifier
-	name			CDATA "id"
-	type			CDATA "int32 isNullable=false isGenerated=true"
-	db-columns		CDATA #IMPLIED
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+	name			NMTOKEN #REQUIRED
+	value			CDATA #REQUIRED
 >
 
-<!-- 
-= "Type" attribute syntax =
-== a reference to DBType ==
- type="DBType::TYPENAME param1='value' param2='value'"
- e.g.
- type="DBType::STRING size='255' isNullable=true"
- or a raw value of DBType constant:
- type="varchar size='255' isNullable=true"
- 
-== a reference to ISqlType/IOrmPropertyType class ==
- type="ClassName ctor-arg1='value' ctor-arg2='value'"
- e.g.
- type="DBType id='string' size='255' isNullable=true"
- or
- type="RawSqlType definition='int8[][] NOT NULL'"
- or
- type="ArrayPropertyType baseType='int8'"
- 
-== a reference to IOrmPropertyAssignable implemetor ==
- type="Integer"
- 
-== a reference to the type defined within project domain (nested refs are allowed)
- type="Class"
+<!-- If entity is identifierless then entity.has-dao should be specified explicitly -->
+<!ELEMENT identifier (param*)>
+<!ATTLIST identifier
+	name			NMTOKEN "id"
+	type			NMTOKEN "uint32"
+	size			NMTOKEN #IMPLIED
+	precision		NMTOKEN #IMPLIED
+	scale			NMTOKEN #IMPLIED
+	nullable		(true|false) #IMPLIED 
+	generated		(true|false) "true"
+	db-columns		NMTOKENS #IMPLIED
+>
+
+<!--
+= "type" attribute possible values =
+
+1. DBType identifier
+2. name of the class that implements:
+   - IDaoRelated
+   - IOrmRelated
+   - IOrmPropertyAssignable
+   - IBoxable
+3. name of the class with public ctor
+
+Simple example:
+<property name="name" type="varchar" size="255" multiplicity="zeroOrOne"/>
+
+Extended example with the same result:
+<property name="name" type="DBType">
+	<param name="id" value="varchar">
+	<param name="size" value="255">
+	<param name="nullable" value="true">
+</property>
 -->
-<!ELEMENT property EMPTY>
+<!ELEMENT property (param*)>
 <!ATTLIST property
-	name			CDATA #REQUIRED
-	type			CDATA #REQUIRED
+	name			NMTOKEN #REQUIRED
+	type			NMTOKEN #REQUIRED
+	
+	size			NMTOKEN #IMPLIED
+	precision		NMTOKEN #IMPLIED
+	scale			NMTOKEN #IMPLIED
+	nullable		(true|false) #IMPLIED
+	
 	visibility		(full|readonly|transparent) "full"
 	unique			(true|false) "false"
 	multiplicity	(zeroOrOne|exactlyOne) "exactlyOne"
-	db-columns		CDATA #IMPLIED
+	db-columns		NMTOKENS #IMPLIED
 >
 
-<!-- 
+<!--
 Container works like a typical property except that:
  - it does not store a value, it only refers to a bunch of entities
  - its visibility is readonly
  - it is always not unique
  - relation (1:*, *:*) is determined by a referencing property type, e.g.: type=Entity refs=EntityProperty
- --> 
+ -->
 <!ELEMENT container EMPTY>
 <!ATTLIST container
-	name			CDATA #REQUIRED
-	type			CDATA #REQUIRED
-	refs			CDATA "id"
+	name			NMTOKEN #REQUIRED
+	type			NMTOKEN #REQUIRED
+	refs			NMTOKEN "id"
 >
 

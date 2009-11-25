@@ -151,7 +151,7 @@ class PgSqlDB extends DB
 	function getDialect()
 	{
 		if (!$this->dialect) {
-			$this->dialect = PgSqlDialect::getInstance();
+			$this->dialect = new PgSqlDialect;
 		}
 
 		return $this->dialect;

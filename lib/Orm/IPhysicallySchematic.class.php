@@ -26,13 +26,13 @@ interface IPhysicallySchematic
 	 * Gets the name of the DB table where entities are stored
 	 * @return string
 	 */
-	function getDBTableName();
+	function getTable();
 
 	/**
 	 * Array of field names
 	 * @return array
 	 */
-	function getDBFields();
+	function getFields();
 }
 
 ?>

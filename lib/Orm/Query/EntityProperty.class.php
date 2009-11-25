@@ -18,6 +18,7 @@
 
 /**
  * @ingroup Orm_Expression
+ * @internal
  */
 final class EntityProperty
 {
@@ -58,7 +59,7 @@ final class EntityProperty
 	 */
 	function getSqlColumn()
 	{
-		$fields = $this->property->getDBFields();
+		$fields = $this->property->getFields();
 
 		Assert::isTrue(
 			sizeof($fields) == 1,

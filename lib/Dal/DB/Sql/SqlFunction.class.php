@@ -21,7 +21,7 @@
  *
  * @ingroup Dal_DB_Sql
  */
-class SqlFunction implements ISqlValueExpression, ISqlSelectable, ISubjective
+class SqlFunction implements ISqlValueExpression, ISubjective
 {
 	/**
 	 * func (ALL expression)

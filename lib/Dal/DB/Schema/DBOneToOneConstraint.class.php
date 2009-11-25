@@ -90,9 +90,11 @@ class DBOneToOneConstraint extends DBConstraint
 	 */
 	function toDialectString(IDialect $dialect)
 	{
+		$fields = new SqlFieldArray(array_keys($this->columns));
+
 		return
 			  'FOREIGN KEY ('
-			. SqlFieldArray::create(array_keys($this->columns))->toDialectString($dialect)
+			. $fields->toDialectString($dialect)
 			. ')'
 			. ' REFERENCES ' . $dialect->quoteIdentifier($this->referencedTable->getName())
 			. ' ON DELETE ' .$this->associationBreakAction->toDialectString($dialect)

@@ -81,7 +81,7 @@ class DBSchemaBuilder
 
 		foreach ($this->ormDomain->getClasses() as $class) {
 			$this->ormClass = $class;
-			$this->dbTable = $this->dbSchema->getTable($this->ormClass->getDBTableName());
+			$this->dbTable = $this->dbSchema->getTable($this->ormClass->getTable());
 			$this->ormIdentifier = $class->getIdentifier();
 			foreach ($class->getProperties() as $property) {
 				if ($this->ormIdentifier !== $property) {
@@ -102,7 +102,7 @@ class DBSchemaBuilder
 	private function importClass()
 	{
 		$this->dbTable = new DBTable();
-		$this->dbTable->setName($this->ormClass->getDBTableName());
+		$this->dbTable->setName($this->ormClass->getTable());
 
 		if (($this->ormIdentifier = $this->ormClass->getIdentifier())) {
 			$this->ormProperty = $this->ormIdentifier;
@@ -119,23 +119,19 @@ class DBSchemaBuilder
 	 */
 	private function importProperty()
 	{
-		if (!sizeof($this->ormProperty->getDBFields())) {
+		if (!sizeof($this->ormProperty->getFields())) {
 			// columnless properties are skipped
 			return;
 		}
 
 		$columns = array_combine(
-			$this->ormProperty->getDBFields(),
-			$this->ormProperty->getType()->getDBFields()
+			$this->ormProperty->getFields(),
+			$this->ormProperty->getType()->getSqlTypes()
 		);
 
 		$dbColumns = array();
 		foreach ($columns as $name => $dbType) {
-			$dbColumn = new DBColumn();
-			$dbColumn->setName($name);
-			$dbColumn->setType($dbType);
-
-			$dbColumns[$name] = $dbColumn;
+			$dbColumns[$name] = new DBColumn($name, $dbType);
 		}
 
 		$this->dbTable->addColumns($dbColumns);
@@ -145,7 +141,7 @@ class DBSchemaBuilder
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
 					$dbColumns,
-					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getDBTableName()),
+					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getTable()),
 					$this->ormProperty->getType()->getAssociationBreakAction()
 				)
 			);

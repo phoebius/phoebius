@@ -267,7 +267,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 		$rawValueSet = array();
 		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-			foreach ($property->getDBFields() as $columnName) {
+			foreach ($property->getFields() as $columnName) {
 				$rawValueSet[$propertyName][] = $dbValues[$columnName];
 			}
 		}
@@ -339,7 +339,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		Assert::isNotEmpty($this->identifier, 'identifierless orm entity');
 
 		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getDBTableName())
+			DeleteQuery::create($this->physicalSchema->getTable())
 				->setExpression(
 					$this->getExpression(
 						Expression::eq(
@@ -379,7 +379,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getDBTableName())
+			DeleteQuery::create($this->physicalSchema->getTable())
 				->setExpression(
 					$this->getExpression($expression)
 				)
@@ -394,7 +394,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	function dropBy(IExpression $condition)
 	{
 		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getDBTableName())
+			DeleteQuery::create($this->physicalSchema->getTable())
 				->setExpression($condition)
 		);
 
@@ -424,7 +424,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
 			$fvc->append(
 				array_combine(
-					$this->logicalSchema->getProperty($propertyName)->getDBFields(),
+					$this->logicalSchema->getProperty($propertyName)->getFields(),
 					$rawValue
 				)
 			);
@@ -462,7 +462,7 @@ class RdbmsDao implements IOrmEntityAccessor
 					$fetched = false;
 					$id = $idOrmPropertyType->preGenerate(
 						$this->getDB(),
-						$this->physicalSchema->getDBTableName(),
+						$this->physicalSchema->getTable(),
 						$this->identifier
 					);
 				}
@@ -478,7 +478,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		if ($this->identifier && $fetched) {
 			$affected = $this->sendQuery(
 				new UpdateQuery(
-					$this->physicalSchema->getDBTableName(),
+					$this->physicalSchema->getTable(),
 					$fvc,
 					$this->getExpression(
 						Expression::eq($this->identifier, $entity->_getId())
@@ -499,7 +499,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		try {
 			$affected = $this->sendQuery(
 				new InsertQuery(
-					$this->physicalSchema->getDBTableName(),
+					$this->physicalSchema->getTable(),
 					$fvc
 				)
 			);
@@ -517,7 +517,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		if ($this->identifier && !$fetched) {
 			$id = $idOrmPropertyType->getGeneratedId(
 				$this->getDB(),
-				$this->physicalSchema->getDBTableName(),
+				$this->physicalSchema->getTable(),
 				$this->identifier
 			);
 
@@ -536,15 +536,15 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	function getSelectQuery()
 	{
-		$table = $this->physicalSchema->getDBTableName();
+		$table = $this->physicalSchema->getTable();
 
 		$selectQuery =
 			SelectQuery::create()
 				->from($table);
 
-		foreach ($this->physicalSchema->getDBFields() as $column) {
+		foreach ($this->physicalSchema->getFields() as $field) {
 			$selectQuery->get(
-				$column,
+				$field,
 				null,
 				$table
 			);

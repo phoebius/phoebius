@@ -64,7 +64,7 @@ final class FundamentalPropertyType
 			'plz pass the corresponding entity'
 		);
 
-		$fields = $identifier->getDBFields();
+		$fields = $identifier->getFields();
 
 		// *Important*
 		// We use dirty hack to obtain RdbmsDao because IOrmEntityAccessor
@@ -77,7 +77,7 @@ final class FundamentalPropertyType
 		$db = $dao->getDB();
 
 		$generator = $db->getGenerator(
-			$orm->getPhysicalSchema()->getDBTableName(),
+			$orm->getPhysicalSchema()->getTable(),
 			reset ($fields)
 		);
 
@@ -90,10 +90,11 @@ final class FundamentalPropertyType
 
 		if (!is_null($value)) {
 			if ($this->type->is(DBType::BOOLEAN)) {
-				// Assume the most dbs represent their booleans from this set of values
+				// Assume that most dbs represent their booleans from this set of values
 				// so no matter to provide a separate PropertyType that handles boolean value.
 				$value = in_array(
-					$value, array('t', 'true', '1', 1, true)
+					strtolower($value),
+					array('t', 'true', '1')
 				);
 			}
 		}
@@ -104,14 +105,7 @@ final class FundamentalPropertyType
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
-			'new DBType('. join(', ', array(
-				'DBType::' . $this->type->getId(),
-				$this->isNullable() ? 'true' : 'false',
-				$this->type->getSize(),
-				$this->type->getPrecision(),
-				$this->type->getScale(),
-				$this->type->isGenerated() ? 'true' : 'false',
-			)) . ')'
+			$this->type->toPhpCodeCall()
 		);
 	}
 }

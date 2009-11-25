@@ -44,7 +44,7 @@ class OrmProperty
 	/**
 	 * @var array
 	 */
-	private $dbFields = array();
+	private $fields = array();
 
 	/**
 	 * @param string name of the property
@@ -68,27 +68,17 @@ class OrmProperty
 		$this->type = $type;
 		$this->unique = $isUnique;
 		$this->visibility =
-			sizeof($this->type->getDBFields()) < 1
+			sizeof($this->type->getSqlTypes()) < 1
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
 
-		$this->setDBFields($fields);
-	}
-
-	/**
-	 * @return OrmProperty
-	 */
-	private function setDBFields(array $fields)
-	{
 		Assert::isTrue(
 			sizeof($fields)
-			== sizeof($this->type->getDBFields()),
+			== sizeof($this->type->getSqlTypes()),
 			'wrong DB field count'
 		);
 
-		$this->dbFields = $fields;
-
-		return $this;
+		$this->fields = $fields;
 	}
 
 	/**
@@ -150,15 +140,15 @@ class OrmProperty
 	/**
 	 * @return array of columnName
 	 */
-	function ___rename___getDBFields()
+	function getFields()
 	{
-		return $this->dbFields;
+		return $this->fields;
 	}
 
 	function toPhpCall()
 	{
 		$fields = array();
-		foreach ($this->dbFields as $field) {
+		foreach ($this->fields as $field) {
 			$fields[] = '\'' . $field . '\'';
 		}
 

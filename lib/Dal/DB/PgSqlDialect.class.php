@@ -125,7 +125,7 @@ class PgSqlDialect extends Dialect
 				);
 
 				$column->setDefaultValue(
-					SqlFunction::create('nextval')->addArg(new SqlValue($sqName))
+					new SqlFunction('nextval', new SqlValue($sqName))
 				);
 			}
 		}

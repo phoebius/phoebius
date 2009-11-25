@@ -183,7 +183,7 @@ class OrmIdentityMap
 	 * Actually, this method is not needed because we can use implicit mapping:
 	 * $this->identityMap[(string)$id] = $entity;
 	 *
-	 * That is because comppsite ids implement IBoxableIdentifier::__toString();
+	 * That is because comppsite ids implement ICompositeIdentifier::__toString();
 	 *
 	 * But right now this method is used to check this explicitly.
 	 * @return string
@@ -195,8 +195,8 @@ class OrmIdentityMap
 		}
 		else {
 			Assert::isTrue(
-				$id instanceof IBoxableIdentifier,
-				'identifier object should implement IBoxableIdentifier'
+				$id instanceof ICompositeIdentifier,
+				'identifier object should implement ICompositeIdentifier'
 			);
 
 			return (string) $id;

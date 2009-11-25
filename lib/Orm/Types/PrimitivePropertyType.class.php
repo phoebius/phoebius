@@ -71,11 +71,10 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 
 	function getSqlTypes()
 	{
-		return new SqlTypeArray(
+		return
 			array(
 				$this->type
-			)
-		);
+			);
 	}
 
 	function getColumnCount()

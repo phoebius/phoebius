@@ -43,7 +43,7 @@ abstract class OrmPropertyType
 
 	/**
 	 * Returns an array of ISqlType for the property
-	 * @return SqlTypeArray
+	 * @return array of key=>ISqlType
 	 */
 	abstract function getSqlTypes();
 

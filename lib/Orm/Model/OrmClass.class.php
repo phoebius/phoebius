@@ -358,7 +358,7 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 	 * Gets the name of the DB table where entities are stored
 	 * @return string
 	 */
-	function getDBTableName()
+	function getTable()
 	{
 		return $this->dbTableName;
 	}
@@ -372,16 +372,12 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return ucfirst($this->name);
 	}
 
-	/**
-	 * Array of columnName => DBType
-	 * @return array
-	 */
-	function getDBFields()
+	function getFields()
 	{
 		$columns = array();
 
 		foreach ($this->properties as $property) {
-			foreach ($property->getDBFields() as $field) {
+			foreach ($property->getFields() as $field) {
 				$columns[] = $field;
 			}
 		}

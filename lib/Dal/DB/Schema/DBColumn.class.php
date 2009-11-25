@@ -26,6 +26,11 @@
 class DBColumn
 {
 	/**
+	 * @var ISqlValueExpression
+	 */
+	private $defaultValue;
+
+	/**
 	 * @var string
 	 */
 	private $name;
@@ -36,8 +41,10 @@ class DBColumn
 
 	function __construct($name, ISqlType $type)
 	{
-		$this->setName($name);
-		$this->setType($type);
+		Assert::isScalar($name);
+
+		$this->name = $name;
+		$this->type = $type;
 	}
 
 	/**
@@ -49,18 +56,6 @@ class DBColumn
 	}
 
 	/**
-	 * @return DBColumn
-	 */
-	function setName($name)
-	{
-		Assert::isScalar($name);
-
-		$this->name = $name;
-
-		return $this;
-	}
-
-	/**
 	 * @return ISqlType
 	 */
 	function getType()
@@ -69,11 +64,19 @@ class DBColumn
 	}
 
 	/**
-	 * @return DBColumn
+	 * @return ISqlValueExpression
 	 */
-	function setType(ISqlType $type)
+	function getDefaultValue()
 	{
-		$this->type = $type;
+		return $this->defaultValue;
+	}
+
+	/**
+	 * @return ISqlValueExpression
+	 */
+	function setDefaultValue(ISqlValueExpression $defaultValue = null)
+	{
+		$this->defaultValue = $defaultValue;
 
 		return $this;
 	}

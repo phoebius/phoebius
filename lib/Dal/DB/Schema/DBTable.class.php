@@ -29,7 +29,7 @@ class DBTable
 	/**
 	 * @var array of {@link DBColumn}
 	 */
-	private $columns = array();
+	private $fields = array();
 
 	/**
 	 * @var array of {@link DBConstraint}

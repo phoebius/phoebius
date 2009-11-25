@@ -112,6 +112,9 @@ EOT;
 	 */
 	private function buildContainerGetter(OrmProperty $ormProperty)
 	{
+		return ;
+
+		// FIXME 'container SHOULD generate code returning filled EntityQuery'
 		Assert::notImplemented(
 			'container SHOULD generate code returning filled EntityQuery'
 		);

@@ -53,10 +53,10 @@ class OrmPhysicalSchemaClassCodeConstructor extends ClassCodeConstructor
 	/**
 	 * @return string
 	 */
-	private function getDBFieldsArray()
+	private function getFieldsPhpArray()
 	{
 		$fields = array();
-		foreach ($this->ormClass->getDBFields() as $field) {
+		foreach ($this->ormClass->getFields() as $field) {
 			$fields[] = '\'' . $field . '\'';
 		}
 
@@ -74,23 +74,19 @@ class OrmPhysicalSchemaClassCodeConstructor extends ClassCodeConstructor
 	{
 		$this->classMethods[] = <<<EOT
 	/**
-	 * @see IPhysicallySchematic::getDBTableName()
+	 * @see IPhysicallySchematic::getTable()
 	 * @return string
 	 */
-	function getDBTableName()
+	function getTable()
 	{
-		return '{$this->ormClass->getDBTableName()}';
+		return '{$this->ormClass->getTable()}';
 	}
 EOT;
 
 		$this->classMethods[] = <<<EOT
-	/**
-	 * @see IPhysicallySchematic::getDBFields()
-	 * @return array
-	 */
-	function getDBFields()
+	function getFields()
 	{
-		return {$this->getDBFieldsArray()};
+		return {$this->getFieldsPhpArray()};
 	}
 EOT;
 	}

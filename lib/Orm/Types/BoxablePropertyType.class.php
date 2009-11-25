@@ -87,14 +87,7 @@ class BoxablePropertyType extends PrimitivePropertyType
 	{
 		return array(
 			'\'' . $this->boxableType . '\'',
-			'new DBType('. join(', ', array(
-				'DBType::' . $this->dbType->getId(),
-				$this->isNullable() ? 'true' : 'false',
-				$this->dbType->getSize(),
-				$this->dbType->getPrecision(),
-				$this->dbType->getScale(),
-				$this->dbType->isGenerated() ? 'true' : 'false',
-			)) . ')'
+			$this->dbType->toPhpCodeCall()
 		);
 	}
 }

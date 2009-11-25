@@ -18,6 +18,7 @@
 
 /**
  * object to ISqlCastable subjection
+ * @internal
  * @ingroup
  */
 final class EntityQueryBuilder implements ISubjectivity
@@ -63,7 +64,7 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$this->entityQuery = $entityQuery;
 
-		$this->table = $entityQuery->getEntity()->getPhysicalSchema()->getDBTableName();
+		$this->table = $entityQuery->getEntity()->getPhysicalSchema()->getTable();
 		$this->alias =
 			$alias
 				? $alias
@@ -105,6 +106,10 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		if ($subject instanceof EntityProperty) {
 			return $subject->getSqlColumn();
+		}
+
+		if ($subject instanceof IBoxable) {
+			return new SqlValue($subject->getValue());
 		}
 
 		if ($subject instanceof EntityPropertyValue) {
@@ -236,8 +241,8 @@ final class EntityQueryBuilder implements ISubjectivity
 				: SqlJoinMethod::LEFT;
 
 		$joinExpr = Expression::andChain();
-		$srcSqlFields = $property->___rename___getDBFields();
-		$dstSqlFields = $builder->entityQuery->getEntity()->getLogicalSchema()->getIdentifier()->___rename___getDBFields();
+		$srcSqlFields = $property->getFields();
+		$dstSqlFields = $builder->entityQuery->getEntity()->getLogicalSchema()->getIdentifier()->getFields();
 
 		foreach ($srcSqlFields as $k => $v) {
 			$joinExpr->add(

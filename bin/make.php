@@ -21,23 +21,7 @@ chdir(dirname(__FILE__));
 require '../etc/app.init.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-
-if (
-		isset($_SERVER['TERM'])
-		&& (
-			   $_SERVER['TERM'] == 'xterm'
-			|| $_SERVER['TERM'] == 'linux'
-		)
-	) {
-	$console = new ConsoleOutput();
-
-}
-else {
-	$console = new RawConsoleOutput();
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
+$argc=2;$argv=array(__FILE__,realpath(dirname(__FILE__).'/../../'));
 if ($argc == 1) {
 	exit('
 Usage:
@@ -96,5 +80,6 @@ catch (Exception $e) {
 	exit ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
 }
 
+echo 'Done';
 
 ?>

@@ -147,7 +147,7 @@ class ValueArray implements IteratorAggregate, Countable, ArrayAccess
 	function merge(array $values)
 	{
 		foreach ($values as $value) {
-			$this->appendValue($value);
+			$this->append($value);
 		}
 
 		return $this;
