@@ -23,10 +23,10 @@ final class ProjectionChain extends TypedValueArray implements IProjection
 		parent::__construct('IProjection', $array);
 	}
 
-	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
 		foreach ($this->toArray() as $projection) {
-			$projection->fill($selectQuery, $entityQuery);
+			$projection->fill($selectQuery, $entityQueryBuilder);
 		}
 	}
 

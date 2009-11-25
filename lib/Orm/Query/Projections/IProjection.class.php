@@ -21,7 +21,7 @@ interface IProjection
 	/**
 	 * @return void
 	 */
-	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQuery);
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder);
 }
 
 ?>

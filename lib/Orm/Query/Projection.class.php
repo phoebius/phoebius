@@ -86,7 +86,7 @@ final class Projection extends StaticClass
 	 */
 	private static function getQueriable($class)
 	{
-		if (is_object($class) && !$class instanceof IOrmRelated) {
+		if (is_object($class) && $class instanceof IOrmRelated) {
 			$class = get_class($class);
 		}
 

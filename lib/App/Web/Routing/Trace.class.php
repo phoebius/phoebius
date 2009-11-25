@@ -129,7 +129,7 @@ final class Trace extends Collection
 	{
 		$this->route->getDispacher()->handle($this);
 
-		$this->setHandled();
+		$this->isHandled = true;
 	}
 
 	/**

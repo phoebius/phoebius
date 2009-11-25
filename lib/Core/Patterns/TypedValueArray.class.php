@@ -43,7 +43,7 @@ abstract class TypedValueArray extends ValueArray
 			'wrong type passed to %s, expected %s but %s found',
 			get_class($this),
 			$this->type,
-			gettype($value)
+			TypeUtils::getName($value)
 		);
 
 		parent::append($value);

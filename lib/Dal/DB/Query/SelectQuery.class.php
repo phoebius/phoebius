@@ -236,7 +236,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	{
 		$expressions = func_get_args();
 		foreach ($expressions as $expression) {
-			$this->order->add($expression);
+			$this->order->append($expression);
 		}
 
 		return $this;

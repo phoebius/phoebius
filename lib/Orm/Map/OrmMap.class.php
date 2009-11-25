@@ -106,19 +106,16 @@ final class OrmMap implements IOrmEntityMapper
 			$value = $entity->$getter();
 
 			if (is_null($value)) {
-//				if ($this->logicalSchema->getIdentifier() === $property) {
-//					continue;
-//				}
-
-				if ($property->getType()->hasDefaultValue()) {
-					$value = $property->getType()->getDefaultValue();
+				if ($this->logicalSchema->getIdentifier() === $property) {
+					continue;
 				}
-				else if ($property->getType()->isNullable()) {
+
+				if ($property->getType()->isNullable()) {
 					continue;
 				}
 			}
 
-			$rawValues[$property->getName()] = $property->getType()->makeRawValue($value);
+			$rawValues[$property->getName()] = $property->getType()->disassemble($value);
 		}
 
 		return $rawValues;
@@ -150,15 +147,15 @@ final class OrmMap implements IOrmEntityMapper
 					$this->scheduleBatchFetch(
 						$entity,
 						$property,
-						$rawValue,
+						new DBValueArray($rawValue),
 						$fetchStrategy
 					);
 				}
 				else {
 					$setter = $property->getSetter();
 					$entity->$setter(
-						$property->getType()->makeValue(
-							$rawValue,
+						$property->getType()->assemble(
+							new DBValueArray($rawValue),
 							$fetchStrategy
 						)
 					);

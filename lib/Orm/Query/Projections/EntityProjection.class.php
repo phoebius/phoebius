@@ -28,17 +28,17 @@ class EntityProjection implements IProjection
 		$this->entity = $entity;
 	}
 
-	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
 		foreach ($this->entity->getPhysicalSchema()->getFields() as $field) {
-			$this->injectField($selectQuery, $field);
+			$this->injectField($selectQuery, $field, $entityQueryBuilder);
 		}
 	}
 
-	protected function injectField(SelectQuery $selectQuery, $field, EntityQuery $entityQuery)
+	protected function injectField(SelectQuery $selectQuery, $field, EntityQueryBuilder $entityQueryBuilder)
 	{
 		$selectQuery->get(
-			new SqlColumn($field, $entityQuery->getAlias())
+			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);
 	}
 }

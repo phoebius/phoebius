@@ -82,6 +82,16 @@ EOT;
 		return self::orm()->getDao();
 	}
 EOT;
+
+			$this->classMethods[] = <<<EOT
+	/**
+	 * @return EntityQuery
+	 */
+	static function query()
+	{
+		return new EntityQuery(self::orm());
+	}
+EOT;
 		}
 
 		foreach ($this->ormClass->getProperties() as $ormProperty) {
@@ -201,7 +211,7 @@ EOT;
 	 */
 	function set{$capitalizedPropertyName}({$typeImpl}\${$propertyName}{$defaulValue})
 	{
-		\$this->{$propertyName} = \${$propertyName}
+		\$this->{$propertyName} = \${$propertyName};
 
 		return \$this;
 	}

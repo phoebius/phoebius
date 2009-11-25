@@ -27,7 +27,7 @@ class DBValueArray extends ValueArray
 			TypeUtils::getName($value)
 		);
 
-		parent::fillJoins($value);
+		parent::append($value);
 
 		return $this;
 	}

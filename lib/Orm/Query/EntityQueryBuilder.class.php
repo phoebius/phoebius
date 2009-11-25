@@ -74,15 +74,30 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$this->joins[] = new SelectQuerySource(
 			new AliasedSqlValueExpression(
-				new SqlIdentifier($entityQuery->getTable()),
-				$entityQuery->alias
+				new SqlIdentifier($this->table),
+				$this->alias
 			)
 		);
 	}
 
+	function getAlias()
+	{
+		return $this->alias;
+	}
+
+	function getTable()
+	{
+		return $this->table;
+	}
+
 	function getSelectQuerySources()
 	{
-		return $this->joins;
+		$yield = $this->joins;
+		foreach ($this->joined as $eqb) {
+			$yield = array_merge($yield, $eqb->getSelectQuerySources());
+		}
+
+		return $yield;
 	}
 
 	function registerIdentifier($string)
@@ -128,7 +143,7 @@ final class EntityQueryBuilder implements ISubjectivity
 						$this->getEntityProperty($subject)
 					);
 			}
-			catch (Exception $e) {
+			catch (OrmModelIntegrityException $e) {
 				// probably, a value, not a property path
 			}
 		}
@@ -174,7 +189,7 @@ final class EntityQueryBuilder implements ISubjectivity
 				$this->propertyCache[$property] =
 					new EntityProperty(
 						$this->alias,
-						$this->entity->getLogicalSchema()->getProperty($property)
+						$this->entityQuery->getEntity()->getLogicalSchema()->getProperty($property)
 					);
 			}
 		}

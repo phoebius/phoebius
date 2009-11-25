@@ -20,7 +20,7 @@
  * Represents an order expression
  * @ingroup Dal_DB_Sql
  */
-final class OrderBy implements ISubjective, ISqlCastable
+final class OrderBy implements ISubjective, ISqlValueExpression
 {
 	/**
 	 * @var mixed

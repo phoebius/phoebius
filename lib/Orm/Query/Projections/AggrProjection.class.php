@@ -29,26 +29,26 @@ class AggrProjection extends PropertyProjection
 		parent::__construct($property, $alias);
 	}
 
-	function getFunc(EntityQuery $entityQuery)
+	function getFunc(EntityQueryBuilder $entityQueryBuilder)
 	{
 		return $this->func;
 	}
 
-	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
-		$selectQuery->get($this->getSqlFunction($entityQuery));
+		$selectQuery->get($this->getSqlFunction($entityQueryBuilder));
 	}
 
 	/**
 	 * @return SqlFunction
 	 * @param EntityQuery $entityQuery
 	 */
-	protected function getSqlFunction(EntityQuery $entityQuery)
+	protected function getSqlFunction(EntityQueryBuilder $entityQueryBuilder)
 	{
 		return
 			new SqlFunction(
-				$this->getFunc($entityQuery),
-				$this->getValueExpression($entityQuery)
+				$this->getFunc($entityQueryBuilder),
+				$this->getValueExpression($entityQueryBuilder)
 			);
 	}
 }

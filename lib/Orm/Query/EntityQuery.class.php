@@ -224,9 +224,16 @@ final class EntityQuery implements ISqlSelectQuery
 		$selectQuery = new SelectQuery;
 		$queryBuilder = new EntityQueryBuilder($this);
 
-		$this->projection->fill($selectQuery, $queryBuilder);
+		if ($this->projection->isEmpty()) {
+			Projection::entity($this->entity)->fill($selectQuery, $queryBuilder);
+		}
+		else {
+			$this->projection->fill($selectQuery, $queryBuilder);
+		}
 
-		$selectQuery->setExpression($this->condition->toSubjected($queryBuilder));
+		if ($this->condition) {
+			$selectQuery->setCondition($this->condition->toSubjected($queryBuilder));
+		}
 
 		foreach ($this->order as $orderBy) {
 			$selectQuery->orderBy($orderBy->toSubjected($queryBuilder));

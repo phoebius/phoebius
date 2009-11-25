@@ -22,7 +22,7 @@
 abstract class ActionBasedController extends Controller
 {
 	const PARAMETER_ACTION = 'action';
-	
+
 	/**
 	 * @var Trace|null
 	 */
@@ -35,7 +35,7 @@ abstract class ActionBasedController extends Controller
 	function handle(Trace $trace)
 	{
 		$this->trace = $trace;
-		
+
 		if (isset($trace[self::PARAMETER_ACTION])) {
 			$result = $this->processAction($trace[self::PARAMETER_ACTION]);
 		}
@@ -44,10 +44,10 @@ abstract class ActionBasedController extends Controller
 		}
 
 		$this->processResult($result);
-		
+
 		$this->trace = null;
 	}
-	
+
 	/**
 	 * @return Trace|null
 	 */
@@ -76,7 +76,7 @@ abstract class ActionBasedController extends Controller
 		if (!is_null($value)) {
 			return $value;
 		}
-		
+
 		// check whether it is optional or have the default value
 		if ($argument->allowsNull()) {
 			return null;
@@ -94,7 +94,7 @@ abstract class ActionBasedController extends Controller
 			);
 		}
 	}
-	
+
 	/**
 	 * @return array|null
 	 */
@@ -104,7 +104,7 @@ abstract class ActionBasedController extends Controller
 			return $value;
 		}
 	}
-	
+
 	/**
 	 * @return object|null
 	 */
@@ -120,12 +120,12 @@ abstract class ActionBasedController extends Controller
 				return call_user_func_array(
 					array($class->name, 'cast'),
 					array($value)
-				);	
+				);
 			}
 			catch (TypeCastException $e){}
 		}
 	}
-	
+
 	/**
 	 * @return mixed
 	 */
@@ -185,8 +185,6 @@ abstract class ActionBasedController extends Controller
 			$actionResult = $this->handleUnknownAction($action);
 		}
 
-		$this->trace->setHandled();
-
 		if (
 				!(
 					is_object($actionResult) && $actionResult instanceof IActionResult
@@ -216,14 +214,14 @@ abstract class ActionBasedController extends Controller
 		if (is_string($actionResult)) {
 			return $this->view($actionResult);
 		}
-		
+
 		Assert::isUnreachable(
 			'unknown actionResult %s: %s',
 			get_type($actionResult),
 			$actionResult
 		);
 	}
-	
+
 	/**
 	 * @return ViewResult
 	 */
@@ -232,10 +230,10 @@ abstract class ActionBasedController extends Controller
 		$presentation = new UIViewPresentation($viewName);
 		$presentation->setModel($this->getModel());
 		$presentation->setTrace($this->trace);
-		
+
 		return new ViewResult(new UIPage($presentation));
 	}
-	
+
 	/**
 	 * @return RedirectToRouteResult
 	 */
@@ -243,7 +241,7 @@ abstract class ActionBasedController extends Controller
 	{
 		return new RedirectToRouteResult($routeName, $parameters, $this->trace);
 	}
-	
+
 	/**
 	 * Overridden
 	 * @return string
@@ -263,7 +261,7 @@ abstract class ActionBasedController extends Controller
 		foreach ($method->getParameters() as $parameter) {
 			$argumentsToPass[$parameter->name] = $this->filterArgumentValue($parameter);
 		}
-		
+
 		$actionMethodResult = $method->invokeArgs($this, $argumentsToPass);
 
 		return $actionMethodResult;

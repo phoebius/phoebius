@@ -35,12 +35,12 @@ class UIViewPresentation
 	 * @var Model|null
 	 */
 	protected $model;
-	
+
 	/**
 	 * @var Trace|null
 	 */
 	protected $trace;
-	
+
 	/**
 	 * @var IRouteTable|null
 	 */
@@ -128,24 +128,28 @@ class UIViewPresentation
 
 		Assert::isUnreachable('unknown method %s', $name);
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	function getHref($routeName, array $parameters = array())
 	{
-		
 		// TODO: Trace can be not set when used in MVCless environments => force setting
 		// the base SiteUrl explicitly like Trace and IRouteTable are set
-		
+
 		if ($this->trace) {
-			$url = $this->trace->getUrl($routeName, $parameters);
+			$url = $this->trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
+
+			$this->trace
+				->getRouteTable()
+				->getRoute($routeName)
+				->compose($url, $parameters);
 		}
 		else {
 			Assert::isNotEmpty($this->routeTable, 'routeTable is not set');
-			
+
 			$url = new SiteUrl;
-		
+
 			$this
 				->routeTable
 				->getRoute($routeName)
@@ -154,10 +158,10 @@ class UIViewPresentation
 			// TODO: check whether formed url has the same schema, host and port as the requested
 			// and strip those unused chunks leaving the URI only
 		}
-		
+
 		return (string) $url;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -170,14 +174,14 @@ class UIViewPresentation
 			. $href
 			. '</a>';
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	function getSelfHref()
 	{
 		Assert::isNotEmpty($this->trace, 'trace is not set');
-		
+
 		return $this->trace->getWebContext()->getRequest()->getHttpUrl()->getUri();
 	}
 
@@ -196,7 +200,7 @@ class UIViewPresentation
 			return $found;
 		}
 	}
-	
+
 	/**
 	 * @return Model|null
 	 */
@@ -204,7 +208,7 @@ class UIViewPresentation
 	{
 		return $this->model;
 	}
-	
+
 	/**
 	 * @return Trace|null
 	 */
@@ -212,7 +216,7 @@ class UIViewPresentation
 	{
 		return $this->trace;
 	}
-	
+
 	/**
 	 * @return IRouteTable|null
 	 */
@@ -220,41 +224,41 @@ class UIViewPresentation
 	{
 		return $this->routeTable;
 	}
-	
+
 	/**
 	 * @return UIViewPresentation
 	 */
 	function setModel(Model $model)
 	{
 		$this->model = $model;
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @return UIViewPresentation
 	 */
 	function setTrace(Trace $trace)
 	{
 		$this->trace = $trace;
-		
+
 		if (!$this->routeTable) {
 			$this->routeTable = $trace->getRouteTable();
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @return UIViewPresentation
 	 */
 	function setRouteTable(IRouteTable $routeTable)
 	{
 		$this->routeTable = $routeTable;
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @var string ...
 	 */
@@ -408,7 +412,7 @@ class UIViewPresentation
 	private function spawn($view, Model $model = null)
 	{
 		$presentation = new self ($view);
-		
+
 		$presentation->trace = $this->trace;
 		$this->routeTable = $this->routeTable;
 		$presentation->model =
