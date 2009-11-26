@@ -296,19 +296,9 @@ final class PgSqlError extends Enumeration
 
 	private static $sanitized = array();
 
-	/**
-	 * Overridden. Returns the id=>value hash of enumeration members
-	 * @return array
-	 */
-	protected function getMembers()
+	function __construct($id)
 	{
-		if (empty(self::$sanitized)) {
-			foreach (parent::getMembers() as $constant => $member) {
-				self::$sanitized[$member] = str_replace('_', ' ', $constant);
-			}
-		}
-
-		return parent::getMembers();
+		parent::__construct($this->fixValue($id));
 	}
 
 	/**
@@ -324,10 +314,21 @@ final class PgSqlError extends Enumeration
 	 */
 	function getErrorDescription()
 	{
+		if (empty(self::$sanitized)) {
+			$this->readDescriptions();
+		}
+
 		return self::$sanitized[$this->getValue()];
 	}
 
-	function setValue($value)
+	private function readDescriptions()
+	{
+		foreach ($this->getMembers() as $constant => $member) {
+			self::$sanitized[$member] = str_replace('_', ' ', $constant);
+		}
+	}
+
+	private function fixValue($value)
 	{
 		$value = (string) $value;
 
@@ -337,9 +338,7 @@ final class PgSqlError extends Enumeration
 
 		$value = str_repeat('0',  5 - strlen($value)) . $value;
 
-		parent::setValue($value);
-
-		return $this;
+		return $value;
 	}
 }
 

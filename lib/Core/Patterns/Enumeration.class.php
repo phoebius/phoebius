@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Strictly-typed enumeration implementation.
+ * Strictly-typed immutable enumeration implementation.
  *
  * If you need to create an enumeration you can strictly refer to, just extend this base
  * class and define the consts' in a descendant.
@@ -104,7 +104,7 @@ abstract class Enumeration implements IStringCastable
 	 * @param scalar $value one of the final class constants specified
 	 * @return Enumeration itself
 	 */
-	function setValue($value)
+	protected function setValue($value)
 	{
 		$id = $this->getIdByValue($value);
 
