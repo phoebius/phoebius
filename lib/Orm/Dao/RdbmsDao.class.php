@@ -63,10 +63,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	private $entity;
 
-	function __construct(
-			DB $db,
-			IQueryable $entity
-		)
+	function __construct(DB $db, IQueryable $entity)
 	{
 		$this->db = $db;
 		$this->entity = $entity;

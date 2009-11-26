@@ -82,6 +82,83 @@ abstract class OrmPropertyType
 		));
 	}
 
+	function toGetter(IMappable $entity, OrmProperty $property)
+	{
+		$returnValue =
+			($implClass = $this->getImplClass())
+				? $implClass
+				: 'mixed';
+		if ($this->isNullable()) {
+			$returnValue .= '|null';
+		}
+
+		$propertyName = $property->getName();
+		$capitalizedPropertyName = ucfirst($propertyName);
+
+		return <<<EOT
+	/**
+	 * @return {$returnValue}
+	 */
+	function get{$capitalizedPropertyName}()
+	{
+		return \$this->{$propertyName};
+	}
+EOT;
+	}
+
+	function toSetter(IMappable $entity, OrmProperty $property)
+	{
+		$argCastType =
+			($argCastType = $this->getImplClass())
+				? $argCastType . ' '
+				: '';
+
+		$argDocType =
+			$argCastType
+				? $this->getImplClass()
+				: 'scalar';
+
+		$defaultValue =
+			$this->isNullable()
+				? ' = null'
+				: '';
+
+		$propertyName = $property->getName();
+		$capitalizedPropertyName = ucfirst($propertyName);
+
+		return <<<EOT
+	/**
+	 * @param {$argDocType} \${$propertyName}
+	 * @return {$entity->getLogicalSchema()->getEntityName()} itself
+	 */
+	function {$property->getSetter()}({$argCastType}\${$propertyName}{$defaultValue})
+	{
+		\$this->{$propertyName} = \${$propertyName};
+
+		return \$this;
+	}
+EOT;
+	}
+
+	function toField(IMappable $entity, OrmProperty $property)
+	{
+		$typeImpl =
+			($typeImpl = $this->getImplClass())
+				? $typeImpl
+				: 'scalar';
+
+		if ($this->isNullable()) {
+			$typeImpl .= '|null';
+		}
+
+		return <<<EOT
+	/**
+	 * @var {$typeImpl}
+	 */
+	protected \${$property->getName()};
+EOT;
+	}
+
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array();

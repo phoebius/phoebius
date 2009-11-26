@@ -75,7 +75,7 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 
 		return join('', array(
 			'array(',
-			join(',', $names),
+				join(', ', $names),
 			')'
 		));
 	}
@@ -91,15 +91,21 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 				"\t\t\t"
 				. '\'' . $property->getName() . '\''
 				. ' => '
-				. $property->toPhpCall();
+				. (
+					$property->isIdentifier()
+						? '$this->getIdentifier()'
+						: $property->toPhpCall()
+				);
 		}
 
 		$arrayContents = join(",\n", $arrayItems);
-		return <<<EOT
+		$body = <<<EOT
 		return array(
 {$arrayContents}
 		);
 EOT;
+
+		return $body;
 	}
 
 	/**

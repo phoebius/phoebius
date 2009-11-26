@@ -21,33 +21,21 @@
  */
 class OrmAutoClassCodeConstructor extends ClassCodeConstructor
 {
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return 'Auto' .  $this->ormClass->getEntityName();
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
 	}
 
-	/**
-	 * @return string final|abstract|null
-	 */
 	protected function getClassType()
 	{
 		return 'abstract';
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$ormEntityHolder = $this->ormClass->getEntityName() . 'Entity';
@@ -120,115 +108,28 @@ EOT;
 	/**
 	 * @return void
 	 */
-	private function buildContainerGetter(OrmProperty $ormProperty)
+	private function fetchClassMembers(OrmProperty $property)
 	{
-		return ;
-
-		// FIXME 'container SHOULD generate code returning filled EntityQuery'
-		Assert::notImplemented(
-			'container SHOULD generate code returning filled EntityQuery'
-		);
-
-		$propertyName = $ormProperty->getName();
-		$capitalizedPropertyName = ucfirst($ormProperty->getName());
-
-		// make property itself
-		$this->classProperties[] = <<<EOT
-	/**
-	 * @var {$capitalizedPropertyName}
-	 */
-	private \${$propertyName};
-EOT;
-
-		$this->classMethods[] = <<<EOT
-	/**
-	 * @return {$capitalizedPropertyName}
-	 */
-	function get{$capitalizedPropertyName}()
-	{
-		if (!\$this->{$propertyName}) {
-			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this);
-		}
-
-		return \$this->{$propertyName};
-	}
-EOT;
-	}
-
-	/**
-	 * @return void
-	 */
-	private function fetchClassMembers(OrmProperty $ormProperty)
-	{
-		$visibility = $ormProperty->getVisibility();
+		$visibility = $property->getVisibility();
 
 		if ($visibility->is(OrmPropertyVisibility::TRANSPARENT)) {
-			if ($ormProperty->getType() instanceof ContainerPropertyType) {
-				$this->buildContainerGetter($ormProperty);
-			}
-
 			return;
 		}
 
-		$propertyName = $ormProperty->getName();
-		$capitalizedPropertyName = ucfirst($ormProperty->getName());
-		$isNullable = $ormProperty->getType()->isNullable();
-		$typeImpl = $ormProperty->getType()->getImplClass();
-
-		$actualType =
-			$typeImpl
-				? $typeImpl
-				: 'scalar';
-
-			if ($isNullable) {
-				$actualType .= '|null';
-			}
+		$type = $property->getType();
 
 		// make property itself
-		$this->classProperties[] = <<<EOT
-	/**
-	 * @var {$actualType}
-	 */
-	private \${$propertyName};
-EOT;
+		$this->classProperties[] = $type->toField($this->ormClass, $property);
 
 		// make setter
 		if ($visibility->isSettable()) {
-			$defaulValue =
-				$isNullable
-					? ' = null'
-					: '';
+			$this->classMethods[] = $type->toSetter($this->ormClass, $property);
 
-			if ($typeImpl) {
-				$typeImpl .= ' ';
-			}
-
-			$this->classMethods[] = <<<EOT
-	/**
-	 * @param {$actualType} {$propertyName}
-	 * @throws ArgumentException
-	 * @return {$this->ormClass->getName()} itself
-	 */
-	function set{$capitalizedPropertyName}({$typeImpl}\${$propertyName}{$defaulValue})
-	{
-		\$this->{$propertyName} = \${$propertyName};
-
-		return \$this;
-	}
-EOT;
-
-			if (
-					($identifier = $this->ormClass->getIdentifier())
-					&& $identifier->getName() == $ormProperty->getName()
-			) {
+			if ($property->isIdentifier()) {
 				$this->classMethods[] = <<<EOT
-	/**
-	 * @internal
-	 * @return {$this->ormClass->getName()} an object itself
-	 */
 	function _setId(\$id)
 	{
-		\$this->set{$capitalizedPropertyName}(\$id);
+		\$this->{$property->getSetter()}(\$id);
 
 		return \$this;
 	}
@@ -238,34 +139,13 @@ EOT;
 
 		// make getter
 		if ($visibility->isGettable()) {
-			$returnValue = $actualType . (
-				$isNullable
-					? '|null'
-					: ''
-			);
+			$this->classMethods[] = $type->toGetter($this->ormClass, $property);
 
-			$this->classMethods[] = <<<EOT
-	/**
-	 * @return {$returnValue}
-	 */
-	function get{$capitalizedPropertyName}()
-	{
-		return \$this->{$propertyName};
-	}
-EOT;
-
-			if (
-					($identifier = $this->ormClass->getIdentifier())
-					&& $identifier->getName() == $ormProperty->getName()
-			) {
+			if ($property->isIdentifier()) {
 				$this->classMethods[] = <<<EOT
-	/**
-	 * @internal
-	 * @return {$returnValue}
-	 */
 	function _getId()
 	{
-		return \$this->get{$capitalizedPropertyName}();
+		return \$this->get{$property->getGetter()}();
 	}
 EOT;
 			}

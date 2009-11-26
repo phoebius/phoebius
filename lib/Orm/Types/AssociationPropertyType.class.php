@@ -230,6 +230,34 @@ final class AssociationPropertyType extends OrmPropertyType
 		return $this->fkType->getColumnCount();
 	}
 
+	function toGetter(IMappable $entity, OrmProperty $property)
+	{
+		$returnValue =
+			($implClass = $this->getImplClass())
+				? $implClass
+				: 'mixed';
+		if ($this->isNullable()) {
+			$returnValue .= '|null';
+		}
+
+		$propertyName = $property->getName();
+		$capitalizedPropertyName = ucfirst($propertyName);
+
+		return <<<EOT
+	/**
+	 * @return {$returnValue}
+	 */
+	function get{$capitalizedPropertyName}()
+	{
+		if (\$this->{$propertyName}) { // thats is what called lazy fetching
+			\$this->{$propertyName}->fetch();
+		}
+
+		return \$this->{$propertyName};
+	}
+EOT;
+	}
+
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
