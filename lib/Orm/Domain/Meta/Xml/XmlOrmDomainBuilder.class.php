@@ -234,7 +234,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				: $this->makeFields((string) $xmlIdentifier['name'], $type),
 			$type,
 			OrmPropertyVisibility::full(),
-			false
+			false,
+			true
 		);
 
 		return $identifier;

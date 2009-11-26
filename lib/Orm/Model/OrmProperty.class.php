@@ -34,7 +34,7 @@ class OrmProperty
 	/**
 	 * @var boolean
 	 */
-	private $unique;
+	private $isUnique;
 
 	/**
 	 * @var OrmPropertyVisibility
@@ -47,7 +47,12 @@ class OrmProperty
 	private $fields = array();
 
 	/**
-	 * @param string name of the property
+	 * @var boolean
+	 */
+	private $isIdentifier;
+
+	/**
+	 * @param string $name name of the property
 	 * @param array list of database field names
 	 * @param OrmPropertyType property type
 	 * @param false property visibility
@@ -58,27 +63,37 @@ class OrmProperty
 			array $fields,
 			OrmPropertyType $type,
 			OrmPropertyVisibility $visibility,
-			$isUnique = false
+			$isUnique = false,
+			$isIdentifier = false
 		)
 	{
 		Assert::isScalar($name);
 		Assert::isBoolean($isUnique);
+		Assert::isBoolean($isIdentifier);
 
 		$this->name = $name;
+
+		Assert::isTrue(
+			sizeof($fields) == sizeof($type->getSqlTypes()),
+			'wrong DB field count'
+		);
+		$this->fields = $fields;
+
 		$this->type = $type;
-		$this->unique = $isUnique;
 		$this->visibility =
 			sizeof($this->type->getSqlTypes()) < 1
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
+		$this->isUnique = $isUnique;
+		$this->isIdentifier = $isIdentifier;
+	}
 
-		Assert::isTrue(
-			sizeof($fields)
-			== sizeof($this->type->getSqlTypes()),
-			'wrong DB field count'
-		);
-
-		$this->fields = $fields;
+	/**
+	 * @return boolean
+	 */
+	function isIdentifier()
+	{
+		return $this->isIdentifier;
 	}
 
 	/**
@@ -118,7 +133,7 @@ class OrmProperty
 	 */
 	function isUnique()
 	{
-		return $this->unique;
+		return $this->isUnique;
 	}
 
 	/**
@@ -157,14 +172,17 @@ class OrmProperty
 			'array(' . join(', ', $fields).')',
 			$this->type->toPhpCodeCall(),
 			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()})",
-			$this->unique
+			$this->isUnique
+				? 'true'
+				: 'false',
+			$this->isIdentifier
 				? 'true'
 				: 'false'
 		);
 
 		return join('', array(
 			'new OrmProperty(',
-			join(',', $ctorArguments),
+				join(', ', $ctorArguments),
 			')'
 		));
 	}
