@@ -38,7 +38,7 @@ interface IOrmEntityAccessor
 	function getLazyById($id);
 
 	/**
-	 * Similar to IOrmEntityAccessor::getById() but for multiple entities at once. If one or more entities of
+	 * If one or more entities of
 	 * the set not found, they won't be presented in the result set of entities
 	 * @return array of {@link OrmEntity}
 	 */
@@ -53,12 +53,12 @@ interface IOrmEntityAccessor
 	 * @throws OrmEntityNotFoundException
 	 * @return OrmEntity
 	 */
-	function getBy(IExpression $condition);
+	function getByExpression(IExpression $condition);
 
 	/**
 	 * @return array of {@link OrmEntity}
 	 */
-	function getListBy(IExpression $condition);
+	function getListByExpression(IExpression $condition);
 
 	/**
 	 * @throws OrmEntityNotFoundException
@@ -70,6 +70,8 @@ interface IOrmEntityAccessor
 	 * @return array
 	 */
 	function getListByQuery(ISqlSelectQuery $query);
+
+	function getCustomCellByQuery(ISqlSelectQuery $query);
 
 	/**
 	 * @return array
@@ -100,7 +102,7 @@ interface IOrmEntityAccessor
 	/**
 	 * @return integer
 	 */
-	function dropBy(IExpression $condition);
+	function dropByExpression(IExpression $condition);
 
 	/**
 	 * @return boolean

@@ -51,7 +51,7 @@ final class BinaryLogicalOperator extends LogicalOperator
 	 * Creates an instance of {@link BinaryLogicalOperator} with {@link BinaryExpression::EQUALS} value
 	 * @return BinaryLogicalOperator
 	 */
-	static function equals()
+	static function eq()
 	{
 		return new self (self::EQUALS);
 	}

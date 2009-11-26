@@ -78,7 +78,7 @@ final class FSUtils extends StaticClass
 	{
 		Assert::isScalar($prefix);
 
-		$where = PathResolver::getInstance()->getTmpDir(__CLASS__);
+		$where = PathResolver::getInstance()->getTmpDir($prefix);
 		$filepath = tempnam($where, $prefix);
 
 		if (!$filepath) {
@@ -98,7 +98,7 @@ final class FSUtils extends StaticClass
 	{
 		Assert::isScalar($prefix);
 
-		$directory = PathResolver::getInstance()->getTmpDir(__CLASS__);
+		$directory = PathResolver::getInstance()->getTmpDir($prefix);
 
 		$attempts = 5;
 		$path = null;

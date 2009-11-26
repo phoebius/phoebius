@@ -19,22 +19,21 @@
 /**
  * LINQ to OrmEntity
  *
- * @example
+ * Example:
  * @code
- * $entitySetQuery =
+ * $entitySet =
  * 	EntityQuery::create(MyEntity::orm())
- * 		->get(MyEntity::orm())
  * 		->where(
  *			Expression::between(
  *				'time',
  *				Date::create('-1 day')
  *				Date::create('+1 day')
  *			)
- * 		);
+ * 		)
+ * 		->getList();
  * @endcode
  *
- * TODO:
- * # implement IOrmEntityAccessor helper methods
+ * @todo implement IOrmEntityAccessor helper methods
  *
  * @ingroup Orm_Query
  */
@@ -115,6 +114,8 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * We don't know why OrderBY is not a part of a separate projection, so we follow
+	 * the default behaviour of nhibernate
 	 * @param OrderBy ...
 	 * @return EntityQuery an object itself
 	 */
@@ -221,33 +222,59 @@ final class EntityQuery implements ISqlSelectQuery
 	 */
 	function toSelectQuery()
 	{
+		return $this->makeSelect(
+			$this->projection->isEmpty()
+				? Projection::entity($this->entity) // mostly-used default behaviour is getting the OrmEntities
+				: $this->projection
+		);
+	}
+
+	private function makeSelect(IProjection $projection)
+	{
 		$selectQuery = new SelectQuery;
 		$queryBuilder = new EntityQueryBuilder($this);
 
-		if ($this->projection->isEmpty()) {
-			Projection::entity($this->entity)->fill($selectQuery, $queryBuilder);
-		}
-		else {
-			$this->projection->fill($selectQuery, $queryBuilder);
-		}
+		$projection->fill($selectQuery, $queryBuilder);
 
 		if ($this->condition) {
-			$selectQuery->setCondition($this->condition->toSubjected($queryBuilder));
+			$selectQuery->setCondition(
+				$this->condition->toSubjected($queryBuilder)
+			);
 		}
 
 		foreach ($this->order as $orderBy) {
-			$selectQuery->orderBy($orderBy->toSubjected($queryBuilder));
+			$selectQuery->orderBy(
+				$orderBy->toSubjected($queryBuilder)
+			);
 		}
 
 		$selectQuery->setLimit($this->limit);
 		$selectQuery->setOffset($this->offset);
 
+		// now add all those sources that EntityQueryBuilder collected for us
 		foreach ($queryBuilder->getSelectQuerySources() as $source) {
 			$selectQuery->addSource($source);
 		}
 
 		return $selectQuery;
 	}
+
+	/**
+	 * @return IExpression
+	 */
+	function toExpression()
+	{
+		if (!$this->condition) {
+			return new ExpressionChain;
+		}
+
+		return $this->condition->toSubjected(new EntityQueryBuilder($this));
+	}
+
+	function getCustomList(){}
+	function getObject(){}
+	function getRow(){}
+	function getCell(){}
 
 	function getList()
 	{
