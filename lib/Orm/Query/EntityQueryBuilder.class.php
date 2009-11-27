@@ -18,7 +18,7 @@
 
 /**
  * object to ISqlCastable subjection
- * @internal
+ * @aux
  * @ingroup
  */
 final class EntityQueryBuilder implements ISubjectivity

@@ -19,7 +19,7 @@
 /**
  * Represents a SQL join with a complex condition
  * @ingroup Dal_DB_Query
- * @internal
+ * @aux
  */
 class SqlConditionalJoin extends SqlJoin
 {

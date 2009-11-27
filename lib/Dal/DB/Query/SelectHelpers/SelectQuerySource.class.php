@@ -19,7 +19,7 @@
 /**
  * Represents an abstract data source where the {@link SelectQuery} should be applied
  * @ingroup Dal_DB_Query
- * @internal
+ * @aux
  */
 final class SelectQuerySource implements ISqlValueExpression
 {

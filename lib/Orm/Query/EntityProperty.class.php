@@ -18,7 +18,7 @@
 
 /**
  * @ingroup Orm_Expression
- * @internal
+ * @aux
  */
 final class EntityProperty
 {

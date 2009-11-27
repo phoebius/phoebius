@@ -149,6 +149,11 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				// because type juggling depends on the identifier availabilty
 				$class->addIdentifier($id);
 			}
+			else if ($class->hasDao()) {
+				throw new OrmModelIntegrityException(
+					'dao-related entities MUST be identifiable'
+				);
+			}
 
 			// collect props and containers for further processing
 			$name = $class->getName();

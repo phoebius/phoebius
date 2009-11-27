@@ -19,7 +19,7 @@
 /**
  * Represents a sql join method
  * @ingroup Dal_DB_Query
- * @internal
+ * @aux
  */
 final class SqlJoinMethod extends Enumeration implements ISqlCastable
 {

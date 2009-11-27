@@ -281,6 +281,13 @@ final class EntityQuery implements ISqlSelectQuery
 		return $this->entity->getDao()->getListByQuery($this);
 	}
 
+	function getCount()
+	{
+		return $this->entity->getDao()->getCell(
+			$this->makeSelect(Projection::rowCount())
+		);
+	}
+
 	function getCastedParameters(IDialect $dialect)
 	{
 		return array ();

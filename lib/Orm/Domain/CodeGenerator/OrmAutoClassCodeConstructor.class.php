@@ -118,6 +118,11 @@ EOT;
 
 		$type = $property->getType();
 
+		// FIXME implement ContainerPropertyType getters
+		if ($type instanceof ContainerPropertyType) {
+			return;
+		}
+
 		// make property itself
 		$this->classProperties[] = $type->toField($this->ormClass, $property);
 

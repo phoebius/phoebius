@@ -22,7 +22,18 @@
  */
 abstract class OrmEntity implements IOrmRelated
 {
-	// nothing here
+	/**
+	 * @return OrmEntity
+	 */
+	function save()
+	{
+		if ($this instanceof IDaoRelated) {
+			$dao = call_user_func(array(get_class($this), 'dao'));
+			$dao->save($this);
+		}
+
+		return $this;
+	}
 }
 
 ?>

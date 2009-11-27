@@ -19,7 +19,7 @@
 /**
  * Represents a SQL join with simple condition where the joining tables has the identical names
  * @ingroup Dal_DB_Query
- * @internal
+ * @aux
  */
 class SqlSimpleJoin extends SqlJoin
 {

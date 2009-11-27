@@ -40,7 +40,6 @@
 	value			CDATA #REQUIRED
 >
 
-<!-- If entity is identifierless then entity.has-dao should be specified explicitly -->
 <!ELEMENT identifier (param*)>
 <!ATTLIST identifier
 	name			NMTOKEN "id"

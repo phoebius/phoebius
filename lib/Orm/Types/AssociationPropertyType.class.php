@@ -249,9 +249,9 @@ final class AssociationPropertyType extends OrmPropertyType
 	 */
 	function get{$capitalizedPropertyName}()
 	{
-		if (\$this->{$propertyName}) { // thats is what called lazy fetching
-			\$this->{$propertyName}->fetch();
-		}
+//		if (\$this->{$propertyName}) { // thats is what called lazy fetching
+//			\$this->{$propertyName}->fetch();
+//		}
 
 		return \$this->{$propertyName};
 	}

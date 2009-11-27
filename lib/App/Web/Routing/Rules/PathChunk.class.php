@@ -20,7 +20,7 @@
  * Used internally within the PathRewriteRule as named atomic path part.
  *
  * @ingroup App_Web_Routing_Rules
- * @internal
+ * @aux
  */
 final class PathChunk
 {

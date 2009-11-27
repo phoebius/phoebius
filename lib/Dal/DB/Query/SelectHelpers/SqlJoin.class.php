@@ -19,7 +19,7 @@
 /**
  * Represents a SQL join wrapper for {@link SelectQuery}
  * @ingroup Dal_DB_Query
- * @internal
+ * @aux
  */
 abstract class SqlJoin implements ISqlCastable
 {

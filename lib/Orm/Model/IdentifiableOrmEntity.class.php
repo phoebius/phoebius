@@ -20,7 +20,7 @@
  * Represents an ORM entity
  * @ingroup Orm_Model
  */
-abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
+abstract class IdentifiableOrmEntity extends OrmEntity
 {
 	/**
 	 * @var boolean
@@ -38,7 +38,7 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 	abstract function _getId();
 
 	/**
-	 * @return IdentifiableOrmEntity
+	 * @return IdentifiableOrmEntity itself
 	 */
 	abstract function _setId($id);
 
@@ -49,25 +49,34 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 	 */
 	final function fetch()
 	{
-		if (!$this->inFetchProcess && !$this->fetched && ($id = $this->_getId())) {
-			$this->inFetchProcess = true;
-			try {
-				call_user_func(array($this, 'dao'))->getById($id);
+		if ($this instanceof IDaoRelated) {
+			if (!$this->inFetchProcess && !$this->fetched && ($id = $this->_getId())) {
+
+				$this->inFetchProcess = true;
+				try {
+					call_user_func(array(get_class($this), 'dao'))->getById($id);
+					$this->inFetchProcess = false;
+				}
+				catch (Exception $e) {
+					$this->inFetchProcess = false;
+					throw $e;
+				}
+
+				$this->fetched = true;
 			}
-			catch (Exception $e) {
-				$this->inFetchProcess = false;
-				throw $e;
-			}
-			$this->inFetchProcess = false;
-			$this->fetched = true;
 		}
 
 		return $this;
 	}
 
-	/**
-	 * @return void
-	 */
+	function drop()
+	{
+		if ($this instanceof IDaoRelated && ($id = $this->_getId())) {
+			$dao = call_user_func(array(get_class($this), 'dao'));
+			$dao->dropById($id);
+		}
+	}
+
 	function __clone()
 	{
 		$this->_setId(null);
