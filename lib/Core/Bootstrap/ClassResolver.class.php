@@ -70,6 +70,9 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 		$classpath = $this->resolveClassPath($classname, false, $useCacheOnly);
 
 		if ($classpath) {
+
+
+
 			try {
 				include $classpath;
 
@@ -88,10 +91,15 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 						return true;
 					}
 				}
+				else {
+					// if we do not unregister the handler then we suppress the actual error
+					// replacing it with 'ClassNotFound' error :(
+					Exceptionizer::getInstance()->unregister();
 
-				die($e->getMessage());
-
-				throw $e;
+					// if we throw an exception back to callstack than we would see
+					// a wrong error :(
+					trigger_error($e->getMessage(), E_USER_ERROR);
+				}
 			}
 		}
 
