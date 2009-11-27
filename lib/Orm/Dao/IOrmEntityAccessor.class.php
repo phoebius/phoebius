@@ -17,102 +17,203 @@
  ************************************************************************************************/
 
 /**
+ * Contract for accessing IdentifiableOrmEntity
+ *
  * @ingroup Orm_Dao
  */
 interface IOrmEntityAccessor
 {
 	/**
-	 * @return FetchStrategy
+	 * Gets a raw database value of a cell.
+	 *
+	 * The resulting value is not mapped to any of entity properties.
+	 * For straight mapping see IOrmEntityAccessor::getProperty()
+	 *
+	 * @warning A query MUST define only a single database column to retrieve because only the first found
+	 * cell is used as the resulting value.
+	 *
+	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
+	 *
+	 * @throws CellNotFoundException thrown when no tuples where retrieved by the query.
+	 * 				We cannot return NULL or FALSE because these values may be a valid values of the cell
+	 * @param ISqlSelectQuery $query query to execute
+	 * @return mixed a cell's raw value
 	 */
-	function getFetchStrategy();
+	function getCell(ISqlSelectQuery $query);
 
 	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
+	 * Gets an entity property mapped from a the database cells of a specific tuple.
+	 *
+	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 *
+	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
+	 *
+	 * @param string $property name of an entity property
+	 * @param ISqISqlSelectQuery $query query to execute
+	 * @return mixed an OrmPropertyType-mapped value
 	 */
-	function getById($id);
+	function getProperty($property, ISqlSelectQuery $query);
 
 	/**
-	 * @return OrmEntity
+	 * Gets an IdentifiableOrmEntity object by id without fetching it from the DB (if not yet fetched).
+	 *
+	 * This method is optimized for assembling, i.e. if identified entity was fetched earlier
+	 * then it would be used as the resulting object.
+	 *
+	 * The returned entity can be assembled with actual values using IdentifiableOrmEntity::fetch() method.
+	 *
+	 * Note that this method does not check the existance of an entity in the DB.
+	 *
+	 * @param mixed $id
+	 * @return IdentifiableOrmEntity
 	 */
-	function getLazyById($id);
+	function getLazyEntityById($id);
 
 	/**
-	 * If one or more entities of
-	 * the set not found, they won't be presented in the result set of entities
-	 * @return array of {@link OrmEntity}
+	 * Gets the IdentifiableOrmEntity object by id.
+	 *
+	 * Entity assembling is performed according to the currently set FetchStrategy.
+	 *
+	 * @throws OrmEntityNotFoundException thrown when entity is not presented in the DB
+	 *
+	 * @param mixed $id
+	 * @return IdentifiableOrmEntity
+	 */
+	function getEntityById($id);
+
+	/**
+	 * Gets the IdentifiableOrmEntity object by query.
+	 *
+	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 *
+	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
+	 *
+	 * @throws OrmEntityNotFoundException thrown when entity is not presented in the DB
+	 * @param ISqlSelectQuery $query query to execute
+	 * @return IdentifiableOrmEntity
+	 */
+	function getEntity(ISqlSelectQuery $query);
+
+	/**
+	 * Gets a tuple of raw database values.
+	 *
+	 * Values presented in the resulting tuple are not mapped to an entity properties.
+	 * For the straight mapping see IOrmEntityAccessor::getProperty()
+	 *
+	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
+	 *
+	 * @throws RowNotFoundException thrown when no tuples where retrieved by the query.
+	 * 				We actually can return NULL or FALSE because a tuple can be presented as
+	 * 				array only, but we throw an explicit exception to be similar
+	 * 				with IOrmEntityAccessor::getCell() method
+	 * @param ISqlSelectQuery $query query to execute
+	 * @return array an associative array that represents a tuple of raw database values
+	 */
+	function getRow(ISqlSelectQuery $query);
+
+	/**
+	 * Gets the set of IdentifiableOrmEntity objects by their identifiers
+	 *
+	 * Note that if some objects where not found, they silently won't be presented in the resulting
+	 * set. No exception is thrown in this case (which is not similar
+	 * to IOrmEntityAccessor::getById() logic).
+	 *
+	 * The resulting set is an associate array of identifiable objects where keys are identifiers
+	 * casted to strings.
+	 *
+	 * Also not that this method DOES NOT GUARANTEE to return a set of objects in a order defined
+	 * by the set of identifiers.
+	 *
+	 * @param array $ids associative array of identifiable objects
 	 */
 	function getByIds(array $ids);
 
 	/**
-	 * Returns all entities
+	 * Gets the set IdentifiableOrmEntity objects by query.
+	 *
+	 * If query is not presented then ALL possible objects are fetched.
+	 *
+	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 *
+	 * @param ISqlSelectQuery $query optinal query to execute
+	 * @return array set of IdentifiableOrmEntity objects
 	 */
-	function getList();
+	function getList(ISqlSelectQuery $query = null);
 
 	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
+	 * Gets a set of tuples of raw database values.
+	 *
+	 * Values presented in the resulting tuples are not mapped to an entity properties.
+	 *
+	 * If query is not presented then ALL tuples are retrieved.
+	 *
+	 * @param ISqlSelectQuery $query query to execute
+	 * @return array an array of associative arrays that represent a tuples of raw database values
 	 */
-	function getByExpression(IExpression $condition);
+	function getRows(ISqlSelectQuery $query = null);
 
 	/**
-	 * @return array of {@link OrmEntity}
+	 * Gets a set of raw database values of a specific cell.
+	 *
+	 * The resulting value is not mapped to any of entity properties.
+	 * For straight mapping see IOrmEntityAccessor::getPropertyList()
+	 *
+	 * @warning A query MUST define only a single database column to retrieve because only the first found
+	 * cell is used as the resulting value.
+	 *
+	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
+	 *
+	 * @param ISqlSelectQuery $query query to execute
+	 * @return array an array of raw values of a specific cell
 	 */
-	function getListByExpression(IExpression $condition);
+	function getColumn(ISqlSelectQuery $query);
 
 	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
+	 * Gets a set of entity properties mapped from a set of raw database cells.
+	 *
+	 * If query is not presented then a resulting property set would be collected from ALL
+	 * objectes presented in the DB.
+	 *
+	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 *
+	 * @param string $property name of an entity property
+	 * @param ISqISqlSelectQuery $query query to execute
+	 * @return mixed an array of OrmPropertyType-mapped values
 	 */
-	function getByQuery(ISqlSelectQuery $query);
+	function getPropertyList($property, ISqlSelectQuery $query = null);
 
 	/**
-	 * @return array
+	 * Executes a query against the entity's database and returns the number of affected rows
+	 *
+	 * @param ISqlQuery $query query to execute
+	 * @return int number of affected rows, or NULL if query has no affect on rows
 	 */
-	function getListByQuery(ISqlSelectQuery $query);
-
-	function getCustomCellByQuery(ISqlSelectQuery $query);
+	function executeQuery(ISqlQuery $query);
 
 	/**
-	 * @return array
+	 * Drops the IdentifiableOrmEntity object by id from the database.
+	 *
+	 * This method does not perform a check whether the IdentifiableOrmEntity is presented
+	 * in the database or not, but returns a boolean result specifying whether the drop has
+	 * affection on object (if it was presented) or not.
+	 *
+	 * @param mixed $id
+	 * @return boolean whether the drop has affection on object (if it was presented) or not.
 	 */
-	function getCustomRowByQuery(ISqlSelectQuery $query);
+	function dropEntityById($id);
 
 	/**
-	 * @return array
-	 */
-	function getCustomRowsByQuery(ISqlSelectQuery $query);
-
-	/**
-	 * Returns the number of affected rows
-	 * @return integer
-	 */
-	function sendQuery(ISqlQuery $query);
-
-	/**
+	 * Save the IdentifiableOrmEntity object to the database.
+	 *
+	 * If entity's ID is not set then an entity is treated as a newly created object and
+	 * a new tuple is inserted in the database.
+	 *
+	 * Otherwise,
+	 *
+	 * @param IdentifiableOrmEntity $entity entity to save
 	 * @return boolean
 	 */
-	function dropById($id);
-
-	/**
-	 * @return integer
-	 */
-	function dropByIds(array $id);
-
-	/**
-	 * @return integer
-	 */
-	function dropByExpression(IExpression $condition);
-
-	/**
-	 * @return boolean
-	 */
-	function drop(IdentifiableOrmEntity $entity);
-
-	/**
-	 * @return OrmEntity
-	 */
-	function save(OrmEntity $entity);
+	function saveEntity(IdentifiableOrmEntity $entity);
 }
 
 ?>
