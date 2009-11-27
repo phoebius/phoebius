@@ -29,7 +29,7 @@ abstract class OrmPropertyType
 	/**
 	 * @return mixed native value
 	 */
-	abstract function assemble(DBValueArray $values, FetchStrategy $fetchStrategy);
+	abstract function assemble(array $tuple, FetchStrategy $fetchStrategy);
 
 	/**
 	 * @return SqlValueArray
@@ -53,16 +53,16 @@ abstract class OrmPropertyType
 	abstract function getColumnCount();
 
 	/**
-	 * @param array of DBValueArray
+	 * @param array $tuples
 	 * @param FetchStrategy
 	 * @return array of native values
 	 */
-	function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
+	function assebmleSet(array $tuples, FetchStrategy $fetchStrategy)
 	{
 		$yield = array();
 
-		foreach ($valueSet as $values) {
-			$yield = $this->assemble($values, $fetchStrategy);
+		foreach ($tuples as $tuple) {
+			$yield = $this->assemble($tuple, $fetchStrategy);
 		}
 
 		return $yield;

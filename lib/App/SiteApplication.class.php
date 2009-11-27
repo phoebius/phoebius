@@ -83,7 +83,7 @@ class SiteApplication
 				$trace = $this->router->getTrace($this->webContext);
 				$trace->handle();
 			}
-			catch (RouteException $e) {
+			catch (Exception $e) {
 				$trace = $this->router->getFallbackTrace($trace);
 				$trace->handle();
 			}

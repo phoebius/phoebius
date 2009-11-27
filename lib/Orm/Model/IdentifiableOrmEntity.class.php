@@ -69,6 +69,11 @@ abstract class IdentifiableOrmEntity extends OrmEntity
 		return $this;
 	}
 
+	final function isFetched()
+	{
+		return $this->fetched;
+	}
+
 	function drop()
 	{
 		if ($this instanceof IDaoRelated && ($id = $this->_getId())) {

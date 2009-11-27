@@ -78,7 +78,7 @@ final class Expression extends StaticClass
 	 */
 	static function eq($subject, $value)
 	{
-		return new BinaryExpression($subject, BinaryLogicalOperator::equals(), $value);
+		return new BinaryExpression($subject, BinaryLogicalOperator::eq(), $value);
 	}
 
 	/**

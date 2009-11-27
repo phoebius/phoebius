@@ -16,9 +16,32 @@
  *
  ************************************************************************************************/
 
-class PropertyProjection extends RawProjection
+class PropertyProjection implements IProjection
 {
-	// nothing here
+	private $property;
+
+	function __construct($property)
+	{
+		$this->property = $property;
+	}
+
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
+	{
+		$property = $entityQueryBuilder->getEntity()->getLogicalSchema()->getProperty($this->property);
+
+		foreach ($property->getFields() as $field) {
+			$this->fillPropertyField($field, $selectQuery, $entityQueryBuilder);
+		}
+
+		$selectQuery->get($this->getValueExpression($entityQueryBuilder));
+	}
+
+	protected function fillPropertyField($field, SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
+	{
+		$selectQuery->get(
+			new SqlColumn($field, $entityQueryBuilder->getAlias())
+		);
+	}
 }
 
 ?>

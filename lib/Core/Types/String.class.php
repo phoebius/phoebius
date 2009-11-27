@@ -23,7 +23,10 @@
  */
 class String extends Scalar
 {
-	// nothing - scalar is enough to represent the string
+	static function cast($value)
+	{
+		return new self ($value);
+	}
 }
 
 ?>

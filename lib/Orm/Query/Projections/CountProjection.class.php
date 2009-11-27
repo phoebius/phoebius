@@ -27,22 +27,19 @@ class CountProjection extends AggrProjection
 		parent::__construct('COUNT', $property ? $property : 'id', $alias);
 	}
 
-	/**
-	 * @return ISqlValueExpression
-	 */
-	protected function getValueExpression(EntityQuery $entityQuery)
+	protected function getValueExpression(EntityQueryBuilder $builder)
 	{
 		if ($this->lookupProperty) {
 			return
 				new AliasedSqlValueExpression(
-					$entityQuery->subject(
-						$entityQuery->getEntity()->getLogicalSchema()->getIdentifier()
+					$builder->subject(
+						$builder->getEntity()->getLogicalSchema()->getIdentifier()
 					),
-					$this->alias
+					$this->getAlias()
 				);
 		}
 
-		return parent::getValueExpression($entityQuery);
+		return parent::getValueExpression($builder);
 	}
 }
 

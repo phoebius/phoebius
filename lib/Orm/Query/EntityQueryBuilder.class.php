@@ -64,7 +64,7 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$this->entityQuery = $entityQuery;
 
-		$this->table = $entityQuery->getEntity()->getPhysicalSchema()->getTable();
+		$this->table = $entityQuery->getPivot()->getPhysicalSchema()->getTable();
 		$this->alias =
 			$alias
 				? $alias
@@ -88,6 +88,14 @@ final class EntityQueryBuilder implements ISubjectivity
 	function getTable()
 	{
 		return $this->table;
+	}
+
+	/**
+	 * @return IQueryable
+	 */
+	function getEntity()
+	{
+		return $this->entityQuery->getPivot();
 	}
 
 	function getSelectQuerySources()
@@ -116,7 +124,7 @@ final class EntityQueryBuilder implements ISubjectivity
 		}
 
 		if ($subject instanceof OrmProperty) {
-			return $this->subject(new EntityProperty($this, $subject));
+			return $this->subject(new EntityProperty($this->alias, $subject));
 		}
 
 		if ($subject instanceof EntityProperty) {
@@ -143,7 +151,7 @@ final class EntityQueryBuilder implements ISubjectivity
 						$this->getEntityProperty($subject)
 					);
 			}
-			catch (OrmModelIntegrityException $e) {
+			catch (ArgumentException $e) {
 				// probably, a value, not a property path
 			}
 		}
@@ -189,7 +197,7 @@ final class EntityQueryBuilder implements ISubjectivity
 				$this->propertyCache[$property] =
 					new EntityProperty(
 						$this->alias,
-						$this->entityQuery->getEntity()->getLogicalSchema()->getProperty($property)
+						$this->getEntity()->getLogicalSchema()->getProperty($property)
 					);
 			}
 		}

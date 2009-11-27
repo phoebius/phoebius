@@ -48,11 +48,11 @@ class BoxablePropertyType extends PrimitivePropertyType
 		return $this->boxableType;
 	}
 
-	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
-		Assert::isTrue($values->count() == 1);
+		Assert::isTrue(sizeof($tuple) == 1);
 
-		$value = $values->getFirst();
+		$value = reset($tuple);
 
 		if (is_null($value) && $this->isNullable()) {
 			return null;

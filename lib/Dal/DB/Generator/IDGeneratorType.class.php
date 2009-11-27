@@ -24,6 +24,16 @@ final class IDGeneratorType extends Enumeration
 	const PRE = 1;
 	const POST = 2;
 	const BOTH = 3;
+
+	function isPre()
+	{
+		return in_array($this->getValue(), array(self::PRE, self::BOTH));
+	}
+
+	function isPost()
+	{
+		return in_array($this->getValue(), array(self::POST, self::BOTH));
+	}
 }
 
 ?>

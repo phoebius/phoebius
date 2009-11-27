@@ -84,9 +84,9 @@ final class FundamentalPropertyType
 		return new PropertyValueGenerator($this, $generator);
 	}
 
-	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
-		$value = parent::assemble($values, $fetchStrategy);
+		$value = parent::assemble($tuple, $fetchStrategy);
 
 		if (!is_null($value)) {
 			if ($this->type->is(DBType::BOOLEAN)) {

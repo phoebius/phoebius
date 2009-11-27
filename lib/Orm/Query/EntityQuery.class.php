@@ -98,7 +98,7 @@ final class EntityQuery implements ISqlSelectQuery
 	/**
 	 * @return IQueryable
 	 */
-	function getEntity()
+	function getPivot()
 	{
 		return $this->entity;
 	}
@@ -271,20 +271,38 @@ final class EntityQuery implements ISqlSelectQuery
 		return $this->condition->toSubjected(new EntityQueryBuilder($this));
 	}
 
-	function getCustomList(){}
-	function getObject(){}
-	function getRow(){}
-	function getCell(){}
+	function getEntity()
+	{
+		return $this->entity->getDao()->getEntity($this);
+	}
+
+	function getRow()
+	{
+		return $this->entity->getDao()->getRow($this);
+	}
+
+	function getCell()
+	{
+		return $this->entity->getDao()->getCell($this);
+	}
 
 	function getList()
 	{
-		return $this->entity->getDao()->getListByQuery($this);
+		return $this->entity->getDao()->getList($this);
 	}
 
 	function getCount()
 	{
 		return $this->entity->getDao()->getCell(
 			$this->makeSelect(Projection::rowCount())
+		);
+	}
+
+	function getProperty($property)
+	{
+		return $this->entity->getDao()->getProperty(
+			$property,
+			$this->makeSelect(Projection::property($property))
 		);
 	}
 

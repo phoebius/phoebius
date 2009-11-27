@@ -231,6 +231,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 		//only try, nevermind if it fails
 		$this->lockCacheFile();
 
+		$found = false;
 		$found = $this->invokeResolvers($classname, true);
 
 		if (!$found) {

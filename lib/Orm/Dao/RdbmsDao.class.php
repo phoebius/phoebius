@@ -47,14 +47,12 @@ class RdbmsDao implements IOrmEntityAccessor
 	private $map;
 
 	/**
-	 * null if orm entity is identifierless
-	 * @var OrmIdentityMap|null
+	 * @var OrmIdentityMap
 	 */
 	private $identityMap;
 
 	/**
-	 * null if orm entity is identifierless
-	 * @var OrmProperty|null
+	 * @var OrmProperty
 	 */
 	private $identifier;
 
@@ -70,11 +68,12 @@ class RdbmsDao implements IOrmEntityAccessor
 		$this->map = $entity->getMap();
 		$this->logicalSchema = $entity->getLogicalSchema();
 		$this->physicalSchema = $entity->getPhysicalSchema();
+		$this->identifier = $this->logicalSchema->getIdentifier();
 		$this->identityMap = new OrmIdentityMap($this->logicalSchema);
 	}
 
 	/**
-	 * @return DbDao
+	 * @return RdbmsDao
 	 */
 	function setFetchStrategy(FetchStrategy $fs)
 	{
@@ -95,84 +94,107 @@ class RdbmsDao implements IOrmEntityAccessor
 		return $this->fetchStrategy;
 	}
 
-	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
-	 */
-	function getById($id)
+	function getCell(ISqlSelectQuery $query)
 	{
-		$entity = $this->identityMap->getLazy($id);
+		$query->setLimit(1);
 
-		// Avoid replace this code with $entity->fetch() because IdentifiableOrmEntity::fetch()
-		// calls RdbmsDao::getById() to be filled with data
+		return $this->getDB()->getCell($query);
+	}
+
+	function getProperty($property, ISqlSelectQuery $query)
+	{
+		$query->setLimit(1);
+
+		$row = $this->getDB()->getRow($query);
+
+		$object =
+			$this->logicalSchema
+				->getProperty($property)
+				->getType()
+				->assemble($row, $this->getFetchStrategy());
+
+		return $object;
+	}
+
+	function getLazyEntityById($id)
+	{
+		return $this->identityMap->getLazy($id);
+	}
+
+	function getEntityById($id)
+	{
+		$entity = $this->getLazyById($id);
+
 		if (!OrmUtils::isFetchedEntity($entity)) {
+			$query =
+				EntityQuery::create($this->entity)
+					->setLimit(1)
+					->where(Expression::eq($this->identifier, $id));
+
 			try {
-				$row = $this->getDB()->getRow(
-					EntityQuery::create($this->entity)
-						->setLimit(1)
-						->where(
-							Expression::eq($this->identifier, $id)
-						)
-					);
+				$row = $this->getRow($query);
 			}
 			catch (RowNotFoundException $e) {
 				throw new OrmEntityNotFoundException($this->logicalSchema);
 			}
 
-			$this->buildEntity(
-				$entity,
-				$row
-			);
+			$this->map->assemble($entity, $row, $this->getFetchStrategy());
 		}
 
 		return $entity;
 	}
 
-	/**
-	 * @return OrmEntity
-	 */
-	function getLazyById($id)
+	function getEntity(ISqlSelectQuery $query)
 	{
-		return $this->identityMap->getLazy($id);
+		try {
+			$row = $this->getRow($query);
+		}
+		catch (RowNotFoundException $e) {
+			throw new OrmEntityNotFoundException($this->logicalSchema);
+		}
+
+		$entity = $this->logicalSchema->getNewEntity();
+		$this->map->assemble($entity, $row, $this->getFetchStrategy());
+
+		$this->identityMap->add($entity);
+
+		return $entity;
 	}
 
-	/**
-	 * Similar to IOrmEntityAccessor::getById() but for multiple entities at once. If one or more
-	 * entities of the set not found, they won't be presented in the result set of entities
-	 * @return array of {@link OrmEntity}
-	 */
+	function getRow(ISqlSelectQuery $query)
+	{
+		return $this->getDB()->getRow($query);
+	}
+
 	function getByIds(array $ids)
 	{
-		$fetched = array();
+		$entitySet = array();
 		$toFetch = array();
-		$toFetchIds = array();
 
 		foreach ($ids as $id) {
 			$entity = $this->identityMap->getLazy($id);
 
-			if (OrmUtils::isFetchedEntity($entity)) {
-				$fetched[] = $entity;
+			if (!OrmUtils::isFetchedEntity($entity)) {
+				$toFetch[$id] = $entity;
 			}
 			else {
-				$toFetch[spl_object_hash($entity)] = $entity;
-				$toFetchIds[] = $id;
+				$entitySet[$id] = $entity;
 			}
 		}
 
 		if (!empty($toFetch)) {
-			$fetchExpression = Expression::orChain();
+			$query =
+				EntityQuery::create($this->entity)
+					->where(
+						Expression::in($this->identifier, array_keys($toFetch))
+					);
 
-			foreach ($toFetchIds as $id) {
-				$fetchExpression->add(
-					Expression::eq($this->identifier, $id)
-				);
-			}
+			$fetched = $this->getList($query);
 
-			$newFetched = $this->getListBy($this->toExpression($fetchExpression));
-
-			foreach ($newFetched as $entity) {
-				unset ($toFetch[spl_object_hash($entity)]);
-				$fetched[] = $entity;
+			foreach ($fetched as $entity) {
+				$id = $entity->_getId();
+				$entitySet[$id] = $entity;
+				unset ($toFetch[$id]);
 			}
 
 			// if there were some ID collisions - we should remove them from identityMap
@@ -183,353 +205,155 @@ class RdbmsDao implements IOrmEntityAccessor
 			}
 		}
 
-		return $fetched;
+		return $entitySet;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getList()
+	function getList(ISqlSelectQuery $query = null)
 	{
-		return $this->getListByQuery(
-			$this->getSelectQuery()
-		);
-	}
+		$rows = $this->getRows($query);
 
-	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
-	 */
-	function getBy(IExpression $condition)
-	{
-		return $this->getByQuery(
-			$this->getSelectQuery()->setExpression($condition)
-		);
-	}
-
-	/**
-	 * @return array of {@link OrmEntity}
-	 */
-	function getListBy(IExpression $condition)
-	{
-		return $this->getListByQuery(
-			$this->getSelectQuery()->setExpression($condition)
-		);
-	}
-
-	/**
-	 * @throws OrmEntityNotFoundException
-	 * @return OrmEntity
-	 */
-	function getByQuery(ISqlSelectQuery $query)
-	{
-		return $this->buildEntity(
-			$this->logicalSchema->getNewEntity(),
-			$this->getDbValueSetByQuery($query)
-		);
-	}
-
-	private function getDbValueSetByQuery(ISqlSelectQuery $query)
-	{
-		$query->setLimit(1);
-
-		try {
-			return $this->getDB()->getRow($query);
-		}
-		catch (RowNotFoundException $e) {
-			throw new OrmEntityNotFoundException($this->logicalSchema);
-		}
-	}
-
-	/**
-	 * @return OrmEntity
-	 */
-	private function buildEntity(OrmEntity $entity, array $dbValues)
-	{
-		$id = $entity->_getId();
-		$entity->_setId(null);
-		$entity->fetch();
-		$entity->_setId($id);
-
-		$rawValueSet = array();
-		foreach ($this->logicalSchema->getProperties() as $propertyName => $property) {
-			foreach ($property->getFields() as $columnName) {
-				$rawValueSet[$propertyName][] = $dbValues[$columnName];
-			}
+		$entitySet = array ();
+		foreach ($rows as $row) {
+			$entity = $this->map->assemble($this->logicalSchema->getNewEntity(), $row, $this->getFetchStrategy());
+			$entitySet[] = $entity;
+			$this->identityMap->add($entity);
 		}
 
-		$this->map->setRawValues($entity, $rawValueSet, $this->getFetchStrategy());
-
-
-		$this->identityMap->add($entity);
-
-		return $entity;
+		return $entitySet;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getListByQuery(ISqlSelectQuery $query)
+	function getRows(ISqlSelectQuery $query = null)
 	{
+		if (!$query) {
+			$query = EntityQuery::create($this->entity);
+		}
+
 		$rows = $this->getDB()->getRows($query);
 
-		$entities = array();
+		return $rows;
+	}
 
-		if (!empty($rows)) {
+	function getColumn(ISqlSelectQuery $query)
+	{
+		return $this->getDB()->getColumn($query);
+	}
 
-			$batchId = $this->map->beginBatchFetchingMode();
+	function getPropertyList($property, ISqlSelectQuery $query = null)
+	{
+		$property = $this->logicalSchema->getProperty($property);
+		$type = $property->getType();
 
-			foreach ($rows as $row) {
-				$entities[] = $this->buildEntity($this->logicalSchema->getNewEntity(), $row);
-			}
-
-			 $this->map->commitBatchFetchingMode($batchId);
+		if (!$query) {
+			$query =
+				EntityQuery::create($this->entity)
+					->get(Projection::property($property));
 		}
 
-		return $entities;
+		$rows = $this->getRows($query);
+		$propertySet = $type->assebmleSet($rows, $this->getFetchStrategy());
+
+		return $propertySet;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getCustomRowByQuery(ISqlSelectQuery $query)
-	{
-		return $this->getDB()->getRow($query);
-	}
-
-	/**
-	 * @return array
-	 */
-	function getCustomRowsByQuery(ISqlSelectQuery $query)
-	{
-		return $this->getDB()->getRows($query);
-	}
-
-	/**
-	 * Returns the number of affected rows
-	 * @return integer
-	 */
-	function sendQuery(ISqlQuery $query)
+	function executeQuery(ISqlQuery $query)
 	{
 		$result = $this->getDB()->sendQuery($query, false);
 		return $this->getDB()->getAffectedRowsNumber($result);
 	}
 
-	/**
-	 * @return boolean
-	 */
-	function dropById($id)
+	function dropEntityById($id)
 	{
-		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getTable())
-				->setExpression(
-					$this->getExpression(
-						Expression::eq(
-							$this->identifier,
-							$id
-						)
-					)
-				)
-		);
+		$query =
+			EntityQuery::create($this->entity)
+				->where(
+					Expression::eq($this->identifier, $id)
+				);
 
-		$this->identityMap->drop($id);
-
-		Assert::isTrue(($affected == 0) || ($affected == 1));
-
-		return $affected == 1;
+		return $this->executeQuery($query);
 	}
 
-	/**
-	 * @return integer
-	 */
-	function dropByIds(array $ids)
+	private function insert(IdentifiableOrmEntity $entity)
 	{
-		$expression = Expression::orChain();
+		$id = $entity->_getId();
+		$idType = $this->identifier->getType();
 
-		foreach ($ids as $id) {
+		$generator =
+			$id && $idType instanceof IOrmEntityIdGenerator
+				? $idType->getIdGenerator($entity)
+				: null;
 
-			$this->identityMap->drop($id);
+		$generatorType =
+			$generator
+				? $generator->getType()
+				: null;
 
-			$expression->add(
-				Expression::eq(
-					$this->identifier,
-					$id
-				)
-			);
-		}
-
-		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getTable())
-				->setExpression(
-					$this->getExpression($expression)
-				)
-		);
-
-		return $affected;
-	}
-
-	/**
-	 * @return integer
-	 */
-	function dropBy(IExpression $condition)
-	{
-		$affected = $this->sendQuery(
-			DeleteQuery::create($this->physicalSchema->getTable())
-				->setExpression($condition)
-		);
-
-		if ($this->identityMap && $affected > 0) {
-			$this->identityMap->clean();
-		}
-
-		return $affected;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function drop(IdentifiableOrmEntity $entity)
-	{
-		return $this->dropById($entity->_getId());
-	}
-
-	/**
-	 * @return SqlFieldValueCollection
-	 */
-	private function getFieldValueCollection(OrmEntity $entity)
-	{
-		$fvc = new SqlFieldValueCollection();
-		foreach ($this->map->getRawValues($entity) as $propertyName => $rawValue) {
-			$fvc->append(
-				array_combine(
-					$this->logicalSchema->getProperty($propertyName)->getFields(),
-					$rawValue
-				)
-			);
-		}
-
-		return $fvc;
-	}
-
-	/**
-	 * @return IExpression
-	 */
-	private function getExpression(IExpression $expression)
-	{
-		Assert::notImplemented();
-
-		return EntityQuery::create($this->entity)
-			->where($expression)
-			->toExpression();
-	}
-
-	/**
-	 * @return OrmEntity
-	 */
-	function save(OrmEntity $entity)
-	{
-		$fetched = true;
-
-		if ($this->identifier) {
-			$id = $entity->_getId();
-			$idOrmPropertyType = $this->identifier->getType();
-
-			// INSERT
-			if (empty($id)) {
-				if ($idOrmPropertyType instanceof IGenerated) {
-					$fetched = false;
-					$id = $idOrmPropertyType->preGenerate(
-						$this->getDB(),
-						$this->physicalSchema->getTable(),
-						$this->identifier
-					);
-				}
+		if ($generatorType && $generatorType->isPre()) {
+			$id = $generator->generate($entity);
+			if ($id) {
+				$entity->_setId($id);
 			}
-
-			$entity->_setId(null);
-			$entity->fetch();
-			$entity->_setId($id);
 		}
 
-		$fvc = $this->getFieldValueCollection($entity);
+		$affected = $this->executeQuery(
+			new InsertQuery(
+				$this->physicalSchema->getTable(),
+				new SqlFieldValueCollection($this->map->disassemble($entity))
+			)
+		);
 
-		if ($this->identifier && $fetched) {
-			$affected = $this->sendQuery(
-				new UpdateQuery(
-					$this->physicalSchema->getTable(),
-					$fvc,
-					$this->getExpression(
-						Expression::eq($this->identifier, $entity->_getId())
-					)
-				)
-			);
-
-			Assert::isTrue(($affected == 0) || ($affected == 1));
-
-			if ($affected == 1) {
-				return $entity;
+		if ($generatorType && $generatorType->isPost()) {
+			$id = $generator->generate($entity);
+			if ($id) {
+				$entity->_set($id);
 			}
-			else { // for mysql
-				$trySafeInsert = true;
+		}
+
+		$this->identityMap->add($entity);
+	}
+
+	private function update(IdentifiableOrmEntity $entity)
+	{
+		$affected = $this->executeQuery(
+			new UpdateQuery(
+				$this->physicalSchema->getTable(),
+				$this->map->disassemble($entity),
+				EntityQuery::create($this->entity)
+					->where(Expression::eq($this->identifier, $entity->_getId()))
+					->toExpression()
+			)
+		);
+
+		return $affected > 0;
+	}
+
+	function saveEntity(IdentifiableOrmEntity $entity)
+	{
+		$id = $entity->_getId();
+
+		$entity->_setId(null);
+		$entity->fetch();
+		$entity->_setId($id);
+
+		if ($id) {
+			$updated = $this->update($entity);
+
+			if ($updated) {
+				return true;
 			}
 		}
 
 		try {
-			$affected = $this->sendQuery(
-				new InsertQuery(
-					$this->physicalSchema->getTable(),
-					$fvc
-				)
-			);
+			$this->insert($entity);
 		}
 		catch (UniqueViolationException $e) {
-			if (isset($trySafeInsert)) {
-				return $entity;
+			if (!$id) {
+				throw $e;
 			}
-
-			throw $e;
 		}
 
-		Assert::isTrue($affected == 1);
-
-		if ($this->identifier && !$fetched) {
-			$id = $idOrmPropertyType->getGeneratedId(
-				$this->getDB(),
-				$this->physicalSchema->getTable(),
-				$this->identifier
-			);
-
-			$entity->_setId($id);
-		}
-
-		if ($this->identityMap) {
-			$this->identityMap->add($entity);
-		}
-
-		return $entity;
+		return true;
 	}
 
-	/**
-	 * @return SelectQuery
-	 */
-	function getSelectQuery()
-	{
-		$table = $this->physicalSchema->getTable();
-
-		$selectQuery =
-			SelectQuery::create()
-				->from($table);
-
-		foreach ($this->physicalSchema->getFields() as $field) {
-			$selectQuery->get(
-				$field,
-				null,
-				$table
-			);
-		}
-
-		return $selectQuery;
-	}
 
 	/**
 	 * @return DB

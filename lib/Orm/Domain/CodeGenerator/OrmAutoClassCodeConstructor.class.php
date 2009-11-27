@@ -150,7 +150,7 @@ EOT;
 				$this->classMethods[] = <<<EOT
 	function _getId()
 	{
-		return \$this->get{$property->getGetter()}();
+		return \$this->{$property->getGetter()}();
 	}
 EOT;
 			}

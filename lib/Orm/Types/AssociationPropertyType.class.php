@@ -104,10 +104,10 @@ final class AssociationPropertyType extends OrmPropertyType
 		return $this->container->getLogicalSchema()->getEntityName();
 	}
 
-	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
 		try {
-			$id = $this->fkType->assemble($values, $fetchStrategy);
+			$id = $this->fkType->assemble($tuple, $fetchStrategy);
 		}
 		catch (OrmModelIntegrityException $e) {
 			$id = null;
@@ -133,13 +133,13 @@ final class AssociationPropertyType extends OrmPropertyType
 		return $entity;
 	}
 
-	function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
+	function assebmleSet(array $tuples, FetchStrategy $fetchStrategy)
 	{
 		$ids = array();
 
-		foreach ($valueSet as $dbValueArray) {
+		foreach ($tuples as $tuple) {
 			try {
-				$ids[] = $this->fkType->assemble($dbValueArray, $fetchStrategy);
+				$ids[] = $this->fkType->assemble($tuple, $fetchStrategy);
 			}
 			catch (OrmModelIntegrityException $e) {
 				if (!$this->isNullable()) {

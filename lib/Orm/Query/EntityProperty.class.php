@@ -32,10 +32,23 @@ final class EntityProperty
 	 */
 	private $property;
 
+	/**
+	 * @var OrmPropertyType
+	 */
+	private $type;
+
 	function __construct($owner, OrmProperty $property)
 	{
 		$this->owner = $owner;
 		$this->property = $property;
+		$type = $property->getType();
+
+		Assert::isTrue(
+			$type->getColumnCount() == 1,
+			'composite property querying is not yet supported (`%s`.`%s` is illegal for EntityQuery)',
+			$owner,
+			$property->getName()
+		);
 	}
 
 	/**
@@ -60,11 +73,6 @@ final class EntityProperty
 	function getSqlColumn()
 	{
 		$fields = $this->property->getFields();
-
-		Assert::isTrue(
-			sizeof($fields) == 1,
-			'single-field properties are supported'
-		);
 
 		$field = reset($fields);
 

@@ -44,11 +44,11 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 		return null;
 	}
 
-	function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
-		Assert::isTrue($values->count() == 1);
+		Assert::isTrue(count($tuple) == 1);
 
-		return $values->getFirst();
+		return reset($tuple);
 	}
 
 	function disassemble($value)

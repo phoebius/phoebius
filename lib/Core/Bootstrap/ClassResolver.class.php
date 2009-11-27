@@ -76,7 +76,7 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 				return true;
 			}
 			catch (ExecutionContextException $e) {
-				if ($e->getSeverity() == E_WARNING) {
+				if ($e->getSeverity() == E_WARNING && $e->getFile() == __FILE__) {
 					unset($this->foundClasspaths[$classname]);
 					$this->uncache($classname);
 
@@ -88,6 +88,8 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 						return true;
 					}
 				}
+
+				die($e->getMessage());
 
 				throw $e;
 			}

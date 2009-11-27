@@ -16,7 +16,7 @@
  *
  ************************************************************************************************/
 
-class AggrProjection extends PropertyProjection
+class AggrProjection extends RawProjection
 {
 	private $func;
 

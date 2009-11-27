@@ -27,7 +27,6 @@ interface IIDGenerator
 	 * @return mixed
 	 */
 	function generate(IdentifiableOrmEntity $entity);
-
 }
 
 ?>

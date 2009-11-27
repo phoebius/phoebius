@@ -18,15 +18,10 @@
 
 final class GroupByPropertyProjection extends PropertyProjection
 {
-	function __construct($property)
-	{
-		parent::__construct($property);
-	}
-
-	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	protected function fillPropertyField($field, SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
 		$selectQuery->groupBy(
-			$this->getValueExpression($entityQuery)
+			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);
 	}
 }

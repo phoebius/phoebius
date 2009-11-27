@@ -32,16 +32,17 @@ interface IOrmEntityMapper
 	function setProperties(OrmEntity $entity, array $properties);
 
 	/**
+	 * entity -> tuple
 	 * @return array
 	 */
-	function getRawValues(OrmEntity $entity);
+	function disassemble(OrmEntity $entity);
 
 	/**
 	 * Array->entity mapping (aka entity assembler). Creates a new entity and performs 1:1 mapping
 	 * by filling the values specified by the array
 	 * @return OrmEntity
 	 */
-	function setRawValues(OrmEntity $entity, array $rawValues, FetchStrategy $fetchStrategy);
+	function assemble(OrmEntity $entity, array $tuple, FetchStrategy $fetchStrategy);
 
 	/**
 	 * @return integer batch fetching id

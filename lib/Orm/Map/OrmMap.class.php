@@ -91,19 +91,16 @@ final class OrmMap implements IOrmEntityMapper
 		return $entity;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getRawValues(OrmEntity $entity)
+	function disassemble(OrmEntity $entity)
 	{
-		$rawValues = array();
+		$tuple = array();
+
 		foreach ($this->logicalSchema->getProperties() as $property) {
 			if (!$property->getVisibility()->isGettable()) {
 				continue;
 			}
 
-			$getter = $property->getGetter();
-			$value = $entity->$getter();
+			$value = $entity->{$property->getGetter()}();
 
 			if (is_null($value)) {
 				if ($this->logicalSchema->getIdentifier() === $property) {
@@ -115,51 +112,46 @@ final class OrmMap implements IOrmEntityMapper
 				}
 			}
 
-			$rawValues[$property->getName()] = $property->getType()->disassemble($value);
+			foreach ($property->getType()->disassemble($value) as $field => $value) {
+				$tuple[$field] = $value;
+			}
 		}
 
-		return $rawValues;
+		return $tuple;
 	}
 
 	/**
 	 * @return OrmEntity
 	 */
-	function setRawValues(OrmEntity $entity, array $rawValues, FetchStrategy $fetchStrategy)
+	function assemble(OrmEntity $entity, array $tuple, FetchStrategy $fetchStrategy)
 	{
 		foreach ($this->logicalSchema->getProperties() as $property) {
 			if (!$property->getVisibility()->isSettable()) {
 				continue;
 			}
 
-			if (isset ($rawValues[$property->getName()])) {
-				$rawValue = $rawValues[$property->getName()];
+			$propertyTuple = array();
+			foreach ($property->getFields() as $field) {
+				$propertyTuple[$field] = $tuple[$field];
+			}
 
-				Assert::isTrue(
-					is_array($rawValue)
-					&& array_keys($rawValue) === array_keys($property->getType()->getSqlTypes()),
-					'wrong raw value %s for property %s',
-					$rawValue,
-					$property->getName()
+			// FIXME: batch fetching mode fails, see sheduling mechanism
+			if (false && $this->batchFetchingLevel > 0) {
+				$this->scheduleBatchFetch(
+					$entity,
+					$property,
+					$propertyTuple,
+					$fetchStrategy
 				);
-
-				// FIXME: batch fetching mode fails, see sheduling mechanism
-				if (false && $this->batchFetchingLevel > 0) {
-					$this->scheduleBatchFetch(
-						$entity,
-						$property,
-						new DBValueArray($rawValue),
+			}
+			else {
+				$setter = $property->getSetter();
+				$entity->$setter(
+					$property->getType()->assemble(
+						$propertyTuple,
 						$fetchStrategy
-					);
-				}
-				else {
-					$setter = $property->getSetter();
-					$entity->$setter(
-						$property->getType()->assemble(
-							new DBValueArray($rawValue),
-							$fetchStrategy
-						)
-					);
-				}
+					)
+				);
 			}
 		}
 

@@ -55,12 +55,12 @@ abstract class ContainerPropertyType extends OrmPropertyType
 		return null;
 	}
 
-	final function assemble(DBValueArray $values, FetchStrategy $fetchStrategy)
+	final function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
 		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
 	}
 
-	final function assebmleSet(array $valueSet, FetchStrategy $fetchStrategy)
+	final function assebmleSet(array $tuples, FetchStrategy $fetchStrategy)
 	{
 		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
 	}
