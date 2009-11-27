@@ -47,7 +47,7 @@ final class PropertyValueGenerator implements IIDGenerator
 		$value = $this->generator->generate($entity);
 
 		if (!is_null($value)) {
-			$value = $this->type->makeValue(
+			$value = $this->type->assemble(
 				array($value),
 				new FetchStrategy(FetchStrategy::CASCADE)
 			);

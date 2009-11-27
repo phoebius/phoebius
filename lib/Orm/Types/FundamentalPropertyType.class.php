@@ -60,7 +60,7 @@ final class FundamentalPropertyType
 		$identifier = $orm->getLogicalSchema()->getIdentifier();
 
 		Assert::isTrue(
-			$identifier->getType() === $this,
+			$identifier->getType() == $this,
 			'plz pass the corresponding entity'
 		);
 
@@ -78,7 +78,8 @@ final class FundamentalPropertyType
 
 		$generator = $db->getGenerator(
 			$orm->getPhysicalSchema()->getTable(),
-			reset ($fields)
+			reset ($fields),
+			$this->type
 		);
 
 		return new PropertyValueGenerator($this, $generator);

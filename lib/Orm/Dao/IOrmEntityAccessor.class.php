@@ -29,7 +29,7 @@ interface IOrmEntityAccessor
 	 * The resulting value is not mapped to any of entity properties.
 	 * For straight mapping see IOrmEntityAccessor::getProperty()
 	 *
-	 * @warning A query MUST define only a single database column to retrieve because only the first found
+	 * @warning A query MUST define only a single database column to be retrieved because only the first found
 	 * cell is used as the resulting value.
 	 *
 	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
@@ -44,7 +44,7 @@ interface IOrmEntityAccessor
 	/**
 	 * Gets an entity property mapped from a the database cells of a specific tuple.
 	 *
-	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 * @warning A query MUST define for retrieval at least all those database columns that are needed to assemble an entity
 	 *
 	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
 	 *
@@ -84,7 +84,7 @@ interface IOrmEntityAccessor
 	/**
 	 * Gets the IdentifiableOrmEntity object by query.
 	 *
-	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 * @warning A query MUST define for retrieval at least all those database columns that are needed to assemble an entity
 	 *
 	 * @warning A query MUST be able to limit the resulting rows count to a signle tuple (see ISqlSelectQuery::setLimit()).
 	 *
@@ -133,7 +133,7 @@ interface IOrmEntityAccessor
 	 *
 	 * If query is not presented then ALL possible objects are fetched.
 	 *
-	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 * @warning A query MUST define for retrieval at least all those database columns that are needed to assemble an entity
 	 *
 	 * @param ISqlSelectQuery $query optinal query to execute
 	 * @return array set of IdentifiableOrmEntity objects
@@ -174,7 +174,7 @@ interface IOrmEntityAccessor
 	 * If query is not presented then a resulting property set would be collected from ALL
 	 * objectes presented in the DB.
 	 *
-	 * @warning A query MUST already define for retrieval at least all the database columns that are needed to assemble an entity
+	 * @warning A query MUST define for retrieval at least all those database columns that are needed to assemble an entity
 	 *
 	 * @param string $property name of an entity property
 	 * @param ISqISqlSelectQuery $query query to execute

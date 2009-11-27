@@ -361,11 +361,9 @@ class PgSqlDB extends DB
 	{
 		$query =
 			SelectQuery::create()
-				->getExpr(
-					SqlFunction::create('nextval')->addArg(
-						new SqlValue(
-							$this->getDialect()->getSequenceName($tableName, $columnName)
-						)
+				->get(
+					SqlFunction::create(
+						'nextval', new SqlValue($this->getDialect()->getSequenceName($tableName, $columnName))
 					)
 				);
 

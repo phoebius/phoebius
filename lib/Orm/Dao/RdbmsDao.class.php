@@ -123,7 +123,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 	function getEntityById($id)
 	{
-		$entity = $this->getLazyById($id);
+		$entity = $this->getLazyEntityById($id);
 
 		if (!OrmUtils::isFetchedEntity($entity)) {
 			$query =
@@ -278,7 +278,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$idType = $this->identifier->getType();
 
 		$generator =
-			$id && $idType instanceof IOrmEntityIdGenerator
+			!$id && $idType instanceof IOrmEntityIdGenerator
 				? $idType->getIdGenerator($entity)
 				: null;
 

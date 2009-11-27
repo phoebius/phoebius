@@ -29,7 +29,7 @@ abstract class OrmEntity implements IOrmRelated
 	{
 		if ($this instanceof IDaoRelated) {
 			$dao = call_user_func(array(get_class($this), 'dao'));
-			$dao->save($this);
+			$dao->saveEntity($this);
 		}
 
 		return $this;

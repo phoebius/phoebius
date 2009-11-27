@@ -292,8 +292,8 @@ class Date implements IBoxable, IOrmPropertyAssignable
 			throw new ArgumentException('string', 'wrong modification');
 		}
 
-		$this->int = $time;
-		$this->import($this->int);
+		//$this->int = $time;
+		$this->import($time);
 
 		return $this;
 	}
@@ -390,17 +390,14 @@ class Date implements IBoxable, IOrmPropertyAssignable
 	 */
 	protected function import($int)
 	{
-		if ($int) {
-			list($this->year, $this->month, $this->day) = explode('.', date('Y.m.d', $int));
+		list($this->year, $this->month, $this->day) = explode('.', date('Y.m.d', $int));
 
-			if (checkdate($this->month, $this->day, $this->year)) {
-				$this->int = $this->getDayStartStamp();
-
-				return;
-			}
+		if (checkdate($this->month, $this->day, $this->year)) {
+			$this->int = $int;
 		}
-
-		throw new TypeCastException(__CLASS__, 'specified string is not a valid date');
+		else {
+			throw new TypeCastException(__CLASS__, 'specified string is not a valid date');
+		}
 	}
 
 	/**

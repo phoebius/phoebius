@@ -49,7 +49,7 @@ class PgSqlDialect extends Dialect
 		// date and time
 		DBType::DATE => 'date',
 		DBType::TIME => 'time',
-		DBType::DATETIME => 'datetime',
+		DBType::DATETIME => 'timestamp',
 	);
 
 	function __construct()

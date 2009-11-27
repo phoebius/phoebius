@@ -103,7 +103,11 @@ final class OrmMap implements IOrmEntityMapper
 			$value = $entity->{$property->getGetter()}();
 
 			if (is_null($value)) {
-				if ($this->logicalSchema->getIdentifier() === $property) {
+				if ($property->isIdentifier()) {
+					continue;
+				}
+
+				if ($property->isNullable()) {
 					continue;
 				}
 
@@ -112,8 +116,10 @@ final class OrmMap implements IOrmEntityMapper
 				}
 			}
 
-			foreach ($property->getType()->disassemble($value) as $field => $value) {
-				$tuple[$field] = $value;
+			$fields = $property->getFields();
+			foreach ($property->getType()->disassemble($value) as $k => $value) {
+				$tuple[current($fields)] = $value;
+				next($fields);
 			}
 		}
 
