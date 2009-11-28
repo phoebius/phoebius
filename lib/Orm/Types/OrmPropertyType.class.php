@@ -37,11 +37,6 @@ abstract class OrmPropertyType
 	abstract function disassemble($value);
 
 	/**
-	 * @return boolean
-	 */
-	abstract function isNullable();
-
-	/**
 	 * Returns an array of ISqlType for the property
 	 * @return array of key=>ISqlType
 	 */
@@ -88,7 +83,7 @@ abstract class OrmPropertyType
 			($implClass = $this->getImplClass())
 				? $implClass
 				: 'mixed';
-		if ($this->isNullable()) {
+		if ($property->getMultiplicity()->isNullable()) {
 			$returnValue .= '|null';
 		}
 
@@ -119,7 +114,7 @@ EOT;
 				: 'scalar';
 
 		$defaultValue =
-			$this->isNullable()
+			$property->getMultiplicity()->isNullable()
 				? ' = null'
 				: '';
 
@@ -147,7 +142,7 @@ EOT;
 				? $typeImpl
 				: 'scalar';
 
-		if ($this->isNullable()) {
+		if ($property->getMultiplicity()->isNullable()) {
 			$typeImpl .= '|null';
 		}
 

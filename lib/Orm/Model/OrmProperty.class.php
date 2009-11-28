@@ -42,6 +42,11 @@ class OrmProperty
 	private $visibility;
 
 	/**
+	 * @var AssociationMultiplicity
+	 */
+	private $multiplicity;
+
+	/**
 	 * @var array
 	 */
 	private $fields = array();
@@ -63,6 +68,7 @@ class OrmProperty
 			array $fields,
 			OrmPropertyType $type,
 			OrmPropertyVisibility $visibility,
+			AssociationMultiplicity $multiplicity,
 			$isUnique = false,
 			$isIdentifier = false
 		)
@@ -84,8 +90,17 @@ class OrmProperty
 			sizeof($this->type->getSqlTypes()) < 1
 				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
 				: $visibility;
+		$this->multiplicity = $multiplicity;
 		$this->isUnique = $isUnique;
 		$this->isIdentifier = $isIdentifier;
+	}
+
+	/**
+	 * @return AssociationMultiplicity
+	 */
+	function getMultiplicity()
+	{
+		return $this->multiplicity;
 	}
 
 	/**
@@ -172,6 +187,7 @@ class OrmProperty
 			'array(' . join(', ', $fields).')',
 			$this->type->toPhpCodeCall(),
 			"new OrmPropertyVisibility(OrmPropertyVisibility::{$this->visibility->getId()})",
+			"new AssociationMultiplicity(AssociationMultiplicity::{$this->multiplicity->getId()})",
 			$this->isUnique
 				? 'true'
 				: 'false',

@@ -197,12 +197,6 @@ final class AssociationPropertyType extends OrmPropertyType
 
 	function disassemble($value)
 	{
-		if (is_null($value)) {
-			if (!$this->isNullable()) {
-				throw new OrmModelIntegrityException('cannot be null');
-			}
-		}
-
 		return
 			$this->fkType->disassemble(
 				is_null($value)
@@ -213,11 +207,6 @@ final class AssociationPropertyType extends OrmPropertyType
 							: $value
 					)
 			);
-	}
-
-	function isNullable()
-	{
-		return $this->multiplicity->is(AssociationMultiplicity::ZERO_OR_ONE);
 	}
 
 	function getSqlTypes()
@@ -236,7 +225,7 @@ final class AssociationPropertyType extends OrmPropertyType
 			($implClass = $this->getImplClass())
 				? $implClass
 				: 'mixed';
-		if ($this->isNullable()) {
+		if ($property->getMultiplicity()->isNullable()) {
 			$returnValue .= '|null';
 		}
 

@@ -70,11 +70,6 @@ abstract class ContainerPropertyType extends OrmPropertyType
 		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
 	}
 
-	final function isNullable()
-	{
-		return false;
-	}
-
 	/**
 	 * @return IQueryable
 	 */

@@ -239,6 +239,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				: $this->makeFields((string) $xmlIdentifier['name'], $type),
 			$type,
 			OrmPropertyVisibility::full(),
+			AssociationMultiplicity::zeroOrOne(),
 			false,
 			true
 		);
@@ -322,6 +323,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 				: $this->makeFields((string) $xmlProperty['name'], $type),
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
+			new AssociationMultiplicity((string) $xmlProperty['multiplicity']),
 			$xmlProperty['unique'] == 'true'
 		);
 
@@ -379,7 +381,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 					$type->getEntityName(),
 					$this->makeFields($type->getTable(), $mtmType),
 					$mtmType,
-					OrmPropertyVisibility::full()
+					OrmPropertyVisibility::full(),
+					AssociationMultiplicity::exactlyOne()
 				);
 
 				$proxy->addProperty(
@@ -401,7 +404,8 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 					$referredType->getEntityName(),
 					$this->makeFields($referredType->getTable(), $mtmType),
 					$mtmType,
-					OrmPropertyVisibility::full()
+					OrmPropertyVisibility::full(),
+					AssociationMultiplicity::exactlyOne()
 				);
 
 				$proxy->addProperty(
@@ -424,6 +428,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 			array(),
 			$propertyType,
 			new OrmPropertyVisibility(OrmPropertyVisibility::READONLY),
+			AssociationMultiplicity::zeroOrOne(),
 			false
 		);
 

@@ -32,7 +32,7 @@ final class FundamentalPropertyType
 	{
 		$this->type = $type;
 
-		parent::__construct($type, $type->isNullable());
+		parent::__construct($type);
 	}
 
 	function getReferenceType(AssociationMultiplicity $multiplicity)

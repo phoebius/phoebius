@@ -22,16 +22,6 @@
 interface IOrmEntityMapper
 {
 	/**
-	 * @return array
-	 */
-	function getProperties(OrmEntity $entity);
-
-	/**
-	 * @return OrmEntity
-	 */
-	function setProperties(OrmEntity $entity, array $properties);
-
-	/**
 	 * entity -> tuple
 	 * @return array
 	 */

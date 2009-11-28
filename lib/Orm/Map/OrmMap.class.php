@@ -51,46 +51,6 @@ final class OrmMap implements IOrmEntityMapper
 		$this->logicalSchema = $logicalSchema;
 	}
 
-	/**
-	 * @return array
-	 */
-	function getProperties(OrmEntity $entity)
-	{
-		$yield = array();
-
-		foreach ($this->logicalSchema->getProperties() as $property) {
-			if (!$property->getVisibility()->isGettable()) {
-				continue;
-			}
-
-			$getter = $property->getGetter();
-			$yield[$property->getName()] = $entity->$getter();
-		}
-
-		return $yield;
-	}
-
-	/**
-	 * @return OrmEntity
-	 */
-	function setProperties(OrmEntity $entity, array $properties)
-	{
-		foreach ($this->logicalSchema->getProperties() as $property) {
-			if (!$property->getVisibility()->isSettable()) {
-				continue;
-			}
-
-			$propertyName = $property->getName();
-
-			if (isset($properties[$propertyName])) {
-				$setter = $property->getSetter();
-				$entity->$setter($properties[$propertyName]);
-			}
-		}
-
-		return $entity;
-	}
-
 	function disassemble(OrmEntity $entity)
 	{
 		$tuple = array();

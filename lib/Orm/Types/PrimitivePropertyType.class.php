@@ -26,17 +26,9 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 	 */
 	private $type;
 
-	/**
-	 * @var boolean
-	 */
-	private $isNullable;
-
-	function __construct(ISqlType $type, $isNullable = true)
+	function __construct(ISqlType $type)
 	{
-		Assert::isBoolean($isNullable);
-
 		$this->type = $type;
-		$this->isNullable = $isNullable;
 	}
 
 	function getImplClass()
@@ -53,20 +45,9 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 
 	function disassemble($value)
 	{
-		if (is_null($value)) {
-			if (!$this->isNullable()) {
-				throw new OrmModelIntegrityException('property cannot be null');
-			}
-		}
-
 		return new SqlValueArray(
 			array(new SqlValue($value))
 		);
-	}
-
-	function isNullable()
-	{
-		return $this->isNullable;
 	}
 
 	function getSqlTypes()

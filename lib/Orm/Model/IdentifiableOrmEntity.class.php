@@ -20,7 +20,7 @@
  * Represents an ORM entity
  * @ingroup Orm_Model
  */
-abstract class IdentifiableOrmEntity extends OrmEntity
+abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 {
 	/**
 	 * @var boolean

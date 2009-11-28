@@ -72,14 +72,12 @@ class BoxablePropertyType extends PrimitivePropertyType
 
 	function disassemble($value)
 	{
-		if (is_null($value)) {
-			if (!$this->isNullable()) {
-				throw new OrmModelIntegrityException('property cannot be null');
-			}
-		}
-
 		return new SqlValueArray(
-			array(new SqlValue($value->getValue()))
+			array(new SqlValue(
+				is_null($value)
+					? $value
+					: $value->getValue()
+			))
 		);
 	}
 
