@@ -70,16 +70,14 @@ final class OrmMap implements IOrmEntityMapper
 				if ($property->isNullable()) {
 					continue;
 				}
-
-				if ($property->getType()->isNullable()) {
-					continue;
-				}
 			}
 
-			$fields = $property->getFields();
-			foreach ($property->getType()->disassemble($value) as $k => $value) {
-				$tuple[current($fields)] = $value;
-				next($fields);
+			$fields = array_combine(
+				$property->getFields(),
+				$property->getType()->disassemble($value)
+			);
+			foreach ($fields as $field => $value) {
+				$tuple[$field] = $value;
 			}
 		}
 
