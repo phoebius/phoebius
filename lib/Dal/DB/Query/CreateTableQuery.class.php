@@ -81,18 +81,10 @@ final class CreateTableQuery implements ISqlQuery
 	 */
 	private function makeColumn(DBColumn $column, IDialect $dialect)
 	{
-		$queryParts = array(StringUtils::DELIM_STANDART, "\t");
-
-		$queryParts[] = $dialect->quoteIdentifier($column->getName());
-		$queryParts[] = ' ';
-		$queryParts[] = $column->getType()->toDialectString($dialect);
-
-		if (($defaultValue = $column->getDefaultValue())) {
-			$queryParts[] = ' DEFAULT ';
-			$queryParts[] = $defaultValue->toDialectString($dialect);
-		}
-
-		$this->commaSeparatedQueryParts[] = join('', $queryParts);
+		$this->commaSeparatedQueryParts[] =
+			StringUtils::DELIM_STANDART
+			. "\t"
+			. $column->toDialectString($dialect);
 	}
 
 	/**

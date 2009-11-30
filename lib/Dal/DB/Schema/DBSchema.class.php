@@ -17,59 +17,23 @@
  ************************************************************************************************/
 
 /**
+ * Represents a database schema that aggregates DBTable objects
+ *
  * @ingroup Dal_DB_Schema
  */
 final class DBSchema implements ISqlCastable
 {
 	/**
-	 * @var array of {@link DBTable}
+	 * @var array of DBTable
 	 */
 	private $tables = array();
 
 	/**
-	 * @return DBSchema
-	 */
-	static function create()
-	{
-		return new self;
-	}
-
-	/**
-	 * @return DBSchema
-	 */
-	function setTables(array $tables)
-	{
-		foreach ($tables as $table) {
-			$this->setTable($table);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return DBSchema
-	 */
-	function dropTables()
-	{
-		$this->tables = array();
-
-		return $this;
-	}
-
-	/**
-	 * @return DBSchema
-	 */
-	function addTables(array $tables)
-	{
-		foreach ($tables as $table) {
-			$this->addTable($table);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return DBSchema
+	 * Adds the DBTable object to the schema
+	 *
+	 * @param DBTable $table table to add
+	 * @throws DuplicationException thrown when another DBTable with the same name already added
+	 * @return DBSchema itself
 	 */
 	function addTable(DBTable $table)
 	{
@@ -85,16 +49,26 @@ final class DBSchema implements ISqlCastable
 	}
 
 	/**
-	 * @return DBSchema
+	 * Adds the DBTable objects to the schema
+	 *
+	 * @param array $table set of table to be added
+	 * @throws DuplicationException thrown when another DBTable with the same name already added
+	 * @return DBSchema itself
 	 */
-	function setTable(DBTable $table)
+	function addTables(array $tables)
 	{
-		$this->tables[$table->getName()] = $table;
+		foreach ($tables as $table) {
+			$this->addTable($table);
+		}
 
 		return $this;
 	}
 
 	/**
+	 * Gets the DBTable object by its name
+	 *
+	 * @param string $name name of the table to look up
+	 * @throws ArgumentException thrown when no DBTable object identified by name found
 	 * @return DBTable
 	 */
 	function getTable($name)
@@ -109,7 +83,9 @@ final class DBSchema implements ISqlCastable
 	}
 
 	/**
-	 * @return array of {@link DBTable}
+	 * Gets the list of DBTable objects added to DBSchema
+	 *
+	 * @return array of DBTable
 	 */
 	function getTables()
 	{
@@ -117,7 +93,11 @@ final class DBSchema implements ISqlCastable
 	}
 
 	/**
-	 * @return array of {@link ISqlQuery}
+	 * Creates a list of ISqlQuery objects that represent a DDL for the list of DBTable objects
+	 * added to schema
+	 *
+	 * @param IDialect $dialect database dialect to use
+	 * @return array of ISqlQuery
 	 */
 	function toQueries(IDialect $dialect)
 	{
@@ -129,10 +109,6 @@ final class DBSchema implements ISqlCastable
 		return $queries;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$sql = array();

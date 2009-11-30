@@ -17,15 +17,16 @@
  ************************************************************************************************/
 
 /**
- * Same as DBForeignKeyConstraint but references the primary key only
+ * Represents a foreign key constaint that refers to the primary key of another table.
+ *
  * @ingroup Dal_DB_Schema
  */
 class DBOneToOneConstraint extends DBConstraint
 {
 	/**
-	 * @var array
+	 * @var SqlFieldArray
 	 */
-	private $columns;
+	private $fields;
 
 	/**
 	 * @var DBColumn
@@ -38,63 +39,53 @@ class DBOneToOneConstraint extends DBConstraint
 	private $associationBreakAction;
 
 	/**
-	 * @param array $columns array of DBColumn
-	 * @return DBOneToOneConstraint
+	 * @param array $fields fields of referencing table that reference primary another table
+	 * @param DBTable $referencedTable object that represents referenced table
+	 * @param AssociationBreakAction $associationBreakAction action which is performed on reference break
 	 */
-	static function create(
-			array $columns,
-			DBTable $referencedTable,
-			AssociationBreakAction $associationBreakAction
-		)
-	{
-		return new self ($columns, $referencedTable, $associationBreakAction);
-	}
-
 	function __construct(
-			array $columns,
+			array $fields,
 			DBTable $referencedTable,
 			AssociationBreakAction $associationBreakAction
 		)
 	{
 		foreach ($referencedTable->getConstraints() as $constraint) {
 			if ($constraint instanceof DBPrimaryKeyConstraint) {
-				$pkColumns = $constraint->getColumns();
+				$pkFields = $constraint->getFields();
 
-				if (sizeof($pkColumns) == sizeof($columns)) {
-					foreach ($columns as $column) {
-						$this->columns[$column->getName()] = $column;
-					}
+				Assert::isTrue(
+					sizeof($pkFields) == sizeof($fields),
+					'foreign key (%s) should have the same number of columns as %s`s table primary key (%s)',
+					$fields,
+					$referencedTable->getName(),
+					$referencedTable->getFields()
+				);
 
-					$this->referencedTable = $referencedTable;
-					$this->associationBreakAction = $associationBreakAction;
+				$this->fields = new SqlFieldArray($fields);
 
-					return;
-				}
+				$this->referencedTable = $referencedTable;
+				$this->associationBreakAction = $associationBreakAction;
+
+				break;
 			}
 		}
 
-		throw new ArgumentException('columns', 'columns does not match the primary key');
+		Assert::isUnreachable(
+			'referenced table `%s` MUST contain DBPrimaryKeyConstraint',
+			$referencedTable->getName()
+		);
 	}
 
-	/**
-	 * Returns the affected columns, if any
-	 * @return array of {@link DBColumn}
-	 */
-	function getIndexedColumns()
+	function getIndexableFields()
 	{
 		return $this->columns;
 	}
 
-	/**
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
-		$fields = new SqlFieldArray(array_keys($this->columns));
-
 		return
 			  'FOREIGN KEY ('
-			. $fields->toDialectString($dialect)
+			. $this->fields->toDialectString($dialect)
 			. ')'
 			. ' REFERENCES ' . $dialect->quoteIdentifier($this->referencedTable->getName())
 			. ' ON DELETE ' .$this->associationBreakAction->toDialectString($dialect)

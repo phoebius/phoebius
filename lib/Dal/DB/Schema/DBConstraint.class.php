@@ -17,8 +17,10 @@
  ************************************************************************************************/
 
 /**
- * Aggregated by:
- *  - DBTable
+ * Represents an abstract database constraint.
+ *
+ * Constraint can be optinally named.
+ *
  * @ingroup Dal_DB_Schema
  */
 abstract class DBConstraint implements ISqlCastable
@@ -29,12 +31,15 @@ abstract class DBConstraint implements ISqlCastable
 	private $name;
 
 	/**
-	 * Returns the affected columns, if any
-	 * @return array of {@link DBColumn}
+	 * Gets the fields that should be indexed
+	 *
+	 * @return array of DBColumn
 	 */
-	abstract function getIndexedColumns();
+	abstract function getIndexableFields();
 
 	/**
+	 * Gets the name of the constraint
+	 *
 	 * @return string
 	 */
 	function getName()
@@ -43,7 +48,11 @@ abstract class DBConstraint implements ISqlCastable
 	}
 
 	/**
-	 * @return DBColumn
+	 * Sets the new name of the constraint
+	 *
+	 * @param string $name name of the constraint
+	 *
+	 * @return DBColumn itself
 	 */
 	function setName($name)
 	{
@@ -55,20 +64,15 @@ abstract class DBConstraint implements ISqlCastable
 	}
 
 	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
-	function toDialectString(IDialect $dialect)
-	{
-		return $this->getHead($dialect) . ' ' . $this->getSql();
-	}
-
-	/**
+	 * Gets the SQL representation of the constraint's head
+	 *
+	 * @param IDialect $dialect
+	 *
 	 * @return string
 	 */
 	protected function getHead(IDialect $dialect)
 	{
-		return 'CONSTRAINT '.$dialect->quoteIdentifier($this->name);
+		return 'CONSTRAINT ' . $dialect->quoteIdentifier($this->name);
 	}
 }
 

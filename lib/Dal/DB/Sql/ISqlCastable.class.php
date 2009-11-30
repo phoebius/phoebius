@@ -26,6 +26,8 @@ interface ISqlCastable
 	/**
 	 * Represents the object as unified SQL string
 	 *
+	 * @param IDialect $dialect
+	 *
 	 * @return string
 	 */
 	function toDialectString(IDialect $dialect);

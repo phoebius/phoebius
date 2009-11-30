@@ -17,105 +17,53 @@
  ************************************************************************************************/
 
 /**
+ * Represents a UNIQUE constaint. It is a database constrain that ensures that the data contained
+ * in a field or a group of fields is unique with respect to all the rows in the table
+ *
  * @ingroup Dal_DB_Schema
  */
 class DBUniqueConstraint extends DBConstraint
 {
 	/**
-	 * @var array of {@link DBColumn}
+	 * @var SqlFieldArray
 	 */
-	private $fields = array();
+	private $fields;
 
 	/**
-	 * @return DBUniqueConstraint
+	 * @param array $fields array of field names affected by the constaint
 	 */
-	static function create(array $columns = array())
+	function __construct(array $fields)
 	{
-		return new self ($columns);
-	}
+		$this->fields = new SqlFieldArray;
 
-	function __construct(array $columns = array())
-	{
-		$this->setColumns($columns);
-	}
-
-	/**
-	 * @return DBUniqueConstraint
-	 */
-	function setColumns(array $columns)
-	{
-		$this->columns = array();
-		foreach ($columns as $column) {
-			$this->addColumn($column);
+		foreach ($this->fields as $field) {
+			$this->fields->append($field);
 		}
-
-		return $this;
 	}
 
 	/**
-	 * @return DBUniqueConstraint
+	 * Get the fields affected by the constraint
+	 *
+	 * @return array of string
 	 */
-	function addColumn(DBColumn $column)
+	function getFields()
 	{
-		$name = $column->getName();
-
-		if (isset($this->columns[$name])) {
-			throw new DuplicationException('column', $name);
-		}
-
-		$this->columns[$name] = $column;
-
-		return $this;
+		return $this->fields->toArray();
 	}
 
-	/**
-	 * @return DBUniqueConstraint
-	 */
-	function dropColumns()
-	{
-		$this->columns = array();
-
-		return $this;
-	}
-
-	/**
-	 * @return array of {@link DBColumn}
-	 */
-	function getColumns()
-	{
-		return $this->columns;
-	}
-
-	/**
-	 * @return array of {@link DBColumn}
-	 */
-	function getIndexedColumns()
+	function getIndexableFields()
 	{
 		return array();
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
-		return $this->getHead($dialect) . ' (' . $this->getFieldList($dialect) . ')';
+		return $this->getHead($dialect) . ' (' . $this->fields->toDialectString($dialect) . ')';
 	}
 
-	/**
-	 * @return string
-	 */
 	protected function getHead(IDialect $dialect)
 	{
 		return 'UNIQUE';
-	}
-
-	private function getFieldList(IDialect $dialect)
-	{
-		$fields = new SqlFieldArray(array_keys($this->columns));
-
-		return $fields->toDialectString($dialect);
 	}
 }
 

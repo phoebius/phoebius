@@ -17,13 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * Represents a database column.
+ *
+ * A database column have name, type, and default value.
+ *
  * Aggregated by:
- *  - DBTable
- *  - DBConstraint
- *  - DBIndex (currently unimplemented)
+ * - DBTable
+ * - DBConstraint
+ * - DBIndex (currently unimplemented)
+ *
  * @ingroup Dal_DB_Schema
  */
-class DBColumn
+class DBColumn implements ISqlCastable
 {
 	/**
 	 * @var ISqlValueExpression
@@ -34,11 +39,16 @@ class DBColumn
 	 * @var string
 	 */
 	private $name;
+
 	/**
 	 * @var ISqlType
 	 */
 	private $type;
 
+	/**
+	 * @param string $name name of the column
+	 * @param ISqlType $type SQL type of the column
+	 */
 	function __construct($name, ISqlType $type)
 	{
 		Assert::isScalar($name);
@@ -48,6 +58,8 @@ class DBColumn
 	}
 
 	/**
+	 * Gets the name of the column
+	 *
 	 * @return string
 	 */
 	function getName()
@@ -56,6 +68,8 @@ class DBColumn
 	}
 
 	/**
+	 * Gets the type of the column
+	 *
 	 * @return ISqlType
 	 */
 	function getType()
@@ -64,7 +78,9 @@ class DBColumn
 	}
 
 	/**
-	 * @return ISqlValueExpression
+	 * Gets the default value of the column, if set
+	 *
+	 * @return ISqlValueExpression|null
 	 */
 	function getDefaultValue()
 	{
@@ -72,13 +88,35 @@ class DBColumn
 	}
 
 	/**
-	 * @return ISqlValueExpression
+	 * Sets the default value of the column.
+	 *
+	 * The default value should be presented as ISqlValueExpression which can be computed as
+	 * SQL code
+	 *
+	 * @param ISqlValueExpression $defaultValue value expression to use as default value
+	 * @return ISqlValueExpression itself
 	 */
 	function setDefaultValue(ISqlValueExpression $defaultValue = null)
 	{
 		$this->defaultValue = $defaultValue;
 
 		return $this;
+	}
+
+	function toDialectString(IDialect $dialect)
+	{
+		$queryParts[] = $dialect->quoteIdentifier($this->name);
+		$queryParts[] = ' ';
+		$queryParts[] = $this->type->toDialectString($dialect);
+
+		if ($this->defaultValue) {
+			$queryParts[] = ' DEFAULT ';
+			$queryParts[] = $this->defaultValue->toDialectString($dialect);
+		}
+
+		$string = join('', $queryParts);
+
+		return $string;
 	}
 }
 

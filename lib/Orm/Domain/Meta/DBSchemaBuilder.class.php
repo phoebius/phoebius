@@ -101,8 +101,7 @@ class DBSchemaBuilder
 	 */
 	private function importClass()
 	{
-		$this->dbTable = new DBTable();
-		$this->dbTable->setName($this->ormClass->getTable());
+		$this->dbTable = new DBTable($this->ormClass->getTable());
 
 		if (($this->ormIdentifier = $this->ormClass->getIdentifier())) {
 			$this->ormProperty = $this->ormIdentifier;
@@ -136,7 +135,6 @@ class DBSchemaBuilder
 
 		$this->dbTable->addColumns($dbColumns);
 
-		//Assert::notImplemented('broken: AssociationPropertyType not found by fetcher');
 		if ($this->ormProperty->getType() instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(

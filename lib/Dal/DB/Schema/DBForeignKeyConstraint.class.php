@@ -17,20 +17,25 @@
  ************************************************************************************************/
 
 /**
- * TODO: implement DBForeignKeyConstraint
- * Represents an extended version of {@link DBOneToOneConstraint} class, allowing references
- * to any set of columns, not only defined as Primary key.
+ * Represents a database foreign key constraint.
+ *
+ * This is an unimplemented version of DBOneToOneConstraint class, which allows references
+ * to any set of columns, not only defined as PRIMARY KEY.
+ *
  * Architectural problems:
- *  - API for fulfilling an object should not be obscure, providing simple interface and good fallover
- *    - addReference(DBColumn $column, DBColumn $referencedColumn)
- *          + pros: strictly-typed API
- *          - cons: cannot add multiple refs at once
- *    - addReferences(array())
- *         key is the name of the column, value is the name of the corresponding referenced column
- *          + pros: API is simple - we can add multiple refs at one method call
- *          - cons: ctor must accept both table and referencedTable to check column names (?)
- *      - addColumn()/addReferencedColumn()
- *  - set of referenced columns should be defined by {@link DBUniqueConstraint} (RDBMS requirement)
+ * - API for fulfilling an object should not be obscure, providing simple interface and good fallover
+ *   - addReference(DBColumn $column, DBColumn $referencedColumn)
+ *     - + pros: strictly-typed API
+ *     - - cons: cannot add multiple refs at once
+ *   - addReferences(array())
+ *     key is the name of the column, value is the name of the corresponding referenced column
+ *     - + pros: API is simple - we can add multiple refs at one method call
+ *     - - cons: ctor must accept both table and referencedTable to check column names (?)
+ *   - addColumn()/addReferencedColumn() pair
+ * - set of referenced columns should be defined by DBUniqueConstraint (RDBMS requirement)
+ *
+ * @todo Implement DBForeignKeyConstraint
+ *
  * @ingroup Dal_DB_Schema
  */
 abstract class DBForeignKeyConstraint extends DBConstraint

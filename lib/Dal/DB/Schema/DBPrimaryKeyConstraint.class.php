@@ -17,22 +17,13 @@
  ************************************************************************************************/
 
 /**
- * PK = Unique + NotNull
+ * Represents a PRIMARY KEY constraint. Internally it is a combination of a DBUniqueConstraint and
+ * a not-null constraint
+ *
  * @ingroup Dal_DB_Schema
  */
-class DBPrimaryKeyConstraint extends DBUniqueConstraint
+final class DBPrimaryKeyConstraint extends DBUniqueConstraint
 {
-	/**
-	 * @return DBPrimaryKeyConstraint
-	 */
-	static function create(array $columns = array())
-	{
-		return new self ($columns);
-	}
-
-	/**
-	 * @return string
-	 */
 	protected function getHead(IDialect $dialect)
 	{
 		return 'PRIMARY KEY';

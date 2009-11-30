@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a database table
+ *
  * @ingroup Dal_DB_Schema
  */
 class DBTable
@@ -27,24 +29,23 @@ class DBTable
 	private $name;
 
 	/**
-	 * @var array of {@link DBColumn}
+	 * @var array of DBColumn
 	 */
-	private $fields = array();
+	private $columns = array();
 
 	/**
-	 * @var array of {@link DBConstraint}
+	 * @var array of DBConstraint
 	 */
 	private $constraints = array();
 
-	private $preQueries = array();
-	private $postQueries = array();
-
 	/**
-	 * @return DBTable
+	 * @param string $name name of the table
 	 */
-	static function create()
+	function __construct($name)
 	{
-		return new self;
+		Assert::isScalar($name);
+
+		$this->name = $name;
 	}
 
 	function __sleep()
@@ -55,6 +56,8 @@ class DBTable
 	}
 
 	/**
+	 * Gets the name of the table
+	 *
 	 * @return string
 	 */
 	function getName()
@@ -63,20 +66,11 @@ class DBTable
 	}
 
 	/**
-	 * @return DBTable
-	 */
-	function setName($name)
-	{
-		Assert::isScalar($name);
-
-		$this->name = $name;
-
-		return $this;
-	}
-
-	/**
-	 * @throws DuplicationException
-	 * @return DBTable
+	 * Adds a named DBColumn object to the table
+	 *
+	 * @param DBColumn $column a column to add to the table
+	 * @throws DuplicationException thrown when another column with the same name already added
+	 * @return DBTable itself
 	 */
 	function addColumn(DBColumn $column)
 	{
@@ -92,8 +86,11 @@ class DBTable
 	}
 
 	/**
-	 * @throws DuplicationException
-	 * @return DBTable
+	 * Adds a named DBColumn objects to the table
+	 *
+	 * @param array $columns a list of DBColumn objects to add to the table
+	 * @throws DuplicationException thrown when another column with the same name already added
+	 * @return DBTable itself
 	 */
 	function addColumns(array $columns)
 	{
@@ -105,7 +102,9 @@ class DBTable
 	}
 
 	/**
-	 * @return array of {@link DBColumn}
+	 * Gets the DBColumn objects added to the table
+	 *
+	 * @return array of DBColumn
 	 */
 	function getColumns()
 	{
@@ -113,6 +112,19 @@ class DBTable
 	}
 
 	/**
+	 * Gets the list of column names representing the table
+	 *
+	 * @return array of string
+	 */
+	function getFields()
+	{
+		return array_keys($this->columns);
+	}
+
+	/**
+	 * Gets the named DBColumn object
+	 *
+	 * @param string $name name of the column to look up
 	 * @return DBColumn
 	 */
 	function getColumn($name)
@@ -127,28 +139,14 @@ class DBTable
 	}
 
 	/**
-	 * @return DBTable
-	 */
-	function dropColumns()
-	{
-		$this->columns = array();
-		$this->constraints = array();
-
-		return $this;
-	}
-
-	/**
-	 * @throws DuplicationException
-	 * @return DBTable
+	 * Adds a table constraint
+	 *
+	 * @param DBConstraint $constraint constraint to add
+	 * @throws DuplicationException thrown when another constaint with the same name already added
+	 * @return DBTable itself
 	 */
 	function addConstraint(DBConstraint $constraint)
 	{
-//		foreach ($constraint->getColumns() as $column) {
-//			if (!isset($this->columns[$column->getName()])) {
-//				$this->addColumn($column);
-//			}
-//		}
-
 		$name = $constraint->getName();
 
 		if ($name) {
@@ -167,8 +165,11 @@ class DBTable
 	}
 
 	/**
-	 * @throws DuplicationException
-	 * @return DBTable
+	 * Adds a table constraint
+	 *
+	 * @param array $constraints a list of constraints to add to the table
+	 * @throws DuplicationException thrown when another constaint with the same name already added
+	 * @return DBTable itself
 	 */
 	function addConstraints(array $constraints)
 	{
@@ -180,6 +181,8 @@ class DBTable
 	}
 
 	/**
+	 * Gets the DBConstraint objects added to the table
+	 *
 	 * @return array of DBConstraint
 	 */
 	function getConstraints()
@@ -188,16 +191,9 @@ class DBTable
 	}
 
 	/**
-	 * @return DBTable
-	 */
-	function dropConstraints()
-	{
-		$this->constraints = array();
-
-		return $this;
-	}
-
-	/**
+	 * Creates a list of ISqlQuery objects that represent a DDL for the table
+	 *
+	 * @param IDialect $dialect database dialect to use
 	 * @return array of ISqlQuery
 	 */
 	function toQueries(IDialect $dialect)
