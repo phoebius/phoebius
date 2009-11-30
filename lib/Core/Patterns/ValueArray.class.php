@@ -39,7 +39,7 @@ class ValueArray implements IteratorAggregate, Countable, ArrayAccess
 	private $values = array();
 
 	/**
-	 * @param array list of initial values to be imported
+	 * @param array list of initial values to be appended to array
 	 */
 	function __construct(array $values = array())
 	{

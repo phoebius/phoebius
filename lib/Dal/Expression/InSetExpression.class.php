@@ -107,6 +107,8 @@ class InSetExpression implements ISubjective
 
 	function toDialectString(IDialect $dialect)
 	{
+		$values = new SqlValueExpressionArray($this->set);
+
 		$compiledSlices = array();
 
 		$compiledSlices[] = '(';
@@ -114,7 +116,7 @@ class InSetExpression implements ISubjective
 		$compiledSlices[] = ')';
 		$compiledSlices[] = $this->logic->toDialectString($dialect);
 		$compiledSlices[] = '(';
-		$compiledSlices[] = SqlValueArray::create($this->set)->toDialectString($dialect);
+		$compiledSlices[] = $values->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);

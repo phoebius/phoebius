@@ -18,13 +18,13 @@
 
 final class DistinctCountProjection extends CountProjection
 {
-	protected function getSqlFunction(EntityQuery $entityQuery)
+	protected function getSqlFunction(EntityQueryBuilder $entityQueryBuilder)
 	{
-		$sqlFunction = parent::getSqlFunction($entityQuery);
-
-		$sqlFunction->aggregateDistinct();
-
-		return $sqlFunction;
+		return
+			SqlFunction::aggregateDistinct(
+				$this->getFunc($entityQueryBuilder),
+				$this->getValueExpression($entityQueryBuilder)
+			);
 	}
 }
 

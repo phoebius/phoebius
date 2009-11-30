@@ -90,7 +90,7 @@ class InsertQuery extends RowModificationQuery implements ISqlQuery
 	 */
 	private function getCompiledValues(IDialect $dialect)
 	{
-		$list = new SqlValueArray($this->getRow()->getValues());
+		$list = new SqlValueExpressionArray($this->getRow()->getValues());
 
 		return $list->toDialectString($dialect);
 	}

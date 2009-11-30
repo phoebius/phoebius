@@ -17,24 +17,25 @@
  ************************************************************************************************/
 
 /**
- * Represents an ORDER BY direction
+ * Represents the ordering direction
+ *
  * @ingroup Dal_DB_Sql
  */
 final class OrderDirection extends Enumeration implements ISqlCastable
 {
-	const NONE = '';
+	/**
+	 * Ascending
+	 */
 	const ASC = 'ASC';
+
+	/**
+	 * Descending
+	 */
 	const DESC = 'DESC';
 
 	/**
-	 * @return OrderDirection
-	 */
-	static function create($id)
-	{
-		return new self($id);
-	}
-
-	/**
+	 * Creates an instance of ascending OrderDirection
+	 *
 	 * @return OrderDirection
 	 */
 	static function asc()
@@ -43,6 +44,8 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 	}
 
 	/**
+	 * Creates an instance of descending OrderDirection
+	 *
 	 * @return OrderDirection
 	 */
 	static function desc()
@@ -50,18 +53,6 @@ final class OrderDirection extends Enumeration implements ISqlCastable
 		return new self(self::DESC);
 	}
 
-	/**
-	 * @return OrderDirection
-	 */
-	static function none()
-	{
-		return new self(self::NONE);
-	}
-
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		return $this->getValue();

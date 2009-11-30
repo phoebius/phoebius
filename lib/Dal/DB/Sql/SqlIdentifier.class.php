@@ -17,12 +17,18 @@
  ************************************************************************************************/
 
 /**
+ * Represents a database identifier. This identifier would be correctly quoted while translating
+ * to SQL
+ *
  * @ingroup Dal_DB_Sql
  */
 final class SqlIdentifier implements ISqlValueExpression
 {
 	private $id;
 
+	/**
+	 * @param string $id textual representation of the identifier
+	 */
 	function __construct($id)
 	{
 		Assert::isScalar($id);
@@ -31,6 +37,8 @@ final class SqlIdentifier implements ISqlValueExpression
 	}
 
 	/**
+	 * Gets the textual representation of the database identifier
+	 *
 	 * @return string
 	 */
 	function getId()
@@ -38,10 +46,6 @@ final class SqlIdentifier implements ISqlValueExpression
 		return $this->id;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		return $dialect->quoteIdentifier($this->id);

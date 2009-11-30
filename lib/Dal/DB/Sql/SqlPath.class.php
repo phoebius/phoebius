@@ -17,13 +17,29 @@
  ************************************************************************************************/
 
 /**
+ * Represents a path of SQL identifiers that unambiguously refer to the database object.
+ *
+ * This identifier would be correctly quoted while translating to SQL
+ *
+ * Example:
+ * @code
+ * // result is: "public"."table"
+ * $path = new SqlPath('public', 'table');
+ *
+ * // the same:
+ * $path = new SqlPath('public.table');
+ * @endcode
+ *
  * @ingroup Dal_DB_Sql
  */
 final class SqlPath implements ISqlCastable
 {
 	private $path = array();
 
-	function __construct()
+	/**
+	 * @param string ... list of identifier chunks
+	 */
+	function __construct($chunk)
 	{
 		$args = func_get_args();
 
@@ -35,10 +51,6 @@ final class SqlPath implements ISqlCastable
 		}
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$processedPathChunks = array();

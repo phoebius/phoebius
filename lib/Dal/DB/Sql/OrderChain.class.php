@@ -17,21 +17,23 @@
  ************************************************************************************************/
 
 /**
- * Represents a chain order by expressions
+ * Represents a chain of expressions used in ordering the resulting database rows
  *
  * @ingroup Dal_DB_Sql
  */
 class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 {
+	/**
+	 * @param array $array initial OrderBy objects to be added to the value list
+	 */
 	function __construct(array $values = array())
 	{
 		parent::__construct('OrderBy', $values);
 	}
 
 	/**
-	 * Drops the ascending logic in all order expressions and sets the ASC logic to the last one
-	 * expression
-	 * @return OrderChain an object itself
+	 * Sets the ascending logic to all expressions added to the OrderChain
+	 * @return OrderChain itself
 	 */
 	function setAsc()
 	{
@@ -43,8 +45,7 @@ class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 	}
 
 	/**
-	 * Drops the ascending logic in all order expressions and sets the DESC logic to the last one
-	 * expression
+	 * Sets the descending logic to all expressions added to the OrderChain
 	 * @return OrderChain
 	 */
 	function setDesc()
@@ -60,7 +61,7 @@ class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 	{
 		$me = new self;
 
-		foreach ($this as $elt) {
+		foreach ($this->toArray() as $elt) {
 			$me->append($elt->toSubjected($object));
 		}
 
@@ -70,10 +71,9 @@ class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 	function toDialectString(IDialect $dialect)
 	{
 		if (!$this->isEmpty()) {
-			return
-				'ORDER BY '
-				. SqlValueExpressionArray::create($this->toArray())
-					->toDialectString($dialect);
+			$list = new SqlValueExpressionArray($this->toArray());
+
+			return 'ORDER BY ' . $list->toDialectString($dialect);
 		}
 	}
 }

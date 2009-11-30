@@ -17,29 +17,21 @@
  ************************************************************************************************/
 
 /**
- * Represents the list of ISqlValueExpression
- * @ingroup Dal_DB_Sql
+ * Represents a list of ISqlValueExpression
+ *
  * @see ISqlValueExpression
+ * @ingroup Dal_DB_Sql
  */
 class SqlValueExpressionArray extends TypedValueArray implements ISqlCastable
 {
 	/**
-	 * @return SqlValueExpressionArray
+	 * @param array $array initial ISqlValueExpression objects to be added to the value list
 	 */
-	static function create(array $values = array())
-	{
-		return new self ($values);
-	}
-
 	function __construct(array $values = array())
 	{
 		parent::__construct('ISqlValueExpression', $values);
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();

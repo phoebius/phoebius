@@ -32,7 +32,7 @@ abstract class OrmPropertyType
 	abstract function assemble(array $tuple, FetchStrategy $fetchStrategy);
 
 	/**
-	 * @return SqlValueArray
+	 * @return SqlValueExpressionArray
 	 */
 	abstract function disassemble($value);
 

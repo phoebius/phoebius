@@ -17,10 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents a list of fields, that can be casted to SQL value set
+ * Represents a list of fields
+ *
  * @ingroup Dal_DB_Sql
  */
-class SqlFieldArray extends ValueArray implements ISqlCastable
+final class SqlFieldArray extends ValueArray implements ISqlCastable
 {
 	function toDialectString(IDialect $dialect)
 	{

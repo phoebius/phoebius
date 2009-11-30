@@ -26,17 +26,17 @@ class SqlFunction implements ISqlValueExpression, ISubjective
 	/**
 	 * func (ALL expression)
 	 */
-	const AGGREGATE_ALL = 1;
+	const AGGREGATE_ALL = 'ALL';
 
 	/**
 	 * func (DISTINCT expression)
 	 */
-	const AGGREGATE_DISTINCT = 2;
+	const AGGREGATE_DISTINCT = 'DISTINCT';
 
 	/**
 	 * func (*)
 	 */
-	const AGGREGATE_WITH_NULLS = 3;
+	const AGGREGATE_WITH_NULLS = '*';
 
 	/**
 	 * @var string
@@ -45,31 +45,61 @@ class SqlFunction implements ISqlValueExpression, ISubjective
 
 	/**
 	 * One of SqlFunction::AGGREGATE_* constants
-	 * @var int
 	 */
 	private $aggregate;
 
 	/**
-	 * @var arrau
+	 * @var array
 	 */
 	private $args;
 
 	/**
+	 * Function that invokes the aggregate once for each input row regardless of null or non-null
+	 * values.
+	 * @param mixed $name name of the function
 	 * @return SqlFunction
 	 */
-	static function create($name)
+	static function aggregateWithNulls($name)
 	{
-		$args = func_get_args();
-		array_shift($args);
+		$func = new self ($name);
+		$func->aggregate = self::AGGREGATE_WITH_NULLS;
 
-		$me = new self ($name);
-		$me->args = $args;
-
-		return $me;
+		return $func;
 	}
 
 	/**
-	 * @param string $name
+	 * Function that invokes the aggregate for all distinct non-null values of the expressions
+	 * found in the input rows
+	 * @param string $name name of the function
+	 * @param mixed $field field to aggregate
+	 * @return SqlFunction
+	 */
+	static function aggregateDistinct($name, $field)
+	{
+		$func = new self ($name, $field);
+		$func->aggregate = self::AGGREGATE_DISTINCT;
+
+		return $func;
+	}
+
+	/**
+	 * Function that invokes the aggregate across all input rows for which the given expression(s)
+	 * yield non-null values
+	 * @param string $name name of the function
+	 * @param mixed $field field to aggregate
+	 * @return SqlFunction
+	 */
+	static function aggregateAll($name, $field)
+	{
+		$func = new self ($name, $field);
+		$func->aggregate = self::AGGREGATE_ALL;
+
+		return $func;
+	}
+
+	/**
+	 * @param string $name name of the function
+	 * @param mixed ... optional arguments to be passed to SQL function
 	 */
 	function __construct($name)
 	{
@@ -83,7 +113,7 @@ class SqlFunction implements ISqlValueExpression, ISubjective
 	}
 
 	/**
-	 * Returns the name of the function
+	 * Gets the name of the function
 	 * @return string
 	 */
 	function getName()
@@ -92,91 +122,27 @@ class SqlFunction implements ISqlValueExpression, ISubjective
 	}
 
 	/**
-	 * Returns the arguments set represented as {@link SqlValueExpressionArray}
-	 * @return SqlValueExpressionArray
+	 * Gets the function arguments
+	 * @return array
 	 */
 	function getArgs()
 	{
 		return $this->args;
 	}
 
-	/**
-	 * Invokes the aggregate across all input rows for which the given expression(s)
-	 * yield non-null values
-	 * @return SqlFunction an object itself
-	 */
-	function aggregateAll()
-	{
-		$this->aggregate = self::AGGREGATE_ALL;
-
-		return $this;
-	}
-
-	/**
-	 * Invokes the aggregate for all distinct non-null values of the expressions found in the
-	 * input rows
-	 * @return SqlFunction an object itself
-	 */
-	function aggregateDistinct()
-	{
-		$this->aggregate = self::AGGREGATE_DISTINCT;
-
-		return $this;
-	}
-
-	/**
-	 * Invokes the aggregate once for each input row regardless of null or non-null values.
-	 * The set of arguments should be empty due '*' is used instead of arguments expansion
-	 * @return SqlFunction an object itself
-	 */
-	function aggregateWithNulls()
-	{
-		$this->aggregate = self::AGGREGATE_WITH_NULLS;
-
-		return $this;
-	}
-
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();
 
-		$args = new SqlValueExpressionArray($this->args);
-
 		$compiledSlices[] = $this->name;
 		$compiledSlices[] = '(';
 
-		if ($this->aggregate == self::AGGREGATE_WITH_NULLS) {
-			Assert::isTrue(
-				$args->isEmpty(),
-				'drop out arguments when aggregating rows with nulls'
-			);
-
-			$compiledSlices[] = '*';
+		if ($this->aggregate) {
+			$compiledSlices[] = $this->aggregate;
 		}
-		else {
-			if ($this->aggregate == self::AGGREGATE_ALL) {
-				Assert::isFalse(
-					$args->isEmpty(),
-					'set an aggregation expression as an argument'
-				);
 
-				$compiledSlices[] = 'ALL';
-			}
-			else if ($this->aggregate == self::AGGREGATE_DISTINCT) {
-				Assert::isFalse(
-					$args->isEmpty(),
-					'set an aggregation expression as an argument'
-				);
-
-				$compiledSlices[] = 'DISTINCT';
-			}
-
-			$compiledSlices[] = $args->toDialectString($dialect);
-		}
+		$args = new SqlValueExpressionArray($this->args);
+		$compiledSlices[] = $args->toDialectString($dialect);
 
 		$compiledSlices[] = ')';
 

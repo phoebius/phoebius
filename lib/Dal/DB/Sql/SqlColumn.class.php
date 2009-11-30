@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Represents a sql column (that can reference to its own table)
+ * Represents column of the database table.
+ *
  * @ingroup Dal_DB_Sql
  */
 class SqlColumn implements ISqlValueExpression
@@ -25,7 +26,7 @@ class SqlColumn implements ISqlValueExpression
 	/**
 	 * @var string
 	 */
-	private $fieldName;
+	private $field;
 
 	/**
 	 * @var string
@@ -33,24 +34,16 @@ class SqlColumn implements ISqlValueExpression
 	private $table;
 
 	/**
-	 * Creates an instance of {@link SqlColumn}
-	 * @param string $fieldName
-	 * @param string $tableName
-	 * @return SqlColumn
+	 * @param string $field name of the column
+	 * @param string $table optional name of the table that owns the column
 	 */
-	static function create($fieldName, $tableName = null)
+	function __construct($field, $table = null)
 	{
-		return new self ($fieldName, $tableName);
-	}
+		Assert::isScalar($field);
+		Assert::isScalarOrNull($table);
 
-	/**
-	 * @param string $fieldName
-	 * @param string $tableName
-	 */
-	function __construct($fieldName, $tableName = null)
-	{
-		$this->setFieldName($fieldName);
-		$this->setTableName($tableName);
+		$this->field = $field;
+		$this->table = $table;
 	}
 
 	/**
@@ -59,59 +52,27 @@ class SqlColumn implements ISqlValueExpression
 	 */
 	function getFieldName()
 	{
-		return $this->fieldName;
+		return $this->field;
 	}
 
 	/**
-	 * Sets the field name
-	 * @param string $fieldName
-	 * @return SqlColumn an object itself
-	 */
-	function setFieldName($fieldName)
-	{
-		Assert::isScalar($fieldName);
-
-		$this->fieldName = $fieldName;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the table name to which the field belongs to
-	 * @param string|null $tableName
-	 * @return SqlColumn an object itself
-	 */
-	function setTableName($tableName = null)
-	{
-		Assert::isScalarOrNull($tableName);
-
-		$this->tableName = $tableName;
-
-		return $this;
-	}
-
-	/**
-	 * Gets the string representing a table name to which the field belongs to
+	 * Gets the string representing a table name
 	 * @return string|null
 	 */
 	function getTableName()
 	{
-		return $this->tableName;
+		return $this->table;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$sqlSlices = array();
-		if ($this->tableName)
-		{
-			$sqlSlices[] = $dialect->quoteIdentifier($this->tableName);
+
+		if ($this->table) {
+			$sqlSlices[] = $dialect->quoteIdentifier($this->table);
 		}
 
-		$sqlSlices[] = $dialect->quoteIdentifier($this->fieldName);
+		$sqlSlices[] = $dialect->quoteIdentifier($this->field);
 
 		$identifier = join('.', $sqlSlices);
 		return $identifier;

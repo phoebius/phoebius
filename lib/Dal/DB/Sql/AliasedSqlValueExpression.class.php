@@ -16,11 +16,26 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents a labeled ISqlValueExpression
+ * @ingroup Dal_DB_Sql
+ */
 final class AliasedSqlValueExpression implements ISqlValueExpression
 {
+	/**
+	 * @var ISqlValueExpression
+	 */
 	private $expression;
+
+	/**
+	 * @var string|null
+	 */
 	private $alias;
 
+	/**
+	 * @param ISqlValueExpression $expression expression to label
+	 * @param string $alias optional alias of the expression
+	 */
 	function __construct(ISqlValueExpression $expression, $alias = null)
 	{
 		Assert::isScalarOrNull($alias);

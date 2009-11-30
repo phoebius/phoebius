@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents an order expression
+ * Represents an expression that is used in ordering the resulting database rows
  * @ingroup Dal_DB_Sql
  */
 final class OrderBy implements ISubjective, ISqlValueExpression
@@ -28,11 +28,15 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	private $expression;
 
 	/**
-	 * @var OrderDirection
+	 * @var OrderDirection|null
 	 */
 	private $direction;
 
 	/**
+	 * Creates and OrderBy expression with ascending sorting logic
+	 *
+	 * @param mixed $expression expression to use in sorting
+	 *
 	 * @return OrderBy
 	 */
 	static function asc($expression)
@@ -41,6 +45,10 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	}
 
 	/**
+	 * Creates and OrderBy expression with descending sorting logic
+	 *
+	 * @param mixed $expression expression to use in sorting
+	 *
 	 * @return OrderBy
 	 */
 	static function desc($expression)
@@ -51,24 +59,11 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	function __construct($expression, OrderDirection $direction = null)
 	{
 		$this->expression = $expression;
-		$this->direction =
-			$direction
-				? $direction
-				: OrderDirection::none();
-	}
-
-	function getExpression()
-	{
-		return $this->expression;
-	}
-
-	function getDirection()
-	{
-		return $this->direction;
+		$this->direction = $direction;
 	}
 
 	/**
-	 * Determines whether the direction of the expression is ASC
+	 * Determines whether the direction of the expression is ascending
 	 * @return boolean
 	 */
 	function isAsc()
@@ -77,7 +72,7 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	}
 
 	/**
-	 * Determines whether the direction of the expression is DESC
+	 * Determines whether the direction of the expression is descending
 	 * @return boolean
 	 */
 	function isDesc()
@@ -86,34 +81,23 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	}
 
 	/**
-	 * Sets the direction of order expression to ASC
-	 * @return OrderBy an object itself
+	 * Sets the ascending direction of order the expression
+	 * @return OrderBy itself
 	 */
 	function setAsc()
 	{
-		$this->direction->setValue(OrderDirection::ASC);
+		$this->direction = OrderDirection::asc();
 
 		return $this;
 	}
 
 	/**
-	 * Sets the direction of order expression to DESC
-	 * @return OrderBy an object itself
+	 * Sets the descending direction of order the expression
+	 * @return OrderBy itself
 	 */
 	function setDesc()
 	{
-		$this->direction->setValue(OrderDirection::DESC);
-
-		return $this;
-	}
-
-	/**
-	 * Drops the direction of order expression to the default
-	 * @return OrderBy an object itself
-	 */
-	function none()
-	{
-		$this->direction->setValue(OrderDirection::NONE);
+		$this->direction = OrderDirection::desc();
 
 		return $this;
 	}
@@ -122,7 +106,9 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	{
 		return new self(
 			$object->subject($this->expression),
-			new OrderDirection($this->direction->getValue())
+			$this->direction
+				? new OrderDirection($this->direction->getValue())
+				: null
 		);
 	}
 
@@ -131,7 +117,7 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 		return
 			  $this->getExpression()->toDialectString($dialect)
 			. (
-				$this->direction->isNot(OrderDirection::NONE)
+				$this->direction
 					? ' ' . $this->getDirection()->toDialectString($dialect)
 					: ''
 			);

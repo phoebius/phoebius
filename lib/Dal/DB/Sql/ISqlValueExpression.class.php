@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents a value expression
+ * Represents a SQL value expression
  * @see http://www.postgresql.org/docs/8.3/interactive/sql-expressions.html
  * @ingroup Dal_DB_Sql
  */
