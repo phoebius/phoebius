@@ -18,7 +18,7 @@
 
 /**
  * Represents a logical operator for InSetExpression to search fields in set of values
- * @ingroup Core_Expression_LogicalOperators
+ * @ingroup Dal_Expression_LogicalOperators
  */
 final class InSetLogicalOperator extends LogicalOperator
 {

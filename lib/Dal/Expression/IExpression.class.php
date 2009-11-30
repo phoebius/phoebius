@@ -19,7 +19,7 @@
 /**
  * Represents the expression tree node.
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 interface IExpression extends ISubjective, ISqlValueExpression
 {

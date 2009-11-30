@@ -17,15 +17,16 @@
  ************************************************************************************************/
 
 /**
+ * Represents a contract for objects that are allowed for subjecting other objects
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 interface ISubjectivity
 {
 	/**
-	 * @param mixed $subject subject to convert
-	 * @param ISubjective $object subject container
-	 * @return mixed converted subject
+	 * @param mixed $subject what to subject
+	 * @param ISubjective $object obsoleted optional subject container
+	 * @return mixed new object
 	 */
 	function subject($subject, ISubjective $object = null);
 }

@@ -27,14 +27,14 @@
  * 	Expression::isNull("id")
  * );
  * @endcode
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class ExpressionChain implements ISubjective, IExpression
 {
 	/**
 	 * @var ExpressionChainLogicalOperator
 	 */
-	private $logicalOperator;
+	private $operator;
 
 	/**
 	 * @var array
@@ -42,12 +42,14 @@ class ExpressionChain implements ISubjective, IExpression
 	private $chain = array();
 
 	/**
-	 * @param ExpressionChainLogicalOperator logical operation to use when merging chain elements (conjunction or disjunction)
-	 * @param array array of IExpression
+	 * @param ExpressionChainLogicalOperator $operator logical operation to use
+	 * 													when merging chain elements
+	 * 													(conjunction or disjunction)
+	 * @param array $elements array of IExpression
 	 */
-	function __construct(ExpressionChainLogicalOperator $logicalOperator, array $elements = array())
+	function __construct(ExpressionChainLogicalOperator $operator, array $elements = array())
 	{
-		$this->logicalOperator = $logicalOperator;
+		$this->operator = $operator;
 		foreach ($elements as $element) {
 			$this->add($element);
 		}
@@ -55,7 +57,8 @@ class ExpressionChain implements ISubjective, IExpression
 
 	/**
 	 * Adds the expression to the expression chain
-	 * @return ExpressionChain
+	 * @param IExpression $expression
+	 * @return ExpressionChain itself
 	 */
 	function add(IExpression $expression)
 	{
@@ -65,6 +68,8 @@ class ExpressionChain implements ISubjective, IExpression
 	}
 
 	/**
+	 * Determines whether the chain is empty or not
+	 *
 	 * @return boolean
 	 */
 	function isEmpty()
@@ -73,15 +78,9 @@ class ExpressionChain implements ISubjective, IExpression
 	}
 
 	/**
-	 * @return ExpressionChainLogicalOperator
-	 */
-	function getLogicalOperator()
-	{
-		return $this->logicalOperator;
-	}
-
-	/**
-	 * @return array
+	 * Gets the IExpression object containing within the chain
+	 *
+	 * @return array of IExpression
 	 */
 	function getChain()
 	{
@@ -90,7 +89,7 @@ class ExpressionChain implements ISubjective, IExpression
 
 	function toSubjected(ISubjectivity $object)
 	{
-		$newChain = new self ($this->logicalOperator);
+		$newChain = new self ($this->operator);
 		foreach ($this->chain as $item) {
 			$newChain->chain[] = $item->toSubjected($object);
 		}
@@ -113,7 +112,7 @@ class ExpressionChain implements ISubjective, IExpression
 				$slices[] = ' ( ' . $sqlExpression . ' ) ';
 			}
 
-			$out = join($this->logicalOperator->toDialectString($dialect), $slices);
+			$out = join($this->operator->toDialectString($dialect), $slices);
 
 			return $out;
 		}

@@ -18,7 +18,7 @@
 
 /**
  * Represents a prefix unary logical operator
- * @ingroup Core_Expression_LogicalOperators
+ * @ingroup Dal_Expression_LogicalOperators
  */
 final class PrefixUnaryLogicalOperator extends LogicalOperator
 {

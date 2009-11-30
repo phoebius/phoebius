@@ -16,9 +16,18 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents a contract for an object that can be subjected and spawned
+ *
+ * @ingroup Dal_Expression
+ */
 interface ISubjective
 {
 	/**
+	 * Gets the spawned object passed thru the other object
+	 *
+	 * @param ISubjectivity $object object that acutally performs subjection
+	 *
 	 * @return ISubjective
 	 */
 	function toSubjected(ISubjectivity $object);

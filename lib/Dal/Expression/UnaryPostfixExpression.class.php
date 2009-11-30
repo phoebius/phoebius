@@ -25,7 +25,7 @@
  * Expression::notNull("id");
  * @endcode
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class UnaryPostfixExpression implements ISubjective, IExpression
 {
@@ -37,28 +37,16 @@ class UnaryPostfixExpression implements ISubjective, IExpression
 	/**
 	 * @var UnaryPostfixLogicalOperator
 	 */
-	private $logic;
+	private $operator;
 
-	function __construct($subject, UnaryPostfixLogicalOperator $logic)
+	/**
+	 * @param mixed $subject logical subject
+	 * @param UnaryPostfixLogicalOperator $operator logical operator
+	 */
+	function __construct($subject, UnaryPostfixLogicalOperator $operator)
 	{
 		$this->subject = $subject;
-		$this->logic = $logic;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getSubject()
-	{
-		return $this->subject;
-	}
-
-	/**
-	 * @return UnaryPostfixLogicalOperator
-	 */
-	function getLogicalOperator()
-	{
-		return $this->logic;
+		$this->operator = $operator;
 	}
 
 	function toSubjected(ISubjectivity $object)
@@ -76,7 +64,7 @@ class UnaryPostfixExpression implements ISubjective, IExpression
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = $this->operator->toDialectString($dialect);
 
 		$compiledString = join(' ', $compiledSlices);
 

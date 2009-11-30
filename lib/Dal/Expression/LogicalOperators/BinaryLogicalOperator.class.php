@@ -18,7 +18,7 @@
 
 /**
  * Represents a logical operator used in {@link BinaryExpression}
- * @ingroup Core_Expression_LogicalOperators
+ * @ingroup Dal_Expression_LogicalOperators
  */
 final class BinaryLogicalOperator extends LogicalOperator
 {

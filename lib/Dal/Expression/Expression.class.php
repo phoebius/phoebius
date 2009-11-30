@@ -62,12 +62,15 @@
  * );
  * @endcode
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 final class Expression extends StaticClass
 {
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject = value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -84,6 +87,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject != value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "id" != 1
@@ -99,12 +105,14 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject > value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "id" > 1
 	 * Expression::gt("id", 1);
 	 * @endcode
-	 *
 	 *
 	 * @return BinaryExpression
 	 */
@@ -116,11 +124,15 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject >= value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "id" >= 1
 	 * Expression::gtEq("id", 1);
 	 * @endcode
+	 *
 	 * @return BinaryExpression
 	 */
 	static function gtEq($subject, $value)
@@ -130,6 +142,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject < value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -146,6 +161,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject <= value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "id" <= 1
@@ -160,6 +178,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject LIKE value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -176,6 +197,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject NOT LIKE value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "name" NOT LIKE "mobi%"
@@ -190,6 +214,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject ILIKE value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -206,6 +233,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject NOT ILIKE value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "name" NOT ILIKE "mobi%"
@@ -220,6 +250,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject SIMILAR TO value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 * @return BinaryExpression
 	 */
 	static function similar($subject, $value)
@@ -229,6 +262,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject NOT SIMILAR TO value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to match the subject
 	 * @return BinaryExpression
 	 */
 	static function notSimilar($subject, $value)
@@ -238,6 +274,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject + value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to add to the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -254,6 +293,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject - value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to subtract from the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "cost" - 2
@@ -268,6 +310,9 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject * value
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to multiply the subject
 	 *
 	 * SQL example:
 	 * @code
@@ -284,6 +329,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject / value
 	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $value value to divide the subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "cost" / 2
@@ -298,6 +346,8 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject NOT NOT NULL
+	 *
+	 * @param mixed $subject logical subject
 	 *
 	 * SQL example:
 	 * @code
@@ -314,6 +364,8 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject IS NULL
 	 *
+	 * @param mixed $subject logical subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "id" IS NULL
@@ -328,6 +380,8 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject IS TRUE
+	 *
+	 * @param mixed $subject logical subject
 	 *
 	 * SQL example:
 	 * @code
@@ -344,6 +398,8 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject IS FALSE
 	 *
+	 * @param mixed $subject logical subject
+	 *
 	 * SQL example:
 	 * @code
 	 * // "hasSmth" IS FALSE
@@ -358,6 +414,11 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject between A and B
+	 *
+	 * @param mixed $subject logical subject
+	 * @param mixed $from the beginning of the range
+	 * @param mixed $to the end of the range
+	 *
 	 *
 	 * SQL example:
 	 * @code
@@ -374,6 +435,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject in set
 	 *
+	 * @param mixed $subject logical subject
+	 * @param array $set set of value the subject should match
+	 *
 	 * SQL example:
 	 * @code
 	 * // "type" IN ("completed", "pending")
@@ -381,13 +445,16 @@ final class Expression extends StaticClass
 	 * @endcode
 	 * @return InSetExpression
 	 */
-	static function in($subject, $set)
+	static function in($subject, array $set)
 	{
 		return new InSetExpression($subject, $set, InSetLogicalOperator::in());
 	}
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: subject not in set
+	 *
+	 * @param mixed $subject logical subject
+	 * @param array $set set of value the subject should match
 	 *
 	 * SQL example:
 	 * @code
@@ -404,6 +471,9 @@ final class Expression extends StaticClass
 	/**
 	 * Creates an instance of {@link PrefixUnaryExpression} with prefixed "NOT" logical operator to
 	 * invert the value
+	 *
+	 * @param mixed $subject logical subject
+	 *
 	 * @return PrefixUnaryExpression
 	 */
 	static function not($subject)
@@ -413,6 +483,8 @@ final class Expression extends StaticClass
 
 	/**
 	 * Creates an instance of binary expression node, representing the construction: -subject
+	 *
+	 * @param mixed $subject logical subject
 	 * @return PrefixUnaryExpression
 	 */
 	static function negative($subject)

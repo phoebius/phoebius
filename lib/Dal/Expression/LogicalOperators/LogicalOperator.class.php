@@ -18,7 +18,7 @@
 
 /**
  * Represents an abstract logical operator used for connecting subjects in expression trees
- * @ingroup Core_Expression_LogicalOperators
+ * @ingroup Dal_Expression_LogicalOperators
  */
 abstract class LogicalOperator extends Enumeration implements ISqlCastable
 {

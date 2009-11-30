@@ -19,7 +19,7 @@
 /**
  * Represents a unary prefix expression.
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class PrefixUnaryExpression implements ISubjective, IExpression
 {
@@ -31,38 +31,22 @@ class PrefixUnaryExpression implements ISubjective, IExpression
 	/**
 	 * @var PrefixUnaryLogicalOperator
 	 */
-	private $logic;
+	private $operator;
 
 	/**
-	 * @param PrefixUnaryLogicalOperator
-	 * @param mixed
+	 * @param PrefixUnaryLogicalOperator $operator logical operator
+	 * @param mixed $subject logical subject
 	 */
-	function __construct(PrefixUnaryLogicalOperator $logic, $subject)
+	function __construct(PrefixUnaryLogicalOperator $operator, $subject)
 	{
-		$this->logic = $logic;
+		$this->operator = $operator;
 		$this->subject = $subject;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getSubject()
-	{
-		return $this->subject;
-	}
-
-	/**
-	 * @return PrefixUnaryLogicalOperator
-	 */
-	function getLogicalOperator()
-	{
-		return $this->logic;
 	}
 
 	function toSubjected(ISubjectivity $object)
 	{
 		return new self(
-			$this->logic,
+			$this->operator,
 			$object->subject($this->subject, $this)
 		);
 	}
@@ -71,7 +55,7 @@ class PrefixUnaryExpression implements ISubjective, IExpression
 	{
 		$compiledSlices = array();
 
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = $this->operator->toDialectString($dialect);
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';

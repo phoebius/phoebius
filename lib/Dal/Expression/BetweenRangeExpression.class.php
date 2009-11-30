@@ -24,7 +24,7 @@
  * // "price" BETWEEN 50 AND 100
  * Expression::between("price", 50, 100);
  * @endcode
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class BetweenRangeExpression implements ISubjective, IExpression
 {
@@ -43,35 +43,16 @@ class BetweenRangeExpression implements ISubjective, IExpression
 	 */
 	private $to;
 
+	/**
+	 * @param mixed $subject logical subject
+	 * @param mixed $from starting value of the range
+	 * @param mixed $to ending value of the range
+	 */
 	function __construct($subject, $from, $to)
 	{
 		$this->subject = $subject;
 		$this->from = $from;
 		$this->to = $to;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getSubject()
-	{
-		return $this->subject;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getFrom()
-	{
-		return $this->from;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getTo()
-	{
-		return $this->to;
 	}
 
 	function toSubjected(ISubjectivity $object)

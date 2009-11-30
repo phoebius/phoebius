@@ -18,7 +18,7 @@
 
 /**
  * Represents a logical operator used in expression chaining
- * @ingroup Core_Expression_LogicalOperators
+ * @ingroup Dal_Expression_LogicalOperators
  */
 final class ExpressionChainLogicalOperator extends LogicalOperator
 {

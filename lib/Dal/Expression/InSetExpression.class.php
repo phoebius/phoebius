@@ -25,7 +25,7 @@
  * Expression::in("type", array("completed", "pending"));
  * @endcode
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class InSetExpression implements ISubjective
 {
@@ -42,45 +42,21 @@ class InSetExpression implements ISubjective
 	/**
 	 * @var InSetLogicalOperator
 	 */
-	private $logic;
+	private $operator;
 
 	/**
-	 * @param mixed expression subject
-	 * @param array set of values the subject should match
-	 * @param InSetLogicalOperator|null matching operator
+	 * @param mixed $subject logical subject
+	 * @param array $set set of values the subject should match
+	 * @param InSetLogicalOperator|null $operator logical operator
 	 */
-	function __construct($subject, array $set, InSetLogicalOperator $logic = null)
+	function __construct($subject, array $set, InSetLogicalOperator $operator = null)
 	{
 		$this->subject = $subject;
 		$this->set = $set;
-		$this->logic =
-			$logic
-				? $logic
+		$this->operator =
+			$operator
+				? $operator
 				: InSetLogicalOperator::in();
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getSubject()
-	{
-		return $this->subject;
-	}
-
-	/**
-	 * @return array
-	 */
-	function getSet()
-	{
-		return $this->set;
-	}
-
-	/**
-	 * @return InSetLogicalOperator
-	 */
-	function getLogicalOperator()
-	{
-		return $this->logic;
 	}
 
 	function toSubjected(ISubjectivity $object)
@@ -88,7 +64,7 @@ class InSetExpression implements ISubjective
 		return new self (
 			$object->subject($this->subject, $this),
 			$this->convertSet($object),
-			$this->logic
+			$this->operator
 		);
 	}
 
@@ -114,7 +90,7 @@ class InSetExpression implements ISubjective
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = $this->operator->toDialectString($dialect);
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $values->toDialectString($dialect);
 		$compiledSlices[] = ')';

@@ -25,7 +25,7 @@
  * Expression::eq("id", 1);
  * @endcode
  *
- * @ingroup Core_Expression
+ * @ingroup Dal_Expression
  */
 class BinaryExpression implements ISubjective, IExpression
 {
@@ -42,44 +42,25 @@ class BinaryExpression implements ISubjective, IExpression
 	/**
 	 * @var BinaryLogicalOperator
 	 */
-	private $logic;
+	private $operator;
 
-	function __construct($subject, BinaryLogicalOperator $logic, $value)
+	/**
+	 * @param mixed $subject logical subject
+	 * @param BinaryLogicalOperator $operator logical operator
+	 * @param mixed $value value to match the subject
+	 */
+	function __construct($subject, BinaryLogicalOperator $operator, $value)
 	{
 		$this->subject = $subject;
-		$this->logic = $logic;
+		$this->operator = $operator;
 		$this->value = $value;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getSubject()
-	{
-		return $this->subject;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
-	 * @return BinaryLogicalOperator
-	 */
-	function getLogicalOperator()
-	{
-		return $this->logic;
 	}
 
 	function toSubjected(ISubjectivity $object)
 	{
 		return new self (
 			$object->subject($this->subject, $this),
-			$this->logic,
+			$this->operator,
 			$object->subject($this->value, $this)
 		);
 	}
@@ -91,7 +72,7 @@ class BinaryExpression implements ISubjective, IExpression
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->subject->toDialectString($dialect);
 		$compiledSlices[] = ')';
-		$compiledSlices[] = $this->logic->toDialectString($dialect);
+		$compiledSlices[] = $this->operator->toDialectString($dialect);
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->value->toDialectString($dialect);
 		$compiledSlices[] = ')';
