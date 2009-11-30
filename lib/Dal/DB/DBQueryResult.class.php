@@ -19,6 +19,7 @@
 /**
  * Represents a query result resource.
  *
+ * @aux
  * @ingroup Dal_DB
  */
 class DBQueryResult

@@ -18,6 +18,7 @@
 
 /**
  * Represents a sql join method
+ *
  * @ingroup Dal_DB_Query
  * @aux
  */
@@ -30,10 +31,6 @@ final class SqlJoinMethod extends Enumeration implements ISqlCastable
 	const INNER = 'INNER';
 	const CROSS = 'CROSS';
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		return $this->getValue() . ' JOIN';

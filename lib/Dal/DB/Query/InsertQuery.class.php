@@ -18,81 +18,38 @@
 
 /**
  * Represents the database query for inserting rows
+ *
  * @ingroup Dal_DB_Query
  */
-class InsertQuery implements ISqlQuery
+class InsertQuery extends RowModificationQuery implements ISqlQuery
 {
 	/**
 	 * @var string
 	 */
-	private $tableName;
+	private $table;
 
 	/**
-	 * @var SqlFieldValueCollection
-	 */
-	private $get;
-
-	/**
-	 * Creates an instance of {@link DeleteQuery}
+	 * InsertQuery static constructor
 	 * @param string $table
 	 * @return InsertQuery
 	 */
-	static function create($table, SqlFieldValueCollection $fvc = null)
+	static function create($table)
 	{
-		return new self($table, $fvc);
+		return new self($table);
 	}
 
 	/**
 	 * @param string $table table name
 	 */
-	function __construct($table, SqlFieldValueCollection $fvc = null)
+	function __construct($table)
 	{
 		Assert::isScalar($table);
 
 		$this->tableName = $table;
-		$this->fields =
-			$fvc
-				? $fvc
-				: new SqlFieldValueCollection();
+
+		parent::__construct();
 	}
 
-	/**
-	 * Adds a custom field=>value set
-	 * @return InsertQuery an object itself
-	 */
-	function setFieldValueCollection(SqlFieldValueCollection $set)
-	{
-		$this->fields = $set;
-
-		return $this;
-	}
-
-	/**
-	 * Returns a field=>value to be inserted with a database query
-	 * @return SqlFieldValueCollection
-	 */
-	function getFieldValueCollection()
-	{
-		return $this->fields;
-	}
-
-	/**
-	 * Adds a custom field and it's corresponding value to the field=>value set
-	 * @param string $field
-	 * @param SqlValue $value
-	 * @return InsertQuery an object itself
-	 */
-	function addFieldAndValue($field, SqlValue $value)
-	{
-		$this->fields->add($field, $value);
-
-		return $this;
-	}
-
-	/**
-	 * Casts an object to the plain string SQL query with database dialect
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$querySlices = array();
@@ -113,13 +70,7 @@ class InsertQuery implements ISqlQuery
 		return $compiledQuery;
 	}
 
-	/**
-	 * @see ISqlQuery::getCastedParameters()
-	 *
-	 * @param IDialect $dialect
-	 * @return array
-	 */
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}
@@ -129,7 +80,7 @@ class InsertQuery implements ISqlQuery
 	 */
 	private function getCompiledFields(IDialect $dialect)
 	{
-		$list = new SqlFieldArray($this->fields->getKeys());
+		$list = new SqlFieldArray($this->getRow()->getKeys());
 
 		return $list->toDialectString($dialect);
 	}
@@ -139,7 +90,7 @@ class InsertQuery implements ISqlQuery
 	 */
 	private function getCompiledValues(IDialect $dialect)
 	{
-		$list = new SqlValueArray($this->fields->getValues());
+		$list = new SqlValueArray($this->getRow()->getValues());
 
 		return $list->toDialectString($dialect);
 	}

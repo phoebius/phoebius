@@ -17,11 +17,14 @@
  ************************************************************************************************/
 
 /**
- * Represents a SQL join with simple condition where the joining tables has the identical names
+ * Represents a SelectQuerySource joiner which joins multiple sources by the set of same fiels
+ *
+ * This is the same for `JOIN ON `.
+ *
  * @ingroup Dal_DB_Query
  * @aux
  */
-class SqlSimpleJoin extends SqlJoin
+final class SqlSimpleJoin extends SqlJoin
 {
 	/**
 	 * @var SqlFieldArray
@@ -29,31 +32,23 @@ class SqlSimpleJoin extends SqlJoin
 	private $identicalColumns;
 
 	/**
-	 * @param string $tableName
-	 * @param string|null
-	 * @param SqlJoinMethod $joinMethod
+	 * @param SelectQuerySource $source source to which join operation should be applied
+	 * @param SqlJoinMethod $joinMethod method to use when performing join
 	 * @param SqlFieldArray $identicalColumns set of column names that should be used in joining
 	 */
-	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, SqlFieldArray $identicalColumns)
+	function __construct(SelectQuerySource $source, SqlJoinMethod $joinMethod, SqlFieldArray $identicalColumns)
 	{
 		$this->identicalColumns = $identicalColumns;
 
-		parent::__construct($tableName, $alias, $joinMethod);
+		parent::__construct($source, $joinMethod);
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();
 
 		$compiledSlices[] = $this->getJoinMethod()->toDialectString($dialect);
-		$compiledSlices[] = $dialect->quoteIdentifier($this->getTableName());
-		if (($alias = $this->getTableAlias())) {
-			$compiledSlices[] = $dialect->quoteIdentifier($alias);
-		}
+		$compiledSlices[] = $this->getSource()->toDialectString($dialect);
 		$compiledSlices[] = 'USING';
 		$compiledSlices[] = '(';
 		$compiledSlices[] = $this->identicalColumns->toDialectString($dialect);

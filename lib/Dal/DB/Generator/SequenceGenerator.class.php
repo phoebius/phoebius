@@ -16,6 +16,14 @@
  *
  ************************************************************************************************/
 
+/**
+ * Sequence-based pre-generator. Retrieves the new primary key value by invoking the
+ * database-native sequence incrementor.
+ *
+ * @see PostgeSQL sequences
+ *
+ * @ingroup Dal_DB_Generator
+ */
 class SequenceGenerator implements IIDGenerator
 {
 	/**
@@ -28,6 +36,10 @@ class SequenceGenerator implements IIDGenerator
 	 */
 	private $query;
 
+	/**
+	 * @param DB $db a sequence owner
+	 * @param ISqlSelectQuery $query a query to invoke the sequence incrementor
+	 */
 	function __construct(DB $db, ISqlSelectQuery $query)
 	{
 		$this->db = $db;

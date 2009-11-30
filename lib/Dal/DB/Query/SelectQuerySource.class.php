@@ -17,14 +17,24 @@
  ************************************************************************************************/
 
 /**
- * Represents an abstract data source where the {@link SelectQuery} should be applied
+ * Represents a source for selection
+ *
+ * Source is represented as ISqlValueExpression and can be the following:
+ * - SqlIdentifier to specify tables
+ * - SqlFunction to aggregate or produce the results
+ * - Expression to produce the results
+ * - SelectQuery as a sub-query
+ * - AliasedSqlValueExpression to label the source
+ *
+ * @see SelectQuery::addSource()
+ *
  * @ingroup Dal_DB_Query
  * @aux
  */
 final class SelectQuerySource implements ISqlValueExpression
 {
 	/**
-	 * @var array
+	 * @var array of SqlJoin
 	 */
 	private $joins = array();
 
@@ -33,13 +43,16 @@ final class SelectQuerySource implements ISqlValueExpression
 	 */
 	private $source;
 
+	/**
+	 * @param ISqlValueExpression $source expression to use as source
+	 */
 	function __construct(ISqlValueExpression $source)
 	{
 		$this->source = $source;
 	}
 
 	/**
-	 * Adds a join condition to the target
+	 * Joins a source
 	 * @return SelectQuerySource
 	 */
 	function join(SqlJoin $join)
@@ -50,18 +63,14 @@ final class SelectQuerySource implements ISqlValueExpression
 	}
 
 	/**
-	 * Gets the set of {@link SqlJoin} joins
-	 * @return array
+	 * Get joined sources
+	 * @return array of SqlJoin
 	 */
 	function getJoins()
 	{
 		return $this->joins;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();
@@ -75,7 +84,6 @@ final class SelectQuerySource implements ISqlValueExpression
 	}
 
 	/**
-	 * Casts the set of joins to the SQL
 	 * @return string
 	 */
 	private function compileJoins(IDialect $dialect)

@@ -272,7 +272,9 @@ abstract class DB
 
 	/**
 	 * Connects to the dabase using the data specified inside handle
-	 * @throws DBConnectionException
+	 * @param boolean $force whether to force begin new connection even if the same connection
+	 * 						to this DB is already established
+	 * @throws DBConnectionException if connection failed to be established
 	 * @return DB itself
 	 */
 	abstract function connect($force = false);
@@ -284,8 +286,9 @@ abstract class DB
 	abstract function disconnect();
 
 	/**
-	 * Returns the number of rows affected by the query sent via sendQuery()
+	 * Returns the number of rows affected by the query sent via DB::sendQuery()
 	 * @see DB::sendQuery()
+	 * @param DBQueryResult $result query execution result returned by DB::sendQuery()
 	 * @return integer
 	 */
 	abstract function getAffectedRowsNumber(DBQueryResult $result);
@@ -293,6 +296,7 @@ abstract class DB
 	/**
 	 * Returns the number of rows fetched by the query sent via sendQuery()
 	 * @see DB::sendQuery()
+	 * @param DBQueryResult $result query execution result returned by DB::sendQuery()
 	 * @return integer
 	 */
 	abstract function getFetchedRowsNumber(DBQueryResult $result);
@@ -306,7 +310,7 @@ abstract class DB
 	/**
 	 * Passes the query to the database and returns the query result, without fetching
 	 * the result.
-	 * @throws DBQueryException
+	 * @throws DBQueryException if query execution failed for some reason
 	 * @see DB::getAffectedRowsNumber()
 	 * @see DB::getFetchedRowsNumber()
 	 * @return DBQueryResult
@@ -316,7 +320,7 @@ abstract class DB
 	/**
 	 * Passes the query to the database and fetches a single-row result as an array representing
 	 * a row
-	 * @throws RowNotFoundException
+	 * @throws RowNotFoundException if query returned empty result
 	 * @return array
 	 */
 	abstract function getRow(ISqlSelectQuery $query);
@@ -337,13 +341,16 @@ abstract class DB
 
 	/**
 	 * Passes the query to the database and fetches the first field from a single-row result
-	 * @throws CellNotFoundException
+	 * @throws CellNotFoundException if query returned empty result
 	 * @return scalar
 	 */
 	abstract function getCell(ISqlSelectQuery $query);
 
 	/**
 	 * Gets the column value generator
+	 * @param string $tableName name of the table
+	 * @param string $columnName name of the column
+	 * @param DBType $type type of the column
 	 * @return IIDGenerator
 	 */
 	abstract function getGenerator($tableName, $columnName, DBType $type);

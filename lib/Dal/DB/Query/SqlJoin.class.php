@@ -17,20 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Represents a SQL join wrapper for {@link SelectQuery}
+ * Represents an abstract SelectQuerySource joiner
+ *
  * @ingroup Dal_DB_Query
  * @aux
  */
 abstract class SqlJoin implements ISqlCastable
 {
 	/**
-	 * @var string
+	 * @var SelectQuerySource
 	 */
-	private $tableName;
-	/**
-	 * @var string
-	 */
-	private $alias;
+	private $source;
 
 	/**
 	 * @var SqlJoinMethod
@@ -38,37 +35,26 @@ abstract class SqlJoin implements ISqlCastable
 	private $joinMethod;
 
 	/**
-	 * @param string $tableName
-	 * @param string|null
-	 * @param SqlJoinMethod $joinMethod
+	 * @param SelectQuerySource $source source to which join operation should be applied
+	 * @param SqlJoinMethod $joinMethod method to use when performing join
 	 */
-	function __construct($tableName, $alias, SqlJoinMethod $joinMethod)
+	function __construct(SelectQuerySource $source, SqlJoinMethod $joinMethod)
 	{
-		$this->tableName = $tableName;
+		$this->source = $source;
 		$this->joinMethod = $joinMethod;
-		$this->alias = $alias;
 	}
 
 	/**
-	 * Returns the table name that is to be joined
-	 * @return string
+	 * Gets the source to which join operation is applied
+	 * @return SelectQuerySource
 	 */
-	protected function getTableName()
+	protected function getSource()
 	{
-		return $this->tableName;
+		return $this->source;
 	}
 
 	/**
-	 * Returns the table alias that is to be joined
-	 * @return string
-	 */
-	protected function getTableAlias()
-	{
-		return $this->alias;
-	}
-
-	/**
-	 * Returns the join method to be used when mergin the set of tables
+	 * Gets the join method
 	 * @return SqlJoinMethod
 	 */
 	protected function getJoinMethod()

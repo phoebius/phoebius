@@ -56,7 +56,7 @@ interface IDialect
 	/**
 	 * Gets the set of ISqlQuery queries for building a database table and associated objects
 	 *
-	 * @return array set of ISqlQuery
+	 * @return array of ISqlQuery
 	 */
 	function getTableQuerySet(DBTable $table);
 }

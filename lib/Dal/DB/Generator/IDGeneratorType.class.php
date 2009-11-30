@@ -17,7 +17,13 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Types_Id
+ * Represents an IIDGenerator type. A generator type defines the logic the generator should
+ * be called for new primary key retrieval:
+ * - "PRE" type defines a generator that should be invoked before actual insert
+ * - "POST" type defines a generator that should be invoked after an insert
+ * - "BOTH" type requires generator to be called in both cases
+ *
+ * @ingroup Dal_DB_Generator
  */
 final class IDGeneratorType extends Enumeration
 {

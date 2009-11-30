@@ -89,7 +89,7 @@ class Transaction
 			$query[] = ' '.$this->mode->toDialectString($this->db->getDialect());
 		}
 
-		$this->db->sendQuery(new PlainQuery(join(' ', $query)));
+		$this->db->sendQuery(new RawSqlQuery(join(' ', $query)));
 
 		$this->isStarted = true;
 		$this->isCommited = false;
@@ -111,7 +111,7 @@ class Transaction
 		$this->isCommited = true;
 		$this->isRolledBack = false;
 
-		$this->db->sendQuery(new PlainQuery('COMMIT'));
+		$this->db->sendQuery(new RawSqlQuery('COMMIT'));
 	}
 
 	/**
@@ -144,7 +144,7 @@ class Transaction
 		$this->isCommited = false;
 		$this->isRolledBack = true;
 
-		$this->db->sendQuery(new PlainQuery(join(' ', $query)));
+		$this->db->sendQuery(new RawSqlQuery(join(' ', $query)));
 	}
 
 	/**
@@ -157,7 +157,7 @@ class Transaction
 	{
 		$this->savepoints[] = $savepointId;
 		$query = 'SAVEPOINT ' . $this->db->quoteIdentifier($savepointId);
-		$this->db->sendQuery(new PlainQuery($query));
+		$this->db->sendQuery(new RawSqlQuery($query));
 
 		return $this;
 	}

@@ -17,7 +17,10 @@
  ************************************************************************************************/
 
 /**
- * @ingroup
+ * Primary key generator proxy. Retrieves the new primary key via the actual generator and maps
+ * the resulting value to the domain object thru OrmPropertyType
+ *
+ * @ingroup Dal_DB_Generator
  */
 final class PropertyValueGenerator implements IIDGenerator
 {
@@ -31,6 +34,10 @@ final class PropertyValueGenerator implements IIDGenerator
 	 */
 	private $generator;
 
+	/**
+	 * @param OrmPropertyType $type type to map thru
+	 * @param IIDGenerator $actualGenerator actual generator to get the new primary key
+	 */
 	function __construct(OrmPropertyType $type, IIDGenerator $actualGenerator)
 	{
 		$this->type = $type;

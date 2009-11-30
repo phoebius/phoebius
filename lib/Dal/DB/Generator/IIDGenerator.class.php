@@ -16,15 +16,25 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents a primary key value generator contract.
+ *
+ * @ingroup Dal_DB_Generator
+ */
 interface IIDGenerator
 {
 	/**
+	 * Gets the type of the generator. Type of the generator encapsulates the calling logic
+	 * of the generator.
+	 *
 	 * @return IDGeneratorType
 	 */
 	function getType();
 
 	/**
-	 * @return mixed
+	 * Gets the new primary key value
+	 *
+	 * @return mixed a new value itself
 	 */
 	function generate(IdentifiableOrmEntity $entity);
 }

@@ -36,7 +36,7 @@ final class EntityQueryBuilder implements ISubjectivity
 	/**
 	 * @var EntityQuery
 	 */
-	private $entityQuery;
+	private $condition;
 
 	/**
 	 * @var array of SelectQuerySource
@@ -263,12 +263,12 @@ final class EntityQueryBuilder implements ISubjectivity
 				? SqlJoinMethod::INNER // exactlyOne association is strict enough
 				: SqlJoinMethod::LEFT;
 
-		$joinExpr = Expression::andChain();
+		$condition = Expression::andChain();
 		$srcSqlFields = $property->getFields();
 		$dstSqlFields = $builder->entityQuery->getEntity()->getLogicalSchema()->getIdentifier()->getFields();
 
 		foreach ($srcSqlFields as $k => $v) {
-			$joinExpr->add(
+			$condition->add(
 				Expression::eq(
 					new SqlColumn($srcSqlFields[$k], $this->alias),
 					new SqlColumn($dstSqlFields[$k], $builder->alias)
@@ -278,10 +278,12 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$source->join(
 			new SqlConditionalJoin(
-				$builder->table,
-				$builder->alias,
+				new AliasedSqlValueExpression(
+					new SqlIdentifier($builder->table),
+					$builder->alias
+				),
 				new SqlJoinMethod($joinMethod),
-				$joinExpr
+				$condition
 			)
 		);
 	}

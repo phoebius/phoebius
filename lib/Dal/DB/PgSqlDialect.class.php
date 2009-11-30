@@ -109,14 +109,14 @@ class PgSqlDialect extends Dialect
 			if ($type instanceof DBType && $type->isGenerated()) {
 				$sqName = $this->getSequenceName($table->getName(), $column->getName());
 
-				$preQueries[] = new PlainQuery(
+				$preQueries[] = new RawSqlQuery(
 					'CREATE SEQUENCE %s;',
 					array(
 						new SqlIdentifier($sqName)
 					)
 				);
 
-				$postQueries[] = new PlainQuery(
+				$postQueries[] = new RawSqlQuery(
 					'ALTER SEQUENCE %s OWNED BY %s;',
 					array(
 						new SqlIdentifier($sqName),
@@ -139,7 +139,7 @@ class PgSqlDialect extends Dialect
 			}
 
 			if (!empty($columns)) {
-				$postQueries[] = new PlainQuery(
+				$postQueries[] = new RawSqlQuery(
 					'CREATE INDEX %s ON %s (' . join($columns) . ');',
 					array(
 						new SqlIdentifier($constraint->getName() . '_idx'),

@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * Represents a query for creating database tables.
+ *
  * @ingroup Dal_DB_Query
  */
-class CreateTableQuery implements ISqlQuery
+final class CreateTableQuery implements ISqlQuery
 {
 	/**
 	 * @var DBTable
@@ -31,15 +33,14 @@ class CreateTableQuery implements ISqlQuery
 	 */
 	private $commaSeparatedQueryParts = array();
 
+	/**
+	 * @param DBTable $table a table object that represent an expected database table
+	 */
 	function __construct(DBTable $table)
 	{
 		$this->table = $table;
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$queryParts = array();
@@ -60,10 +61,7 @@ class CreateTableQuery implements ISqlQuery
 		return join('', $queryParts);
 	}
 
-	/**
-	 * @return array
-	 */
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}

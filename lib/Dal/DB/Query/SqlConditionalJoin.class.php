@@ -17,11 +17,14 @@
  ************************************************************************************************/
 
 /**
- * Represents a SQL join with a complex condition
+ * Represents a SelectQuerySource joiner which uses conditional expression for merging.
+ *
+ * This is the same for `JOIN USING`.
+ *
  * @ingroup Dal_DB_Query
  * @aux
  */
-class SqlConditionalJoin extends SqlJoin
+final class SqlConditionalJoin extends SqlJoin
 {
 	/**
 	 * @var IExpression
@@ -29,34 +32,26 @@ class SqlConditionalJoin extends SqlJoin
 	private $condition;
 
 	/**
-	 * @param string $tableName
-	 * @param string|null
-	 * @param SqlJoinMethod $joinMethod
-	 * @param IExpression $condition
+	 * @param SelectQuerySource $source source to which join operation should be applied
+	 * @param SqlJoinMethod $joinMethod method to use when performing join
+	 * @param IExpression $condition condition to use when performing join
 	 */
-	function __construct($tableName, $alias, SqlJoinMethod $joinMethod, IExpression $expression)
+	function __construct(SelectQuerySource $source, SqlJoinMethod $joinMethod, IExpression $condition)
 	{
-		parent::__construct($tableName, $alias, $joinMethod);
+		$this->condition = $condition;
 
-		$this->expression = $expression;
+		parent::__construct($source, $joinMethod);
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$compiledSlices = array();
 
 		$compiledSlices[] = $this->getJoinMethod()->toDialectString($dialect);
-		$compiledSlices[] = $dialect->quoteIdentifier($this->getTableName());
-		if (($alias = $this->getTableAlias())) {
-			$compiledSlices[] = $dialect->quoteIdentifier($alias);
-		}
+		$compiledSlices[] = $this->getSource()->toDialectString($dialect);
 		$compiledSlices[] = 'ON';
 		$compiledSlices[] = '(';
-		$compiledSlices[] = $this->expression->toDialectString($dialect);
+		$compiledSlices[] = $this->condition->toDialectString($dialect);
 		$compiledSlices[] = ')';
 
 		$compiledString = join(' ', $compiledSlices);

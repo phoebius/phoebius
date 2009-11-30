@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents a dummy dialect
+ * Represents a dummy dialect which does not depend on any DB
  *
  * @ingroup Dal_DB
  */
@@ -59,25 +59,25 @@ final class DummyDialect extends LazySingleton implements IDialect
 	{
 		$type = $dbType->getId();
 
-		if ($dbType->hasSize()) {
-			$type .= '(' . $dbType->getSize() . ')';
+		if (($size = $dbType->getSize())) {
+			$type .= '(' . $size. ')';
 		}
 
-		if ($dbType->hasPrecision()) {
-			$type .= '(' . $dbType->getPrecision();
-			if ($dbType->getScale()) {
-				$type .= ',' . $dbType->getScale();
+		if (($precision = $dbType->getPrecision())) {
+			$type .= '(' . $precision;
+			if (($scale = $dbType->getScale())) {
+				$type .= ',' . $scale;
 			}
 
 			$type .= ')';
 		}
 
-		if ($dbType->hasTimezone()) {
-			$type .= ' ' . ($dbType->withTimezeone() ? 'with' : 'without') . ' time zone';
+		if (!$dbType->isNullable()) {
+			$type .= ' NOT NULL';
 		}
 
-		if ($dbType->isNotNullable()) {
-			$type .= ' NOT NULL';
+		if ($dbType->isGenerated()) {
+			$type .= ' GENERATED';
 		}
 
 		return $type;

@@ -17,9 +17,21 @@
  ************************************************************************************************/
 
 /**
+ * sprintf-based SQL query wrapper.
+ *
+ * Accepts textual representation of SQL query and allows to use sprintf placeholders within a
+ * query. Placeholder values should implement ISqlCastable.
+ *
+ * Example:
+ * @code
+ * $query = new RawSqlQuery('CREATE INDEX %s ON table.column', array(new SqlIdentifier("a_idx"));
+ * @endcode
+ *
+ * @warning avoid using this class in real-wolrd applications
+ *
  * @ingroup Dal_DB_Query
  */
-class PlainQuery implements ISqlQuery
+class RawSqlQuery implements ISqlQuery
 {
 	/**
 	 * @var string
@@ -27,29 +39,26 @@ class PlainQuery implements ISqlQuery
 	private $query;
 
 	/**
-	 * @var array of {@link ISqlCastable}
+	 * @var array of ISqlCastable
 	 */
 	private $placeholderValues = array();
 
 	/**
-	 * @param string $query
-	 * @return PlainQuery
-	 */
-	static function create($query, array $placeholderValues = array())
-	{
-		return new self ($query, $placeholderValues);
-	}
-
-	/**
-	 * @param string $query
+	 * @param string $query textual representation of a query
+	 * @param array $placeholderValues array of ISqlCastable placeholder values
 	 */
 	function __construct($query, array $placeholderValues = array())
 	{
-		$this->setQuery($query);
+		Assert::isScalar($query);
+
+		$this->query = $query;
+
 		$this->setPlaceholderValues($placeholderValues);
 	}
 
 	/**
+	 * Gets the textual representation of a query
+	 *
 	 * @return string
 	 */
 	function getQueryAsText()
@@ -57,59 +66,6 @@ class PlainQuery implements ISqlQuery
 		return $this->query;
 	}
 
-	/**
-	 * @param string $query
-	 * @return PlainQuery
-	 */
-	function setQuery($query)
-	{
-		Assert::isScalar($query);
-
-		$this->query = $query;
-
-		return $this;
-	}
-
-	/**
-	 * @return PlainQuery
-	 */
-	function setPlaceholderValues(array $placeholderValues)
-	{
-		$this->placeholderValues = array();
-
-		foreach ($placeholderValues as $placeholderValue) {
-			$this->addPlaceholderValue($placeholderValue);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return PlainQuery
-	 */
-	function addPlaceholderValue(ISqlCastable $placeholderValue)
-	{
-		$this->placeholderValues[] = $placeholderValue;
-
-		return $this;
-	}
-
-	/**
-	 * @return PlainQuery
-	 */
-	function dropPlaceholderValues()
-	{
-		$this->placeholderValues = array();
-
-		return $this;
-	}
-
-	/**
-	 * @see ISqlCastable::toDialectString()
-	 *
-	 * @param IDialect $dialect
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		if (empty($this->placeholderValues)) {
@@ -128,13 +84,7 @@ class PlainQuery implements ISqlQuery
 		}
 	}
 
-	/**
-	 * @see ISqlQuery::getCastedParameters()
-	 *
-	 * @param IDialect $dialect
-	 * @return array
-	 */
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}

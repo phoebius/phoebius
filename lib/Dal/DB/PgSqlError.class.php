@@ -17,8 +17,9 @@
  ************************************************************************************************/
 
 /**
- * PostgreSql error codes enumeration. Original code is created by onPHP team (Konstantin V.
- * Arkhipov)
+ * PostgreSql error codes enumeration.
+ *
+ * Original code is created by onPHP team (Konstantin V. Arkhipov)
  * @ingroup Dal_DB
  */
 final class PgSqlError extends Enumeration
@@ -315,7 +316,7 @@ final class PgSqlError extends Enumeration
 	function getErrorDescription()
 	{
 		if (empty(self::$sanitized)) {
-			$this->readDescriptions();
+			self::$sanitized = $this->readDescriptions();
 		}
 
 		return self::$sanitized[$this->getValue()];
@@ -323,9 +324,13 @@ final class PgSqlError extends Enumeration
 
 	private function readDescriptions()
 	{
+		$yield = array();
+
 		foreach ($this->getMembers() as $constant => $member) {
-			self::$sanitized[$member] = str_replace('_', ' ', $constant);
+			$yield[$member] = str_replace('_', ' ', $constant);
 		}
+
+		return $yield;
 	}
 
 	private function fixValue($value)

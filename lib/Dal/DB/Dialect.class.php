@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an abstract dialect with type association implementation
+ *
  * @ingroup Dal_DB
  */
 abstract class Dialect implements IDialect

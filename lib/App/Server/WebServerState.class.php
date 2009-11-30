@@ -23,7 +23,7 @@
  */
 class WebServerState extends CliServerState implements IWebServerState
 {
-	private static $get = array
+	private static $row = array
 	(
 		'HTTP_X_FORWARDED_FOR', 'CLIENT_IP', 'HTTP_FROM', 'HTTP_CLIENT_IP', 'HTTP_CLIENTIP',
 		'HTTP_CLIENT', 'HTTP_X_FORWARDED', 'HTTP_X_DELEGATE_REMOTE_HOST', 'HTTP_SP_HOST',
@@ -95,7 +95,7 @@ class WebServerState extends CliServerState implements IWebServerState
 	{
 		$envVars = $this->getEnvVars();
 
-		foreach (self::$get as $field) {
+		foreach (self::$row as $field) {
 			if (isset($envVars[$field])) {
 				try {
 					return new IP($envVars[$field]);
@@ -120,7 +120,7 @@ class WebServerState extends CliServerState implements IWebServerState
 
 		$ips[] = $this->getRemoteAddress();
 		$envVars = $this->getEnvVars();
-		foreach (self::$get as $field) {
+		foreach (self::$row as $field) {
 			if (isset($envVars[$field])) {
 				try {
 					$ips[] = new IP($envVars[$field]);

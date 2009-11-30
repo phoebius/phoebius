@@ -38,7 +38,7 @@ class MySqlDB extends DB
 	/**
 	 * @var resource|null
 	 */
-	private $link = null;
+	private $link;
 
 	/**
 	 * @var MySqlDialect
@@ -46,6 +46,8 @@ class MySqlDB extends DB
 	private $myDialect;
 
 	/**
+	 * Static alias for the ctor
+	 *
 	 * @return MySqlDB
 	 */
 	static function create()

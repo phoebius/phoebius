@@ -17,22 +17,22 @@
  ************************************************************************************************/
 
 /**
- * Represents an object that can be casted to a plain string SQL query for selecting data
+ * Defines an object that represents a database query for selecting tuples
  * @ingroup Dal_DB_Query
  */
 interface ISqlSelectQuery extends ISqlQuery
 {
 	/**
-	 * Sets a limit for row selection
+	 * Sets the maximum number of rows to return
 	 * @param integer $limit positive integer
-	 * @return ISqlSelectQuery an object itself
+	 * @return ISqlSelectQuery itself
 	 */
 	function setLimit($limit);
 
 	/**
-	 * Sets an offset for row selection
+	 * Sets the number of rows to skip before starting to return rows
 	 * @param integer $offset positive integer
-	 * @return ISqlSelectQuery an object itself
+	 * @return ISqlSelectQuery itself
 	 */
 	function setOffset($offset);
 

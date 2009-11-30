@@ -33,14 +33,10 @@ class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 	 * expression
 	 * @return OrderChain an object itself
 	 */
-	function asc()
+	function setAsc()
 	{
-		if (!$this->isEmpty()) {
-			foreach ($this->getList() as $expression) {
-				$expression->setNone();
-			}
-
-			$this->getLast()->setAsc();
+		foreach ($this->getList() as $expression) {
+			$expression->setAsc();
 		}
 
 		return $this;
@@ -51,14 +47,10 @@ class OrderChain extends TypedValueArray implements ISubjective, ISqlCastable
 	 * expression
 	 * @return OrderChain
 	 */
-	function desc()
+	function setDesc()
 	{
-		if (!$this->isEmpty()) {
-			foreach ($this->toArray() as $expression) {
-				$expression->setNone();
-			}
-
-			$this->getLast()->setDesc();
+		foreach ($this->toArray() as $expression) {
+			$expression->setDesc();
 		}
 
 		return $this;

@@ -297,7 +297,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$affected = $this->executeQuery(
 			new InsertQuery(
 				$this->physicalSchema->getTable(),
-				new SqlFieldValueCollection($this->map->disassemble($entity))
+				new SqlRow($this->map->disassemble($entity))
 			)
 		);
 

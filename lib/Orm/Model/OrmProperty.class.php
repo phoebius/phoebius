@@ -49,7 +49,7 @@ class OrmProperty
 	/**
 	 * @var array
 	 */
-	private $fields = array();
+	private $row = array();
 
 	/**
 	 * @var boolean

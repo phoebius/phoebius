@@ -17,31 +17,26 @@
  ************************************************************************************************/
 
 /**
- * Represetns a key=>value collection if SqlValue. Field is a name of the column without specifying
- * its belonging to a table
+ * Represents a key=>value associative array of ISqlValueExpression.
  * @ingroup Dal_DB_Sql
  */
-final class SqlFieldValueCollection extends TypedCollection implements ISqlCastable
+final class SqlRow extends TypedCollection implements ISqlCastable
 {
 	/**
-	 * @param array set of value to be appened to collection
+	 * @param array set of value to be appened to the collection
 	 */
 	function __construct(array $array = array())
 	{
-		parent::__construct('SqlValue', $array);
+		parent::__construct('ISqlValueExpression', $array);
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$fieldValueCompiledPairs = array();
 
 		foreach ($this->toArray() as $field => $value) {
 			$fieldValueCompiledPairs[] =
-				  $dialect->quoteIdentifier($field) . ' = '
+				  $dialect->quoteIdentifier($field) . '='
 				. $value->toDialectString($dialect);
 		}
 

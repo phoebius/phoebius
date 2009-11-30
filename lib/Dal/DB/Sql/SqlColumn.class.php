@@ -30,7 +30,7 @@ class SqlColumn implements ISqlValueExpression
 	/**
 	 * @var string
 	 */
-	private $tableName;
+	private $table;
 
 	/**
 	 * Creates an instance of {@link SqlColumn}

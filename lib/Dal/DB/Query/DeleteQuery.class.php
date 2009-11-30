@@ -25,90 +25,76 @@ class DeleteQuery implements ISqlQuery
 	/**
 	 * @var string
 	 */
-	private $tableName;
+	private $table;
 
 	/**
 	 * @var IExpression
 	 */
-	private $entityQuery;
+	private $condition;
 
 	/**
-	 * Creates an instance of {@link DeleteQuery}
-	 * @param string $table
+	 * DeleteQuery static constructor
+	 * @param string $table name of a table to delete rows from
 	 * @return DeleteQuery
 	 */
-	static function create($table, IExpression $expression = null)
+	static function create($table)
 	{
-		return new self($table, $expression);
+		return new self($table);
 	}
 
 	/**
-	 * @param string $table
+	 * @param string $table name of a table to delete rows from
 	 */
-	function __construct($tableName, IExpression $expression = null)
+	function __construct($table)
 	{
-		Assert::isScalar($tableName);
+		Assert::isScalar($table);
 
-		$this->tableName = $tableName;
-		$this->setExpression($expression);
+		$this->table = $table;
 	}
 
 	/**
-	 * Sets the query condition to fill the `WHERE` clause
+	 * Sets the condition for rows that should be deleted
+	 *
+	 * Only rows for which this expression returns true will be deleted.
+	 *
+	 * @param IExpression $condition condition to be applied when deleted rows
+	 *
 	 * @return DeleteQuery an object itself
 	 */
-	function setExpression(IExpression $expression = null)
+	function setCondition(IExpression $condition = null)
 	{
-		$this->entityQuery = $expression;
+		$this->condition = $condition;
 
 		return $this;
 	}
 
 	/**
-	 * Gets the query condition or null if IExpression is not set
+	 * Gets the condition for rows that should be deleted, if set.
+	 *
 	 * @return IExpression|null
 	 */
-	function getExpression()
+	function getCondition()
 	{
-		return $this->entityQuery;
+		return $this->condition;
 	}
 
-	/**
-	 * Gets the table name where the query should be performed
-	 * @return string
-	 */
-	function getTableName()
-	{
-		return $this->tableName;
-	}
-
-	/**
-	 * Casts an object to the plain string SQL query with database dialect
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$querySlices = array();
 
 		$querySlices[] = 'DELETE FROM';
-		$querySlices[] = $dialect->quoteIdentifier($this->tableName);
+		$querySlices[] = $dialect->quoteIdentifier($this->table);
 
 		if ($this->entityQuery) {
 			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->entityQuery->toDialectString($dialect);
+			$querySlices[] = $this->condition->toDialectString($dialect);
 		}
 
 		$compiledQuery = join(' ', $querySlices);
 		return $compiledQuery;
 	}
 
-	/**
-	 * @see ISqlQuery::getCastedParameters()
-	 *
-	 * @param IDialect $dialect
-	 * @return array
-	 */
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}

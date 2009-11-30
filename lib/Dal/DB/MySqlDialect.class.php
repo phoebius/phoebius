@@ -149,14 +149,8 @@ class MySqlDialect extends Dialect
 
 		$type = parent::getTypeRepresentation($dbType);
 
-		switch ($dbType->getValue()) {
-			case DBType::UINT16:
-			case DBType::UINT32:
-			case DBType::UINT64: {
-				if ($dbType->isGenerated()) {
-					$type .= ' AUTO_INCREMENT';
-				}
-			}
+		if ($dbType->isGenerated()) {
+			$type .= ' AUTO_INCREMENT';
 		}
 
 		return $type;
@@ -179,7 +173,7 @@ class MySqlDialect extends Dialect
 			}
 
 			if (!empty($columns)) {
-				$queries[] = new PlainQuery(
+				$queries[] = new RawSqlQuery(
 					'CREATE INDEX %s ON %s (' . join($columns) . ');',
 					array(
 						new SqlIdentifier($constraint->getName() . '_idx'),

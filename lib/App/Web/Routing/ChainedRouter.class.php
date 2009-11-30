@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * LIFO route chain implementation.
+ * LILO route chain implementation.
  *
  * Aggregates routes and lookups the first route that matches the request without an explicit
  * RouteException.

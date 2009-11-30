@@ -17,7 +17,13 @@
  ************************************************************************************************/
 
 /**
- * Represents a simple select query
+ * Represents a SQL SELECT query.
+ *
+ * Consider the following methods to build a basic select query:
+ * - SelectQuery::from()
+ * - SelectQuery::get()
+ * - SelectQuery::where()
+ *
  * @ingroup Dal_DB_Query
  */
 class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
@@ -32,7 +38,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 * SELECT ... FROM
 	 * @var SqlValueExpressionArray
 	 */
-	private $get;
+	private $row;
 
 	/**
 	 * FROM ...
@@ -77,7 +83,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	private $offset = 0;
 
 	/**
-	 * Creates an instance of SelectQuery class
+	 * SelectQuery static constructor
 	 *
 	 * @return SelectQuery
 	 */
@@ -103,6 +109,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
+	 * Sets the query to eliminate duplicate rows from the result
+	 *
 	 * @return SelectQuery
 	 */
 	function setDistinct()
@@ -113,7 +121,12 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Sets the query condition (for "WHERE" clause)
+	 * Sets the condition for rows that should be selected
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
 	 * @return SelectQuery
 	 */
 	function setCondition(IExpression $condition)
@@ -124,7 +137,15 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Alias for SelectQuery::setCondition()
+	 * Sets the condition for rows that should be selected
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
+	 * @see SelectQuery::setCondition()
+	 *
+	 * @return SelectQuery itself
 	 */
 	function where(IExpression $condition)
 	{
@@ -134,7 +155,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Gets the query condition (i.e. "WHERE" clause) or NULL if not yet set
+	 * Gets the condition for rows that should be deleted, if set.
+	 *
 	 * @return IExpression|null
 	 */
 	function getCondition()
@@ -143,6 +165,31 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
+	 * Appends the expression to a SELECT list that form the output rows of the statement.
+	 *
+	 * The expression usually refers to a column of a table, or to a function.
+	 *
+	 * Consider using:
+	 * - SqlColumn to refer to table columns
+	 * - SqlFunction to call functions
+	 * - AliasedSqlValueExpression to label the column of the output rows
+	 *
+	 * Example:
+	 * @code
+	 * // get the primary key
+	 * $query->get(new SqlColumn('id', 'my_table'));
+	 *
+	 * // get the number of rows and label the result as "count_result"
+	 * $query->get(
+	 * 	new AliasedSqlValueExpression(
+	 * 		new SqlFunction('COUNT', 'id'),
+	 * 		'count_result'
+	 * 	)
+	 * );
+	 * @endcode
+	 *
+	 * @param ISqlValueExpression $expression a boolean expression that would form the output rows
+	 *
 	 * @return SelectQuery itself
 	 */
 	function get(ISqlValueExpression $expression)
@@ -153,9 +200,13 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
+	 * Appends the list of expressions to a SELECT list that form the output rows of the statement
+	 *
+	 * @see SelectQuery::get()
+	 * @param array $fields array of ISqlValueExpression
 	 * @return SelectQuery itself
 	 */
-	function getMultiple(array $fields)
+	function getFields(array $fields)
 	{
 		foreach ($fields as $field) {
 			$this->get($field);
@@ -165,7 +216,21 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * @return SelectQuery
+	 * Appends the table (optinally labeled) to the list of sources for selection.
+	 *
+	 * This method is a shorthand for the following:
+	 * @code
+	 * $query->addSource(
+	 * 	new SelectQuerySource(
+	 * 		new AliasedSqlValueExpression(
+	 * 			new SqlIdentifier('my_table'),
+	 * 			'my_table_alias'
+	 * 		)
+	 * 	)
+	 * );
+	 * @endcode
+	 *
+	 * @return SelectQuery itself
 	 */
 	function from($table, $alias = null)
 	{
@@ -182,7 +247,16 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * @return SelectQuery
+	 * Appends the expression to the list of sources for selection.
+	 *
+	 * Source is represented as ISqlValueExpression and can be the following:
+	 * - SqlIdentifier to specify tables
+	 * - SqlFunction to aggregate or produce the results
+	 * - Expression to produce the results
+	 * - SelectQuery as a sub-query
+	 * - AliasedSqlValueExpression to label the source
+	 *
+	 * @return SelectQuery itself
 	 */
 	function addSource(SelectQuerySource $source)
 	{
@@ -192,7 +266,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * @return SelectQuery
+	 * Appends the join clause to the last-added source for selection
+	 *
+	 * @return SelectQuery itself
 	 */
 	function join(SqlJoin $join)
 	{
@@ -204,6 +280,14 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
+	 * Appends the expression(s) that will condense into a single row all selected rows that share
+	 * the same values for the grouped expressions.
+	 *
+	 * Multiple arguments implementing ISqlValueExpression are accepted.
+	 *
+	 * Expression can be an input column name, or the name or ordinal number of an output column
+	 * (SELECT list item), or an arbitrary expression formed from input-column value.
+	 *
 	 * @param ISqlValueExpression ...
 	 * @return SelectQuery itself
 	 */
@@ -218,7 +302,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Adds a having for logical expression
+	 * Sets the expression that eliminates group rows that do not satisfy the condition.
+	 *
 	 * @return SelectQuery itself
 	 */
 	function having(IExpression $expression = null)
@@ -229,6 +314,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
+	 * Appends the list of expressions that will be used when sorting the resulting rows.
+	 *
+	 * Multiple arguments implementing OrderBy are accepted.
+	 *
 	 * @param OrderBy ...
 	 * @return SelectQuery itself
 	 */
@@ -251,55 +340,11 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 		return $this;
 	}
 
-	/**
-	 * Gets the limit for the row selection
-	 * @return integer 0 if limit is not set, otherwise a positive integer
-	 */
-	function getLimit()
-	{
-		return $this->limit;
-	}
-
-	/**
-	 * Drops a row selection limit
-	 * @return SelectQuery itself
-	 */
-	function dropLimit()
-	{
-		$this->limit = 0;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the offset for row selection
-	 * @param integer $offset positive integer
-	 */
 	function setOffset($offset)
 	{
 		Assert::isPositiveInteger($offset);
 
 		$this->offset = $offset;
-
-		return $this;
-	}
-
-	/**
-	 * Gets the offset for the row selection
-	 * @return integet 0 if offset is not set, otherwise a positive integer
-	 */
-	function getOffset()
-	{
-		return $this->offset;
-	}
-
-	/**
-	 * Drops a row selection offset
-	 * @return SelectQuery itself
-	 */
-	function dropOffset()
-	{
-		$this->offset = 0;
 
 		return $this;
 	}
@@ -313,7 +358,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 			$querySlices[] = 'DISTINCT';
 		}
 
-		$querySlices[] = $this->get->toDialectString($dialect);
+		$querySlices[] = $this->row->toDialectString($dialect);
 
 		if (!$this->sources->isEmpty()) {
 			$querySlices[] = 'FROM';
@@ -356,7 +401,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 		return $queryString;
 	}
 
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}

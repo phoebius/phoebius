@@ -17,135 +17,85 @@
  ************************************************************************************************/
 
 /**
- * Represents a database query for updating rows
+ * Represents a database query for chaning rows
+ *
  * @ingroup Dal_DB_Query
  */
-class UpdateQuery implements ISqlQuery
+class UpdateQuery extends RowModificationQuery implements ISqlQuery
 {
-	/**
-	 * @var string
-	 */
-	private $tableName;
-
-	/**
-	 * @var SqlFieldValueCollection
-	 */
-	private $get;
-
 	/**
 	 * @var IExpression
 	 */
-	private $entityQuery;
+	private $condition;
 
 	/**
-	 * Creates an instance of {@link UpdateQuery}
-	 * @param string $tableName
+	 * UpdateQuery static constructor
+	 * @param string $table name of a table to update
 	 * @return UpdateQuery
 	 */
-	static function create(
-			$tableName,
-			SqlFieldValueCollection $fvc = null,
-			IExpression $expression = null
-		)
+	static function create($table)
 	{
-		return new self ($tableName, $fvc, $expression);
+		return new self ($table);
 	}
 
 	/**
-	 * @param string $table
+	 * @param string $table name of a table to update
 	 */
-	function __construct(
-			$tableName,
-			SqlFieldValueCollection $fvc = null,
-			IExpression $expression = null
-		)
+	function __construct($table)
 	{
-		Assert::isScalar($tableName);
+		Assert::isScalar($table);
 
-		$this->tableName = $tableName;
-		$this->fields =
-			$fvc
-				? $fvc
-				: new SqlFieldValueCollection();
-		if ($expression) {
-			$this->setExpression($expression);
-		}
+		$this->table = $table;
+
+		parent::__construct();
 	}
 
 	/**
-	 * Adds a custom field and it's corresponding value to the field=>value set
-	 * @param string $field
-	 * @param SqlValue $value
-	 * @return UpdateQuery an object itself
+	 * Sets the condition for rows that should be updated
+	 *
+	 * Only rows for which this expression returns true will be updated.
+	 *
+	 * @param IExpression $condition condition to be applied when updating rows
+	 *
+	 * @return UpdateQuery itself
 	 */
-	function addFieldAndValue($field, SqlValue $value)
+	function setCondition(IExpression $condition = null)
 	{
-		$this->fields->add($field, $value);
+		$this->condition = $condition;
 
 		return $this;
 	}
 
 	/**
-	 * Adds a custom field=>value set
-	 * @return UpdateQuery an object itself
-	 */
-	function setFieldValueCollection(SqlFieldValueCollection $set)
-	{
-		$this->fields = $set;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the query condition to fill the `WHERE` clause
-	 * @return DeleteQuery an object itself
-	 */
-	function setExpression(IExpression $logic)
-	{
-		$this->entityQuery = $logic;
-
-		return $this;
-	}
-
-	/**
-	 * Gets the query condition or null if IExpression is not set
+	 * Gets the condition for rows that should be updated, if set.
+	 *
 	 * @return IExpression|null
 	 */
-	function getExpression()
+	function getCondition()
 	{
-		return $this->entityQuery;
+		return $this->condition;
 	}
 
-	/**
-	 * Casts an object to the plain string SQL query with database dialect
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		$querySlices = array();
 
 		$querySlices[] = 'UPDATE';
-		$querySlices[] = $dialect->quoteIdentifier($this->tableName);
+		$querySlices[] = $dialect->quoteIdentifier($this->table);
 
 		$querySlices[] = 'SET';
-		$querySlices[] = $this->fields->toDialectString($dialect);
+		$querySlices[] = $this->getRow()->toDialectString($dialect);
 
-		if ($this->entityQuery) {
+		if ($this->condition) {
 			$querySlices[] = 'WHERE';
-			$querySlices[] = $this->entityQuery->toDialectString($dialect);
+			$querySlices[] = $this->condition->toDialectString($dialect);
 		}
 
 		$compiledQuery = join(' ', $querySlices);
 		return $compiledQuery;
 	}
 
-	/**
-	 * @see ISqlQuery::getCastedParameters()
-	 *
-	 * @param IDialect $dialect
-	 * @return array
-	 */
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}

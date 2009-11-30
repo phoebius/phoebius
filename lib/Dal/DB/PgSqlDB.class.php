@@ -36,7 +36,7 @@ class PgSqlDB extends DB
 	/**
 	 * @var resource|null
 	 */
-	private $link = null;
+	private $link;
 
 	/**
 	 * @var array of DBQueryResult
@@ -44,6 +44,8 @@ class PgSqlDB extends DB
 	private $queryResults = array();
 
 	/**
+	 * Static alias for the ctor
+	 *
 	 * @return PgSqlDB
 	 */
 	static function create()
@@ -319,7 +321,7 @@ class PgSqlDB extends DB
 		Assert::isBoolean($isAsync);
 
 		$statementId = $this->prepareQuery($query, $isAsync);
-		$parameters = $query->getCastedParameters($this->getDialect());
+		$parameters = $query->getPlaceholderValues($this->getDialect());
 
 		$executeResult = pg_send_execute($this->link, $statementId, $parameters);
 		if (!$isAsync || !$executeResult) {
@@ -336,8 +338,6 @@ class PgSqlDB extends DB
 				$errorMessage = pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY);
 
 				if (PgSqlError::UNIQUE_VIOLATION == $errorCode) {
-					Assert::isFalse($query instanceof ISqlSelectQuery);
-
 					throw new UniqueViolationException($query, $errorMessage);
 				}
 				else {
@@ -354,9 +354,6 @@ class PgSqlDB extends DB
 		return is_resource($this->link);
 	}
 
-	/**
-	 * @todo replace seq with `RETURNING` syntax
-	 */
 	function getGenerator($tableName, $columnName, DBType $type)
 	{
 		$query =

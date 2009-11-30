@@ -16,6 +16,14 @@
  *
  ************************************************************************************************/
 
+/**
+ * Auto-increment based generator. Retrieves the new primary key by fetching the last insert ID
+ * the database has generated for a newly inserted tuple.
+ *
+ * @see mysql_last_insert_id()
+ *
+ * @ingroup Dal_DB_Geenrator
+ */
 final class LastInsertIdGenerator implements IIDGenerator
 {
 	/**
@@ -23,6 +31,9 @@ final class LastInsertIdGenerator implements IIDGenerator
 	 */
 	private $db;
 
+	/**
+	 * @param DB $db actual db
+	 */
 	function __construct(DB $db)
 	{
 		Assert::isTrue(

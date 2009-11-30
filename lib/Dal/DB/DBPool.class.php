@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Represents a database pool
+ * Represents a pool of relational databases (DB instances).
+ *
  * @ingroup Dal_DB
  */
 final class DBPool extends Pool
@@ -34,7 +35,7 @@ final class DBPool extends Pool
 	private $handles = array();
 
 	/**
-	 * Returns the instance of DBPool
+	 * Gets the instance of DBPool
 	 * @return DBPool
 	 */
 	static function getInstance()
@@ -57,11 +58,12 @@ final class DBPool extends Pool
 	/**
 	 * Gets the database identified by name
 	 * @param string $name name to identify database handle
+	 * @throws ArgumentException if db identified by name not found
 	 * @return DB
 	 */
-	static function get($name, $connectIfDisconnected = false)
+	static function get($name)
 	{
-		return self::getInstance()->getDB($name, $connectIfDisconnected);
+		return self::getInstance()->getDB($name);
 	}
 
 	/**
@@ -108,18 +110,17 @@ final class DBPool extends Pool
 
 	/**
 	 * Gets the database identified by name
+	 * @param string $name name to identify database handle
+	 * @throws ArgumentException if db identified by name not found
 	 * @return DB
 	 */
-	function getDB($name, $connectIfDisconnected = false)
+	function getDB($name)
 	{
 		if (!isset($this->handles[$name])) {
 			throw new ArgumentException('name', 'db not found');
 		}
 
 		$db = $this->handles[$name];
-		if ($connectIfDisconnected && !$db->isConnected()) {
-			$db->connect();
-		}
 
 		return $db;
 	}

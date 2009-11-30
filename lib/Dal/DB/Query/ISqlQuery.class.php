@@ -17,15 +17,21 @@
  ************************************************************************************************/
 
 /**
- * Represents an object that can be casted to a plain string SQL query
+ * Defines an object that represents a database query.
  * @ingroup Dal_DB_Query
  */
 interface ISqlQuery extends ISqlCastable
 {
 	/**
-	 * @return array
+	 * Gets the database values that should be mapped to database-level placeholers that are
+	 * presented in a query.
+	 *
+	 * This can be extremely useful when using database placeholders and query preparation
+	 * over high-load DB servers with persistent connections.
+	 *
+	 * @return array of scalar
 	 */
-	function getCastedParameters(IDialect $dialect);
+	function getPlaceholderValues(IDialect $dialect);
 }
 
 ?>

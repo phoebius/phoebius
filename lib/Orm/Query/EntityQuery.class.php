@@ -306,7 +306,7 @@ final class EntityQuery implements ISqlSelectQuery
 		);
 	}
 
-	function getCastedParameters(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
 		return array ();
 	}
