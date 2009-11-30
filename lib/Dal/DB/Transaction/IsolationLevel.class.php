@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents an isolation level of the {@link Transaction}
+ * Represents an isolation level of Transaction
  * @ingroup Dal_DB_Transaction
  */
 final class IsolationLevel extends Enumeration implements ISqlCastable

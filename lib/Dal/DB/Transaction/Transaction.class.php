@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Reprsents a transaction run in the database
+ * Represents a database transaction
+ *
  * @ingroup Dal_DB_Transaction
  */
 class Transaction
@@ -151,7 +152,7 @@ class Transaction
 	 * Creates a new save point inside the transaction so that it could be rolled back to this
 	 * step
 	 * @param string $savepointthe name of the savepoint
-	 * @return Transaction an object itself
+	 * @return Transaction itself
 	 */
 	function save($savepointId)
 	{
@@ -191,7 +192,7 @@ class Transaction
 
 	/**
 	 * Sets a custom access mode of the transaction
-	 * @return Transaction an object itself
+	 * @return Transaction itself
 	 */
 	function setAccessMode(AccessMode $mode)
 	{
@@ -202,7 +203,7 @@ class Transaction
 
 	/**
 	 * Sets a custom isolation level of the transaction
-	 * @return Transaction an object itself
+	 * @return Transaction itself
 	 */
 	function setIsolationLevel(IsolationLevel $level)
 	{

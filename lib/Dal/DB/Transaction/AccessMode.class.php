@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents an access mode for the {@link Transaction}
+ * Represents an access mode for Transaction
  * @ingroup Dal_DB_Transaction
  */
 final class AccessMode extends Enumeration implements ISqlCastable

@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a wrapper over raw sql type definition.
+ *
  * PHP example:
  * @code
  * $intarr = new RawSqlType('int8[]');
@@ -31,10 +33,13 @@
  * <property name="childIds" column="child_ids" visibility="transparent" type="RawSqlType { definition='int8[]' }">
  * @endcode
  *
- * @ingroup
+ * @ingroup Dal_DB_Type
  */
 class RawSqlType implements ISqlType
 {
+	/**
+	 * @var string
+	 */
 	private $definition;
 
 	/**

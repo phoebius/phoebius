@@ -16,6 +16,11 @@
  *
  ************************************************************************************************/
 
+/**
+ * Contract for SQL representation of DBColumn type
+ *
+ * @ingroup Dal_DB_Type
+ */
 interface ISqlType extends ISqlCastable
 {
 	// nothing here
