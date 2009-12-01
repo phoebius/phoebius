@@ -17,8 +17,12 @@
  ************************************************************************************************/
 
 /**
- * TODO: export Content-Disposition logic (i.e. type: inline/attachment, filename, content-type,
- * creation/modification time into a separate class)
+ * Represents a result that consists of a file
+ *
+ *
+ * @todo export Content-Disposition logic (i.e. type: inline/attachment, filename, content-type,
+ * 				creation/modification time into a separate class)
+ *
  * @ingroup Mvc_ActionResults
  */
 class FileResult implements IActionResult
@@ -41,21 +45,20 @@ class FileResult implements IActionResult
 	/**
 	 * @var boolean
 	 */
-	private $unlinkOnFileFlush = false;
+	private $unlinkOnFinish = false;
 
 	/**
-	 * @return FileResult
+	 * @param string $filepath path to the file that should be presented in response
+	 * @param string $filename optional name of the file to be specified in the response
+	 * @param string $contentType optional content type of the file to be specified in the response
+	 * @param boolean $unlinkOnFinish whether to remove the file when response is finished
 	 */
-	static function create($filepath, $filename = null, $contentType = null)
-	{
-		return new self ($filepath, $filename, $contentType);
-	}
-
-	function __construct($filepath, $filename = null, $contentType = null)
+	function __construct($filepath, $filename = null, $contentType = null, $unlinkOnFinish = false)
 	{
 		Assert::isTrue(is_file($filepath));
 		Assert::isScalarOrNull($filename);
 		Assert::isScalarOrNull($contentType);
+		Assert::isBoolean($unlinkOnFinish);
 
 		$this->filepath = $filepath;
 		$this->filename =
@@ -63,37 +66,15 @@ class FileResult implements IActionResult
 				? $filename
 				: basename($filepath);
 		$this->contentType = $contentType;
+		$this->unlinkOnFileFlush = $unlinkOnFinish;
 	}
 
-	/**
-	 * @return FileResult
-	 */
-	function unlinkOnFileFlush()
-	{
-		$this->unlinkOnFileFlush = true;
-
-		return $this;
-	}
-
-	/**
-	 * @return FileResult
-	 */
-	function keepOnFileFlush()
-	{
-		$this->unlinkOnFileFlush = false;
-
-		return $this;
-	}
-
-	/**
-	 * @return void
-	 */
 	function handleResult(IViewContext $context)
 	{
 		$response = $context->getResponse();
 
 		if ($this->contentType) {
-			$response->addHeader('Content-type', $this->contentType);
+			$response->addHeader('Content-Type', $this->contentType);
 		}
 
 		$fileSize = filesize($this->filepath);
@@ -104,7 +85,7 @@ class FileResult implements IActionResult
 			'Content-Disposition',
 			"attachment; filename=\"{$this->filename}\"; size={$fileSize}; creation-date={$creation}; modification-date={$modif}"
 		);
-		$response->clean();
+
 		$response->outFile($this->filepath);
 		$response->finish();
 	}
@@ -113,7 +94,7 @@ class FileResult implements IActionResult
 	{
 		if ($this->unlinkOnFileFlush) {
 			try {
-				unlink($this->filepath);
+				@unlink($this->filepath);
 			}
 			catch (Exception $e) {
 				// nothing to do

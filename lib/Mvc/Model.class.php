@@ -17,17 +17,13 @@
  ************************************************************************************************/
 
 /**
+ * Represents an object containing controller results passed to presentation object
+ *
  * @ingroup Mvc
  */
 class Model extends Collection
 {
-	/**
-	 * @return Model
-	 */
-	static function create(array $array = array())
-	{
-		return new self ($array);
-	}
+	// nothing here
 }
 
 ?>

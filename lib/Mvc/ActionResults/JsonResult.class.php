@@ -18,20 +18,17 @@
 
 /**
  * Represents a JavaScript Object Notation result that can be used in an AJAX application
+ *
  * @ingroup Mvc_ActionResults
  */
 class JsonResult extends ContentResult
 {
 	/**
-	 * @var array
+	 * @param array $json data to be presented in JSON
 	 */
-	private $json;
-
 	function __construct(array $json)
 	{
-		$this->json = $json;
-
-		parent::__construct(json_encode($this->json));
+		parent::__construct(json_encode($json));
 	}
 }
 

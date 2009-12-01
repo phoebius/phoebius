@@ -24,8 +24,10 @@
 interface IRouteDispatcher
 {
 	/**
+	 * Obtains the controller object and invokes it to handle the incoming context
+	 *
 	 * @param Trace $trace to handle
-	 * @throws TraceException when Trace cannot be handled and should be treated as wrong
+	 * @throws TraceException when Trace is missing valid parameters
 	 * @throws Exception unhandled application fault
 	 * @return void
 	 */

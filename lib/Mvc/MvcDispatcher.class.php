@@ -17,16 +17,20 @@
  ************************************************************************************************/
 
 /**
+ * Represents a class that obtains a Trace handler - an IController object - according to
+ * the Trace and invokes the object to handle the trace
+ *
+ * A name of a controller class consists of the value taken of "controller" parameter taken from
+ * Trace and "Controller" postfix.
+ *
+ * A controller MUST implement IController interface.
+ *
  * @ingroup Mvc
  */
 class MvcDispatcher implements IRouteDispatcher
 {
 	const PARAMETER_CONTROLLER_NAME = 'controller';
-	
-	/**
-	 * @throws TraceException
-	 * @return void
-	 */
+
 	function handle(Trace $trace)
 	{
 		$controllerName = $trace->getRequiredParameter(self::PARAMETER_CONTROLLER_NAME);
@@ -37,9 +41,9 @@ class MvcDispatcher implements IRouteDispatcher
 			throw new TraceException(
 				sprintf('unknown controller %s', $controllerClassName),
 				$trace
-				);
+			);
 		}
-		
+
 		if (
 				!in_array('IController', class_implements($controllerClassName, true))
 		) {
@@ -55,6 +59,11 @@ class MvcDispatcher implements IRouteDispatcher
 	}
 
 	/**
+	 * Gets a new instance of the requested controller
+	 *
+	 * @param string $controllerClassName name of the class that represents a requested controller
+	 * @param Trace $trace trace to handle
+	 *
 	 * @return IController
 	 */
 	protected function getControllerInstance($controllerClassName, Trace $trace)
@@ -63,6 +72,13 @@ class MvcDispatcher implements IRouteDispatcher
 	}
 
 	/**
+	 * Gets the name of controller class. This method DOES NOT check the existance of the method.
+	 *
+	 * By default, this method appends the "Controller" postfix to the value of "controller"
+	 * parameter and upercases the first letter
+	 *
+	 * @param string $controllerName requested controller
+	 *
 	 * @return string
 	 */
 	protected function getControllerClassName($controllerName)

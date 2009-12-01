@@ -17,12 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Represents a contract for controller object
+ *
  * @ingroup Mvc
  */
 interface IController
 {
 	/**
-	 * @throws TraceException
+	 * Runs the controller object to handle the incoming context
+	 *
+	 * @param Trace $trace trace to handle
+	 * @throws TraceException thrown when Trace is missing the required element and thus cannot be handled
 	 * @return void
 	 */
 	function handle(Trace $trace);

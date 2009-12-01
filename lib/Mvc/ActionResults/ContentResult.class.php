@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a textual result
+ *
  * @ingroup Mvc_ActionResults
  */
 class ContentResult implements IActionResult
@@ -27,26 +29,20 @@ class ContentResult implements IActionResult
 	private $content;
 
 	/**
-	 * @return ContentResult
+	 * @param string $content texutal data to be passed to response
 	 */
-	static function create($content)
-	{
-		return new self ($content);
-	}
-
-	function __construct($content)
+	function __construct($content = null)
 	{
 		Assert::isScalarOrNull($content);
 
 		$this->content = $content;
 	}
 
-	/**
-	 * @return void
-	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getResponse()
+		$response = $context->getResponse();
+
+		$response
 			->write($this->content)
 			->finish();
 	}

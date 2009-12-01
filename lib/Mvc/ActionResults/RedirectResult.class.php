@@ -18,6 +18,7 @@
 
 /**
  * Represents a redirection to a new url
+ *
  * @ingroup Mvc_ActionResults
  */
 class RedirectResult implements IActionResult
@@ -27,17 +28,19 @@ class RedirectResult implements IActionResult
 	 */
 	private $url;
 
+	/**
+	 * @param HttpUrl $url url the request should be redirected to
+	 */
 	function __construct(HttpUrl $url)
 	{
 		$this->url = $url;
 	}
 
-	/**
-	 * @return void
-	 */
 	function handleResult(IViewContext $context)
 	{
-		$context->getResponse()->redirect($this->url);
+		$response = $context->getResponse();
+
+		$response->redirect($this->url);
 	}
 }
 

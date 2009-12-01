@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an execution context of a presentation view
+ *
  * @ingroup Mvc
  */
 class ViewContext implements IViewContext
@@ -25,40 +27,32 @@ class ViewContext implements IViewContext
 	 * @var Model
 	 */
 	private $model;
-	
+
 	/**
 	 * @var Trace
 	 */
 	private $trace;
 
-	function __construct(
-			Model $model,
-			Trace $trace
-		)
+	/**
+	 * @param Model $model
+	 * @param Trace $trace
+	 */
+	function __construct(Model $model, Trace $trace)
 	{
 		$this->model = $model;
 		$this->trace = $trace;
 	}
 
-	/**
-	 * @return Model
-	 */
 	function getModel()
 	{
 		return $this->model;
 	}
-	
-	/**
-	 * @return Trace
-	 */
+
 	function getTrace()
 	{
 		return $this->trace;
 	}
-	
-	/**
-	 * @return IWebResponse
-	 */
+
 	function getResponse()
 	{
 		return $this->trace->getWebContext()->getResponse();

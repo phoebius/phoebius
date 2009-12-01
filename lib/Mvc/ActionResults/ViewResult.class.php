@@ -17,8 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Represents HTML and markup
- * IView + Model
+ * Represents HTML markup and raw PHP code, handled by UITemplateControl.
+ *
  * @ingroup Mvc_ActionResults
  */
 class ViewResult implements IActionResult
@@ -33,16 +33,13 @@ class ViewResult implements IActionResult
 		$this->view = $view;
 	}
 
-	/**
-	 * @return void
-	 */
 	function handleResult(IViewContext $context)
 	{
-		$this->view->render(
-			$context->getResponse()
-		);
+		$response = $context->getResponse();
 
-		$context->getResponse()->finish();
+		$this->view->render($response);
+
+		$response->finish();
 	}
 
 }

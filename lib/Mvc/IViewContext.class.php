@@ -17,21 +17,29 @@
  ************************************************************************************************/
 
 /**
+ * Represents an execution context of a presentation view
+ *
  * @ingroup Mvc
  */
 interface IViewContext
 {
 	/**
+	 * Gets the model passed to the presentation
+	 *
 	 * @return Model
 	 */
 	function getModel();
-	
+
 	/**
+	 * Gets the handled Trace which caused view invokation
+	 *
 	 * @return Trace
 	 */
 	function getTrace();
-	
+
 	/**
+	 * Gets the response presentation should be rendered to
+	 *
 	 * @return IWebResponse
 	 */
 	function getResponse();

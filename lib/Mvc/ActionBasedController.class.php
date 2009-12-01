@@ -17,9 +17,26 @@
  ************************************************************************************************/
 
 /**
+ * Represents an controller that maps an "action" parameter from the Trace to the corresponding
+ * method of the object, and invokes it to handle the Trace.
+ *
+ * A method name consists of an "action_" prefix and the value of "action" parameter taken from
+ * the Trace.
+ *
+ * If method is not defined, controller invokes ActionBasedController::handleUnknownAction()
+ * which is by default throws TraceException telling that trace is wrong. This method can be
+ * reimplemented in descendants and thus gracefully handle failed Trace handling process.
+ *
+ * Each action method encapsulates business logic and should produce a result - an object that
+ * implements IActionResult. The controller provides some useful helper methods for doing this:
+ * - ActionBasedController::view() for producing a ViewResult which encapsulates presentation
+ * - ActionBasedController::redirect() for producing external redirects; destination is assembled
+ * 			automatically according to the Route which is defined in IRouteTable
+ *
+ *
  * @ingroup Mvc
  */
-abstract class ActionBasedController extends Controller
+abstract class ActionBasedController implements IController
 {
 	const PARAMETER_ACTION = 'action';
 
@@ -29,14 +46,21 @@ abstract class ActionBasedController extends Controller
 	private $trace;
 
 	/**
-	 * @throws RouteHandleException
-	 * @return void
+	 * @var Model|null
 	 */
+	private $model;
+
+	/**
+	 * @var string|null
+	 */
+	private $action;
+
 	function handle(Trace $trace)
 	{
 		$this->trace = $trace;
 
 		if (isset($trace[self::PARAMETER_ACTION])) {
+			$this->action = $trace[self::PARAMETER_ACTION];
 			$result = $this->processAction($trace[self::PARAMETER_ACTION]);
 		}
 		else {
@@ -49,14 +73,26 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
-	 * @return Trace|null
+	 * Gets the current Model to be passed to presentation layer
+	 *
+	 * @return Model
 	 */
-	protected function getCurrentTrace()
+	function getModel()
 	{
-		return $this->trace;
+		if (!$this->model) {
+			$this->model = new Model();
+		}
+
+		return $this->model;
 	}
 
 	/**
+	 * Gets the actual parameter value to be used when invoking action method
+	 *
+	 * @param ReflectionParameter $argument
+	 *
+	 * @throws TraceException thrown in case when value cannot being obtained
+	 *
 	 * @return mixed
 	 */
 	protected function filterArgumentValue(ReflectionParameter $argument)
@@ -64,10 +100,10 @@ abstract class ActionBasedController extends Controller
 		$request = $this->trace->getWebContext()->getRequest();
 
 		if (isset($request[$argument->name])) {
-			$value = $this->getActualVariableValue($argument, $request[$argument->name]);
+			$value = $this->getActualParameterValue($argument, $request[$argument->name]);
 		}
 		else if (isset($this->trace[$argument->name])) {
-			$value = $this->getActualVariableValue($argument, $this->trace[$argument->name]);
+			$value = $this->getActualParameterValue($argument, $this->trace[$argument->name]);
 		}
 		else {
 			$value = null;
@@ -96,9 +132,16 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
+	 * Casts the parameter value which is expected to be an array according to
+	 * action method signature
+	 *
+	 * @param string $action requested action name
+	 * @param string $name name of the parameter
+	 * @param mixed $value obtained value
+	 *
 	 * @return array|null
 	 */
-	protected function getArrayValue(ReflectionParameter $argument, $value)
+	protected function getArrayValue($action, $name, $value)
 	{
 		if (is_array($value)) {
 			return $value;
@@ -106,9 +149,17 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
+	 * Casts the parameter value which is expected to be an instance of a class according to action
+	 * method signature
+	 *
+	 * @param string $action requested action name
+	 * @param string $name name of the parameter
+	 * @param ReflectionClass $class
+	 * @param mixed $value obtained value
+	 *
 	 * @return object|null
 	 */
-	protected function getClassValue(ReflectionClass $class, ReflectionParameter $argument, $value)
+	protected function getClassValue($action, $name, ReflectionClass $class, $value)
 	{
 		if (is_object($value)) {
 			if ($class->isSubclassOf($value)) {
@@ -127,15 +178,24 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
+	 * Casts the obtained value to the type expected in action method signature.
+	 *
+	 * This is low-level method. Consider reimplementing
+	 * ActionBasedController::getClassValue() and
+	 * ActionBasedController::getArrayValue()
+	 *
+	 * @param ReflectionParameter $argument
+	 * @param mixed $value
+	 *
 	 * @return mixed
 	 */
-	protected function getActualVariableValue(ReflectionParameter $argument, $value)
+	protected function getActualParameterValue(ReflectionParameter $argument, $value)
 	{
 		if ($argument->isArray()) {
-			return $this->getArrayValue($argument, $value);
+			return $this->getArrayValue($this->action, $argument->name, $value);
 		}
 		else if (($class = $argument->getClass())) {
-			return $this->getClassValue($class, $argument, $value);
+			return $this->getClassValue($this->action, $argument->name, $class, $value);
 		}
 		else {
 			return $value;
@@ -143,6 +203,10 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
+	 * Runs the proccess of handing the action method result
+	 *
+	 * @param IActionResult $actionResult
+	 *
 	 * @return void
 	 */
 	protected function processResult(IActionResult $actionResult)
@@ -156,7 +220,14 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
-	 * Overridden
+	 * Represents an action method invoked in case when no other action method can be invoked
+	 * to handle the Trace.
+	 *
+	 * By default this method throws TraceException to notify a calling code that no action
+	 * method found to handle the Trace
+	 *
+	 * @param string|null $action name of an action that was used when looking up the action method
+	 *
 	 * @throws TraceException
 	 * @return IActionResult
 	 */
@@ -169,7 +240,12 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
-	 * @return IActionResult
+	 * Look ups for the action method that corresponds the requested action, collects parameter
+	 * values, invokes the method and wraps its result, if needed.
+	 *
+	 * @param string $action requested action
+	 *
+	 * @return IActionResult the action method result
 	 */
 	protected function processAction($action)
 	{
@@ -202,7 +278,13 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
-	 * Cast the result (of any type) of method to IActionResult. Now works as a stub ONLY
+	 * Cast the result of action method (of any type) to IActionResult.
+	 *
+	 * The following types are supported:
+	 * - string is treated as path to a view and wrapped with ViewResult
+	 * 		See ActionBasedController::view()
+	 * - IActionResult object is treated as-is
+	 *
 	 * @return IActionResult
 	 */
 	protected function makeActionResult($actionResult)
@@ -216,17 +298,24 @@ abstract class ActionBasedController extends Controller
 		}
 
 		Assert::isUnreachable(
-			'unknown actionResult %s: %s',
-			get_type($actionResult),
+			'unknown actionResult `%s`: %s',
+			TypeUtils::getName($actionResult),
 			$actionResult
 		);
 	}
 
 	/**
+	 * Helper method that creates an action method result encapsulating presentation object
+	 *
+	 * @param string $viewName relative path to a view
+	 * @param array $data business logic resulting data to be passed to presentation
+	 *
 	 * @return ViewResult
 	 */
-	protected function view($viewName)
+	protected function view($viewName, array $data = array())
 	{
+		$this->getModel()->append($data);
+
 		$presentation = new UIViewPresentation($viewName);
 		$presentation->setModel($this->getModel());
 		$presentation->setTrace($this->trace);
@@ -235,15 +324,31 @@ abstract class ActionBasedController extends Controller
 	}
 
 	/**
+	 * Helper method that creates an action method result encapsulating redirection
+	 *
+	 * @param string $routeName name of the route to use when building an address.
+	 * 					Route must be presented in IRouteTable
+	 * @param array $parameters parameters to pass to Route for building an address
+	 *
 	 * @return RedirectToRouteResult
 	 */
 	protected function redirect($routeName, array $parameters = array())
 	{
-		return new RedirectToRouteResult($routeName, $parameters, $this->trace);
+		$url = $this->trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
+
+		$this->trace
+			->getRouteTable()
+			->getRoute($routeName)
+			->compose($url, $parameters);
+
+		return new RedirectResult($url);
 	}
 
 	/**
-	 * Overridden
+	 * Gets the name of action method. This method DOES NOT check the existance of the method
+	 *
+	 * @param string $action requested action
+	 *
 	 * @return string
 	 */
 	protected function getMethodName($action)

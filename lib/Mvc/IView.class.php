@@ -17,11 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Represents a view that encapsulates presentation logic
+ *
  * @ingroup Mvc
  */
 interface IView
 {
 	/**
+	 * Renders the presentation
+	 *
+	 * @param IViewContext $context view context to be used while rendering
+	 *
 	 * @return void
 	 */
 	function render(IViewContext $context);

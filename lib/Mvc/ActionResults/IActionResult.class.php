@@ -17,11 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Contract for action result - an object produced by the action method
+ *
  * @ingroup Mvc_ActionResults
  */
 interface IActionResult
 {
 	/**
+	 * Handles the produced result
+	 *
+	 * @param IViewContext $context
+	 *
 	 * @return void
 	 */
 	function handleResult(IViewContext $context);
