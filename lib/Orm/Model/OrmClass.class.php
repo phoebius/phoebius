@@ -17,6 +17,7 @@
  ************************************************************************************************/
 
 /**
+ * @aux
  * @ingroup Orm_Model
  */
 class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
@@ -61,9 +62,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 	 */
 	private $dbTableName;
 
-	/**
-	 * @return OrmEntity
-	 */
 	function getNewEntity()
 	{
 		return new $this->name;
@@ -76,9 +74,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		);
 	}
 
-	/**
-	 * @return IOrmEntityAccessor
-	 */
 	function getDao()
 	{
 		Assert::isTrue(
@@ -139,9 +134,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return $this;
 	}
 
-	/**
-	 * @return IOrmEntityMapper
-	 */
 	function getMap()
 	{
 		if (!$this->map) {
@@ -195,9 +187,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return $this;
 	}
 
-	/**
-	 * @return array of {@link OrmProperty}
-	 */
 	function getProperties()
 	{
 		return $this->properties;
@@ -259,9 +248,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return array_keys($this->properties);
 	}
 
-	/**
-	 * @return OrmClass
-	 */
 	function getProperty($name)
 	{
 		if (!isset($this->properties[$name])) {
@@ -293,9 +279,6 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return !!$this->identifier;
 	}
 
-	/**
-	 * @return OrmProperty|null
-	 */
 	function getIdentifier()
 	{
 		return $this->identifier;
@@ -326,25 +309,16 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return $this;
 	}
 
-	/**
-	 * @return ILogicallySchematic
-	 */
 	function getLogicalSchema()
 	{
 		return $this;
 	}
 
-	/**
-	 * @return IPhysicallySchematic
-	 */
 	function getPhysicalSchema()
 	{
 		return $this;
 	}
 
-	/**
-	 * @return OrmClass
-	 */
 	function setDBTableName($dbTableName)
 	{
 		Assert::isScalar($dbTableName);
@@ -354,19 +328,11 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 		return $this;
 	}
 
-	/**
-	 * Gets the name of the DB table where entities are stored
-	 * @return string
-	 */
 	function getTable()
 	{
 		return $this->dbTableName;
 	}
 
-	/**
-	 * Returns the name of the class representing an entity
-	 * @return string
-	 */
 	function getEntityName()
 	{
 		return ucfirst($this->name);

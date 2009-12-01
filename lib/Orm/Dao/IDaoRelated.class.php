@@ -27,9 +27,14 @@ interface IDaoRelated extends IOrmRelated
 	static function dao();
 
 	/**
+	 * @return IQueryable
+	 */
+	static function orm();
+
+	/**
 	 * @return EntityQuery
 	 */
-	//static function query();
+	static function query();
 }
 
 ?>

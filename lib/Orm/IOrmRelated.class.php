@@ -17,20 +17,26 @@
  ************************************************************************************************/
 
 /**
+ * Defines an entity that is related to ORM. Such an entity can be assembled and disassembled by
+ * IOrmEntityMapper
+ *
  * @ingroup Orm
  */
-class OrmUtils extends StaticClass
+interface IOrmRelated
 {
 	/**
-	 * @return boolean
+	 * Gets the entity mapper
+	 *
+	 * @return IOrmEntityMapper
 	 */
-	static function isFetchedEntity(IdentifiableOrmEntity $entity)
-	{
-		$privatePropertyName = "\0IdentifiableOrmEntity\0fetched";
-		$arrayCasted = (array) $entity;
+	static function map();
 
-		return (boolean) $arrayCasted[$privatePropertyName];
-	}
+	/**
+	 * Gets the entity auxilary container
+	 *
+	 * @return IMappable
+	 */
+	static function orm();
 }
 
 ?>

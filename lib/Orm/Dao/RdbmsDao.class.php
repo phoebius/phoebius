@@ -125,7 +125,7 @@ class RdbmsDao implements IOrmEntityAccessor
 	{
 		$entity = $this->getLazyEntityById($id);
 
-		if (!OrmUtils::isFetchedEntity($entity)) {
+		if (!$entity->isFetched()) {
 			$query =
 				EntityQuery::create($this->entity)
 					->setLimit(1)
@@ -174,7 +174,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		foreach ($ids as $id) {
 			$entity = $this->identityMap->getLazy($id);
 
-			if (!OrmUtils::isFetchedEntity($entity)) {
+			if (!$entity->isFetched()) {
 				$toFetch[$id] = $entity;
 			}
 			else {

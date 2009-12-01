@@ -17,32 +17,32 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Map
+ * Contract for optimized ORM-related entity mapper.
+ *
+ * This mapper should fill the entities at once by collecting the primitive values and then
+ * mapping it to property objects at once, if possible.
+ *
+ * @ingroup Orm
  */
-interface IOrmEntityMapper
+interface IOrmEntityBatchMapper
 {
 	/**
-	 * entity -> tuple
-	 * @return array
-	 */
-	function disassemble(OrmEntity $entity);
-
-	/**
-	 * Array->entity mapping (aka entity assembler). Creates a new entity and performs 1:1 mapping
-	 * by filling the values specified by the array
-	 * @return OrmEntity
+	 * Adds the entity and its primitive value set to a queue of entities waiting to be filled
+	 *
+	 * @param OrmEntity $entity entity to fill
+	 * @param array $tuple set of primitive values
+	 * @param FetchStrategy $fetchStrategy current fetch strategy to use
+	 *
+	 * @return void
 	 */
 	function assemble(OrmEntity $entity, array $tuple, FetchStrategy $fetchStrategy);
 
 	/**
-	 * @return integer batch fetching id
-	 */
-	function beginBatchFetchingMode();
-
-	/**
+	 * Tells the mapper that all entities are queued and now can be filled
+	 *
 	 * @return void
 	 */
-	function commitBatchFetchingMode($batchFetchingId);
+	function finish();
 }
 
 ?>

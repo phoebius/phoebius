@@ -293,17 +293,20 @@ final class EntityQuery implements ISqlSelectQuery
 
 	function getCount()
 	{
-		return $this->entity->getDao()->getCell(
-			$this->makeSelect(Projection::rowCount())
-		);
+		// delayed EntityQuery->SelectQuery cast
+		$me = clone $this;
+		$me->projection = Projection::rowCount();
+
+		return $this->entity->getDao()->getCell($me);
 	}
 
 	function getProperty($property)
 	{
-		return $this->entity->getDao()->getProperty(
-			$property,
-			$this->makeSelect(Projection::property($property))
-		);
+		// delayed EntityQuery->SelectQuery cast
+		$me = clone $this;
+		$me->projection = Projection::property($property);
+
+		return $this->entity->getDao()->getProperty($me);
 	}
 
 	function getPlaceholderValues(IDialect $dialect)

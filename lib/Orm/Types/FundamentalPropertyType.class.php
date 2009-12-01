@@ -69,7 +69,7 @@ final class FundamentalPropertyType
 		// *Important*
 		// We use dirty hack to obtain RdbmsDao because IOrmEntityAccessor
 		// does not provide (and should not provide!) an API to access the database
-		// because IOrmEntityAccessor is a limited interface to an abstract storage.
+		// because it is a limited interface to an abstract storage.
 		// In most cases this type would be used for databases so we can use this hack here.
 		$dao = call_user_func(array(get_class($entity), 'dao'));
 		Assert::isTrue($dao instanceof RdbmsDao);
