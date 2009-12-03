@@ -16,9 +16,14 @@
  *
  ************************************************************************************************/
 
+/**
+ * Contract for query projections needed for querying ORM-related objects
+ * @ingroup Orm_Query_Projections
+ */
 interface IProjection
 {
 	/**
+	 * Fills the SelectQuery in context of the specified ORM-related entity
 	 * @return void
 	 */
 	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder);

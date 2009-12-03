@@ -27,6 +27,11 @@ class OneToManyContainerPropertyType extends ContainerPropertyType
 	 */
 	private $encapsulantProperty;
 
+	/**
+	 * @param IQueryable $container
+	 * @param IQueryable $encapsulant
+	 * @param OrmProperty $encapsulantProperty
+	 */
 	function __construct(
 			IQueryable $container,
 			IQueryable $encapsulant,

@@ -16,10 +16,28 @@
  *
  ************************************************************************************************/
 
+/**
+ * Projection for selecting the concrete property of an entity
+ *
+ * Example:
+ * @code
+ * // SELECT product_name
+ * // FROM product
+ * // WHERE product_id = 1
+ * $query =
+ * 	EntityQuery::create(Product::orm())
+ * 		->get(Projection::property("name"));
+ * @code
+ *
+ * @ingroup Orm_Query_Projections
+ */
 class PropertyProjection implements IProjection
 {
 	private $property;
 
+	/**
+	 * @param string $property name of a property to select
+	 */
 	function __construct($property)
 	{
 		$this->property = $property;
@@ -36,8 +54,21 @@ class PropertyProjection implements IProjection
 		$selectQuery->get($this->getValueExpression($entityQueryBuilder));
 	}
 
-	protected function fillPropertyField($field, SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
+	/**
+	 * Adds the table field to the SELECT list
+	 *
+	 * @param string $field
+	 * @param SelectQuery $selectQuery
+	 * @param EntityQueryBuilder $entityQueryBuilder
+	 */
+	protected function fillPropertyField(
+			$field,
+			SelectQuery $selectQuery,
+			EntityQueryBuilder $entityQueryBuilder
+		)
 	{
+		$entityQueryBuilder->registerIdentifier($field);
+
 		$selectQuery->get(
 			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);

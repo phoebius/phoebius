@@ -17,7 +17,9 @@
  ************************************************************************************************/
 
 /**
- * object to ISqlCastable subjection
+ * EntityQuery->SelectQuery cast helper.
+ *
+ * Casts various objects to ISqlCastable objects, collecting joins according to found associations
  * @aux
  * @ingroup
  */
@@ -34,9 +36,9 @@ final class EntityQueryBuilder implements ISubjectivity
 	private $alias;
 
 	/**
-	 * @var EntityQuery
+	 * @var IQueryable
 	 */
-	private $condition;
+	private $entity;
 
 	/**
 	 * @var array of SelectQuerySource
@@ -49,22 +51,27 @@ final class EntityQueryBuilder implements ISubjectivity
 	private $joined = array();
 
 	/**
-	 * @var array of property{Name,Path}=>EntityProperty
+	 * @var array of propertyPath=>EntityProperty
 	 */
 	private $propertyCache = array();
 
 	/**
-	 * Sql identifiers list
+	 * Fixed sql identifiers list
+	 * @var array
 	 */
 	private $registeredIds = array();
 
-	function __construct(EntityQuery $entityQuery, $alias = null)
+	/**
+	 * @param IQueryable $entity entity to use as base when guessing path to queried properties
+	 * @param string $alias optional table label
+	 */
+	function __construct(IQueryable $entity, $alias = null)
 	{
 		Assert::isScalarOrNull($alias);
 
-		$this->entityQuery = $entityQuery;
+		$this->entity = $entity;
 
-		$this->table = $entityQuery->getPivot()->getPhysicalSchema()->getTable();
+		$this->table = $entity->getPhysicalSchema()->getTable();
 		$this->alias =
 			$alias
 				? $alias
@@ -80,27 +87,42 @@ final class EntityQueryBuilder implements ISubjectivity
 		);
 	}
 
+	/**
+	 * Gets the database table alias
+	 * @return string
+	 */
 	function getAlias()
 	{
 		return $this->alias;
 	}
 
+	/**
+	 * Gets the table name the entity reside
+	 * @return string
+	 */
 	function getTable()
 	{
 		return $this->table;
 	}
 
 	/**
+	 * Gets the entity used as base when guessing path to queried properties
 	 * @return IQueryable
 	 */
 	function getEntity()
 	{
-		return $this->entityQuery->getPivot();
+		return $this->entity;
 	}
 
+	/**
+	 * Gets the list of sources for selection that needed to be looked up when executing
+	 * a selection (according to the linked path to a properties)
+	 * @return array of SelectQuerySource
+	 */
 	function getSelectQuerySources()
 	{
 		$yield = $this->joins;
+
 		foreach ($this->joined as $eqb) {
 			$yield = array_merge($yield, $eqb->getSelectQuerySources());
 		}
@@ -108,9 +130,18 @@ final class EntityQueryBuilder implements ISubjectivity
 		return $yield;
 	}
 
+	/**
+	 * Forces the string to be used as SQL identifier, not a value
+	 * @param string $string
+	 * @return EntityQueryBuilder itself
+	 */
 	function registerIdentifier($string)
 	{
-		$this->registeredIds[$string] = true;
+		if ($string) {
+			$this->registeredIds[$string] = true;
+		}
+
+		return $this;
 	}
 
 	function subject($subject, ISubjective $object = null)
@@ -124,7 +155,7 @@ final class EntityQueryBuilder implements ISubjectivity
 		}
 
 		if ($subject instanceof OrmProperty) {
-			return $this->subject(new EntityProperty($this->alias, $subject));
+			return $this->subject(new EntityProperty($this, $subject));
 		}
 
 		if ($subject instanceof EntityProperty) {
@@ -159,13 +190,6 @@ final class EntityQueryBuilder implements ISubjectivity
 		return new SqlValue((string) $subject);
 	}
 
-	function addId($id)
-	{
-		$this->registeredIds[$id] = true;
-
-		return $this;
-	}
-
 	private function hasId($subject)
 	{
 		if (isset($this->registeredIds[$subject])) {
@@ -196,7 +220,7 @@ final class EntityQueryBuilder implements ISubjectivity
 			else {
 				$this->propertyCache[$property] =
 					new EntityProperty(
-						$this->alias,
+						$this,
 						$this->getEntity()->getLogicalSchema()->getProperty($property)
 					);
 			}
@@ -265,7 +289,7 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$condition = Expression::andChain();
 		$srcSqlFields = $property->getFields();
-		$dstSqlFields = $builder->entityQuery->getEntity()->getLogicalSchema()->getIdentifier()->getFields();
+		$dstSqlFields = $builder->entity->getLogicalSchema()->getIdentifier()->getFields();
 
 		foreach ($srcSqlFields as $k => $v) {
 			$condition->add(

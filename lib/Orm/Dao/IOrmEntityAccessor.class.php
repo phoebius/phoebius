@@ -107,7 +107,7 @@ interface IOrmEntityAccessor
 	 * 				array only, but we throw an explicit exception to be similar
 	 * 				with IOrmEntityAccessor::getCell() method
 	 * @param ISqlSelectQuery $query query to execute
-	 * @return array an associative array that represents a tuple of raw database values
+	 * @return associative array that represents a tuple of raw database values
 	 */
 	function getRow(ISqlSelectQuery $query);
 

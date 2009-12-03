@@ -304,6 +304,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	/**
 	 * Sets the expression that eliminates group rows that do not satisfy the condition.
 	 *
+	 * @param IExpression $expression expression to use
+	 *
 	 * @return SelectQuery itself
 	 */
 	function having(IExpression $expression = null)

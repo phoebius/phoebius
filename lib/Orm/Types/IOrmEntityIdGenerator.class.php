@@ -17,11 +17,15 @@
  ************************************************************************************************/
 
 /**
+ * Identifier property type generator invoker (to use for generated ORM-related entity properties)
+ *
  * @ingroup Core_Types
  */
 interface IOrmEntityIdGenerator
 {
 	/**
+	 * Obtaines the new ID generator
+	 *
 	 * @return IIDGenerator
 	 */
 	function getIdGenerator(IdentifiableOrmEntity $entity);

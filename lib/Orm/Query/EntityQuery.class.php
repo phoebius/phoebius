@@ -33,7 +33,21 @@
  * 		->getList();
  * @endcode
  *
- * @todo implement IOrmEntityAccessor helper methods
+ * API to fill the query:
+ * - Projection as a shorthand for various projections
+ * - EntityQuery::get() to add the projections to the projection chain
+ * - Expression as a shorthand for various expression trees
+ * - EntityQuery::where() to set the expression
+ *
+ * API to retrieve ORM-related entity objects:
+ * - EntityQuery::getList() to retrieve lists of entities
+ * - EntityQuery::getEntity() to retrieve a specific object
+ * - EntityQuery::getProperty() to get the value of a specific cell
+ *
+ * API to retrieve raw data:
+ * - EntityQuery::getCell(), EntityQuery::getCount() - raw cell values
+ * - EntityQuery::getRow() to get the database row
+ * - EntityQuery::getRows()
  *
  * @ingroup Orm_Query
  */
@@ -75,6 +89,8 @@ final class EntityQuery implements ISqlSelectQuery
 	private $offset = 0;
 
 	/**
+	 * EntityQuery static constructor
+	 * @param IQueryable $entity entity we are going to query
 	 * @return EntityQuery
 	 */
 	static function create(IQueryable $entity)
@@ -82,6 +98,9 @@ final class EntityQuery implements ISqlSelectQuery
 		return new self ($entity);
 	}
 
+	/**
+	 * @param IQueryable $entity entity we are going to query
+	 */
 	function __construct(IQueryable $entity)
 	{
 		$this->entity = $entity;
@@ -96,15 +115,8 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
-	 * @return IQueryable
-	 */
-	function getPivot()
-	{
-		return $this->entity;
-	}
-
-	/**
-	 * @return EntityQuery
+	 * Sets the query to eliminate duplicate rows from the result
+	 * @return EntityQuery itself
 	 */
 	function setDistinct()
 	{
@@ -114,8 +126,13 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Appends the list of expressions that will be used when sorting the resulting rows.
+	 *
+	 * Multiple arguments implementing OrderBy are accepted.
+	 *
 	 * We don't know why OrderBY is not a part of a separate projection, so we follow
 	 * the default behaviour of nhibernate
+	 *
 	 * @param OrderBy ...
 	 * @return EntityQuery an object itself
 	 */
@@ -129,11 +146,6 @@ final class EntityQuery implements ISqlSelectQuery
 		return $this;
 	}
 
-	/**
-	 * Sets a limit for row selection
-	 * @param integer $limit positive integer
-	 * @return EntityQuery an object itself
-	 */
 	function setLimit($limit)
 	{
 		Assert::isPositiveInteger($limit);
@@ -143,31 +155,6 @@ final class EntityQuery implements ISqlSelectQuery
 		return $this;
 	}
 
-	/**
-	 * Gets the limit for the row selection
-	 * @return integer 0 if limit is not set, otherwise a positive integer
-	 */
-	function getLimit()
-	{
-		return $this->limit;
-	}
-
-	/**
-	 * Drops a row selection limit
-	 * @return EntityQuery an object itself
-	 */
-	function dropLimit()
-	{
-		$this->limit = 0;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the offset for row selection
-	 * @param integer $offset positive integer
-	 * @return EntityQuery
-	 */
 	function setOffset($offset)
 	{
 		Assert::isPositiveInteger($offset);
@@ -178,27 +165,21 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
-	 * Gets the offset for the row selection
-	 * @return integet 0 if offset is not set, otherwise a positive integer
-	 */
-	function getOffset()
-	{
-		return $this->offset;
-	}
-
-	/**
-	 * Drops a row selection offset
-	 * @return EntityQuery an object itself
-	 */
-	function dropOffset()
-	{
-		$this->offset = 0;
-
-		return $this;
-	}
-
-	/**
-	 * @return EntityQuery
+	 * Appends an IProjection object to the projection chain that actually makes a selection
+	 * expression that form the output rows of the statement.
+	 *
+	 * Example:
+	 * @code
+	 * // gets the number of entities within the database
+	 * $count =
+	 * 	EntityQuery::create(MyEntry::orm())
+	 * 		->get(Projection::rowCount())
+	 * 		->getCell();
+	 * @endcode
+	 *
+	 * @param IProjection $projection
+	 *
+	 * @return EntityQuery itlsef
 	 */
 	function get(IProjection $projection)
 	{
@@ -208,6 +189,12 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Sets the condition for rows that should be selected
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
 	 * @return EntityQuery
 	 */
 	function where(IExpression $condition)
@@ -218,6 +205,8 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Presents EntityQuery as SelectQuery object
+	 *
 	 * @return SelectQuery
 	 */
 	function toSelectQuery()
@@ -231,9 +220,11 @@ final class EntityQuery implements ISqlSelectQuery
 
 	private function makeSelect(IProjection $projection)
 	{
+		// preaparation
 		$selectQuery = new SelectQuery;
-		$queryBuilder = new EntityQueryBuilder($this);
+		$queryBuilder = new EntityQueryBuilder($this->entity);
 
+		// subjection
 		$projection->fill($selectQuery, $queryBuilder);
 
 		if ($this->condition) {
@@ -260,6 +251,12 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Converts EntityQuery to IExpresion object.
+	 *
+	 * Note that projections, and references to associated entities are useless and won't be
+	 * presented in the resulting expression because required joins can only be specified
+	 * as sources for selection
+	 *
 	 * @return IExpression
 	 */
 	function toExpression()
@@ -268,29 +265,64 @@ final class EntityQuery implements ISqlSelectQuery
 			return new ExpressionChain;
 		}
 
-		return $this->condition->toSubjected(new EntityQueryBuilder($this));
+		return $this->condition->toSubjected(new EntityQueryBuilder($this->entity));
 	}
 
+	/**
+	 * Gets the ORM-related entity object. The object is obtained according to the current
+	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
+	 * @return IdentifiableOrmEntity
+	 */
 	function getEntity()
 	{
 		return $this->entity->getDao()->getEntity($this);
 	}
 
+	/**
+	 * Gets the plain database tuple. The tuple is obtained according to the current
+	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
+	 * @return associative array that represents a tuple of raw database values
+	 */
 	function getRow()
 	{
 		return $this->entity->getDao()->getRow($this);
 	}
 
+	/**
+	 * Gets a set of tuples of raw database values.
+	 *
+	 * @return array of associative arrays that represent a tuples of raw database values
+	 */
+	function getRows()
+	{
+		return $this->entity->getDao()->getRows($this);
+	}
+
+	/**
+	 * Gets the plain database tuple cell. The cell is obtained according to the current
+	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
+	 * @return scalar
+	 */
 	function getCell()
 	{
 		return $this->entity->getDao()->getCell($this);
 	}
 
+	/**
+	 * Gets the set plain database tuples. The tuples are obtained according to the current
+	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
+	 * @return array
+	 */
 	function getList()
 	{
 		return $this->entity->getDao()->getList($this);
 	}
 
+	/**
+	 * Gets the number of entities presented in the database according to the current setting
+	 * of EntityQuery
+	 * @return int
+	 */
 	function getCount()
 	{
 		// delayed EntityQuery->SelectQuery cast
@@ -300,6 +332,12 @@ final class EntityQuery implements ISqlSelectQuery
 		return $this->entity->getDao()->getCell($me);
 	}
 
+	/**
+	 * Gets the value of the entity's property. The value is obtained according to the current
+	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
+	 * @param string name of the property
+	 * @return scalar
+	 */
 	function getProperty($property)
 	{
 		// delayed EntityQuery->SelectQuery cast

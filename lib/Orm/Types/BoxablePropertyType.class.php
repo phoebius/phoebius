@@ -17,6 +17,9 @@
  ************************************************************************************************/
 
 /**
+ * Represents a property type that is implemented by IBoxable class and can be stored in a single
+ * database column
+ *
  * @ingroup Orm_Types
  */
 class BoxablePropertyType extends PrimitivePropertyType
@@ -31,6 +34,10 @@ class BoxablePropertyType extends PrimitivePropertyType
 	 */
 	private $boxableType;
 
+	/**
+	 * @param string $boxableType name of an IBoxable class
+	 * @param DBType $dbType type to use to store the value
+	 */
 	function __construct($boxableType, DBType $dbType)
 	{
 		Assert::isTrue(
@@ -40,7 +47,7 @@ class BoxablePropertyType extends PrimitivePropertyType
 		$this->boxableType = $boxableType;
 		$this->dbType = $dbType;
 
-		parent::__construct($dbType, $dbType->isNullable());
+		parent::__construct($dbType);
 	}
 
 	function getImplClass()

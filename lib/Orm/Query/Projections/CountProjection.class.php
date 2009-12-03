@@ -16,26 +16,44 @@
  *
  ************************************************************************************************/
 
+/**
+ * Projection that counts the resulting rows by the property and optionally labels the result
+ *
+ * @ingroup Orm_Query_Projections
+ */
 class CountProjection extends AggrProjection
 {
 	private $lookupProperty;
 
+	/**
+	 * @param string $property property to be used for aggregation. If not set, PK is used
+	 * @param string $alias optional label for the result of the aggregator
+	 */
 	function __construct($property = null, $alias = null)
 	{
-		$this->lookupProperty = null === $property;
+		$this->lookupProperty = !$property;
 
-		parent::__construct('COUNT', $property ? $property : 'id', $alias);
+		parent::__construct(
+			'COUNT',
+			$property
+				? $property
+				: '___lookup_me_in_CountProjection::getValueExpression()___',
+			$alias
+		);
 	}
 
 	protected function getValueExpression(EntityQueryBuilder $builder)
 	{
 		if ($this->lookupProperty) {
+			$alias = $this->getAlias();
+			$builder->registerIdentifier($alias);
+
 			return
 				new AliasedSqlValueExpression(
 					$builder->subject(
 						$builder->getEntity()->getLogicalSchema()->getIdentifier()
 					),
-					$this->getAlias()
+					$alias
 				);
 		}
 

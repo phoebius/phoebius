@@ -17,6 +17,9 @@
  ************************************************************************************************/
 
 /**
+ * Represents a type that encapsulates primitive native type, that is stored in a single
+ * database column
+ *
  * @ingroup Orm_Types
  */
 abstract class PrimitivePropertyType extends OrmPropertyType
@@ -26,6 +29,9 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 	 */
 	private $type;
 
+	/**
+	 * @param ISqlType $type
+	 */
 	function __construct(ISqlType $type)
 	{
 		$this->type = $type;

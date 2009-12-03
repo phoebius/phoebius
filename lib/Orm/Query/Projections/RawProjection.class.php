@@ -16,22 +16,44 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents raw, optionally aliased projection. This projection appned ISubjective expression
+ * into the into a SELECT list that form the output rows of the statement.
+ *
+ * Example:
+ * @code
+ * // SELECT product_name
+ * // FROM product
+ * // WHERE product_id = 1
+ * $query =
+ * 	EntityQuery::create(Product::orm())
+ * 		->get(Projection::property("name"));
+ * @code
+ *
+ * @ingroup Orm_Query_Projections
+ */
 class RawProjection implements IProjection
 {
 	private $expression;
 	private $alias;
 
+	/**
+	 * @param mixed $expression value expression to be selected
+	 * @param string $alias alias for value expression
+	 */
 	function __construct($expression, $alias = null)
 	{
+		Assert::isScalarOrNull($alias);
+
 		$this->expression = $expression;
 		$this->alias = $alias;
 	}
 
-	function getExpression()
-	{
-		return $this->expression;
-	}
-
+	/**
+	 * Gets the label for expression to select
+	 *
+	 * @return string|null
+	 */
 	function getAlias()
 	{
 		return $this->alias;
@@ -43,11 +65,13 @@ class RawProjection implements IProjection
 	}
 
 	/**
+	 * Converts value expression to be appended to SELECT list
+	 * @param EntityQueryBuilder $builder
 	 * @return ISqlValueExpression
 	 */
 	protected function getValueExpression(EntityQueryBuilder $builder)
 	{
-		$builder->addId($this->alias);
+		$builder->registerIdentifier($this->alias);
 
 		return
 			new AliasedSqlValueExpression(

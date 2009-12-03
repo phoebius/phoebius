@@ -16,8 +16,16 @@
  *
  ************************************************************************************************/
 
+/**
+ * Represents a chain of projections
+ *
+ * @ingroup Orm_Query_Projections
+ */
 final class ProjectionChain extends TypedValueArray implements IProjection
 {
+	/**
+	 * @param array $array initial IProjection objects to be append to the value list
+	 */
 	function __construct(array $array = array())
 	{
 		parent::__construct('IProjection', $array);

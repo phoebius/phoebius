@@ -37,6 +37,11 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	 */
 	private $encapsulant;
 
+	/**
+	 * @param IQueryable $proxy
+	 * @param OrmProperty $container
+	 * @param OrmProperty $encapsulant
+	 */
 	function __construct(
 			IQueryable $proxy,
 			OrmProperty $container,

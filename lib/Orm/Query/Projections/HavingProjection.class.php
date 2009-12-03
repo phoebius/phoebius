@@ -16,10 +16,21 @@
  *
  ************************************************************************************************/
 
+/**
+ * Sets the expression that eliminates group rows that do not satisfy the condition.
+ *
+ * @ingroup Orm_Query_Projections
+ */
 final class HavingProjection implements IProjection
 {
+	/**
+	 * @var IExpression
+	 */
 	private $expression;
 
+	/**
+	 * @param IExpression $expression expression to use
+	 */
 	function __construct(IExpression $expression)
 	{
 		$this->expression = $expression;

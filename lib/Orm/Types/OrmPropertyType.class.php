@@ -17,21 +17,36 @@
  ************************************************************************************************/
 
 /**
+ * Represents a base type of ORM-related entity's property
+ *
  * @ingroup Orm_Types
  */
 abstract class OrmPropertyType
 {
 	/**
+	 * Gets the name of the class this type implements (if any).
+	 *
 	 * @return string|null
 	 */
 	abstract function getImplClass();
 
 	/**
+	 * Converts the tuple of raw database values to the object that encapsulated ORM-related
+	 * entity's property
+	 *
+	 * @param array $tuple set of database values, wrt OrmPropertyType::getSqlTypes()
+	 * @param FetchStrategy $fetchStrategy fetch strategy to use
+	 *
 	 * @return mixed native value
 	 */
 	abstract function assemble(array $tuple, FetchStrategy $fetchStrategy);
 
 	/**
+	 * Converts the object that encapsulated ORM-related entity's property to the set of
+	 * database values
+	 *
+	 * @param mixed $value PHP value
+	 *
 	 * @return SqlValueExpressionArray
 	 */
 	abstract function disassemble($value);
@@ -43,11 +58,18 @@ abstract class OrmPropertyType
 	abstract function getSqlTypes();
 
 	/**
+	 * Gets the number of database columns acquired by the property type
 	 * @return integer
 	 */
 	abstract function getColumnCount();
 
 	/**
+	 * Converts the set  tuple of raw database values to the object that encapsulated ORM-related
+	 * entity's property
+	 *
+	 * This method can be overridden when custom set conversion can be implemented by the type
+	 * optimistically
+	 *
 	 * @param array $tuples
 	 * @param FetchStrategy
 	 * @return array of native values
@@ -64,6 +86,8 @@ abstract class OrmPropertyType
 	}
 
 	/**
+	 * Gets the PHP code that constructs the object with the current state
+	 *
 	 * @return string
 	 */
 	function toPhpCodeCall()
@@ -77,6 +101,11 @@ abstract class OrmPropertyType
 		));
 	}
 
+	/**
+	 * Create a php code which implements a getter within the entity class
+	 * @param IMappable $entity
+	 * @param OrmProperty $property
+	 */
 	function toGetter(IMappable $entity, OrmProperty $property)
 	{
 		$returnValue =
@@ -101,6 +130,11 @@ abstract class OrmPropertyType
 EOT;
 	}
 
+	/**
+	 * Create a php code which implements a setter within the entity class
+	 * @param IMappable $entity
+	 * @param OrmProperty $property
+	 */
 	function toSetter(IMappable $entity, OrmProperty $property)
 	{
 		$argCastType =
@@ -135,6 +169,12 @@ EOT;
 EOT;
 	}
 
+
+	/**
+	 * Create a php code which implements a field within the entity class
+	 * @param IMappable $entity
+	 * @param OrmProperty $property
+	 */
 	function toField(IMappable $entity, OrmProperty $property)
 	{
 		$typeImpl =
@@ -154,6 +194,11 @@ EOT;
 EOT;
 	}
 
+	/**
+	 * A list of PHP code that is passed as the arguments to the constructor when
+	 * bootstrapping the current state
+	 * @return array
+	 */
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array();

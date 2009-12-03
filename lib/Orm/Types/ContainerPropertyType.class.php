@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a property type for container associations
+ *
  * @ingroup Orm_Types
  */
 abstract class ContainerPropertyType extends OrmPropertyType
@@ -31,6 +33,10 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	 */
 	private $encapsulant;
 
+	/**
+	 * @param IQueryable $container
+	 * @param IQueryable $encapsulant
+	 */
 	function __construct(
 			IQueryable $container,
 			IQueryable $encapsulant

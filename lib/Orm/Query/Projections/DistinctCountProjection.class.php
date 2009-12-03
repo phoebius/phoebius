@@ -16,6 +16,12 @@
  *
  ************************************************************************************************/
 
+/**
+ * Projection invokes the count aggregate for all distinct non-null values of the specified
+ * property or expression found in the input rows
+ *
+ * @ingroup Orm_Query_Projections
+ */
 final class DistinctCountProjection extends CountProjection
 {
 	protected function getSqlFunction(EntityQueryBuilder $entityQueryBuilder)

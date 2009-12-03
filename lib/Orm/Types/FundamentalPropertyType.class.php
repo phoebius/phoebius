@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a wrapper over base DBType
+ *
  * @ingroup Orm_Types
  */
 final class FundamentalPropertyType
@@ -28,6 +30,9 @@ final class FundamentalPropertyType
 	 */
 	private $type;
 
+	/**
+	 * @param DBType $type
+	 */
 	function __construct(DBType $type)
 	{
 		$this->type = $type;

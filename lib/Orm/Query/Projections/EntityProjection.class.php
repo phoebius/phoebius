@@ -16,6 +16,20 @@
  *
  ************************************************************************************************/
 
+/**
+ * Projection for selecting all properties of the specified entity
+ *
+ * Example:
+ * @code
+ * // SELECT product_id, product_name, product_price
+ * // FROM product
+ * $query =
+ * 	EntityQuery::create(Product::orm())
+ * 		->get(Projection::entity("Product"));
+ * @code
+ *
+ * @ingroup Orm_Query_Projections
+ */
 class EntityProjection implements IProjection
 {
 	/**
@@ -23,6 +37,9 @@ class EntityProjection implements IProjection
 	 */
 	private $entity;
 
+	/**
+	 * @param IQueryable $entity entity to select
+	 */
 	function __construct(IQueryable $entity)
 	{
 		$this->entity = $entity;
@@ -31,12 +48,25 @@ class EntityProjection implements IProjection
 	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
 		foreach ($this->entity->getPhysicalSchema()->getFields() as $field) {
-			$this->injectField($selectQuery, $field, $entityQueryBuilder);
+			$this->fillField($field, $selectQuery, $entityQueryBuilder);
 		}
 	}
 
-	protected function injectField(SelectQuery $selectQuery, $field, EntityQueryBuilder $entityQueryBuilder)
+	/**
+	 * Adds the table field to the SELECT list
+	 *
+	 * @param string $field
+	 * @param SelectQuery $selectQuery
+	 * @param EntityQueryBuilder $entityQueryBuilder
+	 */
+	protected function fillField(
+			$field,
+			SelectQuery $selectQuery,
+			EntityQueryBuilder $entityQueryBuilder
+		)
 	{
+		$entityQueryBuilder->registerIdentifier($field);
+
 		$selectQuery->get(
 			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);

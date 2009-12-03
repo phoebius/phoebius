@@ -16,10 +16,21 @@
  *
  ************************************************************************************************/
 
+/**
+ * Projection invokes the specified aggregate across all input rows for which the given
+ * property or expression yield non-null values
+ *
+ * @ingroup Orm_Query_Projections
+ */
 class AggrProjection extends RawProjection
 {
 	private $func;
 
+	/**
+	 * @param string $func name of the aggregate
+	 * @param string $property property to be used for aggregation
+	 * @param string $alias optional label for the result of the aggregator
+	 */
 	function __construct($func, $property, $alias = null)
 	{
 		Assert::isScalar($func);
@@ -29,7 +40,11 @@ class AggrProjection extends RawProjection
 		parent::__construct($property, $alias);
 	}
 
-	function getFunc(EntityQueryBuilder $entityQueryBuilder)
+	/**
+	 * Gets the name of the aggregates
+	 * @return string
+	 */
+	function getFunc()
 	{
 		return $this->func;
 	}
@@ -40,14 +55,16 @@ class AggrProjection extends RawProjection
 	}
 
 	/**
-	 * @return SqlFunction
+	 * Create a SQLFunction with the expression as the argument
+	 *
 	 * @param EntityQuery $entityQuery
+	 * @return SqlFunction
 	 */
 	protected function getSqlFunction(EntityQueryBuilder $entityQueryBuilder)
 	{
 		return
 			new SqlFunction(
-				$this->getFunc($entityQueryBuilder),
+				$this->getFunc(),
 				$this->getValueExpression($entityQueryBuilder)
 			);
 	}

@@ -17,6 +17,7 @@
  ************************************************************************************************/
 
 /**
+ * Represents a queried property requested during the cascaded association resolve process
  * @ingroup Orm_Expression
  * @aux
  */
@@ -33,38 +34,20 @@ final class EntityProperty
 	private $property;
 
 	/**
-	 * @var OrmPropertyType
+	 * @param EntityQueryBuilder $builder
+	 * @param OrmProperty $property
 	 */
-	private $type;
-
-	function __construct($owner, OrmProperty $property)
+	function __construct(EntityQueryBuilder $builder, OrmProperty $property)
 	{
-		$this->owner = $owner;
+		$this->owner = $builder->getAlias();
 		$this->property = $property;
-		$type = $property->getType();
 
 		Assert::isTrue(
-			$type->getColumnCount() == 1,
-			'composite property querying is not yet supported (`%s`.`%s` is illegal for EntityQuery)',
-			$owner,
+			$property->getType()->getColumnCount() == 1,
+			'composite property querying is not yet supported (`%s`.`%s` is illegal)',
+			$builder->getEntity()->getLogicalSchema()->getEntityName(),
 			$property->getName()
 		);
-	}
-
-	/**
-	 * @return EntityQuery
-	 */
-	function getOwner()
-	{
-		return $this->owner;
-	}
-
-	/**
-	 * @return OrmProperty
-	 */
-	function getProperty()
-	{
-		Return $this->property;
 	}
 
 	/**
