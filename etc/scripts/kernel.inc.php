@@ -146,7 +146,6 @@ $classes = array
 	'InternalOperationException' => 'Core/Exceptions',
 	'RecoverableErrorFactory' => 'Core/Bootstrap',
 	'CompilationContextException' => 'Core/Exceptions',
-	'PhpUtils' => 'Utils',
 	'TypeUtils' => 'Utils'
 );
 

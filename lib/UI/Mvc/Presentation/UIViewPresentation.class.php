@@ -17,7 +17,35 @@
  ************************************************************************************************/
 
 /**
- * TODO cut view resolver functionality into a separate level
+ * Represents an extended version of presentation engine which is binded with UIControl objects
+ * and MVC stack and provides various features of it with the protected methods
+ *
+ * Helper methods return strings, that are not appended to the output!
+ *
+ * See:
+ * - UIViewPresentation::__get() for shorthand access to model variables came from the Controller
+ * - UIViewPresentation::getSelfHref() for getting the requested URL
+ * - UIViewPresentation::getHref() for generating URL via the route defined by the IRouteTable
+ * - UIViewPresentation::getHtmlLink() for rendering <a href> container
+ *
+ * Hints:
+ * - use "@" operator to set whether view expects a specific model variable or not:
+ * 		@code
+ * 		<?=@$this->var?>
+ * 		@endcode
+ * 		shows that a view can omit the situation when controller does not provide a "var" variable
+ * 		within a passed model.
+ *
+ * 		@code
+ * 		<?=$this->var?>
+ * 		@endcode
+ * 		will raise a compilation error if the variable is missing
+ * - use getHref() to generate URL defined by the routing system:
+ * 		@code
+ * 		<?=$this->getHref("blog_entry", array("id" => $entry->getId()))?>
+ * 		@endcode
+ *
+ *
  * @ingroup UI_Mvc_Presentation
  */
 class UIViewPresentation
@@ -58,6 +86,9 @@ class UIViewPresentation
 
 	private $viewName;
 
+	/**
+	 * @param string $viewName name of the view located at $app_dir/views/<viewName>.view.php
+	 */
 	function __construct($viewName)
 	{
 		Assert::isScalar($viewName);
@@ -72,6 +103,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * A shorthand setter of the model variable
+	 *
 	 * @return void
 	 */
 	function __set($name, $value)
@@ -82,6 +115,12 @@ class UIViewPresentation
 	}
 
 	/**
+	 * A shorthand getter of the model variables.
+	 *
+	 * If the variable is missing, and error_reporting is turned off (by prepending the call
+	 * with the "@" operator) then the variable is treated as NULL. Otherwise a compilation
+	 * error is raised
+	 *
 	 * @return mixed
 	 */
 	function __get($name)
@@ -105,6 +144,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * A shorthand check whether the variable is defined within the model
+	 *
 	 * @return boolean
 	 */
 	function __isset($name)
@@ -115,6 +156,12 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Looks up for the method in the binded UIControl hierarchy, and invokes the first matched
+	 * one.
+	 *
+	 * @param string $name name of the invoked method
+	 * @param array $arguments arguments to pass
+	 *
 	 * @return mixed
 	 */
 	function __call($name, array $arguments)
@@ -130,6 +177,14 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Gets the string representation of the URL constructed via the named Route that
+	 * is defined within IRouteTable.
+	 *
+	 * Table is hold by the Trace.
+	 *
+	 * @param string $routeName name of the route
+	 * @param array $parameters parameters to pass to Route's rules
+	 *
 	 * @return string
 	 */
 	function getHref($routeName, array $parameters = array())
@@ -163,19 +218,27 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Gets the text representation of the <A HREF> HTML tag.
+	 * URL is constructed via the named Route that is defined within IRouteTable.
+	 *
+	 * @param string $href the contents of the tag
+	 * @param string $routeName name of the route
+	 * @param array $parameters parameters to pass to Route's rules
 	 * @return string
 	 */
 	function getHtmlLink($href, $routeName, array $parameters = array())
 	{
 		return
-		'<a href="'
-			. $this->getHref($routeName, $parameters)
+			'<a href="'
+				. $this->getHref($routeName, $parameters)
 			. '">'
 			. $href
 			. '</a>';
 	}
 
 	/**
+	 * Gets the text representastion of the requested URL
+	 *
 	 * @return string
 	 */
 	function getSelfHref()
@@ -202,6 +265,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Gets the model passed by the controller
+	 *
 	 * @return Model|null
 	 */
 	function getModel()
@@ -210,6 +275,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Gets the trace used to invoke the MVC stack
+	 *
 	 * @return Trace|null
 	 */
 	function getTrace()
@@ -218,6 +285,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Gets the route table used to find the trace to the MVC controller
+	 *
 	 * @return IRouteTable|null
 	 */
 	function getRouteTable()
@@ -226,6 +295,10 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Sets the controller's model
+	 *
+	 * @param Model $model
+	 *
 	 * @return UIViewPresentation
 	 */
 	function setModel(Model $model)
@@ -236,6 +309,10 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Sets the trace used to invoke the MVC stack
+	 *
+	 * @param Trace $trace
+	 *
 	 * @return UIViewPresentation
 	 */
 	function setTrace(Trace $trace)
@@ -250,6 +327,10 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Sets the route table used to find the trace to the MVC controller
+	 *
+	 * @param IRouteTable $routeTable
+	 *
 	 * @return UIViewPresentation
 	 */
 	function setRouteTable(IRouteTable $routeTable)
@@ -260,9 +341,14 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Forces the view to check whether the specified variables are presented in a Model
+	 * passed by the controller
+	 *
+	 * @warning obsoleted wrt UIViewPresentation::__get()
+	 *
 	 * @var string ...
 	 */
-	function expect()
+	protected function expect()
 	{
 		$vars = func_get_args();
 
@@ -276,9 +362,13 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Tells the view to watch for variables that MAY come from the controller within the model
+	 *
+	 * @warning obsoleted wrt UIViewPresentation::__get()
+	 *
 	 * @var string ...
 	 */
-	function accept()
+	protected function accept()
 	{
 		$vars = func_get_args();
 
@@ -289,9 +379,6 @@ class UIViewPresentation
 		}
 	}
 
-	/**
-	 * @return void
-	 */
 	function render(IOutput $output)
 	{
 		$this->output = $output;
@@ -301,9 +388,6 @@ class UIViewPresentation
 		$this->output = null;
 	}
 
-	/**
-	 * @return UIViewPresentation
-	 */
 	function setUIControl(UIControl $control)
 	{
 		$this->control = $control;
@@ -311,15 +395,17 @@ class UIViewPresentation
 		return $this;
 	}
 
-	/**
-	 * @return UIControl|null
-	 */
 	function getUIControl()
 	{
 		return $this->control;
 	}
 
 	/**
+	 * In-place render of a separate UIControl
+	 *
+	 * @param string $view name of the view to render
+	 * @param Model $model optional custom model to pass; if not set, the current model will be passed
+	 *
 	 * @return void
 	 */
 	protected function renderPartial($view, Model $model = null)
@@ -348,6 +434,8 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Sets the master control
+	 *
 	 * @return void
 	 */
 	protected function setMaster($view, Model $model = null)
@@ -371,6 +459,11 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Creates an instance of (a custom) UIPage with UIPresentation inside
+	 *
+	 * @param UIPresentation $presentation presentation to set; if not specified then the current
+	 * 										context will be used
+	 *
 	 * @return UIPage
 	 */
 	protected function getPage(UIPresentation $presentation = null)
@@ -383,6 +476,10 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Creates an instance of (a custom) UIMasterPage with UIPresentation inside
+	 *
+	 * @param UIPresentation $presentation presentation to set; if not specified then the current
+	 * 										context will be used
 	 * @return UIMasterPage
 	 */
 	protected function getMasterPage(UIPresentation $presentation = null)
@@ -395,6 +492,10 @@ class UIViewPresentation
 	}
 
 	/**
+	 * Creates an instance of (a custom) UIUserControl with UIPresentation inside
+	 *
+	 * @param UIPresentation $presentation presentation to set; if not specified then the current
+	 * 										context will be used
 	 * @return UIUserControl
 	 */
 	protected function getUserControl(UIPresentation $presentation = null)

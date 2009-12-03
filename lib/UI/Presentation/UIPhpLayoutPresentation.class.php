@@ -17,6 +17,9 @@
  ************************************************************************************************/
 
 /**
+ * Represents a presentation engine which uses plain PHP files as templates, included in the
+ * context of the object. These PHP ``templates'' may use all protected methods of this class.
+ *
  * @ingroup UI_Presentation
  */
 class UIPhpLayoutPresentation extends UIPresentation
@@ -37,8 +40,8 @@ class UIPhpLayoutPresentation extends UIPresentation
 	private $output;
 
 	/**
-	 * @throws FileNotFoundException
-	 * @param string $layoutPath
+	 * @throws FileNotFoundException thrown when the path to a file is wrong
+	 * @param string $layoutPath path to PHP file
 	 */
 	function __construct($layoutPath)
 	{
@@ -54,9 +57,6 @@ class UIPhpLayoutPresentation extends UIPresentation
 		}
 	}
 
-	/**
-	 * @return void
-	 */
 	function render(IOutput $output)
 	{
 		$this->assertOutsideRenderingContext();

@@ -17,16 +17,27 @@
  ************************************************************************************************/
 
 /**
+ * Controact for presentation binded with the UIControl.
+ *
+ * This may be important if the presentation should use the features of custom hierarchy
+ * of UIControl objects
+ *
  * @ingroup UI_Presentation
  */
 interface IUIControlBindedPresentation
 {
 	/**
-	 * @return IUIControlBindedPresentation an object itself
+	 * Sets the binded UIControl
+	 *
+	 * @param UIControl $control
+	 *
+	 * @return IUIControlBindedPresentation itself
 	 */
 	function setUIControl(UIControl $control);
 
 	/**
+	 * Gets the binded UIControl, if any
+	 *
 	 * @return UIControl|null
 	 */
 	function getUIControl();

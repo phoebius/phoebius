@@ -17,14 +17,35 @@
  ************************************************************************************************/
 
 /**
+ * Abstract string macros
+ *
  * @ingroup Utils
  */
 final class StringUtils extends StaticClass
 {
+	/**
+	 * Unix line delimiter
+	 */
 	const DELIM_UNIX = "\n";
+
+	/**
+	 * Windows line delimiter
+	 */
 	const DELIM_WIN = "\r\n";
+
+	/**
+	 * Locale line delimiter
+	 */
 	const DELIM_LOCALE = PHP_EOL;
+
+	/**
+	 * Represents an empty string
+	 */
 	const EMPTY_STRING = '';
+
+	/**
+	 * Line delimiter to use as standart for the application
+	 */
 	const DELIM_STANDART = self::DELIM_UNIX;
 }
 

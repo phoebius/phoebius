@@ -38,7 +38,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 * SELECT ... FROM
 	 * @var SqlValueExpressionArray
 	 */
-	private $row;
+	private $get;
 
 	/**
 	 * FROM ...
@@ -360,7 +360,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 			$querySlices[] = 'DISTINCT';
 		}
 
-		$querySlices[] = $this->row->toDialectString($dialect);
+		$querySlices[] = $this->get->toDialectString($dialect);
 
 		if (!$this->sources->isEmpty()) {
 			$querySlices[] = 'FROM';

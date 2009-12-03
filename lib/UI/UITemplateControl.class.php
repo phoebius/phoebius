@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a renderable control that is presented using the presentation layer
+ *
  * @ingroup UI
  */
 abstract class UITemplateControl extends UIControl
@@ -26,16 +28,21 @@ abstract class UITemplateControl extends UIControl
 	 */
 	private $presentation;
 
+	/**
+	 * @param UIPresentation $presentation presentation layer
+	 */
 	function __construct(UIPresentation $presentation)
 	{
 		$this->presentation = $presentation;
-		
+
 		if ($presentation instanceof IUIControlBindedPresentation) {
 			$presentation->setUIControl($this);
 		}
 	}
 
 	/**
+	 * Gets the presentation layer of the control
+	 *
 	 * @return UIPresentation
 	 */
 	function getPresentation()
@@ -43,9 +50,6 @@ abstract class UITemplateControl extends UIControl
 		return $this->presentation;
 	}
 
-	/**
-	 * @return void
-	 */
 	function render(IOutput $output)
 	{
 		$this->presentation->render($output);

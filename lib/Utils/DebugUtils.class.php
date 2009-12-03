@@ -26,7 +26,7 @@ final class DebugUtils extends StaticClass
 	 * Same as PHP's sprintf, but supports non-scalar arguments, that are expanded in print_r
 	 * manner
 	 * @param string $string the string to be processed
-	 * @param mixed ... any arguments
+	 * @param mixed ...
 	 */
 	static function sprintf($string)
 	{

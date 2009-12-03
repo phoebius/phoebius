@@ -34,7 +34,7 @@ interface IOrmRelated
 	/**
 	 * Gets the entity auxiliary container
 	 *
-	 * @return IMappable
+	 * @return IQueryable
 	 */
 	static function orm();
 }

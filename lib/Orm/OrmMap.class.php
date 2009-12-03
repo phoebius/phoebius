@@ -21,7 +21,7 @@
  *
  * @ingroup Orm
  */
-final class OrmMap implements IOrmEntityBatchMapper, IOrmEntityMapper
+final class OrmMap implements IOrmEntityBatchMapper
 {
 	/**
 	 * @var ILogicallySchematic

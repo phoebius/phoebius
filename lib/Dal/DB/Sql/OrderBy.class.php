@@ -115,10 +115,10 @@ final class OrderBy implements ISubjective, ISqlValueExpression
 	function toDialectString(IDialect $dialect)
 	{
 		return
-			  $this->getExpression()->toDialectString($dialect)
+			  $this->expression->toDialectString($dialect)
 			. (
 				$this->direction
-					? ' ' . $this->getDirection()->toDialectString($dialect)
+					? ' ' . $this->direction->toDialectString($dialect)
 					: ''
 			);
 	}

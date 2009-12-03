@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Rerpresents a custom nestable renderable control
+ *
  * @ingroup UI
  */
 class UIUserControl extends UITemplateControl
@@ -27,6 +29,8 @@ class UIUserControl extends UITemplateControl
 	private $parentControl;
 
 	/**
+	 * Sets the parent control
+	 *
 	 * @return UIUserControl an object itself
 	 */
 	function setParentControl(UITemplateControl $parentControl)
@@ -36,9 +40,6 @@ class UIUserControl extends UITemplateControl
 		return $this;
 	}
 
-	/**
-	 * @return UITemplateControl|null
-	 */
 	function getParentControl()
 	{
 		return $this->parentControl;

@@ -17,11 +17,17 @@
  ************************************************************************************************/
 
 /**
- * Encoding utilities
+ * Encoding utilities.
+ *
  * @ingroup Utils
  */
 final class EncodingUtils extends StaticClass
 {
+	/**
+	 * Whether string is in UTF-8
+	 * @param string $str
+	 * @return boolean
+	 */
 	static function isUtf8($str)
 	{
 		// ^(?:[\x00-\x7f]|[\xc0-\xdf][\x80-\xbf]|[\xe0​-\xef][\x80-\xbf][\x80-\xbf]|[\xf0-\xf7][\x80-\xbf​][\x80-\xbf][\x80-\xbf]+)$

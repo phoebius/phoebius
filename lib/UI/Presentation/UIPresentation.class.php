@@ -17,10 +17,19 @@
  ************************************************************************************************/
 
 /**
+ * Contract for presentation logic encapsulator, used to render UIControl
+ *
  * @ingroup UI_Presentation
  */
 abstract class UIPresentation
 {
+	/**
+	 * Renders the presentation logic to the source
+	 *
+	 * @param IOutput $output render destination
+	 *
+	 * @return void
+	 */
 	abstract function render(IOutput $output);
 }
 

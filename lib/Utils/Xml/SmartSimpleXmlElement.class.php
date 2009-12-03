@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * TODO: overwrite __toString() to force valid object2string cast
+ * @todo overwrite __toString() to force valid object2string cast
  * @ingroup Utils_Xml
  */
 class SmartSimpleXmlElement extends SimpleXMLElement

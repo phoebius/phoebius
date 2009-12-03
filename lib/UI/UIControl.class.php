@@ -17,16 +17,24 @@
  ************************************************************************************************/
 
 /**
+ * Represents a renderable UI control
+ *
  * @ingroup UI
  */
 abstract class UIControl
 {
 	/**
+	 * Renders the UI representation to the source
+	 *
+	 * @param IOutput $output render destination
+	 *
 	 * @return void
 	 */
 	abstract function render(IOutput $output);
 
 	/**
+	 * Gets the parent UIControl, if set
+	 *
 	 * @return UIControl|null
 	 */
 	abstract function getParentControl();

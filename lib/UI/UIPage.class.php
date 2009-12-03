@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a renderable page
+ *
  * @ingroup UI
  */
 class UIPage extends UITemplateControl
@@ -27,6 +29,8 @@ class UIPage extends UITemplateControl
 	private $masterPage = null;
 
 	/**
+	 * Sets the master page for the control
+	 *
 	 * @return UIPage an object itself
 	 */
 	function setMasterPage(UIMasterPage $masterPage)
@@ -37,6 +41,8 @@ class UIPage extends UITemplateControl
 	}
 
 	/**
+	 * Gets the master page for the control
+	 *
 	 * @return UIMasterPage
 	 */
 	function getMasterPage()
@@ -44,17 +50,11 @@ class UIPage extends UITemplateControl
 		return $this->masterPage;
 	}
 
-	/**
-	 * @return UIMasterPage
-	 */
 	function getParentControl()
 	{
 		return $this->masterPage;
 	}
 
-	/**
-	 * @return void
-	 */
 	function render(IOutput $output)
 	{
 		$memoryBuffer = new MemoryStream;

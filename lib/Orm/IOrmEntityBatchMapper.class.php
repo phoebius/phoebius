@@ -24,19 +24,8 @@
  *
  * @ingroup Orm
  */
-interface IOrmEntityBatchMapper
+interface IOrmEntityBatchMapper extends IOrmEntityMapper
 {
-	/**
-	 * Adds the entity and its primitive value set to a queue of entities waiting to be filled
-	 *
-	 * @param OrmEntity $entity entity to fill
-	 * @param array $tuple set of primitive values
-	 * @param FetchStrategy $fetchStrategy current fetch strategy to use
-	 *
-	 * @return void
-	 */
-	function assemble(OrmEntity $entity, array $tuple, FetchStrategy $fetchStrategy);
-
 	/**
 	 * Tells the mapper that all entities are queued and now can be filled
 	 *

@@ -208,7 +208,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 
 		Assert::isScalar($classname);
 
-		if (PhpUtils::typeExists($classname)) {
+		if (TypeUtils::isDefined($classname)) {
 			return true;
 		}
 
@@ -223,7 +223,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 			$this->cacheFileIsLoaded = true;
 
 			//are you happy? we've got it
-			if (PhpUtils::typeExists($classname, false)) {
+			if (TypeUtils::isDefined($classname)) {
 				return true;
 			}
 		}
@@ -253,7 +253,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 			}
 		}
 
-		return PhpUtils::typeExists($classname);
+		return TypeUtils::isDefined($classname);
 	}
 
 	/**

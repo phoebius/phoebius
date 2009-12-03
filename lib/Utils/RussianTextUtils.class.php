@@ -24,7 +24,11 @@ class RussianTextUtils extends StaticClass
 {
 	/**
 	 * Choose russion word declension based on numeric.
+	 *
 	 * Example for $expressions: array("ответ", "ответа", "ответов")
+	 *
+	 * @param int $number
+	 * @param array $expressions
 	 * @return string
 	 */
 	static function getDeclension($number, array $expressions)

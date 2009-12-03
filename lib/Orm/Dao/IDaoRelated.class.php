@@ -32,13 +32,6 @@ interface IDaoRelated extends IOrmRelated
 	static function dao();
 
 	/**
-	 * Gets the entity auxiliary container
-	 *
-	 * @return IQueryable
-	 */
-	static function orm();
-
-	/**
 	 * Gets the high-level query
 	 *
 	 * @return EntityQuery

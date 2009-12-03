@@ -325,11 +325,11 @@ final class EntityQuery implements ISqlSelectQuery
 	 */
 	function getCount()
 	{
-		// delayed EntityQuery->SelectQuery cast
-		$me = clone $this;
-		$me->projection = Projection::rowCount();
-
-		return $this->entity->getDao()->getCell($me);
+		return $this->entity->getDao()->getCell(
+			$this->makeSelect(
+				Projection::rowCount()
+			)
+		);
 	}
 
 	/**
@@ -340,11 +340,11 @@ final class EntityQuery implements ISqlSelectQuery
 	 */
 	function getProperty($property)
 	{
-		// delayed EntityQuery->SelectQuery cast
-		$me = clone $this;
-		$me->projection = Projection::property($property);
-
-		return $this->entity->getDao()->getProperty($me);
+		return $this->entity->getDao()->getProperty(
+			$this->makeSelect(
+				Projection::property($property)
+			)
+		);
 	}
 
 	function getPlaceholderValues(IDialect $dialect)

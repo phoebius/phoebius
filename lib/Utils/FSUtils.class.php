@@ -17,7 +17,8 @@
  ************************************************************************************************/
 
 /**
- * Filesystem utils
+ * Filesystem utilities
+ * @aux
  * @ingroup Utils
  */
 final class FSUtils extends StaticClass

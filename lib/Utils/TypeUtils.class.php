@@ -25,7 +25,7 @@ final class TypeUtils extends StaticClass
 	/**
 	 * Get string representation of the type
 	 *
-	 * @param mixed
+	 * @param mixed $value
 	 * @return string
 	 */
 	static function getName($value)
@@ -43,7 +43,7 @@ final class TypeUtils extends StaticClass
 
 	/**
 	 * Determines whether the value is integer
-	 * @param mixed
+	 * @param mixed $value
 	 * @return boolean
 	 */
 	static function isInteger($value)
@@ -56,18 +56,9 @@ final class TypeUtils extends StaticClass
 	}
 
 	/**
-	 * @return boolean
-	 */
-	static function isBoolean($value)
-	{
-		return (
-			   is_bool($value)
-			|| in_array($value, array(0, 1, 'f', 't', 'false', 'true'))
-		);
-	}
-
-	/**
-	 * @param string|object
+	 * Determines whether the type (interface of class) exists
+	 *
+	 * @param string|object $object
 	 * @return boolean
 	 */
 	static function isExists($object)
@@ -80,7 +71,25 @@ final class TypeUtils extends StaticClass
 	}
 
 	/**
-	 * @param string|object
+	 * Determines whether the type (interface of class) is already defined
+	 *
+	 * @param string|object $object
+	 * @return boolean
+	 */
+	static function isDefined($object)
+	{
+		$name = self::resolveName($object);
+
+		return
+			class_exists($name, false)
+			|| interface_exists($name, false);
+	}
+
+	/**
+	 * Determines whether class is the child class of the parent class
+	 *
+	 * @param string|object $child
+	 * @param string|object $parent
 	 * @return boolean
 	 */
 	static function isChild($child, $parent)
