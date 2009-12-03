@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * Represents an property of ORM-related entity
+ *
  * @ingroup Orm_Model
  */
-class OrmProperty
+final class OrmProperty
 {
 	/**
 	 * @var string
@@ -96,6 +98,7 @@ class OrmProperty
 	}
 
 	/**
+	 * Gets the property multiplicity
 	 * @return AssociationMultiplicity
 	 */
 	function getMultiplicity()
@@ -104,6 +107,7 @@ class OrmProperty
 	}
 
 	/**
+	 * Determines whether the property is identifier
 	 * @return boolean
 	 */
 	function isIdentifier()
@@ -112,30 +116,33 @@ class OrmProperty
 	}
 
 	/**
+	 * Gets the name of property getter
 	 * @return string
 	 */
 	function getGetter()
 	{
 		if (!$this->visibility->isGettable()) {
-			throw new OrmModelPropertyException($this, 'cannot have getter');
+			throw new OrmModelIntegrityException($this->name . 'cannot have getter');
 		}
 
 		return 'get' . ucfirst($this->name);
 	}
 
 	/**
+	 * Gets the name of property setter
 	 * @return string
 	 */
 	function getSetter()
 	{
 		if (!$this->visibility->isSettable()) {
-			throw new OrmModelPropertyException($this, 'cannot have setter');
+			throw new OrmModelIntegrityException($this->name . 'cannot have setter');
 		}
 
 		return 'set' . ucfirst($this->name);
 	}
 
 	/**
+	 * Gets the name of the property
 	 * @return string
 	 */
 	function getName()
@@ -144,6 +151,8 @@ class OrmProperty
 	}
 
 	/**
+	 * Determines whether property is used to ensure that is's value is unique with respect to all
+	 * the entities stored in the table
 	 * @return boolean
 	 */
 	function isUnique()
@@ -152,6 +161,7 @@ class OrmProperty
 	}
 
 	/**
+	 * Gets the ORM type of the property
 	 * @return OrmPropertyType
 	 */
 	function getType()
@@ -160,6 +170,7 @@ class OrmProperty
 	}
 
 	/**
+	 * Gets the property visibility
 	 * @return OrmPropertyVisibility
 	 */
 	function getVisibility()
@@ -168,13 +179,17 @@ class OrmProperty
 	}
 
 	/**
-	 * @return array of columnName
+	 * Gets the names of the fields used to store the property value inside the database
+	 * @return array of string
 	 */
 	function getFields()
 	{
 		return $this->fields;
 	}
 
+	/**
+	 * @return string
+	 */
 	function toPhpCall()
 	{
 		$fields = array();

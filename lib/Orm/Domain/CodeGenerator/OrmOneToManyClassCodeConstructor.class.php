@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * One-to-many worker generator
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmOneToManyClassCodeConstructor extends ClassCodeConstructor
+class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
 	/**
 	 * @var OrmProperty
@@ -27,13 +29,9 @@ class OrmOneToManyClassCodeConstructor extends ClassCodeConstructor
 	private $ormProperty;
 
 	/**
-	 * @return OrmOneToManyClassCodeConstructor
+	 * @param OrmClass $ormClass object that represents a class to be generated
+	 * @param OrmProperty $ormProperty property that representa one-to-many relation
 	 */
-	static function create(OrmClass $ormClass, OrmProperty $ormProperty)
-	{
-		return new self ($ormClass, $ormProperty);
-	}
-
 	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
 	{
 		$this->ormProperty = $ormProperty;
@@ -41,25 +39,16 @@ class OrmOneToManyClassCodeConstructor extends ClassCodeConstructor
 		parent::__construct($ormClass);
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
 	}
 
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return ucfirst($this->ormProperty->getName());
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classMethods[] = <<<EOT

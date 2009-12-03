@@ -17,6 +17,9 @@
  ************************************************************************************************/
 
 /**
+ * Represents an auxiliary container of ORM entities' representation
+ *
+ * @aux
  * @ingroup Orm_Domain
  */
 final class OrmDomain
@@ -27,11 +30,13 @@ final class OrmDomain
 	private $dbSchema;
 
 	/**
-	 * @var array of {@link OrmClass}
+	 * @var array of OrmClass
 	 */
 	private $classes = array();
 
 	/**
+	 * Gets the name of the database schema presented in DBPool to be used when generating SQL, if set
+	 *
 	 * @return string|null
 	 */
 	function getDbSchema()
@@ -40,6 +45,10 @@ final class OrmDomain
 	}
 
 	/**
+	 * Sets the name of the database schema presented in DBPool to be used when generating SQL
+	 *
+	 * @param stirng $dbSchema
+	 *
 	 * @return OrmDomain
 	 */
 	function setDbSchema($dbSchema = null)
@@ -52,17 +61,9 @@ final class OrmDomain
 	}
 
 	/**
-	 * @return OrmDomain
-	 */
-	function dropClasses()
-	{
-		$this->classes = array();
-
-		return $this;
-	}
-
-	/**
-	 * @return array of {@link OrmClass}
+	 * Gets the OrmClass objects defined within the domain
+	 *
+	 * @return array of OrmClass
 	 */
 	function getClasses()
 	{
@@ -70,38 +71,10 @@ final class OrmDomain
 	}
 
 	/**
-	 * @return OrmDomain
-	 */
-	function addClasses(array $classes)
-	{
-		foreach ($classes as $class) {
-			$this->addClass($class);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return OrmDomain
-	 */
-	function setClasses(array $classes)
-	{
-		$this->dropClasses()->addClasses($classes);
-
-		return $this;
-	}
-
-	/**
-	 * @return OrmDomain
-	 */
-	function setClass(OrmClass $class)
-	{
-		$this->classes[$class->getName()] = $class;
-
-		return $this;
-	}
-
-	/**
+	 * Adds the new OrmClass object to the domain
+	 *
+	 * @throws OrmModelIntegrityException if the сдфыы with the same name already added
+	 *
 	 * @return OrmDomain
 	 */
 	function addClass(OrmClass $class)
@@ -118,6 +91,10 @@ final class OrmDomain
 	}
 
 	/**
+	 * Gets the OrmClass object identified by name
+	 *
+	 * @throws OrmModelIntegrityException if no class identified by found
+	 *
 	 * @return OrmClass
 	 */
 	function getClass($name)
@@ -130,6 +107,8 @@ final class OrmDomain
 	}
 
 	/**
+	 * Determines whether the OrmClass object with the specified name is defined within the OrmDomain
+	 *
 	 * @return boolean
 	 */
 	function classExists($name)

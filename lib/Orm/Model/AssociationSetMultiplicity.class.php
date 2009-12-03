@@ -25,22 +25,6 @@ final class AssociationSetMultiplicity extends Enumeration
 {
 	const ONE_OR_MORE = '+';
 	const ZERO_OR_MORE = '*';
-
-	/**
-	 * @return AssociationSetMultiplicity
-	 */
-	static function oneOrMore()
-	{
-		return new self (self::ONE_OR_MORE);
-	}
-
-	/**
-	 * @return AssociationSetMultiplicity
-	 */
-	static function zeroOrMore()
-	{
-		return new self (self::ZERO_OR_MORE);
-	}
 }
 
 ?>

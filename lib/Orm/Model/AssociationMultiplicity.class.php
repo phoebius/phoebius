@@ -33,6 +33,8 @@ final class AssociationMultiplicity extends Enumeration
 	const EXACTLY_ONE = 'exactlyOne';
 
 	/**
+	 * Nullable (i.e. value can be not presented at all)
+	 *
 	 * @return AssociationMultiplicity
 	 */
 	static function zeroOrOne()
@@ -41,6 +43,8 @@ final class AssociationMultiplicity extends Enumeration
 	}
 
 	/**
+	 * Exact association (value MUST be presented)
+	 *
 	 * @return AssociationMultiplicity
 	 */
 	static function exactlyOne()
@@ -49,6 +53,8 @@ final class AssociationMultiplicity extends Enumeration
 	}
 
 	/**
+	 * Determines whether mulitplicity allows null values
+	 *
 	 * @return boolean
 	 */
 	function isNullable()

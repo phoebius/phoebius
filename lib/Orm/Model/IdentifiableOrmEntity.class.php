@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents an ORM entity
+ * Represents an entity that is related to ORM and is stored in the database.
  * @ingroup Orm_Model
  */
 abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
@@ -33,18 +33,21 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 	private $inFetchProcess = false;
 
 	/**
+	 * Gets the entity id, no matter how the identifier propery is named.
 	 * @return mixed
 	 */
 	abstract function _getId();
 
 	/**
+	 * Ыets the entity id, no matter how the identifier propery is named.
 	 * @return IdentifiableOrmEntity itself
 	 */
 	abstract function _setId($id);
 
 	/**
-	 * Lazy fetching stub
-	 * @throws OrmEntityNotFoundException
+	 * Assembles the entity properies (if they are not yet obtained from the storage) using
+	 * the set ID.
+	 * @throws OrmEntityNotFoundException if entity by the id is not presented in the DB
 	 * @return IdentifiableOrmEntity
 	 */
 	final function fetch()
@@ -69,17 +72,39 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 		return $this;
 	}
 
+	/**
+	 * Determines whether entity is fetched
+	 * @return boolean
+	 */
 	final function isFetched()
 	{
 		return $this->fetched;
 	}
 
+	/**
+	 * Completely drops the entity from the database
+	 *
+	 * @return void
+	 */
 	function drop()
 	{
-		if ($this instanceof IDaoRelated && ($id = $this->_getId())) {
+		if (($id = $this->_getId())) {
 			$dao = call_user_func(array(get_class($this), 'dao'));
 			$dao->dropById($id);
 		}
+	}
+
+	/**
+	 * Saves the entity. If the ID is presented then DAO tries to update the existing one
+	 *
+	 * @return OrmEntity itself
+	 */
+	function save()
+	{
+		$dao = call_user_func(array(get_class($this), 'dao'));
+		$dao->saveEntity($this);
+
+		return $this;
 	}
 
 	function __clone()

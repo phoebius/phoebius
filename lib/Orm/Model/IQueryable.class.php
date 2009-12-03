@@ -17,16 +17,22 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm
+ * Defines an ORM-related object that can be accessed thru the DAO
+ *
+ * @ingroup Orm_Model
  */
 interface IQueryable extends IMappable
 {
 	/**
+	 * Gets the data access object
+	 *
 	 * @return IOrmEntityAccessor
 	 */
 	function getDao();
 
 	/**
+	 * Gets the physical representation of the entity
+	 *
 	 * @return IPhysicallySchematic
 	 */
 	function getPhysicalSchema();

@@ -17,9 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * Many-to-many worker generator
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
+class OrmManyToManyClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
 	/**
 	 * @var OrmProperty
@@ -27,13 +29,9 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 	private $ormProperty;
 
 	/**
-	 * @return OrmManyToManyClassCodeConstructor
+	 * @param OrmClass $ormClass object that represents a class to be generated
+	 * @param OrmProperty $ormProperty property that representa many-to-many relation
 	 */
-	static function create(OrmClass $ormClass, OrmProperty $ormProperty)
-	{
-		return new self ($ormClass, $ormProperty);
-	}
-
 	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
 	{
 		$this->ormProperty = $ormProperty;
@@ -41,25 +39,16 @@ class OrmManyToManyClassCodeConstructor extends ClassCodeConstructor
 		parent::__construct($ormClass);
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
 	}
 
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return ucfirst($this->ormProperty->getName());
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classMethods[] = <<<EOT

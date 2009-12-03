@@ -17,9 +17,13 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Domain_Meta
+ * Represents a scanner which accepts XML representation of ORM-related entity set and creates
+ * and object representation of the entities (aka OrmClass)
+ *
+ * @aux
+ * @ingroup Orm_Domain_Notation
  */
-class XmlOrmDomainBuilder implements IOrmDomainBuilder
+class XmlOrmDomainBuilder
 {
 	const DTD_BASE_PATH = '/share/Orm/Domain/Meta/Xml/abstract.dtd';
 	const DTD_ROOT_ELEMENT_NAME = 'domain';
@@ -37,36 +41,32 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 	 */
 	private $ormDomain;
 
-	function __construct(OrmDomain $ormDomain, $xmlFilename, $dtdFilename = null)
+	/**
+	 * @param string $xmlFilename path to an XML file with the description of entity set
+	 * @throws FileNotFoundException thrown when path is incorrect
+	 */
+	function __construct($xmlFilename)
 	{
 		Assert::isScalar($xmlFilename);
-		Assert::isScalarOrNull($dtdFilename);
 
 		if (!is_file($xmlFilename)) {
 			throw new FileNotFoundException($xmlFilename);
 		}
 
-		if ($dtdFilename) {
-			if (!is_file($dtdFilename)) {
-				throw new FileNotFoundException($dtdFilename);
-			}
-		}
-		else {
-			$dtdFilename = PHOEBIUS_BASE_ROOT . self::DTD_BASE_PATH;
-		}
-
-		$this->ormDomain = $ormDomain;
 		$this->xmlFilename = $xmlFilename;
-		$this->dtdFilename = str_replace('\\', '/', $dtdFilename);
+		$this->dtdFilename = str_replace('\\', '/', PHOEBIUS_BASE_ROOT . self::DTD_BASE_PATH);
 	}
 
 	/**
-	 * @throws OrmModelException
+	 * Creates an object representation of ORM-related entites
+	 *
+	 * @throws OrmModeIntegritylException thrown when description has errors
 	 * @return OrmDomain
 	 */
 	function build()
 	{
 		try {
+			$this->ormDomain = new OrmDomain;
 			$this->load();
 			$this->generateDomain();
 		}
@@ -96,7 +96,7 @@ class XmlOrmDomainBuilder implements IOrmDomainBuilder
 		}
 		catch (ExecutionContextException $e) {
 			$xmlError = libxml_get_last_error();
-			throw new OrmModelDefinitionException(
+			throw new OrmModelIntegrityException(
 				$xmlError->message . ' in ' . $this->xmlFilename . ':' . $xmlError->line
 			);
 		}

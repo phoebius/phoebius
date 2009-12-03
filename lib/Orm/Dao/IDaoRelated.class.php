@@ -17,21 +17,30 @@
  ************************************************************************************************/
 
 /**
+ * Defines an entity that is related to ORM and is stored in the database.
+ * Such an entity can be assembled and disassembled by IOrmEntityMapper and queried by IOrmEntityAccessor
+ *
  * @ingroup Orm_Dao
  */
 interface IDaoRelated extends IOrmRelated
 {
 	/**
+	 * Gets the object that allows querying
+	 *
 	 * @return IOrmEntityAccessor
 	 */
 	static function dao();
 
 	/**
+	 * Gets the entity auxiliary container
+	 *
 	 * @return IQueryable
 	 */
 	static function orm();
 
 	/**
+	 * Gets the high-level query
+	 *
 	 * @return EntityQuery
 	 */
 	static function query();

@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents a UNIQUE constaint. It is a database constrain that ensures that the data contained
+ * Represents a UNIQUE constaint. It is a database constraint that ensures that the data contained
  * in a field or a group of fields is unique with respect to all the rows in the table
  *
  * @ingroup Dal_DB_Schema

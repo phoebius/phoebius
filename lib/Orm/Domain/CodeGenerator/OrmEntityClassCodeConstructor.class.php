@@ -17,21 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Generates a helper class for accessing auxiliary structures of ORM-related entity
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmEntityClassCodeConstructor extends ClassCodeConstructor
+class OrmEntityClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return $this->ormClass->getEntityName() . 'Entity';
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return true;
@@ -47,9 +43,6 @@ class OrmEntityClassCodeConstructor extends ClassCodeConstructor
 		return 'final';
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classMethods[] = <<<EOT

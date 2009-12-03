@@ -19,19 +19,13 @@
 /**
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmPhysicalSchemaClassCodeConstructor extends ClassCodeConstructor
+class OrmPhysicalSchemaClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return $this->ormClass->getEntityName() . 'EntityPhysicalSchema';
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
@@ -42,34 +36,11 @@ class OrmPhysicalSchemaClassCodeConstructor extends ClassCodeConstructor
 		return 'final';
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function getImplementsInterfaceNames()
 	{
 		return array('IPhysicallySchematic');
 	}
 
-	/**
-	 * @return string
-	 */
-	private function getFieldsPhpArray()
-	{
-		$fields = array();
-		foreach ($this->ormClass->getFields() as $field) {
-			$fields[] = '\'' . $field . '\'';
-		}
-
-		return join('', array(
-			'array(',
-			join(', ', $fields),
-			')'
-		));
-	}
-
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classMethods[] = <<<EOT
@@ -89,6 +60,20 @@ EOT;
 		return {$this->getFieldsPhpArray()};
 	}
 EOT;
+	}
+
+	private function getFieldsPhpArray()
+	{
+		$fields = array();
+		foreach ($this->ormClass->getFields() as $field) {
+			$fields[] = '\'' . $field . '\'';
+		}
+
+		return join('', array(
+			'array(',
+			join(', ', $fields),
+			')'
+		));
 	}
 }
 

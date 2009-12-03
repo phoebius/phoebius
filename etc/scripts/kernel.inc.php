@@ -35,7 +35,7 @@ define('PHOEBIUS_BASE_ROOT', $baseRootDirectory);
 define('PHOEBIUS_INITIALIZED', true);
 
 define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v.'.PHOEBIUS_VERSION);
-define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v.'.PHOEBIUS_VERSION);
+define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius Framework v.'.PHOEBIUS_VERSION);
 
 if (!defined('APP_AREA')) {
 	/**

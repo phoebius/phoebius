@@ -56,7 +56,7 @@ if (!file_exists($xmlSchema)) {
 	exit ('$app/var/domain.xml not found at ' . $xmlSchema);
 }
 
-$domainBuilder = new XmlOrmDomainBuilder(new OrmDomain, $xmlSchema);
+$domainBuilder = new XmlOrmDomainBuilder($xmlSchema);
 
 try {
 

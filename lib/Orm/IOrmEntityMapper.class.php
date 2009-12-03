@@ -44,7 +44,7 @@ interface IOrmEntityMapper
 	 * @param array $tuple set of primitive values
 	 * @param FetchStrategy $fetchStrategy current fetch strategy to use
 	 *
-	 * @return OrmEntity
+	 * @return void
 	 */
 	function assemble(OrmEntity $entity, array $tuple, FetchStrategy $fetchStrategy);
 

@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an action to be raised when one-to-one association breaks
+ *
  * @ingroup Orm_Model
  */
 final class AssociationBreakAction extends Enumeration implements ISqlCastable
@@ -26,6 +28,7 @@ final class AssociationBreakAction extends Enumeration implements ISqlCastable
 	const REMOVE_ASSOCIATION = 'SET NULL';
 
 	/**
+	 * Cascaded action: drop a referenced object too
 	 * @return AssociationBreakAction
 	 */
 	static function cascade()
@@ -34,6 +37,7 @@ final class AssociationBreakAction extends Enumeration implements ISqlCastable
 	}
 
 	/**
+	 * Restrict association break
 	 * @return AssociationBreakAction
 	 */
 	static function restrict()
@@ -42,6 +46,7 @@ final class AssociationBreakAction extends Enumeration implements ISqlCastable
 	}
 
 	/**
+	 * Remove association (reference becomes NULL)
 	 * @return AssociationBreakAction
 	 */
 	static function removeAssociation()
@@ -49,10 +54,6 @@ final class AssociationBreakAction extends Enumeration implements ISqlCastable
 		return new self (self::REMOVE_ASSOCIATION);
 	}
 
-	/**
-	 * Casts an object to the SQL dialect string
-	 * @return string
-	 */
 	function toDialectString(IDialect $dialect)
 	{
 		return $this->getValue();

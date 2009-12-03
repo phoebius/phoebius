@@ -17,21 +17,17 @@
  ************************************************************************************************/
 
 /**
+ * Generates an auxiliary class that holds internal representaion of ORM-related entity
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
+class OrmLogicalSchemaClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return $this->ormClass->getEntityName() . 'EntityLogicalSchema';
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
@@ -42,75 +38,11 @@ class OrmLogicalSchemaClassCodeConstructor extends ClassCodeConstructor
 		return 'final';
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function getImplementsInterfaceNames()
 	{
 		return array('ILogicallySchematic');
 	}
 
-	/**
-	 * @return string
-	 */
-	private function getIdentifierMethodReturn()
-	{
-		if (($identifier = $this->ormClass->getIdentifier())) {
-			return $identifier->toPhpCall();
-		}
-		else {
-			return "null";
-		}
-	}
-
-	/**
-	 * @return string
-	 */
-	private function getPropertyNameArray()
-	{
-		$names = array();
-		foreach ($this->ormClass->getPropertyNames() as $name) {
-			$names[] = '\'' . $name . '\'';
-		}
-
-		return join('', array(
-			'array(',
-				join(', ', $names),
-			')'
-		));
-	}
-
-	/**
-	 * @return string
-	 */
-	private function getGetPropertiesMethodBody()
-	{
-		$arrayItems = array();
-		foreach ($this->ormClass->getProperties() as $property) {
-			$arrayItems[] =
-				"\t\t\t"
-				. '\'' . $property->getName() . '\''
-				. ' => '
-				. (
-					$property->isIdentifier()
-						? '$this->getIdentifier()'
-						: $property->toPhpCall()
-				);
-		}
-
-		$arrayContents = join(",\n", $arrayItems);
-		$body = <<<EOT
-		return array(
-{$arrayContents}
-		);
-EOT;
-
-		return $body;
-	}
-
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classProperties[] = <<<EOL
@@ -174,6 +106,55 @@ EOL;
 		return \$properties[\$name];
 	}
 EOL;
+	}
+
+	private function getIdentifierMethodReturn()
+	{
+		if (($identifier = $this->ormClass->getIdentifier())) {
+			return $identifier->toPhpCall();
+		}
+		else {
+			return "null";
+		}
+	}
+
+	private function getPropertyNameArray()
+	{
+		$names = array();
+		foreach ($this->ormClass->getPropertyNames() as $name) {
+			$names[] = '\'' . $name . '\'';
+		}
+
+		return join('', array(
+			'array(',
+				join(', ', $names),
+			')'
+		));
+	}
+
+	private function getGetPropertiesMethodBody()
+	{
+		$arrayItems = array();
+		foreach ($this->ormClass->getProperties() as $property) {
+			$arrayItems[] =
+				"\t\t\t"
+				. '\'' . $property->getName() . '\''
+				. ' => '
+				. (
+					$property->isIdentifier()
+						? '$this->getIdentifier()'
+						: $property->toPhpCall()
+				);
+		}
+
+		$arrayContents = join(",\n", $arrayItems);
+		$body = <<<EOT
+		return array(
+{$arrayContents}
+		);
+EOT;
+
+		return $body;
 	}
 }
 

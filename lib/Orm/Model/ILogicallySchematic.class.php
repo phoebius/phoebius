@@ -18,7 +18,7 @@
 
 /**
  * Defines an interface for accessing logical schema information
- * @ingroup Orm
+ * @ingroup Orm_Model
  */
 interface ILogicallySchematic
 {

@@ -17,9 +17,10 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Model_Exceptions
+ * Thrown when ORM model has inconsistencies
+ * @ingroup Orm_Exceptions
  */
-class OrmModelIntegrityException extends OrmModelException
+class OrmModelIntegrityException extends StateException
 {
 	// nothing
 }

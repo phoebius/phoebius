@@ -17,28 +17,26 @@
  ************************************************************************************************/
 
 /**
+ * Thrown when entity not found by the criteria
+ *
  * @ingroup Orm_Exceptions
  */
 class OrmEntityNotFoundException extends ObjectNotFoundException
 {
 	/**
-	 * @var ILogicallySchematic
+	 * @var IQueryable
 	 */
-	private $logicalSchema;
-
-	function __construct(ILogicallySchematic $logicalSchema)
-	{
-		$this->logicalSchema = $logicalSchema;
-
-		parent::__construct();
-	}
+	private $entity;
 
 	/**
-	 * @return ILogicallySchematic
+	 * @param IQueryable $entity looked up entity
+	 * @param string $message
 	 */
-	function getLogicalSchema()
+	function __construct(IQueryable $entity, $message)
 	{
-		return $this->logicalSchema;
+		$this->entity = $entity;
+
+		parent::__construct($message);
 	}
 }
 

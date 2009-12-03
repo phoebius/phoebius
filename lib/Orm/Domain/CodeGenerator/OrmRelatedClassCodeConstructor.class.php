@@ -17,25 +17,25 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Model_Exceptions
+ * Represents a PHP class code generator, which build classes based on internal representation of
+ * ORM-related entity
+ * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmModelPropertyException extends OrmModelException
+abstract class OrmRelatedClassCodeConstruct extends ClassCodeConstructor
 {
-	private $property;
-
-	function __construct(OrmProperty $property, $message)
-	{
-		$this->property = $property;
-
-		parent::__construct($message);
-	}
+	/**
+	 * object that represents a class to be generated
+	 *
+	 * @var OrmClass
+	 */
+	protected $ormClass;
 
 	/**
-	 * @return OrmProperty
+	 * @param OrmClass $ormClass object that represents a class to be generated
 	 */
-	function getProperty()
+	function __construct(OrmClass $ormClass)
 	{
-		return $this->property;
+		$this->ormClass = $ormClass;
 	}
 }
 

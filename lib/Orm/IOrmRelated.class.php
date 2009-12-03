@@ -32,7 +32,7 @@ interface IOrmRelated
 	static function map();
 
 	/**
-	 * Gets the entity auxilary container
+	 * Gets the entity auxiliary container
 	 *
 	 * @return IMappable
 	 */

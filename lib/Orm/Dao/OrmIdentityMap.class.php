@@ -17,6 +17,11 @@
  ************************************************************************************************/
 
 /**
+ * IdentityMap for ORM-related entities used by IOrmEntityAccessor (particurlarly, by RdbmsDao).
+ *
+ * This class is important to guarantee entity persistence.
+ *
+ * @aux
  * @ingroup Orm_Dao
  */
 class OrmIdentityMap
@@ -156,27 +161,6 @@ class OrmIdentityMap
 	function getList()
 	{
 		return $this->identityMap;
-	}
-
-	/**
-	 *
-	 * @return unknown_type
-	 */
-	function getIds()
-	{
-		return $this->idList;
-	}
-
-	/**
-	 * @return OrmIdentityMap
-	 */
-	function addList(array $list)
-	{
-		foreach ($list as $object) {
-			$this->add($object);
-		}
-
-		return $this;
 	}
 
 	/**

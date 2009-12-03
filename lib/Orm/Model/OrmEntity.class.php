@@ -17,23 +17,12 @@
  ************************************************************************************************/
 
 /**
- * Represents an ORM entity
+ * Represents an ORM-related entity
  * @ingroup Orm_Model
  */
 abstract class OrmEntity implements IOrmRelated
 {
-	/**
-	 * @return OrmEntity
-	 */
-	function save()
-	{
-		if ($this instanceof IDaoRelated) {
-			$dao = call_user_func(array(get_class($this), 'dao'));
-			$dao->saveEntity($this);
-		}
-
-		return $this;
-	}
+	// nothing here
 }
 
 ?>

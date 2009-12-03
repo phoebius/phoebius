@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a layer between ORM and RDBMS
+ *
  * @ingroup Orm_Dao
  */
 class RdbmsDao implements IOrmEntityAccessor
@@ -61,6 +63,10 @@ class RdbmsDao implements IOrmEntityAccessor
 	 */
 	private $entity;
 
+	/**
+	 * @param DB $db RDBMS to use
+	 * @param IQueryable $entity ORM-related entity representation
+	 */
 	function __construct(DB $db, IQueryable $entity)
 	{
 		$this->db = $db;
@@ -73,6 +79,20 @@ class RdbmsDao implements IOrmEntityAccessor
 	}
 
 	/**
+	 * Gets the database used to obtain entity data.
+	 *
+	 * If the connection to the database is not yet established, it is invoked.
+	 *
+	 * @return DB
+	 */
+	function getDB()
+	{
+		return $this->db->connect(false);
+	}
+
+	/**
+	 * Sets the fetch strategy to use
+	 *
 	 * @return RdbmsDao
 	 */
 	function setFetchStrategy(FetchStrategy $fs)
@@ -83,6 +103,8 @@ class RdbmsDao implements IOrmEntityAccessor
 	}
 
 	/**
+	 * Gets the current fetching strategy
+	 *
 	 * @return FetchStrategy
 	 */
 	function getFetchStrategy()
@@ -135,7 +157,7 @@ class RdbmsDao implements IOrmEntityAccessor
 				$row = $this->getRow($query);
 			}
 			catch (RowNotFoundException $e) {
-				throw new OrmEntityNotFoundException($this->logicalSchema);
+				throw new OrmEntityNotFoundException($this->entity, $id.' is not presented');
 			}
 
 			$this->map->assemble($entity, $row, $this->getFetchStrategy());
@@ -150,7 +172,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			$row = $this->getRow($query);
 		}
 		catch (RowNotFoundException $e) {
-			throw new OrmEntityNotFoundException($this->logicalSchema);
+			throw new OrmEntityNotFoundException($this->entity, 'query returned zero rows');
 		}
 
 		$entity = $this->logicalSchema->getNewEntity();
@@ -272,6 +294,34 @@ class RdbmsDao implements IOrmEntityAccessor
 		return $this->executeQuery($query);
 	}
 
+	function saveEntity(IdentifiableOrmEntity $entity)
+	{
+		$id = $entity->_getId();
+
+		$entity->_setId(null);
+		$entity->fetch();
+		$entity->_setId($id);
+
+		if ($id) {
+			$updated = $this->update($entity);
+
+			if ($updated) {
+				return true;
+			}
+		}
+
+		try {
+			$this->insert($entity);
+		}
+		catch (UniqueViolationException $e) {
+			if (!$id) {
+				throw $e;
+			}
+		}
+
+		return true;
+	}
+
 	private function insert(IdentifiableOrmEntity $entity)
 	{
 		$id = $entity->_getId();
@@ -324,43 +374,6 @@ class RdbmsDao implements IOrmEntityAccessor
 		);
 
 		return $affected > 0;
-	}
-
-	function saveEntity(IdentifiableOrmEntity $entity)
-	{
-		$id = $entity->_getId();
-
-		$entity->_setId(null);
-		$entity->fetch();
-		$entity->_setId($id);
-
-		if ($id) {
-			$updated = $this->update($entity);
-
-			if ($updated) {
-				return true;
-			}
-		}
-
-		try {
-			$this->insert($entity);
-		}
-		catch (UniqueViolationException $e) {
-			if (!$id) {
-				throw $e;
-			}
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * @return DB
-	 */
-	function getDB()
-	{
-		return $this->db->connect(false);
 	}
 }
 

@@ -17,7 +17,10 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm_Domain_Meta
+ * Represents a builder for creating an object representation of database schema based on graph
+ * of ORM entites (aka OrmClass)
+ *
+ * @ingroup Orm_Domain_Notation
  */
 class DBSchemaBuilder
 {
@@ -52,23 +55,18 @@ class DBSchemaBuilder
 	private $ormProperty;
 
 	/**
-	 * @return DBSchemaBuilder
+	 * @param OrmDomain $ormDomain all we need to know is a graph or ORM-related entity' internals
 	 */
-	static function create(OrmDomain $ormDomain, DBSchema $dbSchema = null)
-	{
-		return new self ($ormDomain, $dbSchema);
-	}
-
-	function __construct(OrmDomain $ormDomain, DBSchema $dbSchema = null)
+	function __construct(OrmDomain $ormDomain)
 	{
 		$this->ormDomain = $ormDomain;
-		$this->dbSchema =
-			$dbSchema
-				? $dbSchema
-				: new DBSchema();
+		$this->dbSchema = new DBSchema();
 	}
 
 	/**
+	 * Creates an DBSchema object - an object representation of database schema based on ORM-related
+	 * entity graph
+	 *
 	 * @return DBSchema
 	 */
 	function build()

@@ -17,16 +17,22 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Orm
+ * Defines an ORM-related object
+ *
+ * @ingroup Orm_Model
  */
 interface IMappable
 {
 	/**
+	 * Gets the mapper for the entity
+	 *
 	 * @return IOrmEntityMapper
 	 */
 	function getMap();
 
 	/**
+	 * Gets the logical schema of the entity
+	 *
 	 * @return ILogicallySchematic
 	 */
 	function getLogicalSchema();

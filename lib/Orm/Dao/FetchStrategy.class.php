@@ -17,12 +17,14 @@
  ************************************************************************************************/
 
 /**
+ * Represents a strategy to obtain and assemble DAO-related entities
+ *
  * @ingroup Orm_Dao
  */
 final class FetchStrategy extends Enumeration
 {
 	/**
-	 * fetching is proceded by request
+	 * fetching is proceeded by request
 	 */
 	const LAZY = 1;
 
@@ -32,6 +34,8 @@ final class FetchStrategy extends Enumeration
 	const CASCADE = 2;
 
 	/**
+	 * entity properties are assembled on demand
+	 *
 	 * @return FetchStrategy
 	 */
 	static function lazy()
@@ -40,6 +44,8 @@ final class FetchStrategy extends Enumeration
 	}
 
 	/**
+	 * entity properties are assembled at once
+	 *
 	 * @return FetchStrategy
 	 */
 	static function cascade()

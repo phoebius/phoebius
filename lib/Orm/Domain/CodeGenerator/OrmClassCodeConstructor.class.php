@@ -17,21 +17,19 @@
  ************************************************************************************************/
 
 /**
+ * Generates a public class that represents ORM-related entity.
+ *
+ * @see OrmAutoClassCodeConstructor for aux representation of an entity
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmClassCodeConstructor extends ClassCodeConstructor
+class OrmClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return true;
 	}
 
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return $this->ormClass->getEntityName();

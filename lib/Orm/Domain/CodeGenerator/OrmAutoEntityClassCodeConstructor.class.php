@@ -17,45 +17,32 @@
  ************************************************************************************************/
 
 /**
+ * An abstract representation of helper lass for accessing auxiliary structures of ORM-related entity
+ *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmAutoEntityClassCodeConstructor extends ClassCodeConstructor
+class OrmAutoEntityClassCodeConstructor extends OrmRelatedClassCodeConstruct
 {
-	/**
-	 * @return string
-	 */
 	function getClassName()
 	{
 		return 'Auto' . $this->ormClass->getEntityName() . 'Entity';
 	}
 
-	/**
-	 * @return string final|abstract|null
-	 */
 	protected function getClassType()
 	{
 		return 'abstract';
 	}
 
-	/**
-	 * @return boolean
-	 */
 	function isPublicEditable()
 	{
 		return false;
 	}
 
-	/**
-	 * @return string
-	 */
 	protected function getExtendsClassName()
 	{
 		return 'LazySingleton';
 	}
 
-	/**
-	 * @return string
-	 */
 	protected function getImplementsInterfaceNames()
 	{
 		return array(
@@ -65,9 +52,6 @@ class OrmAutoEntityClassCodeConstructor extends ClassCodeConstructor
 		);
 	}
 
-	/**
-	 * @return void
-	 */
 	protected function findMembers()
 	{
 		$this->classMethods[] = <<<EOT
