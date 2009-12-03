@@ -17,12 +17,16 @@
  ************************************************************************************************/
 
 /**
+ * SimpleXMLElement with DOM utils
+ *
  * @todo overwrite __toString() to force valid object2string cast
  * @ingroup Utils_Xml
  */
 class SmartSimpleXmlElement extends SimpleXMLElement
 {
 	/**
+	 * Converts object to DOMNode
+	 *
 	 * @return DOMNode
 	 */
 	function toDomNode()
@@ -31,6 +35,8 @@ class SmartSimpleXmlElement extends SimpleXMLElement
 	}
 
 	/**
+	 * Gets the textual representaion of the node
+	 *
 	 * @return string
 	 */
 	function getCData()

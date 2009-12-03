@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a stream that writes the contents to file
+ *
  * @ingroup Utils_Stream
  */
 class FileWriteStream implements IOutput
@@ -26,6 +28,9 @@ class FileWriteStream implements IOutput
 	 */
 	private $filename;
 
+	/**
+	 * @param string $filename path to a file where to append the contents
+	 */
 	function __construct($filename)
 	{
 		Assert::isScalar($filename);
@@ -35,9 +40,6 @@ class FileWriteStream implements IOutput
 		file_put_contents($filename, null);
 	}
 
-	/**
-	 * @return FileWriteStream
-	 */
 	function write($buffer)
 	{
 		file_put_contents($this->filename, $buffer, FILE_APPEND);

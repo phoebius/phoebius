@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an output stream that collects written data in internal buffer
+ *
  * @ingroup Utils_Stream
  */
 final class MemoryStream implements IOutput
@@ -26,9 +28,6 @@ final class MemoryStream implements IOutput
 	 */
 	private $buffer;
 
-	/**
-	 * @return FileWriteStream
-	 */
 	function write($buffer)
 	{
 		$this->buffer .= $buffer;
@@ -37,6 +36,8 @@ final class MemoryStream implements IOutput
 	}
 
 	/**
+	 * Gets the contents of the buffer
+	 *
 	 * @return string
 	 */
 	function getBuffer()
@@ -45,6 +46,8 @@ final class MemoryStream implements IOutput
 	}
 
 	/**
+	 * Erases the buffer
+	 *
 	 * @return MemoryStream
 	 */
 	function clean()
@@ -55,6 +58,8 @@ final class MemoryStream implements IOutput
 	}
 
 	/**
+	 * Gets the contents of the buffer
+	 *
 	 * @return string
 	 */
 	function __toString()

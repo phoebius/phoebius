@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represnets a HTTP request method
+ *
  * @ingroup Utils_Net
  */
 final class RequestMethod extends Enumeration

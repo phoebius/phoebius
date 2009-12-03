@@ -28,15 +28,6 @@ final class IP implements IStringCastable
 
 	/**
 	 * @throws ArgumentException
-	 * @return IP
-	 */
-	static function create($ip)
-	{
-		return new self($ip);
-	}
-
-	/**
-	 * @throws ArgumentException
 	 */
 	function __construct($ip)
 	{
@@ -54,7 +45,7 @@ final class IP implements IStringCastable
 	/**
 	 * @return boolean
 	 */
-	function equalTo(IP $ip)
+	function equals(IP $ip)
 	{
 		return $this->getLongIp() == $ip->getLongIp();
 	}

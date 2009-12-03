@@ -17,28 +17,35 @@
  ************************************************************************************************/
 
 /**
+ * Contract for string cipherer
+ *
  * @ingroup Utils_Cipher
  */
 interface ICipherer
 {
 	/**
+	 * Sets the key to be used when ciphering the string
+	 *
 	 * @param string $key
 	 * @return ICipherer an object itself
 	 */
 	function setKey($key);
 
 	/**
+	 * Gets the key used in cipher, if set
 	 * @return string
 	 */
 	function getKey();
 
 	/**
+	 * Ciphers the data using the key
 	 * @param string $data
 	 * @return string
 	 */
 	function encrypt($data);
 
 	/**
+	 * Decrypts the cypher using the key
 	 * @param string $cypher
 	 * @return string
 	 */

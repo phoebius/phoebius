@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Simple XOR cipher implementation
+ *
  * @ingroup Utils_Cipher
  */
 class XorCipherer implements ICipherer
@@ -24,17 +26,13 @@ class XorCipherer implements ICipherer
 	private $key = '';
 
 	/**
-	 * @param string $key
+	 * @param string $key key to use in ciphering
 	 */
 	function __construct($key)
 	{
 		$this->setKey($key);
 	}
 
-	/**
-	 * @param string $key
-	 * @return XorCipherer
-	 */
 	function setKey($key)
 	{
 		Assert::isScalar($key);
@@ -44,18 +42,11 @@ class XorCipherer implements ICipherer
 		return $this;
 	}
 
-	/**
-	 * @return string
-	 */
 	function getKey()
 	{
 		return $this->key;
 	}
 
-	/**
-	 * @param string $data
-	 * @return string
-	 */
 	function encrypt($data)
 	{
 		$key = $this->key;
@@ -72,10 +63,6 @@ class XorCipherer implements ICipherer
 		return $b64u;
 	}
 
-	/**
-	 * @param string $cypher
-	 * @return string
-	 */
 	function decrypt($cypher)
 	{
 		$result = array();
