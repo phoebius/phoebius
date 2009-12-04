@@ -18,6 +18,9 @@
 
 /**
  * Contract for query projections needed for querying ORM-related objects
+ *
+ * @see Projection as a shorthand for mostly-used projections
+ *
  * @ingroup Orm_Query_Projections
  */
 interface IProjection

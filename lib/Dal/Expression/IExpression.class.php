@@ -19,6 +19,8 @@
 /**
  * Represents the expression tree node.
  *
+ * @see Expression for shorthand access to mostly-used expressions
+ *
  * @ingroup Dal_Expression
  */
 interface IExpression extends ISubjective, ISqlValueExpression

@@ -30,7 +30,7 @@
  * 	EntityQuery::create(Product::orm())
  * 		->get(Projection::groupBy("name"))
  * 		->get(Projection::groupBy("inStock"));
- * @code
+ * @endcode
  *
  * @ingroup Orm_Query_Projections
  */

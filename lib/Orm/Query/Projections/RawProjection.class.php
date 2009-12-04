@@ -28,7 +28,7 @@
  * $query =
  * 	EntityQuery::create(Product::orm())
  * 		->get(Projection::property("name"));
- * @code
+ * @endcode
  *
  * @ingroup Orm_Query_Projections
  */

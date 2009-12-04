@@ -21,7 +21,7 @@
  *
  * Casts various objects to ISqlCastable objects, collecting joins according to found associations
  * @aux
- * @ingroup
+ * @ingroup Orm_Query_Builder
  */
 final class EntityQueryBuilder implements ISubjectivity
 {

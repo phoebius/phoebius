@@ -21,15 +21,12 @@
  *
  * A realisting example (taken from PostgreSQL documentation):
  * @code
- * SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit
- *  FROM products p LEFT JOIN sales s USING (product_id)
- *  WHERE s.date > CURRENT_DATE
- *  GROUP BY product_id, p.name, p.price, p.cost
- *  HAVING sum(p.price * s.units) > 5000;
- * @endcode
+ * //SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit
+ * // FROM products p LEFT JOIN sales s USING (product_id)
+ * // WHERE s.date > CURRENT_DATE
+ * // GROUP BY product_id, p.name, p.price, p.cost
+ * // HAVING sum(p.price * s.units) > 5000;
  *
- * Example:
- * @code
  * $query = new EntityQuery(Products::orm());
  * $query->get(Projection::property("id"));
  * $query->get(Projection::property("name"));
@@ -76,7 +73,7 @@ final class Projection extends StaticClass
 	 * $query =
 	 * 	EntityQuery::create(Product::orm())
 	 * 		->get(Projection::entity("Product"));
-	 * @code
+	 * @endcode
 	 *
 	 * @param string|IDaoRelated|IQueriable $entity
 	 *
@@ -100,7 +97,7 @@ final class Projection extends StaticClass
 	 * $query =
 	 * 	EntityQuery::create(Product::orm())
 	 * 		->get(Projection::property("name"));
-	 * @code
+	 * @endcode
 	 *
 	 * @param string $property name of the property
 	 * @param string $alias optional label for the property value
@@ -128,7 +125,7 @@ final class Projection extends StaticClass
 	 * 	EntityQuery::create(Product::orm())
 	 * 		->get(Projection::groupBy("name"))
 	 * 		->get(Projection::groupBy("inStock"));
-	 * @code
+	 * @endcode
 	 *
 	 * @param mixed $group reference to an a property or expression
 	 *
@@ -153,7 +150,7 @@ final class Projection extends StaticClass
 	 * 		)
 	 * 	)
 	 * );
-	 * @code
+	 * @endcode
 	 *
 	 * @param IExpression $expression
 	 *
