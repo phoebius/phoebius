@@ -51,9 +51,7 @@ abstract class PrimitivePropertyType extends OrmPropertyType
 
 	function disassemble($value)
 	{
-		return new SqlValueExpressionArray(
-			array(new SqlValue($value))
-		);
+		return array(new SqlValue($value));
 	}
 
 	function getSqlTypes()

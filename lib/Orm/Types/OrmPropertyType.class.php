@@ -47,7 +47,7 @@ abstract class OrmPropertyType
 	 *
 	 * @param mixed $value PHP value
 	 *
-	 * @return SqlValueExpressionArray
+	 * @return array
 	 */
 	abstract function disassemble($value);
 

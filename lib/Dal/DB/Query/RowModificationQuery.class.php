@@ -53,7 +53,7 @@ abstract class RowModificationQuery
 	 */
 	function set($field, ISqlValueExpression $value)
 	{
-		$this->row->append($field, $value);
+		$this->row->set($field, $value);
 
 		return $this;
 	}
@@ -68,9 +68,7 @@ abstract class RowModificationQuery
 	 */
 	function setValues(array $values)
 	{
-		foreach ($values as $field => $value) {
-			$this->row->append($field, $value);
-		}
+		$this->row->append($values);
 
 		return $this;
 	}

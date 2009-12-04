@@ -79,13 +79,14 @@ class BoxablePropertyType extends PrimitivePropertyType
 
 	function disassemble($value)
 	{
-		return new SqlValueExpressionArray(
-			array(new SqlValue(
-				is_null($value)
-					? $value
-					: $value->getValue()
-			))
-		);
+		return
+			array(
+				new SqlValue(
+					is_null($value)
+						? $value
+						: $value->getValue()
+				)
+			);
 	}
 
 	protected function getCtorArgumentsPhpCode()

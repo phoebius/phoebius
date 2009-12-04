@@ -345,10 +345,10 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		$affected = $this->executeQuery(
-			new InsertQuery(
-				$this->physicalSchema->getTable(),
-				new SqlRow($this->map->disassemble($entity))
+			InsertQuery::create(
+				$this->physicalSchema->getTable()
 			)
+			->setValues($this->map->disassemble($entity))
 		);
 
 		if ($generatorType && $generatorType->isPost()) {
@@ -364,9 +364,11 @@ class RdbmsDao implements IOrmEntityAccessor
 	private function update(IdentifiableOrmEntity $entity)
 	{
 		$affected = $this->executeQuery(
-			new UpdateQuery(
-				$this->physicalSchema->getTable(),
-				$this->map->disassemble($entity),
+			UpdateQuery::create(
+				$this->physicalSchema->getTable()
+			)
+			->setValues($this->map->disassemble($entity))
+			->setCondition(
 				EntityQuery::create($this->entity)
 					->where(Expression::eq($this->identifier, $entity->_getId()))
 					->toExpression()
