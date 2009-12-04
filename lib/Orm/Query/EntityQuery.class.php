@@ -134,7 +134,7 @@ final class EntityQuery implements ISqlSelectQuery
 	 * the default behaviour of nhibernate
 	 *
 	 * @param OrderBy ...
-	 * @return EntityQuery an object itself
+	 * @return EntityQuery itself
 	 */
 	function orderBy()
 	{

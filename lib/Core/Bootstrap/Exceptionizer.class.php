@@ -55,7 +55,7 @@ final class Exceptionizer extends LazySingleton
 
 	/**
 	 * Gets the instance of singleton class
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	static function getInstance()
 	{
@@ -77,7 +77,7 @@ final class Exceptionizer extends LazySingleton
 	 * 	than you can set this argument to false.
 	 * @param string $defaultExceptionName name of the exception to be thrown when translatable
 	 * 	error occurs. Default is Exception
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function register($coverMask = E_ALL, $supressUncovered, $defaultExceptionName)
 	{
@@ -98,7 +98,7 @@ final class Exceptionizer extends LazySingleton
 	/**
 	 * Sets the default exception name to which the errors should be casted
 	 * @param string $exceptionName name of the exception class that implements {@link IErrorExceptionFactory}
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function setDefaultException($exceptionName)
 	{
@@ -116,7 +116,7 @@ final class Exceptionizer extends LazySingleton
 	 * to the {@link ExecutionContextException} and E_USER_ERROR to {@link CompilationContextException}
 	 * @param integer $errorTypean separate error type (not a mask!)
 	 * @param string $exceptionName name of an exception class that implements {@link IErrorExceptionFactory}
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function setException($errorType, $exceptionName)
 	{
@@ -139,7 +139,7 @@ final class Exceptionizer extends LazySingleton
 	 * Drops an exception set to a custom error type so that this error type will now be casted
 	 * to a default exception class
 	 * @param integer $errorTypean separate error type (not a mask!)
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function dropErrorTypedException($errorType)
 	{
@@ -153,7 +153,7 @@ final class Exceptionizer extends LazySingleton
 	/**
 	 * Drops all exceptinons set to the custom error types so that now all error types covered
 	 * by a mask will be casted to a default exception class
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function dropErrorTypedExceptions()
 	{
@@ -170,7 +170,7 @@ final class Exceptionizer extends LazySingleton
 	 * 	exceptions. E.g., if you specify E_WARNING | E_NOTICE as the cover mask, E_NOTICE
 	 *  and E_WARNING errors would be translated to exceptions, but E_ERROR is not.
 	 * 	Default is E_ALL.
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function setCoverMask($coverMask = E_ALL)
 	{
@@ -189,7 +189,7 @@ final class Exceptionizer extends LazySingleton
 	 * @param boolean $supressUncovered specifies what to do with errors that do not match the
 	 * 	cover mask. If you wish to supress them and let the default handler to process those errors
 	 * 	than you can set this argument to false.
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function setUncoveredErrorsIgnorance($flag = false)
 	{
@@ -202,7 +202,7 @@ final class Exceptionizer extends LazySingleton
 
 	/**
 	 * Specifies that errors that do not match the cover mask specified, should be supressed
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function supressUncovered()
 	{
@@ -214,7 +214,7 @@ final class Exceptionizer extends LazySingleton
 	/**
 	 * Specifies that errors that match the cover mask specified, should be handled by the default
 	 * error handler
-	 * @return Exceptionizer an object itself
+	 * @return Exceptionizer itself
 	 */
 	function handleUncovered()
 	{

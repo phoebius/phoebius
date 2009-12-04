@@ -142,7 +142,7 @@ class ValueArray implements IteratorAggregate, Countable, ArrayAccess
 	/**
 	 * Appends the list of values to the array
 	 * @param array $values values to be appened to array
-	 * @return ValueArray an object itself
+	 * @return ValueArray itself
 	 */
 	function merge(array $values)
 	{

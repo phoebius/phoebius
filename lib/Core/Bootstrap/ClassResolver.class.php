@@ -51,7 +51,7 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 
 	/**
 	 * Drops a resolver cache
-	 * @return ClassResolver an object itself
+	 * @return ClassResolver itself
 	 */
 	function clearCache()
 	{

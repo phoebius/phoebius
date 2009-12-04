@@ -59,7 +59,7 @@ class DeleteQuery implements ISqlQuery
 	 *
 	 * @param IExpression $condition condition to be applied when deleted rows
 	 *
-	 * @return DeleteQuery an object itself
+	 * @return DeleteQuery itself
 	 */
 	function setCondition(IExpression $condition = null)
 	{

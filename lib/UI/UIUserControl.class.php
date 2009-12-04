@@ -31,7 +31,7 @@ class UIUserControl extends UITemplateControl
 	/**
 	 * Sets the parent control
 	 *
-	 * @return UIUserControl an object itself
+	 * @return UIUserControl itself
 	 */
 	function setParentControl(UITemplateControl $parentControl)
 	{

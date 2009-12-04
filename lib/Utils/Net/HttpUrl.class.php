@@ -17,25 +17,32 @@
  ************************************************************************************************/
 
 /**
+ * HTTP URL object representation
+ *
  * @ingroup Utils_Net
  */
 class HttpUrl implements IStringCastable
 {
-	// ports to be ommited
+	// ports to be omitted
 	const DEFAULT_HTTP_PORT = 80;
 	const DEFAULT_HTTPS_PORT = 443;
 
-	private $scheme = 'http';
-	private $user = null;
-	private $pass = null;
-	private $host = null;
-	private $port = null;
-	private $path = '/';
+	private $scheme;
+	private $user;
+	private $pass;
+	private $host;
+	private $port;
+	private $path;
 	private $query = array();
-	private $fragment = '';
+	private $fragment;
 
+	/**
+	 * @param string $url url to be imported
+	 */
 	function __construct($url = null)
 	{
+		Assert::isScalarOrNull($url);
+
 		if ($url) {
 			$chunks = parse_url($url);
 
@@ -88,7 +95,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param string $scheme
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setScheme($scheme)
 	{
@@ -116,7 +123,7 @@ class HttpUrl implements IStringCastable
 	}
 
 	/**
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setCredentials($user, $password)
 	{
@@ -139,7 +146,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param string $host
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setHost($host)
 	{
@@ -160,7 +167,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param integer $port
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setPort($port)
 	{
@@ -181,7 +188,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param string $path
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setPath($path)
 	{
@@ -202,7 +209,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param array $query
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setQuery(array $query)
 	{
@@ -212,7 +219,7 @@ class HttpUrl implements IStringCastable
 	}
 
 	/**
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function addQueryArgument($key, $value)
 	{
@@ -225,7 +232,7 @@ class HttpUrl implements IStringCastable
 	}
 
 	/**
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function mergeQuery(array $query)
 	{
@@ -236,7 +243,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param string $query
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function dropQuery()
 	{
@@ -273,7 +280,7 @@ class HttpUrl implements IStringCastable
 
 	/**
 	 * @param string $fragment
-	 * @return HttpUrl an object itself
+	 * @return HttpUrl itself
 	 */
 	function setFragment($fragment)
 	{

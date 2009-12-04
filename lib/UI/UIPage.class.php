@@ -31,7 +31,7 @@ class UIPage extends UITemplateControl
 	/**
 	 * Sets the master page for the control
 	 *
-	 * @return UIPage an object itself
+	 * @return UIPage itself
 	 */
 	function setMasterPage(UIMasterPage $masterPage)
 	{

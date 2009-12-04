@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represnets a HTTP request method
+ * Represents a HTTP request method
  *
  * @ingroup Utils_Net
  */

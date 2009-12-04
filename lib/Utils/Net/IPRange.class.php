@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents a range of two IP adresses
+ *
  * @ingroup Utils_Net
  */
 final class IPRange implements IStringCastable
@@ -32,16 +34,12 @@ final class IPRange implements IStringCastable
 	private $to;
 
 	/**
-	 * @return IPRange
+	 * @param IP $ip1
+	 * @param IP $ip2
 	 */
-	static function create(IP $ip1, IP $ip2)
-	{
-		return new self($ip1, $ip2);
-	}
-
 	function __construct(IP $ip1, IP $ip2)
 	{
-		if ($ip1->getLongIp() > $ip2->getLongIp()) {
+		if ($ip1->toInt() > $ip2->toInt()) {
 			$t = $ip1;
 			$ip1 = $ip2;
 			$ip2 = $t;
@@ -52,6 +50,8 @@ final class IPRange implements IStringCastable
 	}
 
 	/**
+	 * Gets the head of the range
+	 *
 	 * @return IP
 	 */
 	function getRangeStart()
@@ -60,6 +60,8 @@ final class IPRange implements IStringCastable
 	}
 
 	/**
+	 * Gets the tail of the range
+	 *
 	 * @return IP
 	 */
 	function getRangeEnd()
@@ -68,23 +70,27 @@ final class IPRange implements IStringCastable
 	}
 
 	/**
+	 * Determines whether the specified IP is inside the range
+	 *
 	 * @return boolean
 	 */
 	function contains(IP $ip)
 	{
 		$mask =
-			($this->to->equalTo($this->from)
-				? $this->to->getLongIp()
-				: 0xffffffff << (32 - $this->to->getLongIp()));
+			($this->to->equals($this->from)
+				? $this->to->toInt()
+				: 0xffffffff << (32 - $this->to->toInt()));
 		return
-			($ip->getLongIp() & $mask)
-			== ($this->from->getLongIp() & $mask);
+			($ip->toInt() & $mask)
+			== ($this->from->toInt() & $mask);
 	}
 
 	/**
+	 * Gets the string representation of the range
+	 *
 	 * @return string
 	 */
-	function getRange()
+	function toString()
 	{
 		return $this->from . '/' . $this->to;
 	}

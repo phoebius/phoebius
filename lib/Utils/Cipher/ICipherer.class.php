@@ -27,7 +27,7 @@ interface ICipherer
 	 * Sets the key to be used when ciphering the string
 	 *
 	 * @param string $key
-	 * @return ICipherer an object itself
+	 * @return ICipherer itself
 	 */
 	function setKey($key);
 

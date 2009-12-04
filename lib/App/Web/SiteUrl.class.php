@@ -147,7 +147,7 @@ class SiteUrl extends HttpUrl
 	 * Sets the base host
 	 *
 	 * @param string $baseHost host to be treated as base host
-	 * @return SiteUrl an object itself
+	 * @return SiteUrl itself
 	 */
 	function setBaseHost($baseHost)
 	{
@@ -183,7 +183,7 @@ class SiteUrl extends HttpUrl
 	 *
 	 * @param string $basePath path to be treated as base uri
 	 *
-	 * @return SiteUrl an object itself
+	 * @return SiteUrl itself
 	 */
 	function setBasePath($basePath = '/')
 	{

@@ -150,7 +150,7 @@ abstract class Dictionary implements ArrayAccess
 	}
 
 	/**
-	 * @return Dictionary an object itself
+	 * @return Dictionary itself
 	 */
 	private function import(array $values)
 	{

@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Represents an IP address
+ *
  * @ingroup Utils_Net
  */
 final class IP implements IStringCastable
@@ -24,58 +26,53 @@ final class IP implements IStringCastable
 	/**
 	 * @var integer
 	 */
-	private $longIP;
+	private $int;
 
 	/**
-	 * @throws ArgumentException
+	 * @param string|int
+	 * @throws ArgumentException thrown if the specified IP is wrong
 	 */
 	function __construct($ip)
-	{
-		$this->setIp($ip);
-	}
-
-	/**
-	 * @return string
-	 */
-	function getIP()
-	{
-		return long2ip($this->longIP);
-	}
-
-	/**
-	 * @return boolean
-	 */
-	function equals(IP $ip)
-	{
-		return $this->getLongIp() == $ip->getLongIp();
-	}
-
-	/**
-	 * @return integer
-	 */
-	function getIPAsInteger()
-	{
-		return $this->longIP;
-	}
-
-	function __toString()
-	{
-		return $this->getIP();
-	}
-
-	/**
-	 * @throws ArgumentException
-	 * @return IP an object itself
-	 */
-	function setIp($ip)
 	{
 		if (ip2long($ip) === -1) {
 			throw new ArgumentException('ip', 'wrong ip given');
 		}
 
-		$this->longIP = ip2long($ip);
+		$this->int = ip2long($ip);
+	}
 
-		return $this;
+	/**
+	 * Determines whether two IP objects are equal
+	 * @return boolean
+	 */
+	function equals(IP $ip)
+	{
+		return $this->int == $ip->int;
+	}
+
+	/**
+	 * Gets the long integer representation of the object
+	 *
+	 * @return integer
+	 */
+	function toInt()
+	{
+		return $this->int;
+	}
+
+	/**
+	 * Gets the texutal representation of the object
+	 *
+	 * @return string
+	 */
+	function toString()
+	{
+		return long2ip($this->int);
+	}
+
+	function __toString()
+	{
+		return $this->toString();
 	}
 }
 

@@ -25,7 +25,7 @@ final class PathResolver extends LazySingleton
 {
 	/**
 	 * Gets the instance of singleton class
-	 * @return PathResolver an object itself
+	 * @return PathResolver itself
 	 */
 	static function getInstance()
 	{

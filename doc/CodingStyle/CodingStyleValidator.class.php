@@ -48,7 +48,7 @@ class CodingStyleValidator implements IGuidelined
 	 * Please consider, how methods with the long list of arguments are formatted.
 	 * @param $target object to validate
 	 * @param $somethingElse boolean something else argument
-	 * @return CodingStyleValidator an object itself
+	 * @return CodingStyleValidator itself
 	 */
 	function validateAgainstCustom(
 			IConvention $convention,
@@ -75,7 +75,7 @@ class CodingStyleValidator implements IGuidelined
 
 	/**
 	 * Validates the coding style against custom convention
-	 * @return CodingStyleValidator an object itself
+	 * @return CodingStyleValidator itself
 	 */
 	function validateAgainst(IConvention $convention)
 	{
