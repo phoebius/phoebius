@@ -134,8 +134,8 @@ class PgSqlDialect extends Dialect
 			$columns = array();
 
 			// create indexes
-			foreach ($constraint->getIndexedColumns() as $column) {
-				$columns[] = $this->quoteIdentifier($column->getName());
+			foreach ($constraint->getIndexableFields() as $field) {
+				$columns[] = $this->quoteIdentifier($field);
 			}
 
 			if (!empty($columns)) {

@@ -147,7 +147,7 @@ class XmlOrmDomainBuilder
 				$id = $this->generateIdentifier($entity->properties->identifier);
 				// we should generate an identifier (if any) before properties
 				// because type juggling depends on the identifier availabilty
-				$class->addIdentifier($id);
+				$class->setIdentifier($id);
 			}
 			else if ($class->hasDao()) {
 				throw new OrmModelIntegrityException(

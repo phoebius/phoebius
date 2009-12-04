@@ -57,8 +57,7 @@ abstract class ClassCodeConstructor extends CodeConstructor
 	{
 		if ($this->isPublicEditable()) {
 			return <<<EOT
-This file is public, and won't be regenerated explicitly.
-Feel free to modify and extend it.
+This file is public, and won't be regenerated explicitly. Feel free to modify and extend it.
 EOT;
 		}
 		else {

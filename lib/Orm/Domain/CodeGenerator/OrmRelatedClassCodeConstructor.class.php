@@ -21,7 +21,7 @@
  * ORM-related entity
  * @ingroup Orm_Domain_CodeGenerator
  */
-abstract class OrmRelatedClassCodeConstruct extends ClassCodeConstructor
+abstract class OrmRelatedClassCodeConstructor extends ClassCodeConstructor
 {
 	/**
 	 * object that represents a class to be generated

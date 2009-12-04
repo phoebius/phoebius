@@ -21,7 +21,7 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmAutoEntityClassCodeConstructor extends OrmRelatedClassCodeConstruct
+class OrmAutoEntityClassCodeConstructor extends OrmRelatedClassCodeConstructor
 {
 	function getClassName()
 	{

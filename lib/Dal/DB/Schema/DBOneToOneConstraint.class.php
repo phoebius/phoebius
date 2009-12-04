@@ -56,9 +56,9 @@ class DBOneToOneConstraint extends DBConstraint
 				Assert::isTrue(
 					sizeof($pkFields) == sizeof($fields),
 					'foreign key (%s) should have the same number of columns as %s`s table primary key (%s)',
-					$fields,
+					join(', ', $fields),
 					$referencedTable->getName(),
-					$referencedTable->getFields()
+					join(', ', $pkFields)
 				);
 
 				$this->fields = new SqlFieldArray($fields);
@@ -66,7 +66,7 @@ class DBOneToOneConstraint extends DBConstraint
 				$this->referencedTable = $referencedTable;
 				$this->associationBreakAction = $associationBreakAction;
 
-				break;
+				return;
 			}
 		}
 
@@ -78,7 +78,7 @@ class DBOneToOneConstraint extends DBConstraint
 
 	function getIndexableFields()
 	{
-		return $this->columns;
+		return $this->fields;
 	}
 
 	function toDialectString(IDialect $dialect)

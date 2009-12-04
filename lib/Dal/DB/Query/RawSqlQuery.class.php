@@ -53,7 +53,7 @@ class RawSqlQuery implements ISqlQuery
 
 		$this->query = $query;
 
-		$this->setPlaceholderValues($placeholderValues);
+		$this->placeholderValues = $placeholderValues;
 	}
 
 	/**

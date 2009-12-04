@@ -23,7 +23,7 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmAutoClassCodeConstructor extends OrmRelatedClassCodeConstruct
+class OrmAutoClassCodeConstructor extends OrmRelatedClassCodeConstructor
 {
 	function getClassName()
 	{

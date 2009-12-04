@@ -130,27 +130,28 @@ class DBSchemaBuilder
 		foreach ($columns as $name => $dbType) {
 			$dbColumns[$name] = new DBColumn($name, $dbType);
 		}
+		$fields = array_keys($dbColumns);
 
 		$this->dbTable->addColumns($dbColumns);
 
 		if ($this->ormProperty->getType() instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
-					$dbColumns,
+					$fields,
 					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getTable()),
 					$this->ormProperty->getType()->getAssociationBreakAction()
 				)
 			);
 		}
 
-		if ($this->ormProperty === $this->ormIdentifier) {
+		if ($this->ormProperty->isIdentifier()) {
 			$this->dbTable->addConstraint(
-				new DBPrimaryKeyConstraint($dbColumns)
+				new DBPrimaryKeyConstraint($fields)
 			);
 		}
 		else if ($this->ormProperty->isUnique()) {
 			$this->dbTable->addConstraint(
-				new DBUniqueConstraint($dbColumns)
+				new DBUniqueConstraint($fields)
 			);
 		}
 	}

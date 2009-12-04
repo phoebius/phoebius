@@ -23,7 +23,7 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmClassCodeConstructor extends OrmRelatedClassCodeConstruct
+class OrmClassCodeConstructor extends OrmRelatedClassCodeConstructor
 {
 	function isPublicEditable()
 	{

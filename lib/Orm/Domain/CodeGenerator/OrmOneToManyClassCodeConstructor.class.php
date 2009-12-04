@@ -21,7 +21,7 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstruct
+class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 {
 	/**
 	 * @var OrmProperty

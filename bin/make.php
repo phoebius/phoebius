@@ -73,7 +73,7 @@ try {
 	}
 
 	$generator = new OrmGenerator($schemaDir, $autoRoot, $publicRoot);
-	$generator->regeneratePublic();
+	//$generator->regeneratePublic();
 	$generator->generate($ormDomain);
 }
 catch (Exception $e) {

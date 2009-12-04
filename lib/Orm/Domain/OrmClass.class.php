@@ -197,13 +197,11 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 	 *
 	 * @return OrmClass
 	 */
-	function addIdentifier(OrmProperty $property)
+	function setIdentifier(OrmProperty $property)
 	{
-		if ($this->identifier) {
-			throw new OrmModelIntegrityException("Identifier already set");
-		}
+		$this->identifier = $property;
 
-		$this->setIdentifier($property);
+		$this->addProperty($property);
 
 		return $this;
 	}

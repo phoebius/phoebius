@@ -34,11 +34,7 @@ class DBUniqueConstraint extends DBConstraint
 	 */
 	function __construct(array $fields)
 	{
-		$this->fields = new SqlFieldArray;
-
-		foreach ($this->fields as $field) {
-			$this->fields->append($field);
-		}
+		$this->fields = new SqlFieldArray($fields);
 	}
 
 	/**

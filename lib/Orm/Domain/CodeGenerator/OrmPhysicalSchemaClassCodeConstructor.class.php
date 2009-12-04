@@ -19,7 +19,7 @@
 /**
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmPhysicalSchemaClassCodeConstructor extends OrmRelatedClassCodeConstruct
+class OrmPhysicalSchemaClassCodeConstructor extends OrmRelatedClassCodeConstructor
 {
 	function getClassName()
 	{
