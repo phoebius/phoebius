@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * ***********************************************************************************************
+ *
+ * Phoebius Framework
+ *
+ * **********************************************************************************************
+ *
+ * Copyright (c) 2009 phoebius.org
+ *
+ * All rights reserved.
+ *
+ *************************************************************************************************
+-->
+
+<!DOCTYPE groups SYSTEM "groups.dtd">
+
+<groups>
+	<group id="App">
+		<about>Application lifecycle wrappers over environment state</about>
+		<includes>
+			<group id="Web">
+				<about>Handles web requests</about>
+				<includes>
+					<group id="Routing" name="Request routing">
+						<about>Prepares, routes and dispatches the request to the target request
+							handler</about>
+						<includes>
+							<group id="Rules" name="Request rules">
+								<about> Routing rules </about>
+							</group>
+							<group id="Exceptions" />
+						</includes>
+					</group>
+				</includes>
+			</group>
+
+			<group id="Server">
+				<about>Wrappers over server information</about>
+			</group>
+		</includes>
+	</group>
+	<group id="Core">
+		<about>Low-level framework's infrastructure</about>
+
+		<includes>
+			<group id="Bootstrap">
+				<about>Internal handlers for automating dynamic library load</about>
+			</group>
+
+			<group id="Exceptions" />
+
+			<group id="FS">
+				<about>Classes related to filesystem items</about>
+			</group>
+
+			<group id="Patterns">
+				<about>Base classes</about>
+			</group>
+
+			<group id="Types">
+				<about>Object-oriented type wrappers</about>
+				<includes>
+					<group id="Complex">
+						<about>Complex types</about>
+					</group>
+				</includes>
+			</group>
+		</includes>
+	</group>
+	<group id="Dal">
+		<about>Data abstraction layers</about>
+
+		<includes>
+			<group id="Cache">
+				<about>Cache abstraction</about>
+			</group>
+
+			<group id="DB">
+				<about>Unified RDBMS interfaces</about>
+
+				<includes>
+					<group id="Exceptions"> </group>
+
+					<group id="Generator">
+						<about>Primary key generator abstraction</about>
+					</group>
+
+					<group id="Query">
+						<about>OO wrappers over SQL queries</about>
+					</group>
+
+					<group id="Schema">
+						<about>OO wrappers over abstract database schema</about>
+					</group>
+
+					<group id="Sql">
+						<about>OO wrappers over various SQL particles</about>
+					</group>
+
+					<group id="Transaction">
+						<about>Transaction interface</about>
+					</group>
+
+				</includes>
+			</group>
+		
+			<group id="Expression">
+				<about>Basic expression trees implementation</about>
+				<includes>
+					<group id="LogicalOperators">
+						<about>Various logical operators used in expression trees for connecting
+							subjects</about>
+					</group>
+				</includes>
+			</group>
+			
+		</includes>
+	</group>
+
+	<group id="Mvc">
+		<about>Model-view-controller implementation</about>
+		<includes>
+			<group id="ActionResults">
+				<about>Wrappers over various results that actions produce while execution</about>
+			</group>
+		</includes>
+	</group>
+
+	<group id="Orm">
+		<about>Object relational mapping engine - the heart of Phoebius framework</about>
+		<includes>
+			<group id="Dao">
+				<about>Data access objects - a unified interface for accessing ORM objects wherever
+					they are stored</about>
+			</group>
+
+			<group id="Domain">
+				<about>Implementation of ORM objects aggregator</about>
+				<includes>
+					<group id="CodeGenerator">
+						<about>Auxiliary classes for generating code of ORM-related entities</about>
+					</group>
+
+					<group id="Notation">
+						<about>Utilities to import data from various sources into internal graph
+							that reflects ORM entities, their properties and relations</about>
+					</group>
+				</includes>
+			</group>
+
+			<group id="Exceptions" />
+
+			<group id="Expression">
+				<about>Queries over ORM entities</about>
+			</group>
+
+			<group id="Map">
+				<about>Mapper of raw RDBMS (or any other source, accessed by DAO provider) data and
+					ORM objects' types</about>
+			</group>
+
+			<group id="Model">
+				<about>OO wrappers over internal representation of ORM objects' graph (inner
+					structures and dependencies)</about>
+			</group>
+			
+			<group id="Query">
+				<about>High-level interface to query ORM-related object</about>
+				<includes>
+					<group id="Projections">
+						<about>Sets of projections to obtain data from the database</about>
+					</group>
+				</includes>
+			</group>
+
+			<group id="Types">
+				<about>O wrappers over various ORM entity property types</about>
+			</group>
+
+		</includes>
+	</group>
+
+	<group id="UI">
+		<about>Object-oriented UI</about>
+		<includes>
+			<group id="Mvc">
+				<about><![CDATA[UI for MVC's views]]></about>
+				<includes>
+					<group id="Presentation">
+						<about>Connector for tying UI presentation and MVC's views</about>
+					</group>
+				</includes>
+			</group>
+			<group id="Presentation">
+				<about>Simple template engine based on raw PHP and classes. Similar to ASP.NET's
+					System.Web.UI</about>
+			</group>
+		</includes>
+	</group>
+
+	<group id="Test">
+		<about>Base classes for framework unit tests</about>
+	</group>
+
+	<group id="Utils">
+		<about>Helper packages</about>
+		<includes>
+			<group id="Cipher" />
+			<group id="Image" />
+			<group id="Net" />
+			<group id="Stream" />
+			<group id="Sys" />
+			<group id="Xml" />
+		</includes>
+	</group>
+</groups>

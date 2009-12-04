@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * ***********************************************************************************************
+ *
+ * Phoebius Framework
+ *
+ * **********************************************************************************************
+ *
+ * Copyright (c) 2009 phoebius.org
+ *
+ * All rights reserved.
+ *
+ *************************************************************************************************
+-->
+
+<!-- Introduce branches -->
+
+<!ELEMENT groups (group)*>
+
+	<!ELEMENT group (about?, includes?)>
+	<!ATTLIST group
+		id				CDATA #REQUIRED
+		name			CDATA #IMPLIED
+		gid				CDATA #IMPLIED
+		version			CDATA #IMPLIED
+	>
+	
+		<!ELEMENT about (#PCDATA)*>
+		
+		<!ELEMENT includes (group)*>
+		
