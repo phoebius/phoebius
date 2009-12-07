@@ -161,7 +161,7 @@ class MySqlDialect extends Dialect
 		$table = clone $table;
 
 		$queries = array(
-			CreateTableQuery::create($table)
+			new CreateTableQuery($table)
 		);
 
 		foreach ($table->getConstraints() as $constraint) {
