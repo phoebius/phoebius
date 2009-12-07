@@ -1,5 +1,4 @@
 .*
-!.keepdir
 
 tmp/*
 !tmp/.keepdir
