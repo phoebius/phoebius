@@ -175,6 +175,13 @@ abstract class ActionBasedController implements IController
 			}
 			catch (TypeCastException $e){}
 		}
+		else if ($class->implementsInterface('IDaoRelated') && is_scalar($value)) {
+			try {
+				$dao = call_user_func(array($class->name, 'dao'));
+				return $dao->getEntityById($value);
+			}
+			catch (OrmEntityNotFoundException $e){}
+		}
 	}
 
 	/**
