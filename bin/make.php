@@ -21,7 +21,7 @@ chdir(dirname(__FILE__));
 require '../etc/app.init.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-$argc=2;$argv=array(__FILE__,realpath(dirname(__FILE__).'/../../'));
+
 if ($argc == 1) {
 	exit('
 Usage:
