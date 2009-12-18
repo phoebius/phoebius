@@ -74,7 +74,7 @@ class CompositePropertyType extends OrmPropertyType
 
 	function getColumnCount()
 	{
-		return count($this->nameMappings);
+		return count($this->sqlTypes);
 	}
 
 	protected function getCtorArgumentsPhpCode()
