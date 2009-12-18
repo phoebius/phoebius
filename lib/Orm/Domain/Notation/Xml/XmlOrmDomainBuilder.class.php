@@ -464,9 +464,7 @@ class XmlOrmDomainBuilder
 				);
 			}
 			else {
-				throw new OrmModelIntegrityException(
-					'composite type is not implemented, use dao-related identifierable types'
-				);
+				return new CompositePropertyType($class);
 			}
 		}
 		else if (DBType::hasMember($name)) {
@@ -491,9 +489,8 @@ class XmlOrmDomainBuilder
 				);
 			}
 			else if (TypeUtils::isChild($name, 'IOrmRelated')) {
-				throw new OrmModelIntegrityException(
-					'composite type is not implemented, use dao-related identifierable types'
-				);
+				$orm = call_user_func(array($name, 'orm'));
+				return new CompositePropertyType($orm);
 			}
 			else if (TypeUtils::isChild($name, 'IOrmPropertyAssignable')) {
 				return
