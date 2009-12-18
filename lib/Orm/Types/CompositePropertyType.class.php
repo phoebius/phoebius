@@ -33,6 +33,9 @@ class CompositePropertyType extends OrmPropertyType
 	// outer field name => type
 	private $sqlTypes = array();
 
+	/**
+	 * @param IMappable $entity entity to handle composite property
+	 */
 	function __construct(IMappable $entity)
 	{
 		$this->entity = $entity;
