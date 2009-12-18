@@ -82,7 +82,7 @@ final class OrmProperty
 		$this->name = $name;
 
 		Assert::isTrue(
-			sizeof($fields) == sizeof($type->getSqlTypes()),
+			sizeof($fields) == $type->getColumnCount(),
 			'wrong DB field count'
 		);
 		$this->fields = $fields;

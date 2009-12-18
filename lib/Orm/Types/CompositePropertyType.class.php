@@ -21,7 +21,7 @@
  *
  * @ingroup Orm_Types
  */
-class CompositePropertyType extends OrmPropertyType
+final class CompositePropertyType extends OrmPropertyType
 {
 	/**
 	 * @var IMappable
@@ -39,12 +39,68 @@ class CompositePropertyType extends OrmPropertyType
 	private $sqlTypes;
 
 	/**
+	 * @var array
+	 */
+	private $mappings;
+	private $fields;
+
+	/**
 	 * @param IMappable $entity entity to handle composite property
 	 */
-	function __construct(IMappable $entity)
+	function __construct(IMappable $entity, array $fields = null)
 	{
 		$this->entity = $entity;
 		$this->entityClass = $this->entity->getLogicalSchema()->getEntityName();
+
+		if ($fields) {
+			$this->importFields($fields);
+		}
+	}
+
+	function importFields(array $fields)
+	{
+		$this->fields = $fields;
+
+		$idx = 0;
+
+		foreach ($this->entity->getLogicalSchema()->getProperties() as $name => $property) {
+			$type = $property->getType();
+			$count = $type->getColumnCount();
+			$this->mappings[$name] = array_slice($fields, $idx, $count);
+
+			if ($type instanceof self) {
+				$type->importFields($this->mappings[$name]);
+			}
+
+			$idx += $count;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @return IMappable
+	 */
+	function getEntity()
+	{
+		return $this->entity;
+	}
+
+	function getVirtualProperty($name)
+	{
+		Assert::isNotNull($this->mappings, 'mappings are not yet set');
+
+		$property = $this->entity->getLogicalSchema()->getProperty($name);
+
+		return new OrmProperty(
+			$name,
+			$this->mappings[$name],
+			$property->getType(),
+			$property->getVisibility(),
+			$property->getMultiplicity(),
+			$property->isUnique(),
+			$property->isIdentifier()
+		);
 	}
 
 	function getImplClass()
@@ -91,8 +147,21 @@ class CompositePropertyType extends OrmPropertyType
 
 	protected function getCtorArgumentsPhpCode()
 	{
+		if ($this->fields) {
+			$fields = array();
+			foreach ($this->fields as $field) {
+				$fields[] = '\'' . $field . '\'';
+			}
+
+			$fields = 'array(' . join(', ', $fields).')';
+		}
+		else {
+			$fields = 'null';
+		}
+
 		return array(
-			$this->entityClass . '::orm()'
+			$this->entityClass . '::orm()',
+			$fields
 		);
 	}
 }
