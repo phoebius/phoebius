@@ -128,11 +128,8 @@ class MySqlDialect extends Dialect
 				if (!$size) {
 					$dbType->setSize(255);
 				}
-				else {
-					if ($size < 255) {
-						 break;
-					}
-					else if ($size < 65535) {
+				else if ($size > 255) {
+					if ($size < 65535) {
 						$customType = 'TEXT';
 					}
 					else if ($size < 16777215) {
