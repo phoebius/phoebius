@@ -327,10 +327,6 @@ class XmlOrmDomainBuilder
 			$xmlProperty['unique'] == 'true'
 		);
 
-		if ($type instanceof CompositePropertyType) {
-			$type->importFields($property->getFields());
-		}
-
 		return $property;
 	}
 

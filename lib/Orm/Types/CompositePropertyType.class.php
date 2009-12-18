@@ -39,43 +39,12 @@ final class CompositePropertyType extends OrmPropertyType
 	private $sqlTypes;
 
 	/**
-	 * @var array
-	 */
-	private $mappings;
-	private $fields;
-
-	/**
 	 * @param IMappable $entity entity to handle composite property
 	 */
-	function __construct(IMappable $entity, array $fields = null)
+	function __construct(IMappable $entity)
 	{
 		$this->entity = $entity;
 		$this->entityClass = $this->entity->getLogicalSchema()->getEntityName();
-
-		if ($fields) {
-			$this->importFields($fields);
-		}
-	}
-
-	function importFields(array $fields)
-	{
-		$this->fields = $fields;
-
-		$idx = 0;
-
-		foreach ($this->entity->getLogicalSchema()->getProperties() as $name => $property) {
-			$type = $property->getType();
-			$count = $type->getColumnCount();
-			$this->mappings[$name] = array_slice($fields, $idx, $count);
-
-			if ($type instanceof self) {
-				$type->importFields($this->mappings[$name]);
-			}
-
-			$idx += $count;
-		}
-
-		return $this;
 	}
 
 	/**
@@ -86,15 +55,25 @@ final class CompositePropertyType extends OrmPropertyType
 		return $this->entity;
 	}
 
-	function getVirtualProperty($name)
+	/**
+	 * @param $name
+	 * @param $owner
+	 * @return OrmProperty
+	 */
+	function getVirtualProperty($name, OrmProperty $owner)
 	{
-		Assert::isNotNull($this->mappings, 'mappings are not yet set');
+		$idx = 0;
+		foreach ($this->entity->getLogicalSchema()->getProperties() as $_ => $property) {
+			if ($_ == $name) {
+				break;
+			}
 
-		$property = $this->entity->getLogicalSchema()->getProperty($name);
+			$idx += $property->getType()->getColumnCount();
+		}
 
 		return new OrmProperty(
 			$name,
-			$this->mappings[$name],
+			array_slice($owner->getFields(), $idx, sizeof($property->getFields())),
 			$property->getType(),
 			$property->getVisibility(),
 			$property->getMultiplicity(),
@@ -147,21 +126,8 @@ final class CompositePropertyType extends OrmPropertyType
 
 	protected function getCtorArgumentsPhpCode()
 	{
-		if ($this->fields) {
-			$fields = array();
-			foreach ($this->fields as $field) {
-				$fields[] = '\'' . $field . '\'';
-			}
-
-			$fields = 'array(' . join(', ', $fields).')';
-		}
-		else {
-			$fields = 'null';
-		}
-
 		return array(
 			$this->entityClass . '::orm()',
-			$fields
 		);
 	}
 }

@@ -213,6 +213,7 @@ final class EntityQueryBuilder implements ISubjectivity
 	private function getEntityProperty($property)
 	{
 		if (!isset($this->propertyCache[$property])) {
+
 			// a path actually
 			if (false !== strpos($property, '.')) {
 				$this->propertyCache[$property] = $this->guessEntityProperty($property);
@@ -221,7 +222,7 @@ final class EntityQueryBuilder implements ISubjectivity
 				$this->propertyCache[$property] =
 					new EntityProperty(
 						$this,
-						$this->getEntity()->getLogicalSchema()->getProperty($property)
+						$this->entity->getLogicalSchema()->getProperty($property)
 					);
 			}
 		}
@@ -247,24 +248,38 @@ final class EntityQueryBuilder implements ISubjectivity
 		}
 		else {
 			$property = $this->getEntityProperty($propertyName)->getProperty();
+			$type = $property->getType();
 
-			// FIXME accept only AssocProperty
+			if ($type instanceof AssociationPropertyType) {
+				$builder = $this->joined[$propertyName] =
+					new self (
+						$type->getContainer(),
+						(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
+							? $this->alias . '_' . $propertyName
+							: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
+					);
 
-			$builder = $this->joined[$propertyName] =
-				new self(
-					$property->getType()->getContainer(),
-					(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
-						? $this->alias . '_' . $propertyName
-						: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
+				$this->join($property, $builder, end($this->joins));
+			}
+			else if ($type instanceof CompositePropertyType) {
+			}
+			else {
+				Assert::isUnreachable(
+					'do not know how to query %s',
+					get_class($type)
 				);
-
-			$this->join($property, $builder, end($this->joins));
+			}
 		}
 
 		return
 			$builder->getEntityProperty(
 				join('.', array_slice($propertyPath, 1))
 			);
+	}
+
+	private function processComposite($name, $path, CompositePropertyType $type)
+	{
+
 	}
 
 	/**
