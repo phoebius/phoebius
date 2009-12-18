@@ -78,16 +78,18 @@ final class OrmMap implements IOrmEntityBatchMapper
 
 			$propertyTuple = array();
 			foreach ($property->getFields() as $field) {
-				$propertyTuple[$field] = $tuple[$field];
+				$propertyTuple[] = $tuple[$field];
 			}
 
-			$setter = $property->getSetter();
-			$entity->$setter(
-				$property->getType()->assemble(
-					$propertyTuple,
-					$fetchStrategy
-				)
+			$propertyType = $property->getType();
+			$propertyTuple = array_combine(
+				array_keys($propertyType->getSqlTypes()),
+				$propertyTuple
 			);
+
+			$setter = $property->getSetter();
+			$value = $propertyType->assemble($propertyTuple, $fetchStrategy);
+			$entity->$setter($value);
 		}
 
 		return $entity;
