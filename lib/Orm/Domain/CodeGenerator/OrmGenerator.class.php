@@ -199,7 +199,11 @@ class OrmGenerator
 		$this->buildClass(new OrmClassCodeConstructor($class));
 
 		$this->buildClass(new OrmLogicalSchemaClassCodeConstructor($class));
-		$this->buildClass(new OrmPhysicalSchemaClassCodeConstructor($class));
+
+		if ($class->hasDao()) {
+			$this->buildClass(new OrmPhysicalSchemaClassCodeConstructor($class));
+		}
+
 		$this->buildClass(new OrmAutoEntityClassCodeConstructor($class));
 		$this->buildClass(new OrmEntityClassCodeConstructor($class));
 

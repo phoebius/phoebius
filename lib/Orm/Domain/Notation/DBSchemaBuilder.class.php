@@ -72,12 +72,20 @@ class DBSchemaBuilder
 	function build()
 	{
 		foreach ($this->ormDomain->getClasses() as $class) {
+			if (!$class->hasDao()) {
+				continue;
+			}
+
 			$this->ormClass = $class;
 			$this->importClass($class);
 			$this->ormClass = null;
 		}
 
 		foreach ($this->ormDomain->getClasses() as $class) {
+			if (!$class->hasDao()) {
+				continue;
+			}
+
 			$this->ormClass = $class;
 			$this->dbTable = $this->dbSchema->getTable($this->ormClass->getTable());
 			$this->ormIdentifier = $class->getIdentifier();
