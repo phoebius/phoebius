@@ -28,10 +28,15 @@ class CompositePropertyType extends OrmPropertyType
 	 */
 	private $entity;
 
+	/**
+	 * @var string
+	 */
 	private $entityClass;
 
-	// outer field name => type
-	private $sqlTypes = array();
+	/**
+	 * @var array of ISqlType
+	 */
+	private $sqlTypes;
 
 	/**
 	 * @param IMappable $entity entity to handle composite property
@@ -40,15 +45,6 @@ class CompositePropertyType extends OrmPropertyType
 	{
 		$this->entity = $entity;
 		$this->entityClass = $this->entity->getLogicalSchema()->getEntityName();
-
-		foreach ($this->entity->getLogicalSchema()->getProperties() as $property) {
-			$fields = array_combine(
-				$property->getFields(),
-				$property->getType()->getSqlTypes()
-			);
-
-			$this->sqlTypes = array_merge($this->sqlTypes, $fields);
-		}
 	}
 
 	function getImplClass()
@@ -72,12 +68,25 @@ class CompositePropertyType extends OrmPropertyType
 
 	function getSqlTypes()
 	{
+		if (!$this->sqlTypes) {
+			$this->sqlTypes = array();
+
+			foreach ($this->entity->getLogicalSchema()->getProperties() as $property) {
+				$fields = array_combine(
+					$property->getFields(),
+					$property->getType()->getSqlTypes()
+				);
+
+				$this->sqlTypes = array_merge($this->sqlTypes, $fields);
+			}
+		}
+
 		return $this->sqlTypes;
 	}
 
 	function getColumnCount()
 	{
-		return count($this->sqlTypes);
+		return count($this->getSqlTypes());
 	}
 
 	protected function getCtorArgumentsPhpCode()
