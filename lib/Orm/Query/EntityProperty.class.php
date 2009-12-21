@@ -44,7 +44,7 @@ final class EntityProperty
 
 		Assert::isTrue(
 			$property->getType()->getColumnCount() == 1,
-			'composite property querying is not yet supported (`%s`.`%s` is illegal)',
+			'composite property querying is not supported (`%s`.`%s` is ambiguous)',
 			$builder->getEntity()->getLogicalSchema()->getEntityName(),
 			$property->getName()
 		);

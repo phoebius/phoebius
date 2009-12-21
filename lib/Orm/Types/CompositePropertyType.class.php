@@ -63,8 +63,8 @@ final class CompositePropertyType extends OrmPropertyType
 	function getVirtualProperty($name, OrmProperty $owner)
 	{
 		$idx = 0;
-		foreach ($this->entity->getLogicalSchema()->getProperties() as $_ => $property) {
-			if ($_ == $name) {
+		foreach ($this->entity->getLogicalSchema()->getProperties() as $property) {
+			if ($property->getName() == $name) {
 				break;
 			}
 
@@ -73,7 +73,7 @@ final class CompositePropertyType extends OrmPropertyType
 
 		return new OrmProperty(
 			$name,
-			array_slice($owner->getFields(), $idx, sizeof($property->getFields())),
+			array_slice($owner->getFields(), $idx, $property->getType()->getColumnCount()),
 			$property->getType(),
 			$property->getVisibility(),
 			$property->getMultiplicity(),

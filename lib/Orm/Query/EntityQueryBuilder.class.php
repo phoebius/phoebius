@@ -77,12 +77,15 @@ final class EntityQueryBuilder implements ISubjectivity
 				? $alias
 				: $this->table;
 
-		$this->registeredIds[$alias] = true;
+		$this->registeredIds[$this->table] = true;
+		if ($alias) {
+			$this->registeredIds[$alias] = true;
+		}
 
 		$this->joins[] = new SelectQuerySource(
 			new AliasedSqlValueExpression(
 				new SqlIdentifier($this->table),
-				$this->alias
+				$alias
 			)
 		);
 	}
@@ -213,12 +216,11 @@ final class EntityQueryBuilder implements ISubjectivity
 	private function getEntityProperty($property)
 	{
 		if (!isset($this->propertyCache[$property])) {
-
 			// a path actually
 			if (false !== strpos($property, '.')) {
 				$this->propertyCache[$property] = $this->guessEntityProperty($property);
 			}
-			else {
+			else if (!isset($this->propertyCache[$property])) {
 				$this->propertyCache[$property] =
 					new EntityProperty(
 						$this,
@@ -241,27 +243,26 @@ final class EntityQueryBuilder implements ISubjectivity
 			return $this->getEntityProperty($propertyPath);
 		}
 
-		$propertyName = reset($propertyPath);
+		$propertyName = reset($propertyPathChunks);
 
 		if (isset($this->joined[$propertyName])) {
 			$builder = $this->joined[$propertyName];
 		}
 		else {
-			$property = $this->getEntityProperty($propertyName)->getProperty();
+			$property = $this->entity->getLogicalSchema()->getProperty($propertyName);
 			$type = $property->getType();
 
 			if ($type instanceof AssociationPropertyType) {
 				$builder = $this->joined[$propertyName] =
 					new self (
 						$type->getContainer(),
-						(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) != 0
-							? $this->alias . '_' . $propertyName
-							: substr(sha1($this->alias), 0, 6) . '_' . $propertyName
+						$this->alias . '_' . $propertyName
 					);
 
 				$this->join($property, $builder, end($this->joins));
 			}
 			else if ($type instanceof CompositePropertyType) {
+				return $this->processComposite(join('.', array_slice($propertyPathChunks, 1)), $property, $type);
 			}
 			else {
 				Assert::isUnreachable(
@@ -273,12 +274,43 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		return
 			$builder->getEntityProperty(
-				join('.', array_slice($propertyPath, 1))
+				join('.', array_slice($propertyPathChunks, 1))
 			);
 	}
 
-	private function processComposite($name, $path, CompositePropertyType $type)
+	private function processComposite($path, OrmProperty $property, CompositePropertyType $type)
 	{
+		$chunks = explode('.', $path);
+
+		$newProperty = $type->getVirtualProperty(reset($chunks), $property);
+
+		if (sizeof($chunks) == 1) {
+			return new EntityProperty($this, $newProperty);
+		}
+
+		$newType = $newProperty->getType();
+
+		if ($newType instanceof CompositePropertyType) {
+			return $this->processComposite(
+				join('.', array_slice($chunks, 1)),
+				$newProperty,
+				$newType
+			);
+		}
+		else if ($newType instanceof AssociationPropertyType) {
+			$builder = $this->joined[$newProperty->getName()] =
+				new self (
+					$newType->getContainer(),
+					$this->alias . '_' . $newProperty->getName()
+				);
+
+			$this->join($property, $builder, end($this->joins));
+
+			return $builder->getEntityProperty(
+				join('.', array_slice($chunks, 1))
+			);
+		}
+
 
 	}
 
