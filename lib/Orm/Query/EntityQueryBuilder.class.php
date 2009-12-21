@@ -189,6 +189,12 @@ final class EntityQueryBuilder implements ISubjectivity
 				// probably, a value, not a property path
 			}
 		}
+		else {
+			Assert::isUnreachable(
+				'do not know how to preset %s',
+				TypeUtils::getName($subject)
+			);
+		}
 
 		return new SqlValue((string) $subject);
 	}
@@ -216,102 +222,84 @@ final class EntityQueryBuilder implements ISubjectivity
 	private function getEntityProperty($property)
 	{
 		if (!isset($this->propertyCache[$property])) {
-			// a path actually
-			if (false !== strpos($property, '.')) {
-				$this->propertyCache[$property] = $this->guessEntityProperty($property);
-			}
-			else if (!isset($this->propertyCache[$property])) {
-				$this->propertyCache[$property] =
-					new EntityProperty(
-						$this,
-						$this->entity->getLogicalSchema()->getProperty($property)
-					);
-			}
+			$this->propertyCache[$property] = $this->guessEntityProperty($property);
 		}
 
 		return $this->propertyCache[$property];
 	}
 
 	/**
+	 * @aux
 	 * @return EntityProperty
 	 */
-	private function guessEntityProperty($propertyPath)
-	{
-		$propertyPathChunks = explode('.', $propertyPath);
-
-		if (sizeof($propertyPathChunks) == 1) {
-			return $this->getEntityProperty($propertyPath);
-		}
-
-		$propertyName = reset($propertyPathChunks);
-
-		if (isset($this->joined[$propertyName])) {
-			$builder = $this->joined[$propertyName];
-		}
-		else {
-			$property = $this->entity->getLogicalSchema()->getProperty($propertyName);
-			$type = $property->getType();
-
-			if ($type instanceof AssociationPropertyType) {
-				$builder = $this->joined[$propertyName] =
-					new self (
-						$type->getContainer(),
-						$this->alias . '_' . $propertyName
-					);
-
-				$this->join($property, $builder, end($this->joins));
-			}
-			else if ($type instanceof CompositePropertyType) {
-				return $this->processComposite(join('.', array_slice($propertyPathChunks, 1)), $property, $type);
-			}
-			else {
-				Assert::isUnreachable(
-					'do not know how to query %s',
-					get_class($type)
-				);
-			}
-		}
-
-		return
-			$builder->getEntityProperty(
-				join('.', array_slice($propertyPathChunks, 1))
-			);
-	}
-
-	private function processComposite($path, OrmProperty $property, CompositePropertyType $type)
+	private function guessEntityProperty($path)
 	{
 		$chunks = explode('.', $path);
+		$name = reset($chunks);
 
-		$newProperty = $type->getVirtualProperty(reset($chunks), $property);
+		return $this->processProperty(
+			join('.', array_slice($chunks, 1)),
+			$this->entity->getLogicalSchema()->getProperty($name)
+		);
+	}
 
-		if (sizeof($chunks) == 1) {
-			return new EntityProperty($this, $newProperty);
+	private function processProperty($path, OrmProperty $property)
+	{
+		$type = $property->getType();
+
+		if (!$path) {
+			return new EntityProperty($this, $property);
 		}
 
-		$newType = $newProperty->getType();
-
-		if ($newType instanceof CompositePropertyType) {
-			return $this->processComposite(
-				join('.', array_slice($chunks, 1)),
-				$newProperty,
-				$newType
+		if ($type instanceof AssociationPropertyType) {
+			return $this->guessAssociated($path, $property, $type);
+		}
+		else if ($type instanceof CompositePropertyType) {
+			return $this->guessComposite($path, $property, $type);
+		}
+		else {
+			Assert::isUnreachable(
+				'do not know how to refer %s',
+				get_class($type)
 			);
 		}
-		else if ($newType instanceof AssociationPropertyType) {
-			$builder = $this->joined[$newProperty->getName()] =
+	}
+
+	private function guessAssociated($path, OrmProperty $property, AssociationPropertyType $type)
+	{
+		if (!isset($this->joined[$property->getName()])) {
+			$builder = $this->joined[$property->getName()] =
 				new self (
-					$newType->getContainer(),
-					$this->alias . '_' . $newProperty->getName()
+					$type->getContainer(),
+					$this->alias . '_' . $property->getName()
 				);
 
 			$this->join($property, $builder, end($this->joins));
+		}
 
-			return $builder->getEntityProperty(
-				join('.', array_slice($chunks, 1))
+		return $this->joined[$property->getName()]->getEntityProperty($path);
+	}
+
+	private function guessComposite($path, OrmProperty $property, CompositePropertyType $type)
+	{
+		$chunks = explode('.', $path);
+		$name = reset($chunks);
+
+		try {
+			$nextProperty = $type->getVirtualProperty($name, $property);
+		}
+		catch (OrmModelIntegrityException $e) {
+			Assert::isUnreachable(
+				'wrong path `%s`.`%s`: `%s` property not found in %s',
+				$property->getName(), $path, $name,
+				$type->getEntity()->getLogicalSchema()->getEntityName()
 			);
 		}
 
-
+		return $this->processProperty(
+			join('.', array_slice($chunks, 1)),
+			$nextProperty
+		);
 	}
 
 	/**
