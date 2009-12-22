@@ -274,7 +274,7 @@ final class EntityQueryBuilder implements ISubjectivity
 					$this->alias . '_' . $property->getName()
 				);
 
-			$this->join($property, $builder, end($this->joins));
+			$this->join($property, $type, $builder, end($this->joins));
 		}
 
 		return $this->joined[$property->getName()]->getEntityProperty($path);
@@ -307,14 +307,11 @@ final class EntityQueryBuilder implements ISubjectivity
 	 */
 	private function join(
 			OrmProperty $property,
+			AssociationPropertyType $type,
 			EntityQueryBuilder $builder,
 			SelectQuerySource $source
 		)
 	{
-		$type = $property->getType();
-
-		Assert::isTrue($type instanceof AssociationPropertyType);
-
 		$joinMethod =
 			$type->getAssociationMultiplicity()->is(
 				AssociationMultiplicity::EXACTLY_ONE

@@ -97,8 +97,16 @@ final class CompositePropertyType extends OrmPropertyType
 	}
 
 	/**
-	 * @param $name
-	 * @param $owner
+	 * Gets the virtual property.
+	 *
+	 * This property is built in context of the owning property but contains inner info about
+	 * the composite property.
+	 *
+	 * This is needed because property type do not know about the database columns used to store
+	 * the value
+	 *
+	 * @param string $name name of the property to get from the composite type
+	 * @param OrmProperty $owner a property which owns the CompositePropertyType
 	 * @return OrmProperty
 	 */
 	function getVirtualProperty($name, OrmProperty $owner)
