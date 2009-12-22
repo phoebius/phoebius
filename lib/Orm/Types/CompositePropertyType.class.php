@@ -19,6 +19,47 @@
 /**
  * Implements a composite type handler
  *
+ * Example:
+ *
+ * XML defintion:
+ *
+ * @code
+ *
+ *		<entity name="Address" has-dao="false">
+ *			<properties>
+ *				<property name="street" type="String"/>
+ *				<property name="building" type="String"/>
+ *			</properties>
+ *		</entity>
+ *
+ *		<entity name="Location" has-dao="false">
+ *			<properties>
+ *				<property name="county" type="String"/>
+ *				<property name="localAddress" type="Address"/>
+ *			</properties>
+ *		</entity>
+ *
+ *		<entity name="User" has-dao="true">
+ *			<properties>
+ *				<identifier />
+ *				<property name="name" type="String" />
+ *				<property name="location" type="Location" />
+ *			</properties>
+ * 		</entity>
+ * @endcode
+ *
+ * Querying:
+ *
+ * @code
+ * $query =
+ * 	User::query()
+ * 		->where(
+ * 			Expression::eq('location.localAddress.street', 'WallStreet')
+ * 		)
+ * 		->setLimit(1);
+ * $entity = $query->getEntity();
+ * @endcode
+ *
  * @ingroup Orm_Types
  */
 final class CompositePropertyType extends OrmPropertyType
