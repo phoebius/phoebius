@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -320,10 +320,10 @@ class PgSqlDB extends DB
 	{
 		Assert::isBoolean($isAsync);
 
-		$statementId = $this->prepareQuery($query, $isAsync);
+		//$statementId = $this->prepareQuery($query, $isAsync);
 		$parameters = $query->getPlaceholderValues($this->getDialect());
 
-		$executeResult = pg_send_execute($this->link, $statementId, $parameters);
+		$executeResult = pg_send_query($this->link, $query->toDialectString($this->getDialect()));
 		if (!$isAsync || !$executeResult) {
 			$result = pg_get_result($this->link);
 			$resultStatus = pg_result_status($result, PGSQL_STATUS_LONG);

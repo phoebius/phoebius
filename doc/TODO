@@ -1,12 +1,19 @@
  ================================================================================================
-  Phoebius Framework todo stub
-
-  Copyright notice
+ *
+ * Copyright (c) 2010 Scand Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
 DAL/DB
 ======
 Use postgresql RETURNING_ID instead of invoking the sequence
+INSERT INTO tbl1 (id, ...) VALUES (1, ...) RETURNING id
 
 
 Logging
@@ -18,13 +25,6 @@ LoggerPool::setPackageLogger(new FileLogWorker());
 LoggerPool::getAppLogger()->log(...)
 LoggerPool::getPackageLogger('Forms')->log(...)
 
-
-Orm/Metainfo
-============
-Think over replacing serialized graph of OrmDomain/OrmClass/OrmProperty set of objects with
-class/property-level attributes using addendum (http://code.google.com/p/addendum/)
-
-Remove OrmPropertyType::defaultValue wrt populating default property values by Entity itself
  
 Dao/Cache
 =========
@@ -50,16 +50,6 @@ Routing
   - callback a delegate to proccess a variable to route
   - cast incoming variables to IObjectMappable types
  
- 
-Core
-====
-add kernelMode: ring0, ring1 for external libs that do not understand exceptions but use errors instead
-Example:
-	// affects Exceptionizer
-	Kernel::stopNativeMode();
-	require '/3rdparty/ExternalLib/ExternalClass.php';
-	ExternalClass::doSomeWork();
-	Kernel::restoreNativeMode();
  
  
 Mvc
@@ -112,8 +102,6 @@ Dal
 ===
 
 add DbProcedureException (code == PgSqlError::RAISE_EXCEPTION)
-
-DbType should not be final, PostgreSqlDbType can be to support custom types (Tsvector, inetaddr, array, etc)
  
 rename PlainQuery to PlainTextQuery or smth like that
   

@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -27,10 +27,14 @@
  * Raw sql type definition inside domain schema.sql:
  * @code
  * <!-- a property that is generated at database level -->
- * <property name="getChildCount" column="child_count" visibility="readonly" type="RawSqlType { definition='int4 not null default 0 check(child_count >= 0)' }">
+ * <property name="getChildCount" column="child_count" visibility="readonly" type="RawSqlType">
+ * 	<param name="definition" value="int4 not null default 0 check(child_count >= 0)">
+ * </property>
  *
  * <!-- a property that is used completely at db level -->
- * <property name="childIds" column="child_ids" visibility="transparent" type="RawSqlType { definition='int8[]' }">
+ * <property name="childIds" column="child_ids" visibility="transparent" type="RawSqlType">
+ * 	<param name="definition" value="int8[]">
+ * </property>
  * @endcode
  *
  * @ingroup Dal_DB_Type

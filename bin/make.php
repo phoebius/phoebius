@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /* ***********************************************************************************************
  *
@@ -5,7 +6,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -16,44 +17,120 @@
  *
  ************************************************************************************************/
 
-chdir(dirname(__FILE__));
-
-require '../etc/app.init.php';
+require dirname(__FILE__).'/../etc/app.init.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-if ($argc == 1) {
-	exit('
+function help()
+{
+	echo <<<EOT
 Usage:
-# make.php [switches] $app
+# make.php [options] [domain-schema.xml]
 
-where:
- - $app is the absolute path to the application with the unified directory structure
- - switches are not yet used
-');
+Possible options:
+ --app-dir=<dir>		path to the directory where unified application FS resides.
+ 						If not specified, the current directory is used.
+
+ --regenerate-public	forces make to regenerate public files
+
+ --public=<dir>			not yet implemented
+
+ --auto=<dir>			not yet implemented
+
+ --schema=<file>		not yet implemented
+
+ --dry-run				not yet implemented
+
+EOT;
 }
 
-$appDir = realpath($argv[1]);
+function stop($message = null)
+{
+	if ($message) {
+		echo $message, PHP_EOL, PHP_EOL;
+	}
 
-if (!$appDir) {
-	exit ("Unknown path to the application {$argv[1]}");
+	help();
+
+	exit(1);
+}
+
+$appDir = getcwd();
+$regeneratePublic = false;
+$dryRun = false;
+
+$args = $argv;
+array_shift($args);
+foreach ($args as $arg) {
+	if ($arg{0} == '-') {
+		if (strpos($arg, '=')) {
+			list ($k, $v) = explode('=', $arg, 2);
+		}
+		else {
+			$k = $arg;
+			$v = null;
+		}
+
+		switch ($k) {
+			case '--app-dir': {
+				$appDir = realpath($v);
+				break;
+			}
+
+			case '--regenerate-public': {
+				$regeneratePublic = true;
+				break;
+			}
+
+			case '--dry-run': {
+				$dryRun = true;
+				break;
+			}
+
+			default: {
+				stop('Unknown option '. $k);
+			}
+		}
+	}
+}
+
+if (!is_dir($appDir)) {
+	stop ("Unknown path to the application {$appDir}");
+}
+
+$xmlSchema = end($args);
+if ($xmlSchema && $xmlSchema{0} != '-') {
+	$prefixes = array(
+		'',
+		$appDir . '/',
+		getcwd() . '/',
+	);
+
+	foreach ($prefixes as $prefix) {
+		if (file_exists($prefix . $xmlSchema) && is_file($xmlSchema)) {
+			$xmlSchema = realpath($prefix . $xmlSchema);
+			break;
+		}
+	}
+}
+else {
+	$xmlSchema = $appDir . '/var/domain.xml';
+}
+
+if (!file_exists($xmlSchema)) {
+	stop ('XML Schema of domain not found at ' . $xmlSchema);
 }
 
 define('APP_ROOT', $appDir);
 
 $applicationConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'config.php';
 if (file_exists($applicationConfig)) {
-		include $applicationConfig;
+	include $applicationConfig;
 }
 
 $hostConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . APP_SLOT . DIRECTORY_SEPARATOR . 'config.php';
 if (file_exists($hostConfig)) {
 	include $hostConfig;
-}
-
-$xmlSchema = $appDir . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'domain.xml';
-if (!file_exists($xmlSchema)) {
-	exit ('$app/var/domain.xml not found at ' . $xmlSchema);
 }
 
 $domainBuilder = new XmlOrmDomainBuilder($xmlSchema);
@@ -68,18 +145,20 @@ try {
 
 	foreach (array($schemaDir, $autoRoot, $publicRoot) as $_) {
 		if (!is_dir($_)) {
-			mkdir($_, 0777, true);
+			mkdir($_, 0755, true);
 		}
 	}
 
 	$generator = new OrmGenerator($schemaDir, $autoRoot, $publicRoot);
-	//$generator->regeneratePublic();
+	if ($regeneratePublic) {
+		$generator->regeneratePublic();
+	}
 	$generator->generate($ormDomain);
 }
 catch (Exception $e) {
-	exit ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
+	stop ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
 }
 
-echo 'Done';
+echo 'Done', PHP_EOL;
 
 ?>

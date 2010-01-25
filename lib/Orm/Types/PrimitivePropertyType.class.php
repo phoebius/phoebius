@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -22,7 +22,7 @@
  *
  * @ingroup Orm_Types
  */
-abstract class PrimitivePropertyType extends OrmPropertyType
+class PrimitivePropertyType extends OrmPropertyType
 {
 	/**
 	 * @var ISqlType

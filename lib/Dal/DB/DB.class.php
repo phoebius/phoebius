@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -179,7 +179,7 @@ abstract class DB
 	}
 
 	/**
-	 * Gets the name of the database
+	 * Gets the name of the database. This method is obsoleted wrt DB::getName().
 	 * @return string
 	 */
 	function getDBName()
@@ -188,15 +188,36 @@ abstract class DB
 	}
 
 	/**
-	 * Sets the name of the database
+	 * Gets the name of the database
+	 * @return string
+	 */
+	function getName()
+	{
+		return $this->dbname;
+	}
+
+	/**
+	 * Sets the name of the database.
+	 * @param string $name
+	 * @return DB itself
+	 */
+	function setName($name)
+	{
+		Assert::isScalar($name);
+
+		$this->dbname = $name;
+
+		return $this;
+	}
+
+	/**
+	 * Sets the name of the database. This method is obsoleted wrt DB::setName().
 	 * @param string $name
 	 * @return DB itself
 	 */
 	function setDBName($name)
 	{
-		Assert::isScalar($name);
-
-		$this->dbname = $name;
+		$this->setName($name);
 
 		return $this;
 	}

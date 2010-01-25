@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2009 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -52,9 +52,15 @@ final class OrmMap implements IOrmEntityBatchMapper
 					continue;
 				}
 
-				if ($property->isNullable()) {
+				if ($property->getMultiplicity()->is(AssociationMultiplicity::ZERO_OR_ONE)) {
 					continue;
 				}
+
+				Assert::isUnreachable(
+					'%s::%s cannot be valueless',
+					get_class($entity),
+					$property->getName()
+				);
 			}
 
 			$fields = array_combine(
