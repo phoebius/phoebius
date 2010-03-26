@@ -51,13 +51,15 @@ class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 
 	protected function findMembers()
 	{
+		$type = $this->ormProperty->getType();
+
 		$this->classMethods[] = <<<EOT
 	function __construct({$this->ormClass->getName()} \$parent)
 	{
 		parent::__construct(
 			\$parent,
-			{$this->ormClass->getEntityName()}Entity::getInstance(),
-			{$this->ormClass->getEntityName()}Entity::getInstance()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}')
+			{$type->getEncapsulant()->getEntityName()}Entity::getInstance(),
+			{$type->getEncapsulant()->getEntityName()}Entity::getInstance()->getLogicalSchema()->getProperty('{$type->getEncapsulantProperty()->getName()}')
 		);
 	}
 EOT;

@@ -58,7 +58,7 @@ class OneToManyContainer extends Container
 		$query = EntityQuery::create($this->getChildren())
 			->where(
 				Expression::eq(
-					$this->referentialProperty->getName(), $this->getParentObject()
+					$this->referentialProperty, $this->getParentObject()->getId()
 				)
 			);
 
