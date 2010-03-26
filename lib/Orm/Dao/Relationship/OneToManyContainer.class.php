@@ -34,12 +34,13 @@ class OneToManyContainer extends Container
 	function __construct(
 			IdentifiableOrmEntity $parent,
 			IQueryable $children,
-			OrmProperty $referentialProperty
+			OrmProperty $referentialProperty,
+			$readOnly
 		)
 	{
 		$this->referentialProperty = $referentialProperty;
 
-		parent::__construct($parent, $children);
+		parent::__construct($parent, $children, $readOnly);
 	}
 
 	function getCount()

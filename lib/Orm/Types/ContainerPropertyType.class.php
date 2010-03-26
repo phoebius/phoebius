@@ -104,10 +104,10 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	/**
 	 * @return {$returnValue}
 	 */
-	function get{$capitalizedPropertyName}()
+	function get{$capitalizedPropertyName}(\$readOnly = false)
 	{
 		if (!\$this->{$propertyName}) {
-			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this);
+			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this, \$readOnly);
 		}
 
 		return \$this->{$propertyName};
