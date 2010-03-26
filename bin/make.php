@@ -107,7 +107,7 @@ if ($xmlSchema && $xmlSchema{0} != '-') {
 	);
 
 	foreach ($prefixes as $prefix) {
-		if (file_exists($prefix . $xmlSchema) && is_file($xmlSchema)) {
+		if (file_exists($prefix . $xmlSchema) && is_file($prefix . $xmlSchema)) {
 			$xmlSchema = realpath($prefix . $xmlSchema);
 			break;
 		}
