@@ -75,6 +75,13 @@ EOT;
 EOT;
 
 		if ($this->ormClass->hasDao()) {
+			$this->classProperties[] = <<<EOT
+	/**
+	 * @var IOrmEntityAccessor
+	 */
+	private \$dao;
+EOT;
+
 			//
 			// FIXME allow entity to hav custom db-schema
 			//
@@ -84,10 +91,14 @@ EOT;
 	 */
 	function getDao()
 	{
-		return new RdbmsDao(
-			DBPool::getDefault(),
-			\$this
-		);
+		if (!\$this->dao) {
+			\$this->dao = new RdbmsDao(
+				DBPool::getDefault(),
+				\$this
+			);
+		}
+
+		return \$this->dao;
 	}
 EOT;
 
