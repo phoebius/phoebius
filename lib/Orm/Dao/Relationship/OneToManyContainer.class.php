@@ -99,7 +99,7 @@ class OneToManyContainer extends Container
 			$object->drop();
 		}
 
-		foreach ($this->getList() as $list) {
+		foreach ($this->getList() as $object) {
 			$object->save();
 		}
 	}

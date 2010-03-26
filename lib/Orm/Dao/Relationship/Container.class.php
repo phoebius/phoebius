@@ -187,7 +187,7 @@ abstract class Container implements IteratorAggregate
 
 		$this->isFetched = true;
 
-		$this->list = array_unique($this->list);
+		$this->list = array_unique($this->list, SORT_REGULAR);
 
 		return $this;
 	}

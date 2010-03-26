@@ -127,7 +127,7 @@ final class AssociationPropertyType extends OrmPropertyType
 			$entity = $dao->getLazyById($id);
 		}
 		else {
-			$entity = $dao->getById($id);
+			$entity = $dao->getEntityById($id);
 		}
 
 		return $entity;
