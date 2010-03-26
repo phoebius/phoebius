@@ -56,25 +56,11 @@ class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 	{
 		parent::__construct(
 			\$parent,
-			{$this->ormClass->getEntityName()}::map()
+			{$this->ormClass->getEntityName()}::map(),
+			{$this->ormClass->getName()}::map()->getProperty('{$this->ormProperty->getName()}')
 		);
 	}
 EOT;
-
-		$this->classMethods[] = <<<EOT
-	/**
-	 * @return OrmProperty
-	 */
-	function getReferentialProperty()
-	{
-		return {$this->ormClass->getName()}::map()->getProperty('{$this->ormProperty->getName()}');
-	}
-EOT;
-	}
-
-	protected function getClassType()
-	{
-		return 'abstract';
 	}
 
 	protected function getExtendsClassName()
