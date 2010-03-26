@@ -49,7 +49,7 @@ abstract class Container implements IteratorAggregate
 	/**
 	 * @var array
 	 */
-	private $clones = array();
+	private $tracked = array();
 
 	/**
 	 * @var boolean
@@ -158,7 +158,7 @@ abstract class Container implements IteratorAggregate
 	function clean()
 	{
 		$this->list = array();
-		$this->clones = array();
+		$this->tracked = array();
 		$this->isFetched = false;
 
 		return $this;
@@ -209,9 +209,7 @@ abstract class Container implements IteratorAggregate
 	protected function trackClones()
 	{
 		foreach ($this->list as $object) {
-			$copy = clone $object;
-			$copy->_setId($object->_getId());
-			$this->clones[] = $copy;
+			$this->tracked[] = spl_object_hash($object);
 		}
 
 		return $this;
@@ -225,9 +223,9 @@ abstract class Container implements IteratorAggregate
 	protected function getChildrenForDeletion()
 	{
 		$yield = array();
-		foreach ($this->clones as $copy) {
+		foreach ($this->tracked as $hash) {
 			foreach ($this->list as $object) {
-				if ($object->_getId() == $copy->_getId()) { // preserved
+				if ($hash == spl_object_hash($object)) { // preserved
 					continue (2);
 				}
 			}
