@@ -203,6 +203,9 @@ abstract class Container implements IteratorAggregate
 		return $this;
 	}
 
+	/**
+	 * @return Container
+	 */
 	protected function trackClones()
 	{
 		foreach ($this->list as $object) {
