@@ -19,6 +19,8 @@
 /**
  * Contract for accessing IdentifiableOrmEntity
  *
+ * TODO drop{by}() method family
+ *
  * @ingroup Orm_Dao
  */
 interface IOrmEntityAccessor
