@@ -122,8 +122,8 @@ EOT;
 
 		$type = $property->getType();
 
-		// FIXME implement ContainerPropertyType getters
-		if ($type instanceof ContainerPropertyType) {
+		// FIXME implement ManyToManyContainerPropertyType getters
+		if ($type instanceof ManyToManyContainerPropertyType) {
 			return;
 		}
 

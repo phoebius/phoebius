@@ -207,7 +207,7 @@ class OrmGenerator
 		$this->buildClass(new OrmAutoEntityClassCodeConstructor($class));
 		$this->buildClass(new OrmEntityClassCodeConstructor($class));
 
-		//$this->generateContainerFiles($class);
+		$this->generateContainerFiles($class);
 	}
 
 	/**
@@ -221,9 +221,9 @@ class OrmGenerator
 			if ($type instanceof OneToManyContainerPropertyType) {
 				$this->buildClass(new OrmOneToManyClassCodeConstructor($class, $property));
 			}
-			else if ($type instanceof ManyToManyContainerPropertyType) {
-				$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
-			}
+		//	else if ($type instanceof ManyToManyContainerPropertyType) {
+		//		$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
+		//	}
 		}
 	}
 }
