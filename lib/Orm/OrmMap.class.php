@@ -41,7 +41,11 @@ final class OrmMap implements IOrmEntityBatchMapper
 		$tuple = array();
 
 		foreach ($this->logicalSchema->getProperties() as $property) {
-			if (!$property->getVisibility()->isGettable()) {
+			if (
+					!$property->getVisibility()->isGettable()
+					|| !sizeof($property->getFields())
+				)
+			{
 				continue;
 			}
 
@@ -67,6 +71,7 @@ final class OrmMap implements IOrmEntityBatchMapper
 				$property->getFields(),
 				$property->getType()->disassemble($value)
 			);
+
 			foreach ($fields as $field => $value) {
 				$tuple[$field] = $value;
 			}

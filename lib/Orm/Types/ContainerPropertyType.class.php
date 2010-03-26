@@ -73,7 +73,8 @@ abstract class ContainerPropertyType extends OrmPropertyType
 
 	final function disassemble($value)
 	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+		return array();
+		//Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
 	}
 
 	/**
@@ -90,6 +91,45 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	function getContainer()
 	{
 		return $this->container;
+	}
+
+	function toGetter(IMappable $entity, OrmProperty $property)
+	{
+		$returnValue = $typeImpl = ucfirst($property->getName());
+
+		$propertyName = $property->getName();
+		$capitalizedPropertyName = ucfirst($propertyName);
+
+		return <<<EOT
+	/**
+	 * @return {$returnValue}
+	 */
+	function get{$capitalizedPropertyName}()
+	{
+		if (!\$this->{$propertyName}) {
+			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this);
+		}
+
+		return \$this->{$propertyName};
+	}
+EOT;
+	}
+
+	function toSetter(IMappable $entity, OrmProperty $property)
+	{
+		Assert::isUnreachable();
+	}
+
+	function toField(IMappable $entity, OrmProperty $property)
+	{
+		$typeImpl = ucfirst($property->getName()) . '|null';
+
+		return <<<EOT
+	/**
+	 * @var {$typeImpl}
+	 */
+	protected \${$property->getName()};
+EOT;
 	}
 }
 

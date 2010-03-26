@@ -88,10 +88,7 @@ final class OrmProperty
 		$this->fields = $fields;
 
 		$this->type = $type;
-		$this->visibility =
-			sizeof($this->type->getSqlTypes()) < 1
-				? new OrmPropertyVisibility(OrmPropertyVisibility::TRANSPARENT)
-				: $visibility;
+		$this->visibility = $visibility;
 		$this->multiplicity = $multiplicity;
 		$this->isUnique = $isUnique;
 		$this->isIdentifier = $isIdentifier;
