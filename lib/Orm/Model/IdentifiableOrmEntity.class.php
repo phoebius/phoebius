@@ -91,6 +91,7 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 		if (($id = $this->_getId())) {
 			$dao = call_user_func(array(get_class($this), 'dao'));
 			$dao->dropById($id);
+			$this->_setId(null);
 		}
 	}
 
