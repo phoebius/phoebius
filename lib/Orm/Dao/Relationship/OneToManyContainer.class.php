@@ -95,11 +95,21 @@ class OneToManyContainer extends Container
 	{
 		Assert::isFalse($this->isReadonly(), 'cannot save readonly collections');
 
-		foreach ($this->getChildrenForDeletion() as $object) {
-			$object->drop();
+		$isNullable = $this->referentialProperty->getMultiplicity()->isNullable();
+		$setter = $this->referentialProperty->getSetter();
+
+		foreach ($this->getLostTracked() as $object) {
+			if ($isNullable) {
+				$object->{$setter}(null);
+				$object->save();
+			}
+			else {
+				$object->drop();
+			}
 		}
 
-		foreach ($this->getList() as $object) {
+		foreach ($this->getUntracked() as $object) {
+			$object->{$setter}($this->getParentObject());
 			$object->save();
 		}
 	}

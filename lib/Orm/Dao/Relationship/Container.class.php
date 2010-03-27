@@ -216,11 +216,29 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Get the list of objects added after actual fetch
+	 * @return array
+	 */
+	protected function getUntracked()
+	{
+		$yield = array();
+
+		foreach ($this->list as $object) {
+			$hash = spl_object_hash($object);
+			if (!in_array($hash, $this->tracked)) {
+				$yield[] = $object;
+			}
+		}
+
+		return $yield;
+	}
+
+	/**
 	 * Track objects with broken refs
 	 *
 	 * @return array
 	 */
-	protected function getChildrenForDeletion()
+	protected function getLostTracked()
 	{
 		$yield = array();
 		foreach ($this->tracked as $hash) {
