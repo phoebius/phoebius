@@ -214,6 +214,52 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Joins the condition for rows that should be selected using conjunction
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
+	 * @return EntityQuery
+	 */
+	function andWhere(IExpression $condition)
+	{
+		if (!$this->condition) {
+			$this->condition = $condition;
+		}
+		else {
+			$this->condition = Expression::andChain()
+				->add($this->condition)
+				->add($condition);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Joins the condition for rows that should be selected using disjunction
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
+	 * @return EntityQuery
+	 */
+	function orWhere(IExpression $condition)
+	{
+		if (!$this->condition) {
+			$this->condition = $condition;
+		}
+		else {
+			$this->condition = Expression::orChain()
+				->add($this->condition)
+				->add($condition);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Presents EntityQuery as SelectQuery object
 	 *
 	 * @return SelectQuery

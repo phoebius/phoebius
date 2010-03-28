@@ -56,14 +56,12 @@ class OneToManyContainer extends Container
 
 	private function getEntityQuery()
 	{
-		$query = EntityQuery::create($this->getChildren())
-			->where(
+		$query = $this->getQuery()
+			->andWhere(
 				Expression::eq(
-					$this->referentialProperty, $this->getParentObject()->getId()
+					$this->referentialProperty, $this->getParentObject()
 				)
 			);
-
-		$this->fillQuery($query);
 
 		return $query;
 	}
