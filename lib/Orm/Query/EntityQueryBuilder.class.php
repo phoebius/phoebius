@@ -173,6 +173,10 @@ final class EntityQueryBuilder implements ISubjectivity
 			// value cast thru explicit specification of PropertyType to use
 		}
 
+		if ($subject instanceof IdentifiableOrmEntity) {
+			return $this->subject($subject->_getId());
+		}
+
 		if (is_scalar($subject)) {
 
 			if ($this->hasId($subject)) {

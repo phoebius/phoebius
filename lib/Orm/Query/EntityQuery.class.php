@@ -115,6 +115,15 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * Gets the entity we are going to query
+	 * @return IQueryable
+	 */
+	function getQueryRoot()
+	{
+		return $this->entity;
+	}
+
+	/**
 	 * Sets the query to eliminate duplicate rows from the result
 	 * @return EntityQuery itself
 	 */
