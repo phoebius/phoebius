@@ -97,6 +97,7 @@ class OneToManyContainer extends Container
 
 		$isNullable = $this->referentialProperty->getMultiplicity()->isNullable();
 		$setter = $this->referentialProperty->getSetter();
+		$getter = $this->referentialProperty->getGetter();
 
 		foreach ($this->getLostTracked() as $object) {
 			if ($isNullable) {
@@ -108,8 +109,11 @@ class OneToManyContainer extends Container
 			}
 		}
 
-		foreach ($this->getUntracked() as $object) {
-			$object->{$setter}($this->getParentObject());
+		foreach ($this->getList() as $object) {
+			// avoid useless mutation
+			if ($object->{$getter}() !== $this->getParentObject()) {
+				$object->{$setter}($this->getParentObject());
+			}
 			$object->save();
 		}
 	}
