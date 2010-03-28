@@ -57,6 +57,11 @@ abstract class Container implements IteratorAggregate
 	private $readOnly;
 
 	/**
+	 * @var EntityQuery
+	 */
+	private $query;
+
+	/**
 	 * @return Container an object itself
 	 */
 	abstract function fetch();
@@ -88,6 +93,7 @@ abstract class Container implements IteratorAggregate
 		$this->parent = $parent;
 		$this->children = $children;
 		$this->readOnly = $readOnly;
+		$this->query = new EntityQuery($this->children);
 	}
 
 	/**
@@ -192,15 +198,21 @@ abstract class Container implements IteratorAggregate
 		return $this;
 	}
 
-	/**
-	 *
-	 * Fills the query
-	 * @return Container
-	 * @param EntityQuery $query
-	 */
-	protected function fillQuery(EntityQuery $query)
+	function setQuery(EntityQuery $query)
 	{
+		Assert::isTrue($query->getQueryRoot() === $this->children);
+
+		$this->query = $query;
+
 		return $this;
+	}
+
+	/**
+	 * @return EntityQuery
+	 */
+	protected function getQuery()
+	{
+		return $this->query;
 	}
 
 	/**
