@@ -219,9 +219,11 @@ class OrmGenerator
 			$type = $property->getType();
 
 			if ($type instanceof OneToManyContainerPropertyType) {
+				$this->buildClass(new OrmOneToManyAutoClassCodeConstructor($class, $property));
 				$this->buildClass(new OrmOneToManyClassCodeConstructor($class, $property));
 			}
 			else if ($type instanceof ManyToManyContainerPropertyType) {
+				$this->buildClass(new OrmManyToManyAutoClassCodeConstructor($class, $property));
 				$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
 			}
 		}
