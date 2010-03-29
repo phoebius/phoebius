@@ -344,7 +344,7 @@ final class EntityQuery implements ISqlSelectQuery
 		$projection->fill($selectQuery, $queryBuilder);
 
 		if ($this->condition) {
-			$selectQuery->setCondition(
+			$selectQuery->where(
 				$this->condition->toSubjected($queryBuilder)
 			);
 		}
