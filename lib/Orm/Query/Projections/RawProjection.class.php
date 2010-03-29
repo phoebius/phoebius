@@ -75,7 +75,7 @@ class RawProjection implements IProjection
 
 		return
 			new AliasedSqlValueExpression(
-				$builder->subject($this->getExpression()),
+				$builder->subject($this->expression),
 				$this->alias
 			);
 	}

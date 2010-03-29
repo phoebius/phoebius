@@ -22,22 +22,25 @@
  *
  * @ingroup Orm_Query_Projections
  */
-class AggrProjection extends RawProjection
+class AggrProjection implements IProjection
 {
 	private $func;
+	private $expression;
+	private $alias;
 
 	/**
 	 * @param string $func name of the aggregate
-	 * @param string $property property to be used for aggregation
+	 * @param string $expression property to be used for aggregation
 	 * @param string $alias optional label for the result of the aggregator
 	 */
-	function __construct($func, $property, $alias = null)
+	function __construct($func, $expression = null, $alias = null)
 	{
 		Assert::isScalar($func);
 
 		$this->func = $func;
 
-		parent::__construct($property, $alias);
+		$this->expression = $expression;
+		$this->alias = $alias;
 	}
 
 	/**
@@ -55,6 +58,15 @@ class AggrProjection extends RawProjection
 	}
 
 	/**
+	 * Gets the expression to be aggregated
+	 * @return mixed
+	 */
+	protected function getExpression()
+	{
+		return $this->expression;
+	}
+
+	/**
 	 * Create a SQLFunction with the expression as the argument
 	 *
 	 * @param EntityQuery $entityQuery
@@ -63,9 +75,12 @@ class AggrProjection extends RawProjection
 	protected function getSqlFunction(EntityQueryBuilder $entityQueryBuilder)
 	{
 		return
-			new SqlFunction(
-				$this->getFunc(),
-				$this->getValueExpression($entityQueryBuilder)
+			new AliasedSqlValueExpression(
+				new SqlFunction(
+					$this->getFunc(),
+					$entityQueryBuilder->subject($this->getExpression())
+				),
+				$this->alias
 			);
 	}
 }

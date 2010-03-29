@@ -37,27 +37,18 @@ class CountProjection extends AggrProjection
 			'COUNT',
 			$property
 				? $property
-				: '___lookup_me_in_CountProjection::getValueExpression()___',
+				: '___lookup_me_in_CountProjection::getExpression()___',
 			$alias
 		);
 	}
 
-	protected function getValueExpression(EntityQueryBuilder $builder)
+	protected function getExpression()
 	{
 		if ($this->lookupProperty) {
-			$alias = $this->getAlias();
-			$builder->registerIdentifier($alias);
-
-			return
-				new AliasedSqlValueExpression(
-					$builder->subject(
-						$builder->getEntity()->getLogicalSchema()->getIdentifier()
-					),
-					$alias
-				);
+			return $builder->getEntity()->getLogicalSchema()->getIdentifier();
 		}
 
-		return parent::getValueExpression($builder);
+		return parent::getExpression();
 	}
 }
 
