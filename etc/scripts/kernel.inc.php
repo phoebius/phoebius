@@ -16,7 +16,7 @@
  *
  ************************************************************************************************/
 
-define('PHOEBIUS_VERSION', '1.0.1');
+define('PHOEBIUS_VERSION', '1.2.0');
 
 $initializeRootDirectory = str_replace(array('/','\\'), DIRECTORY_SEPARATOR, dirname(__FILE__));
 $initializeRootDirectory = explode(DIRECTORY_SEPARATOR, $initializeRootDirectory);
