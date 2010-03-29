@@ -92,25 +92,31 @@ class OneToManyContainer extends Container
 		return $this;
 	}
 
-	/**
-	 * TODO drop without fetching the objects
-	 */
 	function save()
 	{
 		Assert::isFalse($this->isReadonly(), 'cannot save readonly collections');
 
-		$isNullable = $this->referentialProperty->getMultiplicity()->isNullable();
-		$setter = $this->referentialProperty->getSetter();
 		$getter = $this->referentialProperty->getGetter();
+		$setter = $this->referentialProperty->getSetter();
 
-		foreach ($this->getLostTracked() as $object) {
-			if ($isNullable) {
+		if ($this->referentialProperty->getMultiplicity()->isNullable()) {
+			foreach ($this->getLostTracked() as $object) {
 				$object->{$setter}(null);
 				$object->save();
 			}
-			else {
-				$object->drop();
-			}
+		}
+		else if (sizeof($this->getLostTracked())) {
+			$query = new EntityQuery($this->getChildren());
+			$this->fillQuery($query);
+
+			$query->andWhere(
+				Expression::in(
+					$this->getChildren()->getLogicalSchema()->getIdentifier(),
+					$this->getLostTracked()
+				)
+			);
+
+			$query->delete();
 		}
 
 		foreach ($this->getList() as $object) {
@@ -122,25 +128,18 @@ class OneToManyContainer extends Container
 		}
 	}
 
-	/**
-	 * TODO drop without fetching the objects
-	 */
 	function dropAll()
 	{
 		Assert::isFalse($this->isReadonly(), 'cannot drop readonly collections');
 
 		$query = new EntityQuery($this->getChildren());
-
 		$this->fillQuery($query);
 
-		$dropQuery = new DeleteQuery($this->getChildren()->getPhysicalSchema()->getTable());
-		$dropQuery->setCondition($query->toExpression());
-
-		$this->getChildren()->getDao()->executeQuery($dropQuery);
+		$count = $query->delete();
 
 		$this->clean();
 
-		return $this;
+		return $count;
 	}
 }
 
