@@ -49,26 +49,9 @@ class OrmManyToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 		return ucfirst($this->ormProperty->getName()) . 'Container';
 	}
 
-	protected function findMembers()
-	{
-		$type = $this->ormProperty->getType();
-
-		$this->classMethods[] = <<<EOT
-	function __construct({$this->ormClass->getName()} \$parent, \$readOnly = true)
-	{
-		parent::__construct(
-			\$parent,
-			{$type->getEncapsulant()->getEntityName()}::orm(),
-			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
-			\$readOnly
-		);
-	}
-EOT;
-	}
-
 	protected function getExtendsClassName()
 	{
-		return 'ManyToManyContainer';
+		return 'Auto_' . ucfirst($this->ormProperty->getName()) . 'Container';
 	}
 }
 
