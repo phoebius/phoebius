@@ -385,6 +385,20 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
+	 * @return int
+	 */
+	function delete()
+	{
+		$deleteQuery = new DeleteQuery($this->entity->getPhysicalSchema()->getTable());
+
+		$deleteQuery->setCondition($this->toExpression());
+
+		$affected = $this->entity->getDao()->executeQuery($deleteQuery);
+
+		return $affected;
+	}
+
+	/**
 	 * Gets the ORM-related entity object. The object is obtained according to the current
 	 * setting of EntityQuery and the FetchStrategy set inside DAO of the entity
 	 * @return IdentifiableOrmEntity
