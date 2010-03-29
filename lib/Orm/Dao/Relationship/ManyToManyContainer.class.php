@@ -74,7 +74,7 @@ class ManyToManyContainer extends Container
 	{
 		$query = clone $this->getQuery();
 
-		$this->fillQuery($query);
+		$query = $this->makeSqlSelectQuery($query);
 
 		return $query;
 	}
@@ -82,7 +82,7 @@ class ManyToManyContainer extends Container
 	/**
 	 * @return ISqlSelectQuery
 	 */
-	private function fillQuery(EntityQuery $query)
+	private function makeSqlSelectQuery(EntityQuery $query)
 	{
 		$query = $query->toSelectQuery();
 
@@ -137,7 +137,7 @@ class ManyToManyContainer extends Container
 
 	function fetch()
 	{
-		$list = $this->getSelectQuery()->getList();
+		$list = $this->getChildren()->getDao()->getList($this->getSelectQuery());
 
 		$this->mergeList($list);
 
@@ -171,8 +171,12 @@ class ManyToManyContainer extends Container
 			$proxy = $this->mtm->getProxy()->getLogicalSchema()->getNewEntity();
 			$proxy->{$containerSetter}($this->getParentObject());
 			$proxy->{$encapsulantSetter}($object);
+
+			$insertQuery = new InsertQuery($this->mtm->getProxy()->getPhysicalSchema()->getTable());
+			$insertQuery->setValues($this->mtm->getProxy()->getMap()->disassemble($proxy));
+
 			try {
-				$proxy->save();
+				$this->mtm->getProxy()->getDao()->executeQuery($insertQuery);
 			}
 			catch (UniqueViolationException $e) {}
 		}
