@@ -27,7 +27,7 @@
  *
  * @ingroup Dal_Expression
  */
-class InSetExpression implements ISubjective
+class InSetExpression implements ISubjective, IExpression
 {
 	/**
 	 * @var mixed
@@ -83,6 +83,10 @@ class InSetExpression implements ISubjective
 
 	function toDialectString(IDialect $dialect)
 	{
+		if (empty($this->set)) {
+			return null;
+		}
+
 		$values = new SqlValueExpressionArray($this->set);
 
 		$compiledSlices = array();
