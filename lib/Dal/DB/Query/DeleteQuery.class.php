@@ -85,7 +85,7 @@ class DeleteQuery implements ISqlQuery
 		$querySlices[] = 'DELETE FROM';
 		$querySlices[] = $dialect->quoteIdentifier($this->table);
 
-		if ($this->entityQuery) {
+		if ($this->condition) {
 			$querySlices[] = 'WHERE';
 			$querySlices[] = $this->condition->toDialectString($dialect);
 		}
