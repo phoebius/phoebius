@@ -62,7 +62,7 @@ class ManyToManyContainer extends Container
 			)
 		);
 
-		$sqlQuery = $this->fillQuery($query);
+		$sqlQuery = $this->makeSqlSelectQuery($query);
 
 		$result = $this->getChildren()->getDao()->getRow($sqlQuery);
 		$this->count = (int) $result[$alias];
