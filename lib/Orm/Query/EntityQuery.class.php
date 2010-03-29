@@ -373,6 +373,8 @@ final class EntityQuery implements ISqlSelectQuery
 	 * presented in the resulting expression because required joins can only be specified
 	 * as sources for selection
 	 *
+	 * @todo check whether we refer to encapsulants and avoid this
+	 *
 	 * @return IExpression
 	 */
 	function toExpression()
