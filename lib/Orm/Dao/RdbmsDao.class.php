@@ -75,7 +75,9 @@ class RdbmsDao implements IOrmEntityAccessor
 		$this->logicalSchema = $entity->getLogicalSchema();
 		$this->physicalSchema = $entity->getPhysicalSchema();
 		$this->identifier = $this->logicalSchema->getIdentifier();
-		$this->identityMap = new OrmIdentityMap($this->logicalSchema);
+		if ($this->logicalSchema->getIdentifier()) {
+			$this->identityMap = new OrmIdentityMap($this->logicalSchema);
+		}
 	}
 
 	/**
