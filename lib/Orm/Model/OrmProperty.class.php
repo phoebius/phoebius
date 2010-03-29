@@ -51,7 +51,7 @@ final class OrmProperty
 	/**
 	 * @var array
 	 */
-	private $row = array();
+	private $fields = array();
 
 	/**
 	 * @var boolean
@@ -182,6 +182,18 @@ final class OrmProperty
 	function getFields()
 	{
 		return $this->fields;
+	}
+
+	function getField()
+	{
+		Assert::isTrue(
+			sizeof($this->fields) == 1,
+			'%s has %s fields',
+			$this->name,
+			sizeof($this->fields)
+		);
+
+		return reset ($this->fields);
 	}
 
 	/**

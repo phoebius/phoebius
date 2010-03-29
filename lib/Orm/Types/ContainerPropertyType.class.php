@@ -95,19 +95,18 @@ abstract class ContainerPropertyType extends OrmPropertyType
 
 	function toGetter(IMappable $entity, OrmProperty $property)
 	{
-		$returnValue = $typeImpl = ucfirst($property->getName());
-
 		$propertyName = $property->getName();
 		$capitalizedPropertyName = ucfirst($propertyName);
+		$class = $capitalizedPropertyName . 'Container';
 
 		return <<<EOT
 	/**
-	 * @return {$returnValue}
+	 * @return {$class}
 	 */
 	function get{$capitalizedPropertyName}(\$readOnly = false)
 	{
 		if (!\$this->{$propertyName}) {
-			\$this->{$propertyName} = new {$capitalizedPropertyName}(\$this, \$readOnly);
+			\$this->{$propertyName} = new {$class}(\$this, \$readOnly);
 		}
 
 		return \$this->{$propertyName};

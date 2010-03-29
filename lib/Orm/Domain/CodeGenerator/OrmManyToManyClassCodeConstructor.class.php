@@ -41,23 +41,26 @@ class OrmManyToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 
 	function isPublicEditable()
 	{
-		return false;
+		return true;
 	}
 
 	function getClassName()
 	{
-		return ucfirst($this->ormProperty->getName());
+		return ucfirst($this->ormProperty->getName()) . 'Container';
 	}
 
 	protected function findMembers()
 	{
+		$type = $this->ormProperty->getType();
+
 		$this->classMethods[] = <<<EOT
-	function __construct({$this->ormClass->getName()} \$parent)
+	function __construct({$this->ormClass->getName()} \$parent, \$readOnly = true)
 	{
 		parent::__construct(
 			\$parent,
-			{$this->ormClass->getName()}::orm(),
-			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}')->getType()
+			{$type->getEncapsulant()->getEntityName()}::orm(),
+			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
+			\$readOnly
 		);
 	}
 EOT;

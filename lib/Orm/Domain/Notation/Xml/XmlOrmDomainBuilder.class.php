@@ -371,6 +371,7 @@ class XmlOrmDomainBuilder
 				$this->ormDomain->addClass($proxy);
 			}
 
+			$propName = strtolower($type->getEntityName());
 			try {
 				$mtmType = new AssociationPropertyType(
 					$type,
@@ -378,7 +379,7 @@ class XmlOrmDomainBuilder
 					AssociationBreakAction::cascade()
 				);
 				$type_property = new OrmProperty(
-					$type->getEntityName(),
+					$propName,
 					$this->makeFields($type->getTable(), $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full(),
@@ -390,9 +391,10 @@ class XmlOrmDomainBuilder
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$type_property = $proxy->getProperty($type->getEntityName());
+				$type_property = $proxy->getProperty($propName);
 			}
 
+			$propName = strtolower($referredType->getEntityName());
 			try {
 				$mtmType =
 					new AssociationPropertyType(
@@ -401,7 +403,7 @@ class XmlOrmDomainBuilder
 						AssociationBreakAction::cascade()
 					);
 				$referredType_property = new OrmProperty(
-					$referredType->getEntityName(),
+					$propName,
 					$this->makeFields($referredType->getTable(), $mtmType),
 					$mtmType,
 					OrmPropertyVisibility::full(),
@@ -413,7 +415,7 @@ class XmlOrmDomainBuilder
 				);
 			}
 			catch (OrmModelIntegrityException $e) {
-				$referredType_property = $proxy->getProperty($referredType->getEntityName());
+				$referredType_property = $proxy->getProperty($propName);
 			}
 
 			$propertyType = new ManyToManyContainerPropertyType(

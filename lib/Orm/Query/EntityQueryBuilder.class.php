@@ -338,9 +338,11 @@ final class EntityQueryBuilder implements ISubjectivity
 
 		$source->join(
 			new SqlConditionalJoin(
-				new AliasedSqlValueExpression(
-					new SqlIdentifier($builder->table),
-					$builder->alias
+				new SelectQuerySource(
+					new AliasedSqlValueExpression(
+						new SqlIdentifier($builder->table),
+						$builder->alias
+					)
 				),
 				new SqlJoinMethod($joinMethod),
 				$condition

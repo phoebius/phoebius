@@ -221,9 +221,9 @@ class OrmGenerator
 			if ($type instanceof OneToManyContainerPropertyType) {
 				$this->buildClass(new OrmOneToManyClassCodeConstructor($class, $property));
 			}
-		//	else if ($type instanceof ManyToManyContainerPropertyType) {
-		//		$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
-		//	}
+			else if ($type instanceof ManyToManyContainerPropertyType) {
+				$this->buildClass(new OrmManyToManyClassCodeConstructor($class, $property));
+			}
 		}
 	}
 }

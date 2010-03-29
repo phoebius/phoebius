@@ -122,11 +122,6 @@ EOT;
 
 		$type = $property->getType();
 
-		// FIXME implement ManyToManyContainerPropertyType getters
-		if ($type instanceof ManyToManyContainerPropertyType) {
-			return;
-		}
-
 		// make property itself
 		$this->classProperties[] = $type->toField($this->ormClass, $property);
 

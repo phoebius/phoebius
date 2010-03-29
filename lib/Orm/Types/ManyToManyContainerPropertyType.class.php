@@ -71,7 +71,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	 */
 	function getContainerProxyProperty()
 	{
-		$this->container;
+		return $this->container;
 	}
 
 	/**
@@ -79,7 +79,7 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 	 */
 	function getEncapsulantProxyProperty()
 	{
-		$this->encapsulant;
+		return $this->encapsulant;
 	}
 
 	protected function getCtorArgumentsPhpCode()
