@@ -49,21 +49,27 @@ class OneToManyContainer extends Container
 			return parent::getCount();
 		}
 
-		$this->count = $this->getEntityQuery()->getCount();
+		$this->count = $this->getSelectQuery()->getCount();
 
 		return $this->count;
 	}
 
-	private function getEntityQuery()
+	private function getSelectQuery()
 	{
-		$query = $this->getQuery()
-			->andWhere(
-				Expression::eq(
-					$this->referentialProperty, $this->getParentObject()
-				)
-			);
+		$query = clone $this->getQuery();
+
+		$this->fillQuery($query);
 
 		return $query;
+	}
+
+	private function fillQuery(EntityQuery $query)
+	{
+		$query->andWhere(
+			Expression::eq(
+				$this->referentialProperty, $this->getParentObject()
+			)
+		);
 	}
 
 	function clean()
@@ -75,7 +81,7 @@ class OneToManyContainer extends Container
 
 	function fetch()
 	{
-		$list = $this->getEntityQuery()->getList();
+		$list = $this->getSelectQuery()->getList();
 
 		$this->mergeList($list);
 
@@ -123,9 +129,14 @@ class OneToManyContainer extends Container
 	{
 		Assert::isFalse($this->isReadonly(), 'cannot drop readonly collections');
 
-		$this->fetch();
-		$this->setList();
-		$this->save();
+		$query = new EntityQuery($this->getChildren());
+
+		$this->fillQuery($query);
+
+		$dropQuery = new DeleteQuery($this->getChildren()->getPhysicalSchema()->getTable());
+		$dropQuery->setCondition($query->toExpression());
+
+		$this->getChildren()->getDao()->executeQuery($dropQuery);
 
 		$this->clean();
 
