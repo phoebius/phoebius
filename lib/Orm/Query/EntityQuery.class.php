@@ -112,6 +112,9 @@ final class EntityQuery implements ISqlSelectQuery
 	{
 		$this->projection = clone $this->projection;
 		$this->order = clone $this->order;
+		if ($this->condition) {
+			$this->condition = clone $this->condition;
+		}
 	}
 
 	/**
@@ -186,13 +189,75 @@ final class EntityQuery implements ISqlSelectQuery
 	 * 		->getCell();
 	 * @endcode
 	 *
-	 * @param IProjection $projection
+	 * @param IProjection ...
 	 *
 	 * @return EntityQuery itlsef
 	 */
-	function get(IProjection $projection)
+	function get(IProjection $projection/*, ... */)
+	{
+		$args = func_get_args();
+		foreach ($args as $arg) {
+			$this->projection->append($arg);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Appends an IProjection object to the projection chain that actually makes a selection
+	 * expression that form the output rows of the statement.
+	 *
+	 * Example:
+	 * @code
+	 * // gets the number of entities within the database
+	 * $count =
+	 * 	EntityQuery::create(MyEntry::orm())
+	 * 		->get(Projection::rowCount())
+	 * 		->getCell();
+	 * @endcode
+	 *
+	 * @param IProjection ...
+	 *
+	 * @return EntityQuery itlsef
+	 */
+	function addProjection(IProjection $projection)
 	{
 		$this->projection->append($projection);
+
+		return $this;
+	}
+
+	/**
+	 * Cleans the projection chain and appends an IProjection object to the projection chain
+	 *  that actually makes a selection
+	 * expression that form the output rows of the statement.
+	 *
+	 * Example:
+	 * @code
+	 * // gets the number of entities within the database
+	 * $count =
+	 * 	EntityQuery::create(MyEntry::orm())
+	 * 		->get(Projection::rowCount())
+	 * 		->getCell();
+	 * @endcode
+	 *
+	 * @param IProjection ...
+	 *
+	 * @return EntityQuery itlsef
+	 */
+	function setProjection(IProjection $projection)
+	{
+		$this->dropProjection()->addProjection($projection);
+
+		return $this;
+	}
+
+	/**
+	 * Drops the projection chain
+	 */
+	function dropProjection()
+	{
+		$this->projection = new ProjectionChain;
 
 		return $this;
 	}
@@ -224,13 +289,11 @@ final class EntityQuery implements ISqlSelectQuery
 	 */
 	function andWhere(IExpression $condition)
 	{
-		if (!$this->condition) {
-			$this->condition = $condition;
+		if ($this->condition) {
+			$this->condition = Expression::conjunction($this->condition, $condition);
 		}
 		else {
-			$this->condition = Expression::andChain()
-				->add($this->condition)
-				->add($condition);
+			$this->condition = $condition;
 		}
 
 		return $this;
@@ -247,13 +310,11 @@ final class EntityQuery implements ISqlSelectQuery
 	 */
 	function orWhere(IExpression $condition)
 	{
-		if (!$this->condition) {
-			$this->condition = $condition;
+		if ($this->condition) {
+			$this->condition = Expression::disjunction($this->condition, $condition);
 		}
 		else {
-			$this->condition = Expression::orChain()
-				->add($this->condition)
-				->add($condition);
+			$this->condition = $condition;
 		}
 
 		return $this;
