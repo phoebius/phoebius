@@ -48,7 +48,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 
 	/**
 	 * WHERE ...
-	 * @var IExpression|null
+	 * @var ExpressionChain|null
 	 */
 	private $condition;
 
@@ -106,6 +106,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 		$this->sources = clone $this->sources;
 		$this->order = clone $this->order;
 		$this->groups = clone $this->groups;
+		if ($this->condition) {
+			$this->condition = clone $this->condition;
+		}
 	}
 
 	/**
@@ -121,23 +124,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Sets the condition for rows that should be selected
-	 *
-	 * Only rows for which this expression returns true will be selected.
-	 *
-	 * @param IExpression $condition condition to be applied when selected rows
-	 *
-	 * @return SelectQuery
-	 */
-	function setCondition(IExpression $condition)
-	{
-		$this->condition = $condition;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the condition for rows that should be selected
+	 * Sets the condition for rows that should be selected, if not yet set.
 	 *
 	 * Only rows for which this expression returns true will be selected.
 	 *
@@ -149,7 +136,53 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 */
 	function where(IExpression $condition)
 	{
-		$this->setCondition($condition);
+		$this->condition = $condition;
+
+		return $this;
+	}
+
+	/**
+	 * Appends the condition for rows that should be selected using conjunction
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
+	 * @see SelectQuery::setCondition()
+	 *
+	 * @return SelectQuery itself
+	 */
+	function andWhere(IExpression $condition)
+	{
+		if ($this->condition) {
+			$this->condition = Expression::conjunction($this->condition, $condition);
+		}
+		else {
+			$this->condition = $condition;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Appends the condition for rows that should be selected using disjunction
+	 *
+	 * Only rows for which this expression returns true will be selected.
+	 *
+	 * @param IExpression $condition condition to be applied when selected rows
+	 *
+	 * @see SelectQuery::setCondition()
+	 *
+	 * @return SelectQuery itself
+	 */
+	function orWhere(IExpression $condition)
+	{
+		if ($this->condition) {
+			$this->condition = Expression::disjunction($this->condition, $condition);
+		}
+		else {
+			$this->condition = $condition;
+		}
 
 		return $this;
 	}
@@ -188,13 +221,17 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 * );
 	 * @endcode
 	 *
-	 * @param ISqlValueExpression $expression a boolean expression that would form the output rows
+	 * @param ISqlValueExpression ... a boolean expression that would form the output rows
 	 *
 	 * @return SelectQuery itself
 	 */
 	function get(ISqlValueExpression $expression)
 	{
-		$this->get->append($expression);
+		$args = func_get_args();
+
+		foreach ($args as $arg) {
+			$this->get->append($arg);
+		}
 
 		return $this;
 	}
@@ -206,10 +243,10 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 * @param array $fields array of ISqlValueExpression
 	 * @return SelectQuery itself
 	 */
-	function getFields(array $fields)
+	function arrayGet(array $expressions)
 	{
-		foreach ($fields as $field) {
-			$this->get($field);
+		foreach ($expressions as $expression) {
+			$this->get($expression);
 		}
 
 		return $this;
