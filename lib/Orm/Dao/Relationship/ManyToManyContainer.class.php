@@ -17,6 +17,13 @@
  ************************************************************************************************/
 
 /**
+ * Many-to-many container implementation.
+ *
+ * All we need to know from outer world is:
+ *  - the parent object
+ *  - children entity info
+ *  - property info of ManyToManyPropertyType type
+ *
  * @ingroup Orm_Dao
  */
 class ManyToManyContainer extends Container
@@ -68,64 +75,6 @@ class ManyToManyContainer extends Container
 		$this->count = (int) $result[$alias];
 
 		return $this->count;
-	}
-
-	private function getSelectQuery()
-	{
-		$query = clone $this->getQuery();
-
-		$query = $this->makeSqlSelectQuery($query);
-
-		return $query;
-	}
-
-	/**
-	 * @return ISqlSelectQuery
-	 */
-	private function makeSqlSelectQuery(EntityQuery $query)
-	{
-		$query = $query->toSelectQuery();
-
-		$joinMethod = SqlJoinMethod::INNER;
-		$childrenTable = $this->getChildren()->getPhysicalSchema()->getTable();
-		$proxyTable = $this->mtm->getProxy()->getPhysicalSchema()->getTable();
-
-		$condition = Expression::andChain();
-		$srcSqlFields = $this->getChildren()->getLogicalSchema()->getIdentifier()->getFields();
-
-		$dstSqlFields = $this->mtm->getEncapsulantProxyProperty()->getFields();
-
-		foreach ($srcSqlFields as $k => $v) {
-			$condition->add(
-				Expression::eq(
-					new SqlColumn($srcSqlFields[$k], $childrenTable),
-					new SqlColumn($dstSqlFields[$k], $proxyTable)
-				)
-			);
-		}
-
-		$query->join(
-			new SqlConditionalJoin(
-				new SelectQuerySource(
-					new SqlIdentifier($proxyTable)
-				),
-				new SqlJoinMethod($joinMethod),
-				$condition
-			)
-		);
-
-		$columnName = $this->mtm->getContainerProxyProperty()->getField();
-		$query->andWhere(
-			Expression::eq(
-				new SqlColumn(
-					$columnName,
-					$this->mtm->getProxy()->getPhysicalSchema()->getTable()
-				),
-				new SqlValue($this->getParentObject()->_getId())
-			)
-		);
-
-		return $query;
 	}
 
 	function clean()
@@ -198,6 +147,67 @@ class ManyToManyContainer extends Container
 		$this->clean();
 
 		return $count;
+	}
+
+	/**
+	 * @return ISqlSelectQuery
+	 */
+	private function getSelectQuery()
+	{
+		$query = clone $this->getQuery();
+
+		$query = $this->makeSqlSelectQuery($query);
+
+		return $query;
+	}
+
+	/**
+	 * @return ISqlSelectQuery
+	 */
+	private function makeSqlSelectQuery(EntityQuery $query)
+	{
+		$query = $query->toSelectQuery();
+
+		$joinMethod = SqlJoinMethod::INNER;
+		$childrenTable = $this->getChildren()->getPhysicalSchema()->getTable();
+		$proxyTable = $this->mtm->getProxy()->getPhysicalSchema()->getTable();
+
+		$condition = Expression::andChain();
+		$srcSqlFields = $this->getChildren()->getLogicalSchema()->getIdentifier()->getFields();
+
+		$dstSqlFields = $this->mtm->getEncapsulantProxyProperty()->getFields();
+
+		foreach ($srcSqlFields as $k => $v) {
+			$condition->add(
+				Expression::eq(
+					new SqlColumn($srcSqlFields[$k], $childrenTable),
+					new SqlColumn($dstSqlFields[$k], $proxyTable)
+				)
+			);
+		}
+
+		$query->join(
+			new SqlConditionalJoin(
+				new SelectQuerySource(
+					new SqlIdentifier($proxyTable)
+				),
+				new SqlJoinMethod($joinMethod),
+				$condition
+			)
+		);
+
+		$columnName = $this->mtm->getContainerProxyProperty()->getField();
+		$query->andWhere(
+			Expression::eq(
+				new SqlColumn(
+					$columnName,
+					$this->mtm->getProxy()->getPhysicalSchema()->getTable()
+				),
+				new SqlValue($this->getParentObject()->_getId())
+			)
+		);
+
+		return $query;
 	}
 }
 

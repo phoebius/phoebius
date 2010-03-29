@@ -383,10 +383,21 @@ final class EntityQuery implements ISqlSelectQuery
 			return new ExpressionChain;
 		}
 
-		return $this->condition->toSubjected(new EntityQueryBuilder($this->entity));
+		$eqb = new EntityQueryBuilder($this->entity);
+		$subjected = $this->condition->toSubjected($eqb);
+
+		Assert::isTrue(
+			sizeof($eqb->getSelectQuerySources()) == 1,
+			'do not refer to %s encapsulants here',
+			$this->entity->getLogicalSchema()->getEntityName()
+		);
+
+		return $subjected;
 	}
 
 	/**
+	 * Performs a deletion of persisten objects.
+	 *
 	 * @return int
 	 */
 	function delete()

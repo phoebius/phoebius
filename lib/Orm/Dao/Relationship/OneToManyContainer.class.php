@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2010 phoebius.org
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,6 +17,13 @@
  ************************************************************************************************/
 
 /**
+ * One-to-many container implementation.
+ *
+ * All we need to know from outer world is:
+ *  - the parent object
+ *  - children entity info
+ *  - property info that holds the association to the parent object
+ *
  * @ingroup Orm_Dao
  */
 class OneToManyContainer extends Container
@@ -52,24 +59,6 @@ class OneToManyContainer extends Container
 		$this->count = $this->getSelectQuery()->getCount();
 
 		return $this->count;
-	}
-
-	private function getSelectQuery()
-	{
-		$query = clone $this->getQuery();
-
-		$this->fillQuery($query);
-
-		return $query;
-	}
-
-	private function fillQuery(EntityQuery $query)
-	{
-		$query->andWhere(
-			Expression::eq(
-				$this->referentialProperty, $this->getParentObject()
-			)
-		);
 	}
 
 	function clean()
@@ -140,6 +129,24 @@ class OneToManyContainer extends Container
 		$this->clean();
 
 		return $count;
+	}
+
+	private function getSelectQuery()
+	{
+		$query = clone $this->getQuery();
+
+		$this->fillQuery($query);
+
+		return $query;
+	}
+
+	private function fillQuery(EntityQuery $query)
+	{
+		$query->andWhere(
+			Expression::eq(
+				$this->referentialProperty, $this->getParentObject()
+			)
+		);
 	}
 }
 

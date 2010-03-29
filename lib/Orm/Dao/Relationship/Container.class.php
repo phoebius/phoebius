@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 phoebius.org
+ * Copyright (c) 2010 phoebius.org
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,6 +17,24 @@
  ************************************************************************************************/
 
 /**
+ * An encapsulant container implementation.
+ *
+ * A container provides native API to handle collections of objects that refer to an entity.
+ *
+ * See OneToManyContainer for one-to-many relations, and ManyToManyContainer for many-to-many
+ * relations.
+ *
+ * See Container::setQuery() to filter the results.
+ *
+ * Container::fetch() fetches the list.
+ *
+ * Container::getList() provides a list of fetched encapsulants.
+ *
+ * Container::setList() and Container::mergeList() replaces and merges the list of new encapsulants
+ * (missing objects will cause association to be dropped, new objects will create a new association).
+ *
+ * Finally, Container::save() to save the collection.
+ *
  * @ingroup Orm_Dao
  */
 abstract class Container implements IteratorAggregate
@@ -62,11 +80,15 @@ abstract class Container implements IteratorAggregate
 	private $query;
 
 	/**
+	 * Fetches the collection
+	 *
 	 * @return Container an object itself
 	 */
 	abstract function fetch();
 
 	/**
+	 * Saves the collection
+	 *
 	 * @return Container an object itself
 	 */
 	abstract function save();
@@ -96,15 +118,14 @@ abstract class Container implements IteratorAggregate
 		$this->query = new EntityQuery($this->children);
 	}
 
-	/**
-	 * @return ArrayIterator
-	 */
 	function getIterator()
 	{
 		return new ArrayIterator($this->getList());
 	}
 
 	/**
+	 * Gets the children entity info object
+	 *
 	 * @return IQueryable
 	 */
 	protected function getChildren()
@@ -113,6 +134,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Gets the parent object children belong to
+	 *
 	 * @return IdentifiableOrmEntity
 	 */
 	function getParentObject()
@@ -121,7 +144,7 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
-	 * Must be overridden to optimize calls
+	 * Gets the number of children belonging to the parent. Must be overridden to optimize calls
 	 * @return integer
 	 */
 	function getCount()
@@ -130,6 +153,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Determines whether collection is fetched or not
+	 *
 	 * @return boolean
 	 */
 	function isFetched()
@@ -138,6 +163,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Specifies whether collection is readonly or not
+	 *
 	 * @return boolean
 	 */
 	function isReadonly()
@@ -146,6 +173,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Gets the collection containing objects
+	 *
 	 * @return array
 	 */
 	function getList()
@@ -158,7 +187,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
-	 * Just cleans fetched list
+	 * Just cleans a fetched list
+	 *
 	 * @return Container an object itself
 	 */
 	function clean()
@@ -171,6 +201,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Sets the new collection of objects that should belong to the parent object
+	 *
 	 * @return Container an object itself
 	 */
 	function setList(array $list)
@@ -183,6 +215,9 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Sets the collection of objects that should belong to the parent object appending it
+	 * to already defined collections
+	 *
 	 * @return Container an object itself
 	 */
 	function mergeList(array $list)
@@ -198,6 +233,11 @@ abstract class Container implements IteratorAggregate
 		return $this;
 	}
 
+	/**
+	 * Sets the "filter" object
+	 *
+	 * @return Container an object itself
+	 */
 	function setQuery(EntityQuery $query)
 	{
 		Assert::isTrue($query->getQueryRoot() === $this->children);
@@ -208,6 +248,8 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
+	 * Gets the query for selecting children
+	 *
 	 * @return EntityQuery
 	 */
 	protected function getQuery()
@@ -216,15 +258,16 @@ abstract class Container implements IteratorAggregate
 	}
 
 	/**
-	 * @return Container
+	 * Marks the children that currently defined in a collection as entities with persisten
+	 * association to the parent
+	 *
+	 * @return void
 	 */
 	protected function trackClones()
 	{
 		foreach ($this->list as $object) {
 			$this->tracked[] = spl_object_hash($object);
 		}
-
-		return $this;
 	}
 
 	/**
