@@ -150,9 +150,9 @@ class XmlOrmDomainBuilder
 				$class->setIdentifier($id);
 			}
 			else if ($class->hasDao()) {
-				throw new OrmModelIntegrityException(
-					'dao-related entities MUST be identifiable'
-				);
+//				throw new OrmModelIntegrityException(
+//					$class->getName() . 'marked as dao-related and thus should be identifiable'
+//				);
 			}
 
 			// collect props and containers for further processing
