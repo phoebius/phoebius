@@ -46,6 +46,19 @@ abstract class ContainerPropertyType extends OrmPropertyType
 		$this->encapsulant = $encapsulant;
 	}
 
+	function getContainerClassName(OrmProperty $property)
+	{
+		return
+			$this->container->getLogicalSchema()->getEntityName()
+			. ucfirst($property->getName())
+			. 'Container';
+	}
+
+	function getAutoContainerClassName(OrmProperty $property)
+	{
+		return 'Auto' . $this->getContainerClassName($property);
+	}
+
 	final function getSqlTypes()
 	{
 		return array ();
@@ -97,7 +110,7 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	{
 		$propertyName = $property->getName();
 		$capitalizedPropertyName = ucfirst($propertyName);
-		$class = $capitalizedPropertyName . 'Container';
+		$class = $this->getContainerClassName($property);
 
 		return <<<EOT
 	/**

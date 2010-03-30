@@ -34,6 +34,10 @@ class OrmOneToManyAutoClassCodeConstructor extends OrmRelatedClassCodeConstructo
 	 */
 	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
 	{
+		Assert::isTrue(
+			$ormProperty->getType() instanceof OneToManyContainerPropertyType
+		);
+
 		$this->ormProperty = $ormProperty;
 
 		parent::__construct($ormClass);
@@ -46,7 +50,7 @@ class OrmOneToManyAutoClassCodeConstructor extends OrmRelatedClassCodeConstructo
 
 	function getClassName()
 	{
-		return 'Auto_' . ucfirst($this->ormProperty->getName()) . 'Container';
+		return $this->ormProperty->getType()->getAutoContainerClassName($this->ormProperty);
 	}
 
 	protected function findMembers()
