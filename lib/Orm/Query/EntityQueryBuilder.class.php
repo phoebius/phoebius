@@ -178,11 +178,6 @@ final class EntityQueryBuilder implements ISubjectivity
 		}
 
 		if (is_scalar($subject)) {
-
-			if ($this->hasId($subject)) {
-				return new SqlIdentifier($subject);
-			}
-
 			try {
 				return
 					$this->subject(
@@ -191,6 +186,10 @@ final class EntityQueryBuilder implements ISubjectivity
 			}
 			catch (ArgumentException $e) {
 				// probably, a value, not a property path
+			}
+
+			if ($this->hasId($subject)) {
+				return new SqlIdentifier($subject);
 			}
 		}
 		else {
@@ -275,9 +274,13 @@ final class EntityQueryBuilder implements ISubjectivity
 			$builder = $this->joined[$property->getName()] =
 				new self (
 					$type->getContainer(),
-					$this->alias . '_' . $property->getName()
+					(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT
+						? $this->alias
+						: substr(sha1($this->alias), 0, 6)
+					) . '_' . $property->getName()
 				);
 
+			$builder->joins = array();
 			$this->join($property, $type, $builder, end($this->joins));
 		}
 
