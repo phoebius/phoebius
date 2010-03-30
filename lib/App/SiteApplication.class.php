@@ -88,6 +88,12 @@ class SiteApplication
 	 */
 	function run()
 	{
+		if (APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT) {
+			$trace = $this->router->getTrace($this->webContext);
+			$trace->handle();
+			return;
+		}
+
 		try {
 			try {
 				$trace = $this->router->getTrace($this->webContext);
@@ -101,7 +107,7 @@ class SiteApplication
 					throw $e;
 			}
 		}
-		catch (Exception $e) {
+		catch (ApplicationException $e) {
 			$this->handle500($e, isset($trace) ? $trace : null);
 		}
 	}

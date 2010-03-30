@@ -41,7 +41,7 @@ class OrmManyToManyAutoClassCodeConstructor extends OrmContainerClassCodeConstru
 		parent::__construct(
 			\$parent,
 			{$this->propertyType->getEncapsulant()->getEntityName()}::orm(),
-			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
+			{$this->ormClass->getEntityName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
 			\$readOnly
 		);
 	}

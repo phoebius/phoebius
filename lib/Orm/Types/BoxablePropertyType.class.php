@@ -61,7 +61,7 @@ class BoxablePropertyType extends PrimitivePropertyType
 
 		$value = reset($tuple);
 
-		if (is_null($value) && $this->isNullable()) {
+		if (is_null($value)) {
 			return null;
 		}
 		else {
