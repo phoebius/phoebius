@@ -21,28 +21,8 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmManyToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
+class OrmManyToManyClassCodeConstructor extends OrmContainerClassCodeConstructor
 {
-	/**
-	 * @var OrmProperty
-	 */
-	private $ormProperty;
-
-	/**
-	 * @param OrmClass $ormClass object that represents a class to be generated
-	 * @param OrmProperty $ormProperty property that representa many-to-many relation
-	 */
-	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
-	{
-		Assert::isTrue(
-			$ormProperty->getType() instanceof ManyToManyContainerPropertyType
-		);
-
-		$this->ormProperty = $ormProperty;
-
-		parent::__construct($ormClass);
-	}
-
 	function isPublicEditable()
 	{
 		return true;
@@ -50,12 +30,12 @@ class OrmManyToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
 
 	function getClassName()
 	{
-		return $this->ormProperty->getType()->getContainerClassName($this->ormProperty);
+		return $this->propertyType->getContainerClassName($this->ormProperty);
 	}
 
 	protected function getExtendsClassName()
 	{
-		return $this->ormProperty->getType()->getAutoContainerClassName($this->ormProperty);
+		return $this->propertyType->getAutoContainerClassName($this->ormProperty);
 	}
 }
 

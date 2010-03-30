@@ -21,28 +21,8 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmOneToManyClassCodeConstructor extends OrmRelatedClassCodeConstructor
+class OrmOneToManyClassCodeConstructor extends OrmContainerClassCodeConstructor
 {
-	/**
-	 * @var OrmProperty
-	 */
-	private $ormProperty;
-
-	/**
-	 * @param OrmClass $ormClass object that represents a class to be generated
-	 * @param OrmProperty $ormProperty property that representa one-to-many relation
-	 */
-	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
-	{
-		Assert::isTrue(
-			$ormProperty->getType() instanceof OneToManyContainerPropertyType
-		);
-
-		$this->ormProperty = $ormProperty;
-
-		parent::__construct($ormClass);
-	}
-
 	function isPublicEditable()
 	{
 		return true;

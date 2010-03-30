@@ -21,28 +21,8 @@
  *
  * @ingroup Orm_Domain_CodeGenerator
  */
-class OrmManyToManyAutoClassCodeConstructor extends OrmRelatedClassCodeConstructor
+class OrmManyToManyAutoClassCodeConstructor extends OrmContainerClassCodeConstructor
 {
-	/**
-	 * @var OrmProperty
-	 */
-	private $ormProperty;
-
-	/**
-	 * @param OrmClass $ormClass object that represents a class to be generated
-	 * @param OrmProperty $ormProperty property that representa many-to-many relation
-	 */
-	function __construct(OrmClass $ormClass, OrmProperty $ormProperty)
-	{
-		Assert::isTrue(
-			$ormProperty->getType() instanceof ManyToManyContainerPropertyType
-		);
-
-		$this->ormProperty = $ormProperty;
-
-		parent::__construct($ormClass);
-	}
-
 	function isPublicEditable()
 	{
 		return false;
@@ -50,20 +30,18 @@ class OrmManyToManyAutoClassCodeConstructor extends OrmRelatedClassCodeConstruct
 
 	function getClassName()
 	{
-		return $this->ormProperty->getType()->getAutoContainerClassName($this->ormProperty);
+		return $this->propertyType->getAutoContainerClassName($this->ormProperty);
 	}
 
 	protected function findMembers()
 	{
-		$type = $this->ormProperty->getType();
-
 		$this->classMethods[] = <<<EOT
 	function __construct({$this->ormClass->getName()} \$parent, \$readOnly = true)
 	{
 		parent::__construct(
 			\$parent,
-			{$type->getEncapsulant()->getEntityName()}::orm(),
-			{$this->ormClass->getName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
+			{$this->propertyType->getEncapsulant()->getEntityName()}::orm(),
+			{$this->propertyType->getEncapsulant()->getEntityName()}::orm()->getLogicalSchema()->getProperty('{$this->ormProperty->getName()}'),
 			\$readOnly
 		);
 	}
