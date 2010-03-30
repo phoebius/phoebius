@@ -148,7 +148,9 @@ class ChainedRouter implements IRouteTable, IRouter
 
 	function getFallbackTrace(Trace $parentTrace)
 	{
-		Assert::isNotEmpty($this->fallbackRoute, 'fallback route not found');
+		if (!$this->fallbackRoute){
+			return null;
+		}
 
 		return $this->fallbackRoute->trace($this, $parentTrace->getWebContext(), $parentTrace);
 	}

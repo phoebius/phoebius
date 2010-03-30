@@ -127,7 +127,7 @@ final class Trace extends Collection
 	 */
 	function handle()
 	{
-		$this->route->getDispacher()->handle($this);
+		$this->route->getDispatcher()->handle($this);
 
 		$this->isHandled = true;
 	}

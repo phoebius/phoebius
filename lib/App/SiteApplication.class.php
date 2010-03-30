@@ -62,6 +62,16 @@ class SiteApplication
 	}
 
 	/**
+	 * Gets the WebContext
+	 *
+	 * @return WebContext
+	 */
+	function getWebContext()
+	{
+		return $this->webContext;
+	}
+
+	/**
 	 * Gets the application router
 	 *
 	 * @return IRouter
@@ -85,11 +95,14 @@ class SiteApplication
 			}
 			catch (RouteException $e) {
 				$trace = $this->router->getFallbackTrace($trace);
-				$trace->handle();
+				if ($trace)
+					$trace->handle();
+				else
+					throw $e;
 			}
 		}
 		catch (Exception $e) {
-			$this->handle500($e);
+			$this->handle500($e, isset($trace) ? $trace : null);
 		}
 	}
 
@@ -111,9 +124,10 @@ class SiteApplication
 	 * The failover stub. Handles the application fault
 	 *
 	 * @param Exception $e uncaught exception that caused fault
+	 * @param Trace $trace handled trace that caused an exception, if built.
 	 * @return void
 	 */
-	protected function handle500(Exception $e)
+	protected function handle500(Exception $e, Trace $trace = null)
 	{
 		$response = $this->webContext->getResponse();
 

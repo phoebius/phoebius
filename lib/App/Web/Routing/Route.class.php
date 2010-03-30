@@ -118,7 +118,7 @@ class Route
 	 *
 	 * @return IRouteDispatcher
 	 */
-	function getDispacher()
+	function getDispatcher()
 	{
 		return $this->dispatcher;
 	}
