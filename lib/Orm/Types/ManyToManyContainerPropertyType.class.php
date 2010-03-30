@@ -88,8 +88,10 @@ class ManyToManyContainerPropertyType extends ContainerPropertyType
 
 		return array(
 			$proxyName . '::orm()',
-			$proxyName . '::orm()->getLogicalSchema()->getProperty(\'' . $this->container->getName() . '\')',
-			$proxyName . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulant->getName() . '\')',
+			$this->container->toPhpCall(),
+			$this->encapsulant->toPhpCall()
+			//$proxyName . '::orm()->getLogicalSchema()->getProperty(\'' . $this->container->getName() . '\')',
+			//$proxyName . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulant->getName() . '\')',
 		);
 	}
 }

@@ -56,7 +56,8 @@ class OneToManyContainerPropertyType extends ContainerPropertyType
 		return array(
 			$this->getContainer()->getLogicalSchema()->getEntityName() . '::orm()',
 			$this->getEncapsulant()->getLogicalSchema()->getEntityName() . '::orm()',
-			$this->getEncapsulant()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulantProperty->getName() . '\')',
+			$this->encapsulantProperty->toPhpCall()
+		//	$this->getEncapsulant()->getLogicalSchema()->getName() . '::orm()->getLogicalSchema()->getProperty(\'' . $this->encapsulantProperty->getName() . '\')',
 		);
 	}
 }

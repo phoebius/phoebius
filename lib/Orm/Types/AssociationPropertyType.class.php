@@ -114,7 +114,7 @@ final class AssociationPropertyType extends OrmPropertyType
 		}
 
 		if (is_null($id)) {
-			if (!$this->isNullable()) {
+			if (!$this->multiplicity->isNullable()) {
 				throw new OrmModelIntegrityException('cannot be null');
 			}
 
