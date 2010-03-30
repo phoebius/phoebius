@@ -109,6 +109,18 @@ final class Timestamp extends Date
 		return $this->time;
 	}
 
+	/**
+	 * Sets the new time modifying the current one
+	 * @param Time $time
+	 * @return Timestamp
+	 */
+	function setTime(Time $time)
+	{
+		$this->modify($time->toFormattedString());
+
+		return $this;
+	}
+
 	function equals(Date $timestamp)
 	{
 		return ($this->int == $timestamp->int);
