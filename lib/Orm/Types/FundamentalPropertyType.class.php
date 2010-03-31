@@ -111,7 +111,7 @@ final class FundamentalPropertyType
 	function disassemble($value)
 	{
 		if (!is_null($value) && $this->type->is(DBType::BOOLEAN)) {
-			return new SqlBooleanValue($value);
+			return array(new SqlBooleanValue($value));
 		}
 
 		return parent::disassemble($value);
