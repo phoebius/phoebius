@@ -25,8 +25,8 @@
 class AggrProjection implements IProjection
 {
 	private $func;
-	private $expression;
-	private $alias;
+	protected $expression;
+	protected $alias;
 
 	/**
 	 * @param string $func name of the aggregate
@@ -58,15 +58,6 @@ class AggrProjection implements IProjection
 	}
 
 	/**
-	 * Gets the expression to be aggregated
-	 * @return mixed
-	 */
-	protected function getExpression()
-	{
-		return $this->expression;
-	}
-
-	/**
 	 * Create a SQLFunction with the expression as the argument
 	 *
 	 * @param EntityQuery $entityQuery
@@ -78,7 +69,7 @@ class AggrProjection implements IProjection
 			new AliasedSqlValueExpression(
 				new SqlFunction(
 					$this->getFunc(),
-					$entityQueryBuilder->subject($this->getExpression())
+					$entityQueryBuilder->subject($this->expression)
 				),
 				$this->alias
 			);

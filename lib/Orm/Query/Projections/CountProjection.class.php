@@ -42,13 +42,13 @@ class CountProjection extends AggrProjection
 		);
 	}
 
-	protected function getExpression()
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
 		if ($this->lookupProperty) {
-			return $builder->getEntity()->getLogicalSchema()->getIdentifier();
+			$this->expression = $entityQueryBuilder->getEntity()->getLogicalSchema()->getIdentifier();
 		}
 
-		return parent::getExpression();
+		return parent::fill($selectQuery, $entityQueryBuilder);
 	}
 }
 
