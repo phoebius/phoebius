@@ -59,6 +59,14 @@ interface IDialect
 	 * @return array of ISqlQuery
 	 */
 	function getTableQuerySet(DBTable $table);
+
+	/**
+	 * Gets the sql-compatible representation of boolean value
+	 *
+	 * @param boolean $value
+	 * @return string
+	 */
+	function getSqlBooleanValue($value);
 }
 
 ?>

@@ -165,6 +165,15 @@ class PgSqlDialect extends Dialect
 	{
 		return $tableName . '_' . $columnName . '_sq';
 	}
+
+	function getSqlBooleanValue($value)
+	{
+		Assert::isBoolean($value);
+
+		return $value
+			? 't'
+			: 'f';
+	}
 }
 
 ?>

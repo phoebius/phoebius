@@ -27,18 +27,7 @@ class SqlBooleanValue extends SqlValue
 		$value = $this->getValue();
 
 		if (!is_null($value)) {
-			switch ($dialect->getDBDriver()->getValue()) {
-				case DBDriver::PGSQL: {
-					$value = $value ? 't' : 'f';
-				}
-
-				case DBDriver::MYSQL:
-				default: {
-					$value = $value ? 1 : 0;
-				}
-			}
-
-			return $dialect->quoteValue($value);
+			return $dialect->quoteValue($dialect->getSqlBooleanValue($value));
 		}
 
 		return parent::toDialectString($dialect);

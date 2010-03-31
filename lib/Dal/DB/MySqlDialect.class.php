@@ -182,6 +182,15 @@ class MySqlDialect extends Dialect
 
 		return $queries;
 	}
+
+	function getSqlBooleanValue($value)
+	{
+		Assert::isBoolean($value);
+
+		return $value
+			? 1
+			: 0;
+	}
 }
 
 ?>
