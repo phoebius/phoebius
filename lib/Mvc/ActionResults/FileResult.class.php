@@ -86,8 +86,7 @@ class FileResult implements IActionResult
 			"attachment; filename=\"{$this->filename}\"; size={$fileSize}; creation-date={$creation}; modification-date={$modif}"
 		);
 
-		$response->outFile($this->filepath);
-		$response->finish();
+		$response->writeFile($this->filepath);
 	}
 
 	function __destruct()

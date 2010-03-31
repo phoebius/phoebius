@@ -74,6 +74,15 @@ interface IWebResponse extends IAppResponse
 	 * @return void
 	 */
 	function redirect(HttpUrl $url);
+
+	/**
+	 * Writes the contents of the file to the response.
+	 *
+	 * This method is WebResponse::write() optimized for files.
+	 *
+	 * @return void
+	 */
+	function writeFile($filepath);
 }
 
 ?>

@@ -55,18 +55,11 @@ class WebResponse implements IWebResponse
 		return $this;
 	}
 
-	/**
-	 * Writes the contents of the file to the response.
-	 *
-	 * This method is WebResponse::write() optimized for files.
-	 *
-	 * @return WebResponse itself
-	 */
 	function writeFile($filepath)
 	{
 		readfile($filepath);
 
-		return $this;
+		$this->finish();
 	}
 
 	function finish()
