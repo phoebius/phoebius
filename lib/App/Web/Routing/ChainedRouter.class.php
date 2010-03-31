@@ -89,30 +89,32 @@ class ChainedRouter implements IRouteTable, IRouter
 	 * @param array $parameters array of parameters to be appended to Trace
 	 * @return ChainedRouter itself
 	 */
-	function route($name, $uri, array $parameters = array())
+	function route($name, $uri = null, array $parameters = array())
 	{
 		Assert::isScalar($name);
-		Assert::isScalar($uri);
+		Assert::isScalarOrNull($uri);
 
 		$rules = array();
 
-		$parsedUrlPattern = parse_url($uri);
+		if ($uri) {
+			$parsedUrlPattern = parse_url($uri);
 
-		if (isset($parsedUrlPattern['path'])) {
-			$rules[] = new PathRewriteRule($parsedUrlPattern['path']);
-		}
+			if (isset($parsedUrlPattern['path'])) {
+				$rules[] = new PathRewriteRule($parsedUrlPattern['path']);
+			}
 
-		if (isset($parsedUrlPattern['query'])) {
-			$queryStringVariables = array();
-			parse_str($parsedUrlPattern['query'], $queryStringVariables);
+			if (isset($parsedUrlPattern['query'])) {
+				$queryStringVariables = array();
+				parse_str($parsedUrlPattern['query'], $queryStringVariables);
 
-			foreach ($queryStringVariables as $qsVar => $qsValue) {
-				$rules[] = new RequestVarImportRule(
-					$qsVar,
-					new WebRequestPart(WebRequestPart::GET),
-					!empty($qsValue),
-					empty($qsValue) ? null : $qsValue
-				);
+				foreach ($queryStringVariables as $qsVar => $qsValue) {
+					$rules[] = new RequestVarImportRule(
+						$qsVar,
+						new WebRequestPart(WebRequestPart::GET),
+						!empty($qsValue),
+						empty($qsValue) ? null : $qsValue
+					);
+				}
 			}
 		}
 
