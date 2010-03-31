@@ -108,6 +108,15 @@ final class FundamentalPropertyType
 		return $value;
 	}
 
+	function disassemble($value)
+	{
+		if (!is_null($value) && $this->type->is(DBType::BOOLEAN)) {
+			return new SqlBooleanValue($value);
+		}
+
+		return parent::disassemble($value);
+	}
+
 	protected function getCtorArgumentsPhpCode()
 	{
 		return array(
