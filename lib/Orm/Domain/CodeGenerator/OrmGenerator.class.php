@@ -48,8 +48,6 @@ class OrmGenerator
 		foreach (array('autoClassDir', 'publicClassDir') as $_) {
 			$this->{$_} = $$_;
 		}
-
-		$this->db = $db;
 	}
 
 	/**

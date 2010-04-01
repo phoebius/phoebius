@@ -21,11 +21,18 @@ require dirname(__FILE__).'/../etc/app.init.php';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+function message($message)
+{
+	echo $message, PHP_EOL;
+}
+
 function help()
 {
 	echo <<<EOT
 
-$ make.php [options] [domain-schema.xml]
+Usage:
+
+  $ make.php [options] [domain-schema.xml]
 
 
 General options:
@@ -81,13 +88,14 @@ EOT;
 function stop($message = null)
 {
 	if ($message) {
-		echo $message, PHP_EOL, PHP_EOL;
+		message($message);
 	}
 
 	echo <<<EOT
-type
 
- $ {$GLOBALS['argv'][0]} --help
+Use
+
+  $ {$GLOBALS['argv'][0]} --help
 
 for more information.
 
