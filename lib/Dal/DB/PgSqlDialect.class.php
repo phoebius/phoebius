@@ -163,7 +163,7 @@ class PgSqlDialect extends Dialect
 	 */
 	function getSequenceName($tableName, $columnName)
 	{
-		return $tableName . '_' . $columnName . '_sq';
+		return strtolower($tableName . '_' . $columnName . '_sq');
 	}
 
 	function getSqlBooleanValue($value)
