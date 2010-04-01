@@ -46,15 +46,18 @@ abstract class CodeConstructor
 	protected function getFileHeader()
 	{
 		$product = PHOEBIUS_FULL_PRODUCT_NAME;
+		$now = date('Y/m/d H:i');
 		$message = $this->getHeaderMessage();
 
 		return <<<EOT
 <?php
 /* ***********************************************************************************************
  *
- * {$product}
+ * {$product} Copyright (c) 2010 Scand Ltd.
  *
  * **********************************************************************************************
+ *
+ * Generated at {$now}
  *
  * {$message}
  *

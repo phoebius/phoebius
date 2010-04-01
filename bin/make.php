@@ -19,29 +19,61 @@
 
 require dirname(__FILE__).'/../etc/app.init.php';
 
-Autoloader::getInstance()->clearCache();
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function help()
 {
 	echo <<<EOT
-Usage:
-# make.php [options] [domain-schema.xml]
 
-Possible options:
- --app-dir=<dir>		path to the directory where unified application FS resides.
- 						If not specified, the current directory is used.
+$ make.php [options] [domain-schema.xml]
 
- --regenerate-public	forces make to regenerate public files
 
- --public=<dir>			not yet implemented
+General options:
 
- --auto=<dir>			not yet implemented
+  --app-dir=<dir>        an \$app, a path to the directory where an application resides. Can be
+                         either an absolute path or a path relative to the current directory.
 
- --schema=<file>		not yet implemented
+                         Application directory should contain at least \$app/etc/config.php.
+                         If not specified, the current directory is used.
 
- --dry-run				not yet implemented
+  --host-config=<name>   name of the host configuration resides at \$app/<name>/config.php.
+
+  --dry-run              modify nothing, show the results only. Currently not implemented.
+
+  --help, -h             show this help.
+
+
+Code generator options:
+
+  --code                 generate and ORM over the defined schema: an auxiliary PHP classes
+                         and business-entities.
+
+  --regenerate-public    regenerate public files if already generated. This forces a --code option
+                         to be switched on automatically.
+
+  --public-dir=<dir>     write generated public class' files to <dir>. Default is \$app/lib/Domain.
+                         Path is treated as relative to the application directory (\$app).
+
+  --auto-dir=<dir>       write generated internal class' files to <dir>. Default is \$app/var/lib/Domain.
+                         Path is treated as relative to the application directory (\$app).
+
+
+Database schema generator options:
+
+  --schema               generate database schema. You should set the name of the database config
+                         either in domain-schema.xml (<domain db-schema="<name>">) or
+                         using the --db option explicitly.
+
+  --db=<name>            use this database to generate schema (should be added to DBPool). This
+                         can be set implicitly in domain-schema.xml (<domain db-schema="<name>">).
+                         This forces a --schema option to be switched on automatically.
+
+  --import               import schema to the database. Currently not implemented.
+
+  --schema-file=<file>   write database schema to <file>.
+                         Default is \$app/var/db/<db_driver>-<domain-schema_name>.sql.
+                         Path is treated as relative to the application directory (\$app).
+                         This forces a --schema option to be switched on automatically.
 
 EOT;
 }
@@ -52,14 +84,36 @@ function stop($message = null)
 		echo $message, PHP_EOL, PHP_EOL;
 	}
 
-	help();
+	echo <<<EOT
+type
+
+ $ {$GLOBALS['argv'][0]} --help
+
+for more information.
+
+
+EOT;
+
+	//help();
 
 	exit(1);
 }
 
 $appDir = getcwd();
-$regeneratePublic = false;
+$hostConfig = null;
 $dryRun = false;
+
+$code = false;
+$regeneratePublic = false;
+$publicDir = 'lib/Domain';
+$autoDir = 'var/lib/Domain';
+
+$schema = false;
+$db = null;
+$import = false;
+$schemaFile = null;
+$dbObject = null;
+
 
 $args = $argv;
 array_shift($args);
@@ -74,18 +128,80 @@ foreach ($args as $arg) {
 		}
 
 		switch ($k) {
+
+			//
+			// general
+			//
+
 			case '--app-dir': {
 				$appDir = realpath($v);
 				break;
 			}
 
-			case '--regenerate-public': {
-				$regeneratePublic = true;
+			case '--host-config': {
+				$hostConfig = $v;
 				break;
 			}
 
 			case '--dry-run': {
 				$dryRun = true;
+				break;
+			}
+
+			case '--help':
+			case '-h': {
+				help();
+
+				exit;
+			}
+
+			//
+			// code generator
+			//
+
+			case '--code': {
+				$code = true;
+				break;
+			}
+
+			case '--regenerate-public': {
+				$code = true;
+				$regeneratePublic = true;
+				break;
+			}
+
+			case '--public-dir': {
+				$publicDir = $v;
+				break;
+			}
+
+			case '--auto-dir': {
+				$autoDir = $v;
+			}
+
+			//
+			// schema generator
+			//
+
+			case '--schema': {
+				$schema = true;
+				break;
+			}
+
+			case '--db': {
+				$schema = true;
+				$db = $v;
+				break;
+			}
+
+			case '--import': {
+				$import = true;
+				break;
+			}
+
+			case '--schema-file': {
+				$schema = true;
+				$schemaFile = $v;
 				break;
 			}
 
@@ -96,16 +212,28 @@ foreach ($args as $arg) {
 	}
 }
 
+if (!$code && !$schema) {
+	stop('Nothing to do: neither --code nor --schema is set');
+}
+
 if (!is_dir($appDir)) {
-	stop ("Unknown path to the application {$appDir}");
+	stop ("Unknown path to the application: {$appDir}");
+}
+
+chdir($appDir);
+
+foreach (array('publicDir', 'autoDir') as $dir) {
+	$$dir = $appDir . '/' . $$dir;
+	if (!is_dir($$dir)) {
+		mkdir($$dir, 0755, true);
+	}
 }
 
 $xmlSchema = end($args);
-if ($xmlSchema && $xmlSchema{0} != '-') {
+if ($argv > 1 && $xmlSchema && $xmlSchema{0} != '-') {
 	$prefixes = array(
 		'',
 		$appDir . '/',
-		getcwd() . '/',
 	);
 
 	foreach ($prefixes as $prefix) {
@@ -120,7 +248,7 @@ else {
 }
 
 if (!file_exists($xmlSchema)) {
-	stop ('XML Schema of domain not found at ' . $xmlSchema);
+	stop ('Domain schema not found (' . $xmlSchema . ' does not exist)');
 }
 
 define('APP_ROOT', $appDir);
@@ -130,10 +258,21 @@ if (file_exists($applicationConfig)) {
 	include $applicationConfig;
 }
 
-$hostConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . APP_SLOT . DIRECTORY_SEPARATOR . 'config.php';
-if (file_exists($hostConfig)) {
-	include $hostConfig;
+if ($hostConfig) {
+	$hostConfigFile = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . $hostConfig . DIRECTORY_SEPARATOR . 'config.php';
+	if (file_exists($hostConfigFile)) {
+		include $hostConfigFile;
+	}
+	else {
+		stop ("`{$hostConfig}` host config does not exist");
+	}
 }
+
+if (!defined('APP_SLOT_CONFIGURATION')) {
+	define ('APP_SLOT_CONFIGURATION', SLOT_PRESET_PRODUCTION);
+}
+
+Autoloader::getInstance()->clearCache();
 
 $domainBuilder = new XmlOrmDomainBuilder($xmlSchema);
 
@@ -141,21 +280,58 @@ try {
 
 	$ormDomain = $domainBuilder->build();
 
-	$schemaDir = APP_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'db';
-	$autoRoot = APP_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Domain';
-	$publicRoot = APP_ROOT . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Domain';
+	if ($code) {
+		$generator = new OrmGenerator($autoDir, $publicDir);
 
-	foreach (array($schemaDir, $autoRoot, $publicRoot) as $_) {
-		if (!is_dir($_)) {
-			mkdir($_, 0755, true);
+		if ($regeneratePublic) {
+			$generator->regeneratePublic();
 		}
+
+		$generator->generate($ormDomain);
 	}
 
-	$generator = new OrmGenerator($schemaDir, $autoRoot, $publicRoot);
-	if ($regeneratePublic) {
-		$generator->regeneratePublic();
+	if ($schema) {
+		if (!$db && $ormDomain->getDbSchema()) {
+			$db = $ormDomain->getDbSchema();
+		}
+
+		if ($db) {
+			try {
+				$dbObject = DBPool::get($db);
+			}
+			catch (ArgumentException $e) {
+				stop ("Unknown database reference: $db");
+			}
+		}
+
+		if ($schemaFile) {
+			$schemaFile = $appDir . DIRECTORY_SEPARATOR . $schemaFile;
+		}
+		else {
+			$schemaFile =
+				$appDir
+				. DIRECTORY_SEPARATOR . 'var'
+				. DIRECTORY_SEPARATOR . 'db'
+				. DIRECTORY_SEPARATOR
+				. strtolower($dbObject->getDialect()->getDBDriver()->getValue())
+				. '-' . pathinfo($xmlSchema, PATHINFO_FILENAME) . '.sql';
+
+			$dir = dirname($schemaFile);
+			if (!is_dir($dir)) {
+				mkdir($dir, 0755, true);
+			}
+		}
+
+		$schemaBuilder = new DBSchemaBuilder($ormDomain);
+
+		$schemaConstructor = new SqlSchemaConstructor($schemaBuilder->build());
+
+		$schemaConstructor
+			->make(
+				new FileWriteStream($schemaFile),
+				$dbObject->getDialect()
+			);
 	}
-	$generator->generate($ormDomain);
 }
 catch (Exception $e) {
 	stop ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
