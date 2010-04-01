@@ -280,6 +280,7 @@ abstract class DB
 			'already in transaction'
 		);
 
+		$this->connect(false);
 		$this->transaction = new Transaction($this);
 
 		return $this->transaction;
