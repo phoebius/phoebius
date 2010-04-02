@@ -147,21 +147,27 @@ class MySqlDialect extends Dialect
 		$type = parent::getTypeRepresentation($dbType);
 
 		if ($dbType->isGenerated()) {
-			$type .= ' AUTO_INCREMENT';
+			$type .= ' AUTO_INCREMENT PRIMARY KEY';
 		}
 
 		return $type;
 	}
 
-	function getTableQuerySet(DBTable $table)
+	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
 	{
 		$table = clone $table;
 
-		$queries = array(
-			new CreateTableQuery($table)
-		);
+		$queries = array();
+
+		if ($includeCreateTable) {
+			$queries[] = new CreateTableQuery($table, true);
+		}
 
 		foreach ($table->getConstraints() as $constraint) {
+			if (!$constraint instanceof DBPrimaryKeyConstraint) {
+				$queries[] = new CreateConstraintQuery($table, $constraint);
+			}
+
 			$columns = array();
 
 			// create indexes

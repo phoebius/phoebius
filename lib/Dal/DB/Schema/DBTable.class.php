@@ -198,7 +198,7 @@ class DBTable
 	 */
 	function toQueries(IDialect $dialect)
 	{
-		return $dialect->getTableQuerySet($this);
+		return $dialect->getTableQuerySet($this, true);
 	}
 }
 

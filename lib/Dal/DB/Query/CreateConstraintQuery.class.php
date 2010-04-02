@@ -17,49 +17,42 @@
  ************************************************************************************************/
 
 /**
- * Represents a UNIQUE constaint. It is a database constraint that ensures that the data contained
- * in a field or a group of fields is unique with respect to all the rows in the table
+ * Represents a query for altering tables for creating constraints
  *
- * @ingroup Dal_DB_Schema
+ * @ingroup Dal_DB_Query
  */
-class DBUniqueConstraint extends DBConstraint
+final class CreateConstraintQuery implements ISqlQuery
 {
 	/**
-	 * @var SqlFieldArray
+	 * @var DBTable
 	 */
-	private $fields;
+	private $table;
 
 	/**
-	 * @param array $fields array of field names affected by the constaint
+	 * @var DBConstraint
 	 */
-	function __construct(array $fields)
-	{
-		$this->fields = new SqlFieldArray($fields);
-	}
+	private $constraint;
 
 	/**
-	 * Get the fields affected by the constraint
-	 *
-	 * @return array of string
+	 * @param DBTable $table a table object that represent an expected database table
 	 */
-	function getFields()
+	function __construct(DBTable $table, DBConstraint $constraint)
 	{
-		return $this->fields->toArray();
-	}
-
-	function getIndexableFields()
-	{
-		return array();
+		$this->table = $table;
+		$this->constraint = $constraint;
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
-		return $this->getHead($dialect) . ' UNIQUE (' . $this->fields->toDialectString($dialect) . ')';
+		return
+			'ALTER TABLE ' . $dialect->quoteIdentifier($this->table->getName())
+			. ' ADD ' . $this->constraint->toDialectString($dialect)
+			. ';';
 	}
 
-	protected function getHead(IDialect $dialect)
+	function getPlaceholderValues(IDialect $dialect)
 	{
-		return parent::getHead($dialect) . ' UNIQUE';
+		return array();
 	}
 }
 

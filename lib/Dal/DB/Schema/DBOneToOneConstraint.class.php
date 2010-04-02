@@ -29,6 +29,11 @@ class DBOneToOneConstraint extends DBConstraint
 	private $fields;
 
 	/**
+	 * @var SqlFieldArray
+	 */
+	private $pkFields;
+
+	/**
 	 * @var DBColumn
 	 */
 	private $referencedTable;
@@ -62,6 +67,7 @@ class DBOneToOneConstraint extends DBConstraint
 				);
 
 				$this->fields = new SqlFieldArray($fields);
+				$this->pkFields = new SqlFieldArray($pkFields);
 
 				$this->referencedTable = $referencedTable;
 				$this->associationBreakAction = $associationBreakAction;
@@ -84,10 +90,14 @@ class DBOneToOneConstraint extends DBConstraint
 	function toDialectString(IDialect $dialect)
 	{
 		return
-			  'FOREIGN KEY ('
+			$this->getHead($dialect)
+			. ' FOREIGN KEY ('
 			. $this->fields->toDialectString($dialect)
 			. ')'
 			. ' REFERENCES ' . $dialect->quoteIdentifier($this->referencedTable->getName())
+			. '('
+			. $this->pkFields->toDialectString($dialect)
+			. ')'
 			. ' ON DELETE ' .$this->associationBreakAction->toDialectString($dialect)
 			. ' ON UPDATE ' . AssociationBreakAction::cascade()->toDialectString($dialect);
 	}

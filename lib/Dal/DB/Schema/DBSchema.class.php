@@ -112,14 +112,21 @@ final class DBSchema implements ISqlCastable
 	function toDialectString(IDialect $dialect)
 	{
 		$sql = array();
+		$postSql = array();
 
 		foreach ($this->tables as $table) {
-			foreach ($table->toQueries($dialect) as $query) {
-				$sql[] = $query->toDialectString($dialect);
+			$createTable = new CreateTableQuery($table, true);
+			$sql[] = $createTable->toDialectString($dialect);
+
+			foreach ($dialect->getTableQuerySet($table, false) as $query) {
+				$postSql[] = $query->toDialectString($dialect);
 			}
 		}
 
-		return join(StringUtils::DELIM_STANDART.StringUtils::DELIM_STANDART, $sql);
+		return
+			join(StringUtils::DELIM_STANDART.StringUtils::DELIM_STANDART, $sql)
+			. StringUtils::DELIM_STANDART . StringUtils::DELIM_STANDART
+			. join(StringUtils::DELIM_STANDART . StringUtils::DELIM_STANDART, $postSql);
 	}
 }
 
