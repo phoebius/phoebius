@@ -97,7 +97,7 @@ class PgSqlDialect extends Dialect
 		return "'" . pg_escape_string($value)  . "'";
 	}
 
-	function getTableQuerySet(DBTable $table)
+	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
 	{
 		$table = clone $table;
 
@@ -131,6 +131,8 @@ class PgSqlDialect extends Dialect
 		}
 
 		foreach ($table->getConstraints() as $constraint) {
+			$postQueries[] = new CreateConstraintQuery($table, $constraint);
+
 			$columns = array();
 
 			// create indexes
@@ -149,9 +151,12 @@ class PgSqlDialect extends Dialect
 			}
 		}
 
+		if ($includeCreateTable) {
+			$preQueries[] = new CreateTableQuery($table);
+		}
+
 		return array_merge(
 			$preQueries,
-			array(new CreateTableQuery($table)),
 			$postQueries
 		);
 	}

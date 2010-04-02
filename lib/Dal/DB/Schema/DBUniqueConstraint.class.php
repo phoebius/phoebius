@@ -54,7 +54,7 @@ class DBUniqueConstraint extends DBConstraint
 
 	function toDialectString(IDialect $dialect)
 	{
-		return $this->getHead($dialect) . ' UNIQUE (' . $this->fields->toDialectString($dialect) . ')';
+		return $this->getHead($dialect) . ' (' . $this->fields->toDialectString($dialect) . ')';
 	}
 
 	protected function getHead(IDialect $dialect)
