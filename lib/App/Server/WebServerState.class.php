@@ -74,7 +74,10 @@ class WebServerState extends CliServerState implements IWebServerState
 		foreach ($uniqEnvFields as $uq_field) {
 			// FIXME: read vars from WebServerStateDictionary instead of direct access to $_SERVER
 			if (isset($_SERVER[$uq_field])) {
-				$items[] = $_SERVER[$uq_field];
+				// use strtolower because of an IE issue: it sends
+				// HTTP_ACCEPT_LANGUAGE=en_US via GET and HTTP_ACCEPT_LANGUAGE=en_us via POST
+				// (different case causes wrong checksum)
+				$items[] = strtolower($_SERVER[$uq_field]);
 			}
 		}
 
