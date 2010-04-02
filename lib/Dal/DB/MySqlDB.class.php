@@ -167,7 +167,7 @@ class MySqlDB extends DB
 
 		$this->queryResults[spl_object_hash($this->latestQueryResultId)] = true;
 
-		return $resource;
+		return $this->latestQueryResultId;
 	}
 
 	function getRow(ISqlSelectQuery $query)

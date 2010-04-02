@@ -356,7 +356,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		if ($generatorType && $generatorType->isPost()) {
 			$id = $generator->generate($entity);
 			if ($id) {
-				$entity->_set($id);
+				$entity->_setId($id);
 			}
 		}
 
