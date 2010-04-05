@@ -76,18 +76,17 @@ abstract class ContainerPropertyType extends OrmPropertyType
 
 	final function assemble(array $tuple, FetchStrategy $fetchStrategy)
 	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+		Assert::isUnreachable('%s cannot be used for readonly property', __METHOD__);
 	}
 
 	final function assebmleSet(array $tuples, FetchStrategy $fetchStrategy)
 	{
-		Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
+		Assert::isUnreachable('%s cannot be used for readonly property', __METHOD__);
 	}
 
 	final function disassemble($value)
 	{
 		return array();
-		//Assert::isUnreachable('%s cannot be used for transparent property', __METHOD__);
 	}
 
 	/**
@@ -108,8 +107,7 @@ abstract class ContainerPropertyType extends OrmPropertyType
 
 	function toGetter(IMappable $entity, OrmProperty $property)
 	{
-		$propertyName = $property->getName();
-		$capitalizedPropertyName = ucfirst($propertyName);
+		$capitalizedPropertyName = ucfirst($property->getName());
 		$class = $this->getContainerClassName($property);
 
 		return <<<EOT
@@ -118,11 +116,7 @@ abstract class ContainerPropertyType extends OrmPropertyType
 	 */
 	function get{$capitalizedPropertyName}(\$readOnly = false)
 	{
-		if (!\$this->{$propertyName}) {
-			\$this->{$propertyName} = new {$class}(\$this, \$readOnly);
-		}
-
-		return \$this->{$propertyName};
+		return new {$class}(\$this, \$readOnly);
 	}
 EOT;
 	}
@@ -134,14 +128,7 @@ EOT;
 
 	function toField(IMappable $entity, OrmProperty $property)
 	{
-		$typeImpl = ucfirst($property->getName()) . '|null';
-
-		return <<<EOT
-	/**
-	 * @var {$typeImpl}
-	 */
-	protected \${$property->getName()};
-EOT;
+		return null;
 	}
 }
 
