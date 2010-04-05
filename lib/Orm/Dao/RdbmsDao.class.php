@@ -198,7 +198,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$toFetchIds = array();
 
 		foreach ($ids as $id) {
-			$objects[] = $entity = $this->identityMap->getLazy($id);
+			$objects[(string) $id] = $entity = $this->getLazyEntityById($id);
 
 			if (!$entity->isFetched()) {
 				$toFetchIds[] = $id;
@@ -213,9 +213,23 @@ class RdbmsDao implements IOrmEntityAccessor
 					);
 
 			$fetched = $this->getList($query);
+
+			if (sizeof($fetched) < sizeof($toFetchIds)) {
+				// crop missing objects
+				foreach ($toFetchIds as $id) {
+					foreach ($fetched as $object) {
+						if ($object->_getId() == $id) { // found and fetched
+							continue (2);
+						}
+					}
+
+					unset ($objects[$id]);
+					$this->identityMap->drop($id);
+				}
+			}
 		}
 
-		return $objects;
+		return array_values($objects);
 	}
 
 	private function touchEntity(array $tuple)
