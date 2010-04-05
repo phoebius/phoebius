@@ -75,7 +75,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		$this->logicalSchema = $entity->getLogicalSchema();
 		$this->physicalSchema = $entity->getPhysicalSchema();
 		$this->identifier = $this->logicalSchema->getIdentifier();
-		if ($this->logicalSchema->getIdentifier()) {
+		if ($this->identifier) {
 			$this->identityMap = new OrmIdentityMap($this->logicalSchema);
 		}
 	}
@@ -163,6 +163,7 @@ class RdbmsDao implements IOrmEntityAccessor
 			}
 
 			$this->map->assemble($entity, $row, $this->getFetchStrategy());
+			$entity->setFetched();
 		}
 
 		return $entity;
@@ -177,8 +178,9 @@ class RdbmsDao implements IOrmEntityAccessor
 			throw new OrmEntityNotFoundException($this->entity, 'query returned zero rows');
 		}
 
-		$entity = $this->logicalSchema->getNewEntity();
+		$entity = $this->touchEntity($row);
 		$this->map->assemble($entity, $row, $this->getFetchStrategy());
+		$entity->setFetched();
 
 		$this->identityMap->add($entity);
 
@@ -192,44 +194,49 @@ class RdbmsDao implements IOrmEntityAccessor
 
 	function getByIds(array $ids)
 	{
-		$entitySet = array();
-		$toFetch = array();
+		$objects = array();
+		$toFetchIds = array();
 
 		foreach ($ids as $id) {
-			$entity = $this->identityMap->getLazy($id);
+			$objects[] = $entity = $this->identityMap->getLazy($id);
 
 			if (!$entity->isFetched()) {
-				$toFetch[$id] = $entity;
-			}
-			else {
-				$entitySet[$id] = $entity;
+				$toFetchIds[] = $id;
 			}
 		}
 
-		if (!empty($toFetch)) {
+		if (!empty($toFetchIds)) {
 			$query =
 				EntityQuery::create($this->entity)
 					->where(
-						Expression::in($this->identifier, array_keys($toFetch))
+						Expression::in($this->identifier, $toFetchIds)
 					);
 
 			$fetched = $this->getList($query);
-
-			foreach ($fetched as $entity) {
-				$id = $entity->_getId();
-				$entitySet[$id] = $entity;
-				unset ($toFetch[$id]);
-			}
-
-			// if there were some ID collisions - we should remove them from identityMap
-			if (!empty($toFetch)) {
-				foreach ($toFetch as $entity) {
-					$this->identityMap->drop($entity->_getId());
-				}
-			}
 		}
 
-		return $entitySet;
+		return $objects;
+	}
+
+	private function touchEntity(array $tuple)
+	{
+		if (!$this->identifier) {
+			return $this->logicalSchema->getNewEntity();
+		}
+
+		$idTuple = array();
+		foreach ($this->identifier->getFields() as $field) {
+			$idTuple[] = $tuple[$field];
+		}
+
+		$idTuple = array_combine(
+			array_keys($this->identifier->getType()->getSqlTypes()),
+			array_values($idTuple)
+		);
+
+		$id = $this->identifier->getType()->assemble($idTuple, FetchStrategy::lazy());
+
+		return $this->getLazyEntityById($id);
 	}
 
 	function getList(ISqlSelectQuery $query = null)
@@ -239,7 +246,8 @@ class RdbmsDao implements IOrmEntityAccessor
 		$entitySet = array ();
 		$map = $this->map->getBatchMapper();
 		foreach ($rows as $row) {
-			$entity = $map->assemble($this->logicalSchema->getNewEntity(), $row, $this->getFetchStrategy());
+			$entity = $map->assemble($this->touchEntity($row), $row, $this->getFetchStrategy());
+			$entity->setFetched();
 			$entitySet[] = $entity;
 			$this->identityMap->add($entity);
 		}
@@ -301,13 +309,7 @@ class RdbmsDao implements IOrmEntityAccessor
 
 	function saveEntity(IdentifiableOrmEntity $entity)
 	{
-		$id = $entity->_getId();
-
-		$entity->_setId(null);
-		$entity->fetch();
-		$entity->_setId($id);
-
-		if ($id) {
+		if ($entity->_getId() && $entity->isFetched()) {
 			$updated = $this->update($entity);
 
 			if ($updated) {
@@ -319,10 +321,12 @@ class RdbmsDao implements IOrmEntityAccessor
 			$this->insert($entity);
 		}
 		catch (UniqueViolationException $e) {
-			if (!$id) {
+			if (!$entity->_getId()) {
 				throw $e;
 			}
 		}
+
+		$entity->setFetched();
 
 		return true;
 	}
@@ -364,6 +368,7 @@ class RdbmsDao implements IOrmEntityAccessor
 		}
 
 		$this->identityMap->add($entity);
+		$entity->setFetched();
 	}
 
 	private function update(IdentifiableOrmEntity $entity)
@@ -379,6 +384,8 @@ class RdbmsDao implements IOrmEntityAccessor
 					->toExpression()
 			)
 		);
+
+		$entity->setFetched();
 
 		return $affected > 0;
 	}

@@ -217,7 +217,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 				include $this->cacheFilename;
 			}
 			catch (ExecutionContextException $e) {
-				file_put_contents($this->cacheFilename, '<? ');
+				file_put_contents($this->cacheFilename, '<?php ');
 			}
 
 			$this->cacheFileIsLoaded = true;

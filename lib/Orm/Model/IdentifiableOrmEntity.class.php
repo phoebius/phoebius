@@ -52,22 +52,27 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 	 */
 	final function fetch()
 	{
-		if ($this instanceof IDaoRelated) {
-			if (!$this->inFetchProcess && !$this->fetched && ($id = $this->_getId())) {
+		if (!$this->inFetchProcess && !$this->fetched && ($id = $this->_getId())) {
 
-				$this->inFetchProcess = true;
-				try {
-					call_user_func(array(get_class($this), 'dao'))->getEntityById($id);
-					$this->inFetchProcess = false;
-				}
-				catch (Exception $e) {
-					$this->inFetchProcess = false;
-					throw $e;
-				}
-
-				$this->fetched = true;
+			$this->inFetchProcess = true;
+			try {
+				call_user_func(array(get_class($this), 'dao'))->getEntityById($id);
+				$this->inFetchProcess = false;
 			}
+			catch (Exception $e) {
+				$this->inFetchProcess = false;
+				throw $e;
+			}
+
+			$this->fetched = true;
 		}
+
+		return $this;
+	}
+
+	final function setFetched()
+	{
+		$this->fetched = true;
 
 		return $this;
 	}
