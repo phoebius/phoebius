@@ -79,7 +79,7 @@ abstract class OrmPropertyType
 		$yield = array();
 
 		foreach ($tuples as $tuple) {
-			$yield = $this->assemble($tuple, $fetchStrategy);
+			$yield[] = $this->assemble($tuple, $fetchStrategy);
 		}
 
 		return $yield;

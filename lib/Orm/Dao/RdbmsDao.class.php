@@ -237,11 +237,14 @@ class RdbmsDao implements IOrmEntityAccessor
 		$rows = $this->getRows($query);
 
 		$entitySet = array ();
+		$map = $this->map->getBatchMapper();
 		foreach ($rows as $row) {
-			$entity = $this->map->assemble($this->logicalSchema->getNewEntity(), $row, $this->getFetchStrategy());
+			$entity = $map->assemble($this->logicalSchema->getNewEntity(), $row, $this->getFetchStrategy());
 			$entitySet[] = $entity;
 			$this->identityMap->add($entity);
 		}
+
+		$map->finish();
 
 		return $entitySet;
 	}

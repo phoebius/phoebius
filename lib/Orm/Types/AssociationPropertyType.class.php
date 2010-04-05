@@ -157,7 +157,7 @@ final class AssociationPropertyType extends OrmPropertyType
 					: null;
 		}
 
-		if (empty($ids)) {
+		if (empty($objects)) {
 			return array();
 		}
 
