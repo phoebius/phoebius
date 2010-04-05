@@ -17,7 +17,7 @@
  ************************************************************************************************/
 
 /**
- * Represents a base implementation of ORM-related entity mapper
+ * Represents a base implementation of ORM-related batch entity mapper
  *
  * @ingroup Orm
  */
