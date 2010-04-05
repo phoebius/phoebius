@@ -135,64 +135,45 @@ final class AssociationPropertyType extends OrmPropertyType
 
 	function assebmleSet(array $tuples, FetchStrategy $fetchStrategy)
 	{
-		$ids = array();
+		$objects = array();
+
+		$dao = $this->container->getDao();
 
 		foreach ($tuples as $tuple) {
 			try {
-				$ids[] = $this->fkType->assemble($tuple, $fetchStrategy);
+				$id = $this->fkType->assemble($tuple, $fetchStrategy);
 			}
 			catch (OrmModelIntegrityException $e) {
 				if (!$this->isNullable()) {
 					throw new OrmModelIntegrityException('cannot be null');
 				}
 
-				$ids[] = null;
+				$id = null;
 			}
+
+			$objects[] =
+				$id
+					? $dao->getLazyEntityById($id)
+					: null;
 		}
 
 		if (empty($ids)) {
 			return array();
 		}
 
-		$dao = $this->container->getDao();
-		$entities = array();
-
-		if ($fetchStrategy->is(FetchStrategy::LAZY)) {
-			foreach ($ids as $id) {
-				$entities[] = $id
-					? $dao->getLazyById($id)
-					: null;
-			}
-		}
-		else {
-			$toFetch = array();
-
-			foreach ($ids as $key => $id) {
-				if (!is_null($id)) {
-					$toFetch[] = $id;
+		if ($fetchStrategy->is(FetchStrategy::CASCADE)) {
+			// fetch them all
+			$idsToFetch = array();
+			foreach ($objects as $object) {
+				if ($object && !$object->isFetched()) {
+					$idsToFetch[] = $object->_getId();
 				}
 			}
 
-			$entities = $dao->getByIds($toFetch);
-
-			$toReturn = array();
-			reset($entities);
-
-			foreach ($ids as $id) {
-				if ($id) {
-					$toReturn[] = current($entities);
-
-					next ($entities);
-				}
-				else {
-					$toReturn[] = null;
-				}
-			}
-
-			$entities = $toReturn;
+			$dao->getByIds($idsToFetch);
 		}
 
-		return $entities;
+		return $objects;
 	}
 
 	function disassemble($value)

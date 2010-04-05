@@ -21,7 +21,7 @@
  *
  * @ingroup Orm
  */
-final class OrmMap implements IOrmEntityBatchMapper
+class OrmMap implements IOrmEntityMapper
 {
 	/**
 	 * @var ILogicallySchematic
@@ -87,17 +87,9 @@ final class OrmMap implements IOrmEntityBatchMapper
 				continue;
 			}
 
-			$propertyTuple = array();
-			foreach ($property->getFields() as $field) {
-				$propertyTuple[] = $tuple[$field];
-			}
+			$propertyTuple = $this->getPropertyTuple($property, $tuple);
 
 			$propertyType = $property->getType();
-			$propertyTuple = array_combine(
-				array_keys($propertyType->getSqlTypes()),
-				$propertyTuple
-			);
-
 			$setter = $property->getSetter();
 			$value = $propertyType->assemble($propertyTuple, $fetchStrategy);
 			$entity->$setter($value);
@@ -106,14 +98,29 @@ final class OrmMap implements IOrmEntityBatchMapper
 		return $entity;
 	}
 
-	function getBatchMapper()
+	protected function getPropertyTuple(OrmProperty $property, array $tuple)
 	{
-		return $this;
+		$propertyTuple = array();
+		foreach ($property->getFields() as $field) {
+			$propertyTuple[] = $tuple[$field];
+		}
+
+		$propertyType = $property->getType();
+		$propertyTuple = array_combine(
+			array_keys($propertyType->getSqlTypes()),
+			$propertyTuple
+		);
+
+		return $propertyTuple;
 	}
 
-	function finish()
+	function getBatchMapper()
 	{
-		// nothing
+		if (!$this->logicalSchema->getIdentifier()) {
+			return $this;
+		}
+
+		return new BatchOrmMap($this->logicalSchema, $this);
 	}
 }
 
