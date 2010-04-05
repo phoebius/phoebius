@@ -228,7 +228,12 @@ abstract class Container implements IteratorAggregate
 
 		$this->isFetched = true;
 
-		$this->list = array_unique($this->list, SORT_REGULAR);
+		$list = array();
+		foreach ($this->list as $object) {
+			$list[spl_object_hash($object)] = $object;
+		}
+
+		$this->list = array_values($list);
 
 		return $this;
 	}
