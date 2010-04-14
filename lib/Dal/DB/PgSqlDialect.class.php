@@ -99,8 +99,6 @@ class PgSqlDialect extends Dialect
 
 	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
 	{
-		$table = clone $table;
-
 		$preQueries = array();
 		$postQueries = array();
 
@@ -124,8 +122,13 @@ class PgSqlDialect extends Dialect
 					)
 				);
 
-				$column->setDefaultValue(
-					new SqlFunction('nextval', new SqlValue($sqName))
+				$postQueries[] = new RawSqlQuery(
+					'ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;',
+					array(
+						new SqlIdentifier($table->getName()),
+						new SqlIdentifier($column->getName()),
+						new SqlFunction('nextval', new SqlValue($sqName))
+					)
 				);
 			}
 		}
@@ -168,6 +171,9 @@ class PgSqlDialect extends Dialect
 	 */
 	function getSequenceName($tableName, $columnName)
 	{
+
+//		$tableName = preg_replace('/([a-z])([A-Z])/', '$1_$2', $tableName);
+//		return strtolower($tableName . '_sq');
 		return strtolower($tableName . '_' . $columnName . '_sq');
 	}
 
