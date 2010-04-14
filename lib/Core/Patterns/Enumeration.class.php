@@ -133,7 +133,7 @@ abstract class Enumeration implements IStringCastable
 	{
 		return
 			get_class($this) == get_class($object)
-			&& $this->id === $object->id;
+			&& $this->id == $object->id;
 	}
 
 	/**
@@ -163,7 +163,7 @@ abstract class Enumeration implements IStringCastable
 			$value, get_class($this)
 		);
 
-		return $this->value === $value;
+		return $this->value == $value;
 	}
 
 	/**
@@ -257,7 +257,7 @@ abstract class Enumeration implements IStringCastable
 
 		foreach ($members as $comparableMember => $comparableValue) {
 			foreach ($members as $member => $value) {
-				if ($comparableValue === $value) {
+				if ($comparableValue == $value) {
 					if (empty($yield)) {
 						$yield[] = $comparableMember;
 					}
