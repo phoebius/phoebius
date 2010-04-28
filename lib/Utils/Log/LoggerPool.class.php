@@ -54,10 +54,16 @@ final class LoggerPool extends LazySingleton
 	 *
 	 * @param string $name
 	 * @param string $string
+	 * @param mixed ... args to be passed to a sprintf and evaluated in a $string
 	 * @return void
 	 */
-	static function log($name, $string)
+	static function log($name, $string/*, mixed $args**/)
 	{
+		$args = func_get_args();
+		$args = array_slice($args, 1);
+
+		$string = call_user_func_array('sprintf', $args);
+
 		self::getInstance()
 			->getNamed($name)
 			->log($string);
