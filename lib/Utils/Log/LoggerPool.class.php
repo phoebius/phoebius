@@ -50,6 +50,20 @@ final class LoggerPool extends LazySingleton
 	private $default;
 
 	/**
+	 * Pull a string to a named logger (or to a default logger if the named logger is not defined)
+	 *
+	 * @param string $name
+	 * @param string $string
+	 * @return void
+	 */
+	static function log($name, $string)
+	{
+		self::getInstance()
+			->getNamed($name)
+			->log($string);
+	}
+
+	/**
 	 * Gets the instance of the loggers pool
 	 *
 	 * @return LoggerPool
@@ -103,7 +117,7 @@ final class LoggerPool extends LazySingleton
 	 * Gets the named logger or default logger if no logger by the specified name found
 	 *
 	 * @param string $name
-	 * @return LoggerPool an object itself
+	 * @return ILogger
 	 */
 	function getNamed($name)
 	{

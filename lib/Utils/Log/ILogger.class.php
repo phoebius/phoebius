@@ -24,6 +24,9 @@
 interface ILogger
 {
 	/**
+	 * Puts a string to a log
+	 *
+	 * @param string $string
 	 * @return ILogger an object itself
 	 */
 	function log($string);
