@@ -85,9 +85,15 @@ class PgSqlDB extends DB
 
 		try {
 			if ($this->isPersistent()) {
+
+				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a persistent connection to postgresql: ' . $connectionString);
+
 				$this->link = pg_pconnect($connectionString);
 			}
 			else {
+
+				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a new connection to postgresql: ' . $connectionString);
+
 				$this->link = pg_pconnect(
 					$connectionString,
 					$force
@@ -322,8 +328,18 @@ class PgSqlDB extends DB
 
 		//$statementId = $this->prepareQuery($query, $isAsync);
 		$parameters = $query->getPlaceholderValues($this->getDialect());
+		$queryAsString = $query->toDialectString($this->getDialect());
 
-		$executeResult = pg_send_query($this->link, $query->toDialectString($this->getDialect()));
+		if ($isAsync) {
+			LoggerPool::log(parent::LOG_VERBOSE, 'sending an async query: ' . $queryAsString);
+		}
+		else {
+			LoggerPool::log(parent::LOG_VERBOSE, 'sending query: ' . $queryAsString);
+		}
+
+		LoggerPool::log(parent::LOG_QUERY, $queryAsString);
+
+		$executeResult = pg_send_query($this->link, $queryAsString);
 		if (!$isAsync || !$executeResult) {
 			$result = pg_get_result($this->link);
 			$resultStatus = pg_result_status($result, PGSQL_STATUS_LONG);
@@ -338,9 +354,15 @@ class PgSqlDB extends DB
 				$errorMessage = pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY);
 
 				if (PgSqlError::UNIQUE_VIOLATION == $errorCode) {
+
+					LoggerPool::log(parent::LOG_VERBOSE, 'query caused a unique violation: ' . $errorMessage);
+
 					throw new UniqueViolationException($query, $errorMessage);
 				}
 				else {
+
+					LoggerPool::log(parent::LOG_VERBOSE, 'query caused an error #' . $errorCode . ': ' . $errorMessage);
+
 					throw new PgSqlQueryException($query, $errorMessage, $errorCode);
 				}
 			}

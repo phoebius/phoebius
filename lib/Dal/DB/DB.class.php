@@ -23,6 +23,9 @@
  */
 abstract class DB
 {
+	const LOG_VERBOSE = 'class_DB_log_vervose';
+	const LOG_QUERY = 'class_DB_log_query';
+
 	/**
 	 * @var string|null
 	 */
@@ -279,6 +282,8 @@ abstract class DB
 			),
 			'already in transaction'
 		);
+
+		LoggerPool::log(self::LOG_VERBOSE, 'creating a Transaction object');
 
 		$this->connect(false);
 		$this->transaction = new Transaction($this);

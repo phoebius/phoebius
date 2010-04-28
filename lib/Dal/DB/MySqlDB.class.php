@@ -69,6 +69,13 @@ class MySqlDB extends DB
 			MYSQL_CLIENT_IGNORE_SPACE
 		);
 
+		if ($this->isPersistent()) {
+			LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a persistent connection to MySQL: ' . $this->getHost());
+		}
+		else {
+			LoggerPool::log(parent::LOG_VERBOSE, 'establishing new  connection to MySQL: ' . $this->getHost());
+		}
+
 		$link = call_user_func_array(
 			$this->isPersistent()
 				? 'mysql_pconnect'
@@ -80,12 +87,25 @@ class MySqlDB extends DB
 			$this->link = $link;
 		}
 		else {
-			throw new DBConnectionException($this, mysql_error());
+
+			$error = mysql_error();
+
+			LoggerPool::log(parent::LOG_VERBOSE, 'failed to connect: ' . $error);
+
+			throw new DBConnectionException($this, $error);
 		}
 
 		if (($dbname = $this->getDBName())) {
+
+			LoggerPool::log(parent::LOG_VERBOSE, 'selecting the database: ' . $dbname);
+
 			if (!mysql_select_db($dbname, $this->link)) {
-				throw new DBConnectionException($this, mysql_error($this));
+
+				$error = mysql_error($this->link);
+
+				LoggerPool::log(parent::LOG_VERBOSE, 'failed to select the database: ' . $error);
+
+				throw new DBConnectionException($this, $error);
 			}
 		}
 
@@ -254,19 +274,32 @@ class MySqlDB extends DB
 	 */
 	protected function performQuery(ISqlQuery $query, $isAsync)
 	{
+		$queryAsString = $query->toDialectString($this->getDialect());
+
+		LoggerPool::log(parent::LOG_VERBOSE, 'sending query: ' . $queryAsString);
+		LoggerPool::log(parent::LOG_QUERY, $queryAsString);
+
 		$result = mysql_query(
-			$query->toDialectString($this->getDialect()),
+			$queryAsString,
 			$this->link
 		);
 
 		if (!$result) {
 			$code = mysql_errno($this->link);
+			$error = mysql_error($this->link);
+
 
 			if ($code == 1062) {
-				throw new UniqueViolationException($query, mysql_error($this->link));
+
+				LoggerPool::log(parent::LOG_VERBOSE, 'query caused a unique violation #' . $code . ': ' . $error);
+
+				throw new UniqueViolationException($query, $error);
 			}
 			else {
-				throw new DBQueryException($query, mysql_error($this->link), $code);
+
+				LoggerPool::log(parent::LOG_VERBOSE, 'query caused an error #' . $code . ': ' . $error);
+
+				throw new DBQueryException($query, $error, $code);
 			}
 		}
 
