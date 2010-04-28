@@ -29,11 +29,6 @@ class PgSqlDB extends DB
 	private $dialect;
 
 	/**
-	 * @var array
-	 */
-	private $preparedStatements = array();
-
-	/**
 	 * @var resource|null
 	 */
 	private $link;
@@ -86,13 +81,13 @@ class PgSqlDB extends DB
 		try {
 			if ($this->isPersistent()) {
 
-				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a persistent connection to postgresql: ' . $connectionString);
+				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a persistent connection to postgresql: %s', $connectionString);
 
 				$this->link = pg_pconnect($connectionString);
 			}
 			else {
 
-				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a new connection to postgresql: ' . $connectionString);
+				LoggerPool::log(parent::LOG_VERBOSE, 'obtaining a new connection to postgresql: %s', $connectionString);
 
 				$this->link = pg_pconnect(
 					$connectionString,
@@ -103,6 +98,9 @@ class PgSqlDB extends DB
 			}
 		}
 		catch (ExecutionContextException $e) {
+
+			LoggerPool::log(parent::LOG_VERBOSE, 'connection to postgresql failed: %s', $e->getMessage());
+
 			throw new DBConnectionException(
 				$this,
 				"can not connect using {$connectionString}: {$e->getMessage()}"
@@ -276,47 +274,6 @@ class PgSqlDB extends DB
 	}
 
 	/**
-	 * @throws PgSqlQueryException
-	 * @return string
-	 */
-	private function prepareQuery(ISqlQuery $query, $isAsync)
-	{
-		Assert::isBoolean($isAsync);
-
-		// TODO ISqlQuery should generate its own hash by itself
-		$queryAsString = $query->toDialectString($this->getDialect());
-		$statementId = md5($queryAsString);
-
-		if (!isset($this->preparedStatements[$statementId])) {
-			pg_send_prepare($this->link, $statementId, $queryAsString);
-			$result = pg_get_result($this->link);
-
-			if (PGSQL_COMMAND_OK != pg_result_status($result, PGSQL_STATUS_LONG))
-			{
-				$errorCode = pg_result_error_field($result, PGSQL_DIAG_SQLSTATE);
-				// We generate a unique statement id for each query so prepared statement
-				// duplication occcurs here only within the persistent connection
-				// (because prepared statements are shared between different clients
-				// that use the same connection)
-				if (PgSqlError::DUPLICATE_PREPARED_STATEMENT == $errorCode) {
-					Assert::isTrue(
-						$this->isPersistent(),
-						'invalid generation of statementId: duplication of statementId'
-					);
-				}
-				else {
-					$errorMessage = pg_result_error_field($result, PGSQL_DIAG_MESSAGE_PRIMARY);
-					throw new PgSqlQueryException($query, $errorMessage, $errorCode);
-				}
-			}
-
-			$this->preparedStatements[$statementId] = true;
-		}
-
-		return $statementId;
-	}
-
-	/**
 	 * @throws DBQueryException
 	 * @param ISqlQUery $query
 	 * @param boolean $isAsync
@@ -326,15 +283,14 @@ class PgSqlDB extends DB
 	{
 		Assert::isBoolean($isAsync);
 
-		//$statementId = $this->prepareQuery($query, $isAsync);
 		$parameters = $query->getPlaceholderValues($this->getDialect());
 		$queryAsString = $query->toDialectString($this->getDialect());
 
 		if ($isAsync) {
-			LoggerPool::log(parent::LOG_VERBOSE, 'sending an async query: ' . $queryAsString);
+			LoggerPool::log(parent::LOG_VERBOSE, 'sending an async query: %s', $queryAsString);
 		}
 		else {
-			LoggerPool::log(parent::LOG_VERBOSE, 'sending query: ' . $queryAsString);
+			LoggerPool::log(parent::LOG_VERBOSE, 'sending query: %s', $queryAsString);
 		}
 
 		LoggerPool::log(parent::LOG_QUERY, $queryAsString);
@@ -355,13 +311,13 @@ class PgSqlDB extends DB
 
 				if (PgSqlError::UNIQUE_VIOLATION == $errorCode) {
 
-					LoggerPool::log(parent::LOG_VERBOSE, 'query caused a unique violation: ' . $errorMessage);
+					LoggerPool::log(parent::LOG_VERBOSE, 'query caused a unique violation: %s', $errorMessage);
 
 					throw new UniqueViolationException($query, $errorMessage);
 				}
 				else {
 
-					LoggerPool::log(parent::LOG_VERBOSE, 'query caused an error #' . $errorCode . ': ' . $errorMessage);
+					LoggerPool::log(parent::LOG_VERBOSE, 'query caused an error #%s: %s', $errorCode, $errorMessage);
 
 					throw new PgSqlQueryException($query, $errorMessage, $errorCode);
 				}
