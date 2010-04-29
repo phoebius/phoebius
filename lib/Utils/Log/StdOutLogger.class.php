@@ -23,9 +23,24 @@
  */
 final class StdOutLogger implements ILogger
 {
+	private $useHtml;
+
+	function __construct($useHtml = true)
+	{
+		Assert::isBoolean($useHtml);
+
+		$this->useHtml = $useHtml;
+	}
+
 	function log($string)
 	{
-		echo $string, '<br />', PHP_EOL;
+		echo $string;
+
+		if ($this->useHtml) {
+			echo '<br />';
+		}
+
+		echo PHP_EOL;
 
 		return $this;
 	}
