@@ -97,7 +97,7 @@ class XmlOrmDomainBuilder
 		catch (ExecutionContextException $e) {
 			$xmlError = libxml_get_last_error();
 			throw new OrmModelIntegrityException(
-				$xmlError->message . ' in ' . $this->xmlFilename . ':' . $xmlError->line
+				'Malformed XML: ' . $xmlError->message . ' in ' . $this->xmlFilename . ':' . $xmlError->line
 			);
 		}
 	}
