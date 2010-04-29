@@ -113,6 +113,18 @@ abstract class IdentifiableOrmEntity extends OrmEntity implements IDaoRelated
 		return $this;
 	}
 
+	/**
+	 * Determines whether entities are equal or not
+	 *
+	 * @return boolean
+	 */
+	function equals(IdentifiableOrmEntity $entity)
+	{
+		return
+			get_class($this) == get_class($entity)
+			&& $this->_getId() == $entity->_getId();
+	}
+
 	function __clone()
 	{
 		$this->_setId(null);
