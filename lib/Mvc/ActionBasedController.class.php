@@ -33,6 +33,8 @@
  * - ActionBasedController::redirect() for producing external redirects; destination is assembled
  * 			automatically according to the Route which is defined in IRouteTable
  *
+ * To overload a basic logic of executing a method that corresponds an action, just overload
+ * ActionBasedController::processAction() which actually invokes the found method.
  *
  * @ingroup Mvc
  */
