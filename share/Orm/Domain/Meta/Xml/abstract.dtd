@@ -94,7 +94,12 @@ Container works like a typical property except that:
  - it does not store a value, it only refers to a bunch of entities
  - its visibility is readonly
  - it is always not unique
- - relation (1:*, *:*) is determined by a referencing property type, e.g.: type=Entity refs=EntityProperty
+ - relation (1:*, *:*) is determined by a refs attribute:
+   - if refs contains a name of an existing property of an entity referenced in a "type" attribute
+     then it is OneToMany relation
+   - otherwise refs is treated as a name an automatically built proxy entity which represent
+     a ManyToMany relation. Such a proxy entity is not obligatory to be defined in a domain. This
+     proxy entity at least contains an association properties to the ends of the relation
  -->
 <!ELEMENT container EMPTY>
 <!ATTLIST container
