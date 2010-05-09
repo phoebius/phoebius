@@ -52,6 +52,11 @@ abstract class ActionBasedController implements IController
 	 */
 	private $model;
 
+	/**
+	 * @var string|null
+	 */
+	private $action;
+
 	function handle(Trace $trace)
 	{
 		$this->trace = $trace;
@@ -65,6 +70,7 @@ abstract class ActionBasedController implements IController
 		$reflectedController = new ReflectionObject($this);
 
 		if ($action && $reflectedController->hasMethod($actionMethod)) {
+			$this->action = $action;
 			$result = $this->processAction($action, $reflectedController->getMethod($actionMethod));
 		}
 		else {
