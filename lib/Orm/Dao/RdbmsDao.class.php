@@ -312,13 +312,12 @@ class RdbmsDao implements IOrmEntityAccessor
 
 	function dropEntityById($id)
 	{
-		$query =
+		return
 			EntityQuery::create($this->entity)
 				->where(
 					Expression::eq($this->identifier, $id)
-				);
-
-		return $this->executeQuery($query);
+				)
+				->delete();
 	}
 
 	function saveEntity(IdentifiableOrmEntity $entity)
