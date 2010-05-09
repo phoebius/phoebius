@@ -10,20 +10,18 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
+Before 1.2.0R
+=============
+
+2. move IdentifierableOrmEntity to a separate interface
+
+3. CookieStorage, Authorize modules - ?
+
+
 DAL/DB
 ======
 Use postgresql RETURNING_ID instead of invoking the sequence
 INSERT INTO tbl1 (id, ...) VALUES (1, ...) RETURNING id
-
-
-Logging
-=======
-Centralized pool of loggers (system logger, subsystem loggers)
-LoggerPool::setAppLogger(new SysLogWorker());
-LoggerPool::setPackageLogger(new FileLogWorker());
-
-LoggerPool::getAppLogger()->log(...)
-LoggerPool::getPackageLogger('Forms')->log(...)
 
  
 Dao/Cache

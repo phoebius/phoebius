@@ -50,22 +50,26 @@ abstract class ActionBasedController implements IController
 	 */
 	private $model;
 
-	/**
-	 * @var string|null
-	 */
-	private $action;
-
 	function handle(Trace $trace)
 	{
 		$this->trace = $trace;
 
-		if (isset($trace[self::PARAMETER_ACTION])) {
-			$this->action = $trace[self::PARAMETER_ACTION];
-			$result = $this->processAction($trace[self::PARAMETER_ACTION]);
+		$action = 
+			isset($trace[self::PARAMETER_ACTION])
+				? $trace[self::PARAMETER_ACTION]
+				: null;
+
+		$actionMethod = $this->getMethodName($action);
+		$reflectedController = new ReflectionObject($this);
+
+		if ($action && $reflectedController->hasMethod($actionMethod)) {
+			$result = $this->processAction($action, $reflectedController->getMethod($actionMethod));
 		}
 		else {
-			$result = $this->handleUnknownAction(null);
+			$result = $this->handleUnknownAction($action);
 		}
+
+		$result = $this->makeActionResult($result);
 
 		$this->processResult($result);
 
@@ -261,35 +265,19 @@ abstract class ActionBasedController implements IController
 	 * values, invokes the method and wraps its result, if needed.
 	 *
 	 * @param string $action requested action
+	 * @param ReflectionMethod $method a method that corresponds the action
 	 *
-	 * @return IActionResult the action method result
+	 * @return mixed result that may be processed by ActionBasedController::makeActionResult()
 	 */
-	protected function processAction($action)
+	protected function processAction($action, ReflectionMethod $method)
 	{
-		$actionMethod = $this->getMethodName($action);
-		$reflectedController = new ReflectionObject($this);
+		$argumentsToPass = array();
 
-		if ($reflectedController->hasMethod($actionMethod)) {
-			$actionResult = $this->invokeActionMethod(
-				$reflectedController->getMethod($actionMethod)
-			);
-		}
-		else {
-			$actionResult = $this->handleUnknownAction($action);
+		foreach ($method->getParameters() as $parameter) {
+			$argumentsToPass[$parameter->name] = $this->filterArgumentValue($parameter);
 		}
 
-		if (
-				!(
-					is_object($actionResult) && $actionResult instanceof IActionResult
-				)
-		) {
-			$actionResult = $this->makeActionResult($actionResult);
-		}
-
-		Assert::isTrue(
-			$actionResult instanceof IActionResult,
-			'action method can return IActionResult or view name'
-		);
+		$actionResult = $method->invokeArgs($this, $argumentsToPass);
 
 		return $actionResult;
 	}
@@ -371,22 +359,6 @@ abstract class ActionBasedController implements IController
 	protected function getMethodName($action)
 	{
 		return 'action_' . ($action);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	private function invokeActionMethod(ReflectionMethod $method)
-	{
-		$argumentsToPass = array();
-
-		foreach ($method->getParameters() as $parameter) {
-			$argumentsToPass[$parameter->name] = $this->filterArgumentValue($parameter);
-		}
-
-		$actionMethodResult = $method->invokeArgs($this, $argumentsToPass);
-
-		return $actionMethodResult;
 	}
 }
 
