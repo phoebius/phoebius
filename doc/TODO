@@ -10,13 +10,6 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
-Before 1.2.0R
-=============
-
-2. move IdentifierableOrmEntity to a separate interface
-
-3. CookieStorage, Authorize modules - ?
-
 
 DAL/DB
 ======
