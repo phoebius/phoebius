@@ -446,7 +446,7 @@ class XmlOrmDomainBuilder
 	/**
 	 * Resolution order:
 	 *  - IDaoRelated (check a class existance within the global scope and withing the domain scope) --> AssociationPropertyType
-	 *  - IOrmRelated --> CompositionPropertyType (not implemented)
+	 *  - IOrmRelated --> CompositionPropertyType
 	 *  - IOrmPropertyAssignable --> IOrmPropertyAssignable::getOrmProperty()
 	 *  - IBoxable --> BoxablePropertyType
 	 *  - DBType
@@ -520,8 +520,8 @@ class XmlOrmDomainBuilder
 					$this->makeObject($name, $parameters)
 				);
 			}
-			else {
-				//$this->makeObject($name, $parameters);
+			else if (TypeUtils::isChild($name, 'OrmPropertyType')) { // OrmPropertyType with public ctor
+				return $this->makeObject($name, $parameters);
 			}
 		}
 
