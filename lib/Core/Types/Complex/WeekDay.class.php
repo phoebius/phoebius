@@ -20,7 +20,7 @@
  * strftime()-compatible enumeration
  * @ingroup Core_Types
  */
-final class WeekDay extends Enumeration
+final class WeekDay extends Enumeration implements IBoxable
 {
 	const MONDAY = 1;
 	const TUESDAY = 2;
@@ -29,6 +29,14 @@ final class WeekDay extends Enumeration
 	const FRIDAY = 5;
 	const SATURDAY = 6;
 	const SUNDAY = 0;
+	
+	/**
+	 * @return WeekDay
+	 */
+	static function cast($value)
+	{
+		return new self ($value);
+	}
 
 	/**
 	 * @return WeekDay
