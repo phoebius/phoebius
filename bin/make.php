@@ -43,7 +43,7 @@ General options:
                          Application directory should contain at least \$app/etc/config.php.
                          If not specified, the current directory is used.
 
-  --host-config=<name>   name of the host configuration resides at \$app/<name>/config.php.
+  --host-config=<name>   name of the host configuration resides at \$app/cfg/<name>/config.php.
 
   --dry-run              modify nothing, show the results only. Currently not implemented.
 
