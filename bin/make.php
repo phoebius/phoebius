@@ -34,6 +34,9 @@ Usage:
 
   $ make.php [options] [domain-schema.xml]
 
+If domain-schema.xml is not specified then make.php uses \$app/var/domain.xml.
+\$app is treated as the current directory, if --app-dir option is not set.
+
 
 General options:
 
