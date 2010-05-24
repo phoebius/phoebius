@@ -58,10 +58,10 @@ Code generator options:
   --regenerate-public    regenerate public files if already generated. This forces a --code option
                          to be switched on automatically.
 
-  --public-dir=<dir>     write generated public class' files to <dir>. Default is \$app/lib/Domain.
+  --public-dir=<dir>     write generated public class' files to <dir>. Default is lib/Domain.
                          Path is treated as relative to the application directory (\$app).
 
-  --auto-dir=<dir>       write generated internal class' files to <dir>. Default is \$app/var/lib/Domain.
+  --auto-dir=<dir>       write generated internal class' files to <dir>. Default is var/lib/Domain.
                          Path is treated as relative to the application directory (\$app).
 
 
@@ -78,7 +78,7 @@ Database schema generator options:
   --import               import schema to the database. Currently not implemented.
 
   --schema-file=<file>   write database schema to <file>.
-                         Default is \$app/var/db/<db_driver>-<domain-schema_name>.sql.
+                         Default is var/db/<db_driver>-<domain-schema_name>.sql.
                          Path is treated as relative to the application directory (\$app).
                          This forces a --schema option to be switched on automatically.
 
