@@ -269,8 +269,7 @@ abstract class ActionBasedController implements IController
 	}
 
 	/**
-	 * Look ups for the action method that corresponds the requested action, collects parameter
-	 * values, invokes the method and wraps its result, if needed.
+	 * Collects arguments to be passed to the found action method and invokes it returning its result.
 	 *
 	 * @param string $action requested action
 	 * @param ReflectionMethod $method a method that corresponds the action
