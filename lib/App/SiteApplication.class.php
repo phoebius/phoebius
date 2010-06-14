@@ -91,6 +91,10 @@ class SiteApplication
 		try {
 			try {
 				$trace = $this->router->getTrace($this->webContext);
+				if (!$trace) {
+					throw new Exception("No fallback route is set inside " . get_class($this));
+				}
+
 				$trace->handle();
 			}
 			catch (RouteException $e) {
