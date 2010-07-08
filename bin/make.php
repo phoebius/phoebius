@@ -233,13 +233,6 @@ if (!is_dir($appDir)) {
 
 chdir($appDir);
 
-foreach (array('publicDir', 'autoDir') as $dir) {
-	$$dir = $appDir . '/' . $$dir;
-	if (!is_dir($$dir)) {
-		mkdir($$dir, 0755, true);
-	}
-}
-
 $xmlSchema = end($args);
 if ($argv > 1 && $xmlSchema && $xmlSchema{0} != '-') {
 	$prefixes = array(
@@ -270,7 +263,13 @@ if (file_exists($applicationConfig)) {
 }
 
 if ($hostConfig) {
-	$hostConfigFile = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . $hostConfig . DIRECTORY_SEPARATOR . 'config.php';
+	if (!is_file($hostConfig)) {
+		$hostConfigFile = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . $hostConfig . DIRECTORY_SEPARATOR . 'config.php';
+	}
+	else {
+		$hostConfigFile = $hostConfig;
+	}
+
 	if (file_exists($hostConfigFile)) {
 		include $hostConfigFile;
 	}
@@ -292,6 +291,13 @@ try {
 	$ormDomain = $domainBuilder->build();
 
 	if ($code) {
+		foreach (array('publicDir', 'autoDir') as $dir) {
+			$$dir = $appDir . '/' . $$dir;
+			if (!is_dir($$dir)) {
+				mkdir($$dir, 0755, true);
+			}
+		}
+
 		$generator = new OrmGenerator($autoDir, $publicDir);
 
 		if ($regeneratePublic) {
