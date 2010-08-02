@@ -301,7 +301,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 					$stripPrefix = true;
 				}
 
-				$prependingContents .= preg_replace('/\?\>$/', '', $fileContents);
+				$prependingContents .= preg_replace('/\?\>\s*$/', '', $fileContents);
 
 			}
 
