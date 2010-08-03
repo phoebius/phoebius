@@ -10,6 +10,19 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
+ORM/CodeGen
+===========
+Schema is now generated incorectly.
+The order is: 
+CREATE TABLE statements ...
+CREATE CONSTRAINT statements ... (inc. PKs)
+
+Should be:
+CREATE TABLE statements ...
+CREATE PRIMARY KEY statements ... 
+CREATE CONSTRAINT statements ... 
+
+
 
 DAL/DB
 ======
