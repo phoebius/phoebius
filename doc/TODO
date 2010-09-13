@@ -10,6 +10,14 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
+Phoebius v1.4
+=================================
+ + new routing system (like in fjick)
+ + less greedy schema generator, verbose compiler
+ + schema diff tool, db diff tool
+ + MVC (controller -> view bridge) simplification
+
+
 ORM/CodeGen
 ===========
 Schema is now generated incorectly.
