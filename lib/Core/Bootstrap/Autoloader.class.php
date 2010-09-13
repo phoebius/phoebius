@@ -215,16 +215,16 @@ final class Autoloader extends LazySingleton implements IAutoloader
 		if (false === $this->cacheFileIsLoaded) {
 			try {
 				include $this->cacheFilename;
+
+				$this->cacheFileIsLoaded = true;
+
+				//are you happy? we've got it
+				if (TypeUtils::isDefined($classname)) {
+					return true;
+				}
 			}
 			catch (ExecutionContextException $e) {
 				file_put_contents($this->cacheFilename, '<?php ');
-			}
-
-			$this->cacheFileIsLoaded = true;
-
-			//are you happy? we've got it
-			if (TypeUtils::isDefined($classname)) {
-				return true;
 			}
 		}
 
