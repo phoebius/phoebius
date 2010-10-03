@@ -220,57 +220,42 @@ class PgSqlDB extends DB
 	{
 		$result = $this->performQuery($query, false);
 
-		if ($result) {
-			$array = array();
+        $array = array();
 
-			while (($row = pg_fetch_row($result))) {
-				$array[] = reset($row);
-			}
+        while (($row = pg_fetch_row($result))) {
+            $array[] = reset($row);
+        }
 
-			pg_free_result($result);
+        pg_free_result($result);
 
-			return $array;
-		}
-		else {
-			return array();
-		}
+        return $array;
 	}
 
 	function getCell(ISqlSelectQuery $query)
 	{
-		$result = $this->performQuery($query, false);
+        try {
+            $row = $this->getRow($query);
 
-		if ($result) {
-			$row = pg_fetch_row($result);
-			$cell = reset($row);
-
-			pg_free_result($result);
-
-			return $cell;
-		}
-		else {
-			throw new CellNotFoundException($query);
-		}
+            return reset($row);
+        }
+        catch (RowNotFoundException $e) {
+            throw new CellNotFoundException($query);
+        }
 	}
 
 	function getRows(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
 
-		if ($result) {
-			$array = array();
+        $array = array();
 
-			while (($row = pg_fetch_assoc($result))) {
-				$array[] = $row;
-			}
+        while (($row = pg_fetch_assoc($result))) {
+            $array[] = $row;
+        }
 
-			pg_free_result($result);
+        pg_free_result($result);
 
-			return $array;
-		}
-		else {
-			return array();
-		}
+        return $array;
 	}
 
 	/**

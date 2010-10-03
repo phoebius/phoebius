@@ -173,12 +173,11 @@ class SqliteDB extends DB
 
         $cell = sqlite_fetch_single($result);
 
-        if ($cell) {
-			return $cell;
-		}
-		else {
+        if (!$cell) {
 			throw new CellNotFoundException($query);
 		}
+        
+		return $cell;
 	}
 
 	function getRows(ISqlSelectQuery $query)

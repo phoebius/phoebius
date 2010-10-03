@@ -87,7 +87,6 @@ class MySqlDB extends DB
 			$this->link = $link;
 		}
 		else {
-
 			$error = mysql_error();
 
 			LoggerPool::log(parent::LOG_VERBOSE, 'failed to connect: %s', $error);
@@ -96,7 +95,6 @@ class MySqlDB extends DB
 		}
 
 		if (($dbname = $this->getDBName())) {
-
 			LoggerPool::log(parent::LOG_VERBOSE, 'selecting the database: %s', $dbname);
 
 			if (!mysql_select_db($dbname, $this->link)) {
@@ -213,57 +211,42 @@ class MySqlDB extends DB
 	{
 		$result = $this->performQuery($query, false);
 
-		if ($result) {
-			$array = array();
+        $array = array();
 
-			while (($row = mysql_fetch_row($result))) {
-				$array[] = reset($row);
-			}
+        while (($row = mysql_fetch_row($result))) {
+            $array[] = reset($row);
+        }
 
-			mysql_free_result($result);
+        mysql_free_result($result);
 
-			return $array;
-		}
-		else {
-			return array();
-		}
+        return $array;
 	}
 
 	function getCell(ISqlSelectQuery $query)
 	{
-		$result = $this->performQuery($query, false);
+        try {
+            $row = $this->getRow($query);
 
-		if ($result) {
-			$row = mysql_fetch_row($result);
-			$cell = reset($row);
-
-			mysql_free_result($result);
-
-			return $cell;
-		}
-		else {
-			throw new CellNotFoundException($query);
-		}
+            return reset($row);
+        }
+        catch (RowNotFoundException $e) {
+            throw new CellNotFoundException($query);
+        }
 	}
 
 	function getRows(ISqlSelectQuery $query)
 	{
 		$result = $this->performQuery($query, false);
 
-		if ($result) {
-			$array = array();
+        $array = array();
 
-			while (($row = mysql_fetch_assoc($result))) {
-				$array[] = $row;
-			}
+        while (($row = mysql_fetch_assoc($result))) {
+            $array[] = $row;
+        }
 
-			mysql_free_result($result);
+        mysql_free_result($result);
 
-			return $array;
-		}
-		else {
-			return array();
-		}
+        return $array;
 	}
 
 	/**
