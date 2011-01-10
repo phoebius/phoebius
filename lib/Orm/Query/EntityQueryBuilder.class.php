@@ -225,88 +225,37 @@ final class EntityQueryBuilder implements ISubjectivity
 	private function getEntityProperty($property)
 	{
 		if (!isset($this->propertyCache[$property])) {
-			$this->propertyCache[$property] = $this->guessEntityProperty($property);
+			$this->propertyCache[$property] = 
+				$this->entity->getEntityProperty(new EntityPropertyPath($property, $this));
 		}
 
 		return $this->propertyCache[$property];
 	}
-
+	
 	/**
-	 * @aux
-	 * @return EntityProperty
+	 * @return EntityQueryBuilder
 	 */
-	private function guessEntityProperty($path)
+	function joinEncapsulant($encapsulant)
 	{
-		$chunks = explode('.', $path);
-		$name = reset($chunks);
-
-		return $this->processProperty(
-			join('.', array_slice($chunks, 1)),
-			$this->entity->getLogicalSchema()->getProperty($name)
-		);
-	}
-
-	private function processProperty($path, OrmProperty $property)
-	{
-		$type = $property->getType();
-
-		if (!$path) {
-			return new EntityProperty($this, $property);
-		}
-
-		if ($type instanceof AssociationPropertyType) {
-			return $this->guessAssociated($path, $property, $type);
-		}
-		else if ($type instanceof CompositePropertyType) {
-			return $this->guessComposite($path, $property, $type);
-		}
-		else {
-			Assert::isUnreachable(
-				'do not know how to refer %s',
-				get_class($type)
-			);
-		}
-	}
-
-	private function guessAssociated($path, OrmProperty $property, AssociationPropertyType $type)
-	{
-		if (!isset($this->joined[$property->getName()])) {
-			$builder = $this->joined[$property->getName()] =
+		Assert::isScalar($encapsulant);
+		
+		if (!isset($this->joined[$encapsulant])) {
+			$property = $this->entity->getLogicalSchema()->getProperty($encapsulant);
+			$type = $property->getType();
+			
+			Assert::isTrue($type instanceof OneToManyContainerPropertyType);
+			
+			$builder = $this->joined[$encapsulant] =
 				new self (
 					$type->getContainer(),
-					(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_FLAG_DEVELOPMENT
-						? $this->alias
-						: substr(sha1($this->alias), 0, 6)
-					) . '_' . $property->getName()
+					$this->alias . '_' . $encapsulant
 				);
 
 			$builder->joins = array();
 			$this->join($property, $type, $builder, end($this->joins));
 		}
 
-		return $this->joined[$property->getName()]->getEntityProperty($path);
-	}
-
-	private function guessComposite($path, OrmProperty $property, CompositePropertyType $type)
-	{
-		$chunks = explode('.', $path);
-		$name = reset($chunks);
-
-		try {
-			$nextProperty = $type->getVirtualProperty($name, $property);
-		}
-		catch (OrmModelIntegrityException $e) {
-			Assert::isUnreachable(
-				'wrong path `%s`.`%s`: `%s` property not found in %s',
-				$property->getName(), $path, $name,
-				$type->getEntity()->getLogicalSchema()->getEntityName()
-			);
-		}
-
-		return $this->processProperty(
-			join('.', array_slice($chunks, 1)),
-			$nextProperty
-		);
+		return $this->joined[$encapsulant];
 	}
 
 	/**

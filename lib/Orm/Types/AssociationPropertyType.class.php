@@ -227,6 +227,23 @@ final class AssociationPropertyType extends OrmPropertyType
 	}
 EOT;
 	}
+	
+	/**
+	 * @return EntityProperty
+	 */
+	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
+	{
+		Assert::isFalse(
+			$path->isEmpty(),
+			'incomplete PropertyPath %s: %s is Association and cannot be the tail',
+			$path->getFullPath(),
+			$path->getCurrentPath()
+		);
+		
+		$eqb = $path->getEntityQueryBuilder()->joinEncapsulant($path->getCurrentChunk());
+		
+		return $this->container->getEntityProperty($path->peek($eqb));
+	}
 
 	protected function getCtorArgumentsPhpCode()
 	{
