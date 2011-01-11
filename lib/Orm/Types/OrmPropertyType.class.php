@@ -195,6 +195,8 @@ EOT;
 	}
 	
 	/**
+	 * Returns the entity property for the specified path
+	 * 
 	 * @return EntityProperty
 	 */
 	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 

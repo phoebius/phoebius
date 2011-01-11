@@ -17,6 +17,8 @@
  ************************************************************************************************/
 
 /**
+ * Implements a propery path traverser
+ * 
  * @aux
  * @ingroup Orm_Query_Builder
  */
@@ -26,6 +28,10 @@ final class EntityPropertyPath
 	private $passed = array();
 	private $left = array();
 	
+	/**
+	 * @param string $path comma-separated property path
+	 * @param EntityQueryBuilder $eqb object that encapsulates an entity as a start point of the path
+	 */
 	function __construct($path, EntityQueryBuilder $eqb)
 	{
 		$this->path = $path;
@@ -35,20 +41,37 @@ final class EntityPropertyPath
 		$this->move();
 	}
 	
+	/**
+	 * Returns an object that encapsulates an entity as a start point of the path
+	 * 
+	 * @return EntityQueryBuilder 
+	 */
 	function getEntityQueryBuilder()
 	{
 		return $this->eqb;
 	}
 	
+	/**
+	 * Determines whether we reached the tail of the path
+	 * @return boolean
+	 */
 	function isEmpty()
 	{
 		return empty($this->left);
 	}
 	
+	/**
+	 * Moves the pointer to the next chunk of the path, and returns the new copy of it with
+	 * the new start point.
+	 *
+	 * You can specify another object that that encapsulates an entity as a new point of the path
+	 * 
+	 * @param EntityQueryBuilder object that that encapsulates an entity as a new point of the path
+	 * 
+	 * @return PropertyPath
+	 */
 	function peek(EntityQueryBuilder $eqb = null)
 	{
-		Assert::isFalse($this->isEmpty(), '%s is empty', $this->path);
-		
 		$me = clone $this;
 		
 		$me->move();
@@ -60,21 +83,31 @@ final class EntityPropertyPath
 		return $me;
 	}
 	
-	private function move()
-	{
-		$this->passed[] = array_shift($this->left);
-	}
-	
+	/**
+	 * Returns the current chunk of the path
+	 * 
+	 * @return string
+	 */
 	function getCurrentChunk()
 	{
 		return end($this->passed);
 	}
 	
+	/**
+	 * Returns the next chunk of the path
+	 * 
+	 * @return string
+	 */
 	function getNextChunk()
 	{
 		return reset($this->left);
 	}
 	
+	/**
+	 * Returns the string representation of the path from the beginning till the current point
+	 * 
+	 * @return string
+	 */
 	function getCurrentPath()
 	{
 		return join(".", $this->passed);
@@ -83,6 +116,13 @@ final class EntityPropertyPath
 	function getFullPath()
 	{
 		return $this->path;
+	}
+	
+	private function move()
+	{
+		Assert::isFalse($this->isEmpty(), 'property path %s reached its tail', $this->path);
+		
+		$this->passed[] = array_shift($this->left);
 	}
 }
 

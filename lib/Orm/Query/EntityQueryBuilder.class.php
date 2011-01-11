@@ -226,7 +226,9 @@ final class EntityQueryBuilder implements ISubjectivity
 	{
 		if (!isset($this->propertyCache[$property])) {
 			$this->propertyCache[$property] = 
-				$this->entity->getEntityProperty(new EntityPropertyPath($property, $this));
+				$this->entity
+					->getLogicalSchema()
+					->getEntityProperty(new EntityPropertyPath($property, $this));
 		}
 
 		return $this->propertyCache[$property];
@@ -243,7 +245,7 @@ final class EntityQueryBuilder implements ISubjectivity
 			$property = $this->entity->getLogicalSchema()->getProperty($encapsulant);
 			$type = $property->getType();
 			
-			Assert::isTrue($type instanceof OneToManyContainerPropertyType);
+			Assert::isTrue($type instanceof AssociationPropertyType);
 			
 			$builder = $this->joined[$encapsulant] =
 				new self (

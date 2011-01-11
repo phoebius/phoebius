@@ -228,9 +228,6 @@ final class AssociationPropertyType extends OrmPropertyType
 EOT;
 	}
 	
-	/**
-	 * @return EntityProperty
-	 */
 	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
 	{
 		Assert::isFalse(
@@ -242,7 +239,9 @@ EOT;
 		
 		$eqb = $path->getEntityQueryBuilder()->joinEncapsulant($path->getCurrentChunk());
 		
-		return $this->container->getEntityProperty($path->peek($eqb));
+		return $this->container
+			->getLogicalSchema()
+			->getEntityProperty($path->peek($eqb));
 	}
 
 	protected function getCtorArgumentsPhpCode()

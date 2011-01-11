@@ -49,6 +49,13 @@ interface ILogicallySchematic
 	 * @return OrmProperty
 	 */
 	function getProperty($name);
+	
+	/**
+	 * Returns the entity property for the specified path
+	 * 
+	 * @return EntityProperty
+	 */
+	function getEntityProperty(EntityPropertyPath $path);
 }
 
 ?>

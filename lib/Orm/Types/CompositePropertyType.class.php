@@ -179,9 +179,6 @@ final class CompositePropertyType extends OrmPropertyType
 		return count($this->getSqlTypes());
 	}
 	
-	/**
-	 * @return EntityProperty
-	 */
 	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
 	{
 		Assert::isFalse(
