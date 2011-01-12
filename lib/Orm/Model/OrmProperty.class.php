@@ -59,6 +59,11 @@ final class OrmProperty
 	private $isIdentifier;
 
 	/**
+	 * @var queryable
+	 */
+	private $queryable;
+	
+	/**
 	 * @param string $name name of the property
 	 * @param array list of database field names
 	 * @param OrmPropertyType property type
@@ -72,12 +77,14 @@ final class OrmProperty
 			OrmPropertyVisibility $visibility,
 			AssociationMultiplicity $multiplicity,
 			$isUnique = false,
-			$isIdentifier = false
+			$isIdentifier = false,
+			$queryable = false
 		)
 	{
 		Assert::isScalar($name);
 		Assert::isBoolean($isUnique);
 		Assert::isBoolean($isIdentifier);
+		Assert::isBoolean($queryable);
 
 		$this->name = $name;
 
@@ -92,6 +99,7 @@ final class OrmProperty
 		$this->multiplicity = $multiplicity;
 		$this->isUnique = $isUnique;
 		$this->isIdentifier = $isIdentifier;
+		$this->queryable = $queryable;
 	}
 
 	/**
@@ -156,6 +164,15 @@ final class OrmProperty
 	{
 		return $this->isUnique;
 	}
+	
+	/**
+	 * Determines whether property is used in query conditions and thus should be indexed
+	 * @return boolean
+	 */
+	function isQueryable()
+	{
+		return $this->queryable;
+	}
 
 	/**
 	 * Gets the ORM type of the property
@@ -216,6 +233,9 @@ final class OrmProperty
 				? 'true'
 				: 'false',
 			$this->isIdentifier
+				? 'true'
+				: 'false',
+			$this->queryable
 				? 'true'
 				: 'false'
 		);

@@ -118,6 +118,8 @@ final class DBSchema implements ISqlCastable
 			$createTable = new CreateTableQuery($table, true);
 			$sql[] = $createTable->toDialectString($dialect);
 
+			// replace getTableQuerySet() with DbTable::createIndexes($dialect)
+			// or Dialect::fillIndexes(DbTable $tbl);
 			foreach ($dialect->getTableQuerySet($table, false) as $query) {
 				$postSql[] = $query->toDialectString($dialect);
 			}

@@ -135,24 +135,10 @@ class PgSqlDialect extends Dialect
 
 		foreach ($table->getConstraints() as $constraint) {
 			$postQueries[] = new CreateConstraintQuery($table, $constraint);
-
-			$columns = array();
-
-			// create indexes
-			foreach ($constraint->getIndexableFields() as $field) {
-				$columns[] = $this->quoteIdentifier($field);
-			}
-
-			if (!empty($columns)) {
-				$postQueries[] = new RawSqlQuery(
-					'CREATE INDEX %s ON %s (' . join($columns) . ');',
-					array(
-						new SqlIdentifier($constraint->getName() . '_idx'),
-						new SqlIdentifier($table->getName())
-					)
-				);
-			}
 		}
+		
+		// indexes
+		Assert::notImplemented('index import');
 
 		if ($includeCreateTable) {
 			$preQueries[] = new CreateTableQuery($table);

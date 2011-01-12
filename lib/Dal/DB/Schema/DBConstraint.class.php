@@ -29,13 +29,33 @@ abstract class DBConstraint implements ISqlCastable
 	 * @var string
 	 */
 	private $name;
-
+	
 	/**
-	 * Gets the fields that should be indexed
-	 *
-	 * @return array of DBColumn
+	 * @var array
 	 */
-	abstract function getIndexableFields();
+	private $fields;
+	
+	/**
+	 * @param array of string $fields
+	 */
+	function __construct(array $fields)
+	{
+		Assert::isNotEmpty($fields, 'constraint cannot be across zero fields');
+		
+		$this->fields = $fields;
+	}
+	
+	function getFields()
+	{
+		return $this->fields;
+	}
+	
+	protected function getFieldsAsString(IDialect $dialect)
+	{
+		$fields = new SqlFieldArray($this->fields);
+		
+		return $fields->toDialectString($dialect);
+	}
 
 	/**
 	 * Gets the name of the constraint

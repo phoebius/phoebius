@@ -162,6 +162,9 @@ class DBSchemaBuilder
 				new DBUniqueConstraint($fields)
 			);
 		}
+		else if ($this->ormProperty->isQueryable()) {
+			Assert::notImplemented('add index');
+		}
 	}
 }
 

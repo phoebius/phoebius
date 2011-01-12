@@ -37,6 +37,11 @@ class DBTable
 	 * @var array of DBConstraint
 	 */
 	private $constraints = array();
+	
+	/**
+	 * @var array of DBIndex
+	 */
+	private $indexes = array();
 
 	/**
 	 * @param string $name name of the table
@@ -155,7 +160,11 @@ class DBTable
 			}
 		}
 		else {
-			$name = 'constraint_' . $this->name . '_' . (sizeof($this->constraints) + 1);
+			$name = 
+				'constraint_' . 
+				$this->name . '_' . 
+				join('_', $constraint->getFields()) 
+				. (sizeof($this->constraints) + 1);
 			$constraint->setName($name);
 		}
 

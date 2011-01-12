@@ -147,7 +147,7 @@ class MySqlDialect extends Dialect
 		$type = parent::getTypeRepresentation($dbType);
 
 		if ($dbType->isGenerated()) {
-			$type .= ' AUTO_INCREMENT PRIMARY KEY';
+			$type .= ' AUTO_INCREMENT';
 		}
 
 		return $type;
@@ -164,27 +164,10 @@ class MySqlDialect extends Dialect
 		}
 
 		foreach ($table->getConstraints() as $constraint) {
-			if (!$constraint instanceof DBPrimaryKeyConstraint) {
-				$queries[] = new CreateConstraintQuery($table, $constraint);
-			}
-
-			$columns = array();
-
-			// create indexes
-			foreach ($constraint->getIndexableFields() as $field) {
-				$columns[] = $this->quoteIdentifier($field);
-			}
-
-			if (!empty($columns)) {
-				$queries[] = new RawSqlQuery(
-					'CREATE INDEX %s ON %s (' . join($columns) . ');',
-					array(
-						new SqlIdentifier($constraint->getName() . '_idx'),
-						new SqlIdentifier($table->getName())
-					)
-				);
-			}
+			$queries[] = new CreateConstraintQuery($table, $constraint);
 		}
+		
+		Assert::notImplemented('import indexes');
 
 		return $queries;
 	}

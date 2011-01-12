@@ -71,6 +71,8 @@ class DBOneToOneConstraint extends DBConstraint
 
 				$this->referencedTable = $referencedTable;
 				$this->associationBreakAction = $associationBreakAction;
+				
+				parent::__construct($fields);
 
 				return;
 			}
@@ -82,17 +84,12 @@ class DBOneToOneConstraint extends DBConstraint
 		);
 	}
 
-	function getIndexableFields()
-	{
-		return $this->fields;
-	}
-
 	function toDialectString(IDialect $dialect)
 	{
 		return
 			$this->getHead($dialect)
 			. ' FOREIGN KEY ('
-			. $this->fields->toDialectString($dialect)
+			. $this->getFieldsAsString($dialect)
 			. ')'
 			. ' REFERENCES ' . $dialect->quoteIdentifier($this->referencedTable->getName())
 			. '('
