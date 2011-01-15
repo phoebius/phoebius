@@ -17,18 +17,23 @@
  ************************************************************************************************/
 
 /**
- * Represents an abstract database constraint.
+ * Represents an database index.
  *
- * Constraint can be optinally named.
+ * Index can be optinally named.
  *
  * @ingroup Dal_DB_Schema
  */
-abstract class DBConstraint implements ISqlCastable
+class DBIndex implements ISqlCastable
 {
 	/**
 	 * @var string
 	 */
 	private $name;
+	
+	/**
+	 * @var string
+	 */
+	private $type;
 	
 	/**
 	 * @var array
@@ -38,24 +43,29 @@ abstract class DBConstraint implements ISqlCastable
 	/**
 	 * @param array of string $fields
 	 */
-	function __construct(array $fields, $name = null)
+	function __construct(array $fields, $name = null, $type = null)
 	{
-		Assert::isNotEmpty($fields, 'constraint cannot be across zero fields');
+		Assert::isNotEmpty($fields, 'index cannot be across zero fields');
 		
 		$this->fields = $fields;
 		
 		if ($name) {
 			$this->setName($name);
 		}
+		
+		$this->type = type;
 	}
 	
+	/**
+	 * Gets the list of columns to be indexed
+	 */
 	function getFields()
 	{
 		return $this->fields;
 	}
 
 	/**
-	 * Gets the name of the constraint
+	 * Gets the name of the index
 	 *
 	 * @return string
 	 */
@@ -65,11 +75,21 @@ abstract class DBConstraint implements ISqlCastable
 	}
 
 	/**
-	 * Sets the new name of the constraint
+	 * Gets the type of index
 	 *
-	 * @param string $name name of the constraint
+	 * @return string
+	 */
+	function getType()
+	{
+		return $this->type;
+	}
+
+	/**
+	 * Sets the new name of the index
 	 *
-	 * @return DBConstraint itself
+	 * @param string $name name of the index
+	 *
+	 * @return DBIndex itself
 	 */
 	function setName($name)
 	{
@@ -79,17 +99,14 @@ abstract class DBConstraint implements ISqlCastable
 
 		return $this;
 	}
-
-	/**
-	 * Gets the SQL representation of the constraint's head
-	 *
-	 * @param IDialect $dialect
-	 *
-	 * @return string
-	 */
-	protected function getHead(IDialect $dialect)
+	
+	function toDialectString(IDialect $dialect)
 	{
-		return 'CONSTRAINT ' . $dialect->quoteIdentifier($this->name);
+		return 
+			' INDEX ' 
+			. $dialect->quoteIdentifier($this->getName()) 
+			. ($this->type ? ' ' . $this->type . ' ' : '')
+			. ' (' . $this->getFieldsAsString($dialect) . ')';
 	}
 	
 	/**

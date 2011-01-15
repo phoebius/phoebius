@@ -51,7 +51,8 @@ class DBOneToOneConstraint extends DBConstraint
 	function __construct(
 			array $fields,
 			DBTable $referencedTable,
-			AssociationBreakAction $associationBreakAction
+			AssociationBreakAction $associationBreakAction,
+			$name = null
 		)
 	{
 		foreach ($referencedTable->getConstraints() as $constraint) {
@@ -72,7 +73,7 @@ class DBOneToOneConstraint extends DBConstraint
 				$this->referencedTable = $referencedTable;
 				$this->associationBreakAction = $associationBreakAction;
 				
-				parent::__construct($fields);
+				parent::__construct($fields, $name);
 
 				return;
 			}

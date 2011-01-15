@@ -141,29 +141,35 @@ class DBSchemaBuilder
 		$fields = array_keys($dbColumns);
 
 		$this->dbTable->addColumns($dbColumns);
+		
+		// now add constraints and indexes
+
+		if ($this->ormProperty->isIdentifier()) {
+			$this->dbTable->addConstraint(
+				new DBPrimaryKeyConstraint($fields, $this->ormProperty->getName() . '_pk')
+			);
+		}
+		else if ($this->ormProperty->isUnique()) {
+			$this->dbTable->addConstraint(
+				new DBUniqueConstraint($fields, $this->ormProperty->getName() . '_uq')
+			);
+		}
 
 		if ($this->ormProperty->getType() instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
 					$fields,
 					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getTable()),
-					$this->ormProperty->getType()->getAssociationBreakAction()
+					$this->ormProperty->getType()->getAssociationBreakAction(),
+					$this->ormProperty->getName() . '_fk'
 				)
 			);
 		}
-
-		if ($this->ormProperty->isIdentifier()) {
-			$this->dbTable->addConstraint(
-				new DBPrimaryKeyConstraint($fields)
+		
+		if ($this->ormProperty->isQueryable()) {
+			$this->dbTable->addIndex(
+				new DBIndex($fields, $this->ormProperty->getName() . '_idx')
 			);
-		}
-		else if ($this->ormProperty->isUnique()) {
-			$this->dbTable->addConstraint(
-				new DBUniqueConstraint($fields)
-			);
-		}
-		else if ($this->ormProperty->isQueryable()) {
-			Assert::notImplemented('add index');
 		}
 	}
 }

@@ -17,11 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents a query for creating database tables.
+ * Represents a query for altering tables for creating indexes
  *
  * @ingroup Dal_DB_Query
  */
-final class CreateTableQuery implements ISqlQuery
+final class CreateIndexQuery implements ISqlQuery
 {
 	/**
 	 * @var DBTable
@@ -29,61 +29,31 @@ final class CreateTableQuery implements ISqlQuery
 	private $table;
 
 	/**
-	 * @var array
+	 * @var DBIndex
 	 */
-	private $commaSeparatedQueryParts = array();
+	private $index;
 
 	/**
 	 * @param DBTable $table a table object that represent an expected database table
+	 * @param DBIndex $index index to be created
 	 */
-	function __construct(DBTable $table)
+	function __construct(DBTable $table, DBIndex $index)
 	{
 		$this->table = $table;
+		$this->index = $index;
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
-		$queryParts = array();
-		$this->commaSeparatedQueryParts = array();
-
-		$queryParts[] = 'CREATE TABLE ';
-		$queryParts[] = $dialect->quoteIdentifier($this->table->getName());
-		$queryParts[] = '(';
-
-		$this->makeColumns($dialect);
-
-		$queryParts[] = join(',', $this->commaSeparatedQueryParts);
-
-		$queryParts[] = StringUtils::DELIM_STANDART;
-		$queryParts[] = ');';
-
-		return join('', $queryParts);
+		return
+			'ALTER TABLE ' . $dialect->quoteIdentifier($this->table->getName())
+			. ' ADD ' . $this->index->toDialectString($dialect)
+			. ';';
 	}
 
 	function getPlaceholderValues(IDialect $dialect)
 	{
-		return array ();
-	}
-
-	/**
-	 * @return void
-	 */
-	private function makeColumns(IDialect $dialect)
-	{
-		foreach ($this->table->getColumns() as $column) {
-			$this->makeColumn($column, $dialect);
-		}
-	}
-
-	/**
-	 * @return void
-	 */
-	private function makeColumn(DBColumn $column, IDialect $dialect)
-	{
-		$this->commaSeparatedQueryParts[] =
-			StringUtils::DELIM_STANDART
-			. "\t"
-			. $column->toDialectString($dialect);
+		return array();
 	}
 }
 

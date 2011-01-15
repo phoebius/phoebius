@@ -96,39 +96,31 @@ final class DBSchema implements ISqlCastable
 	 * Creates a list of ISqlQuery objects that represent a DDL for the list of DBTable objects
 	 * added to schema
 	 *
-	 * @param IDialect $dialect database dialect to use
-	 * @return array of ISqlQuery
+	 * @return SqlQuerySet
 	 */
-	function toQueries(IDialect $dialect)
+	function toQueries()
 	{
-		$queries = array();
+		$DDLs = new SqlQuerySet;
+		$constraintDDLs = new SqlQuerySet;
+		$indexDDLs = new SqlQuerySet;
+		
 		foreach ($this->tables as $table) {
-			$queries += $table->toQueries($dialect);
+			$DDLs->addQuery($table->getQuery());
+			
+			$constraintDDLs->addQueries($table->getConstraintQueries());
+			
+			$indexDDLs->addQueries($table->getIndexQueries());
 		}
 
-		return $queries;
+		return 
+			$DDLs
+				->merge($constraintDDLs)
+				->merge($indexDDLs);
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
-		$sql = array();
-		$postSql = array();
-
-		foreach ($this->tables as $table) {
-			$createTable = new CreateTableQuery($table, true);
-			$sql[] = $createTable->toDialectString($dialect);
-
-			// replace getTableQuerySet() with DbTable::createIndexes($dialect)
-			// or Dialect::fillIndexes(DbTable $tbl);
-			foreach ($dialect->getTableQuerySet($table, false) as $query) {
-				$postSql[] = $query->toDialectString($dialect);
-			}
-		}
-
-		return
-			join(StringUtils::DELIM_STANDART.StringUtils::DELIM_STANDART, $sql)
-			. StringUtils::DELIM_STANDART . StringUtils::DELIM_STANDART
-			. join(StringUtils::DELIM_STANDART . StringUtils::DELIM_STANDART, $postSql);
+		return $this->toQueries()->toDialectString($dialect);
 	}
 }
 
