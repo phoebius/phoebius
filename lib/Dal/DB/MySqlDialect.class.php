@@ -153,23 +153,9 @@ class MySqlDialect extends Dialect
 		return $type;
 	}
 
-	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
+	function getExtraTableQueries(DBTable $table)
 	{
-		$table = clone $table;
-
-		$queries = array();
-
-		if ($includeCreateTable) {
-			$queries[] = new CreateTableQuery($table, true);
-		}
-
-		foreach ($table->getConstraints() as $constraint) {
-			$queries[] = new CreateConstraintQuery($table, $constraint);
-		}
-		
-		Assert::notImplemented('import indexes');
-
-		return $queries;
+		return array();
 	}
 
 	function getSqlBooleanValue($value)

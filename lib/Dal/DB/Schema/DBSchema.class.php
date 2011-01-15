@@ -98,11 +98,12 @@ final class DBSchema implements ISqlCastable
 	 *
 	 * @return SqlQuerySet
 	 */
-	function toQueries()
+	function toQueries(IDialect $dialect = null)
 	{
 		$DDLs = new SqlQuerySet;
 		$constraintDDLs = new SqlQuerySet;
 		$indexDDLs = new SqlQuerySet;
+		$extraDDLs = new SqlQuerySet;
 		
 		foreach ($this->tables as $table) {
 			$DDLs->addQuery($table->getQuery());
@@ -110,12 +111,18 @@ final class DBSchema implements ISqlCastable
 			$constraintDDLs->addQueries($table->getConstraintQueries());
 			
 			$indexDDLs->addQueries($table->getIndexQueries());
+			
+			if ($dialect) {
+				$extraDDLs->addQueries($dialect->getExtraTableQueries($table));
+			}
 		}
-
-		return 
-			$DDLs
-				->merge($constraintDDLs)
-				->merge($indexDDLs);
+ 
+		$DDLs
+			->merge($constraintDDLs)
+			->merge($indexDDLs)
+			->merge($extraDDLs);
+			
+		return $DDLs;
 	}
 
 	function toDialectString(IDialect $dialect)
