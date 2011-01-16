@@ -1,4 +1,4 @@
- ================================================================================================
+  ================================================================================================
  *
  * Copyright (c) 2010 Scand Ltd.
  *
@@ -17,27 +17,6 @@ Phoebius v1.4
  + schema diff tool, db diff tool
  + MVC (controller -> view bridge) simplification
  + schema with indexes
-
-
-ORM/CodeGen
-===========
-Schema is now generated incorectly.
-The order is:
-CREATE TABLE statements ...
-CREATE CONSTRAINT statements ... (inc. PKs)
-
-Should be:
-CREATE TABLE statements ...
-CREATE PRIMARY KEY statements ...
-CREATE CONSTRAINT statements ...
-
-
-Add the following optional attrs of the property to the schema:
-index = [ true | false ]
-default = // for primitive scalar types represented by DBType only
-
-
-
 
 
 DAL/DB
