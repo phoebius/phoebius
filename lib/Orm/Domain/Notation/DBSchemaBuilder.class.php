@@ -143,32 +143,45 @@ class DBSchemaBuilder
 		$this->dbTable->addColumns($dbColumns);
 		
 		// now add constraints and indexes
-
-		if ($this->ormProperty->isIdentifier()) {
+		
+		$this->importConstraints($this->ormProperty);
+	}
+	
+	private function importConstraints(OrmProperty $property)
+	{
+		$fields = $property->getFields();
+		
+		if ($property->isIdentifier()) {
 			$this->dbTable->addConstraint(
-				new DBPrimaryKeyConstraint($fields, $this->ormProperty->getName() . '_pk')
+				new DBPrimaryKeyConstraint($fields, $property->getName() . '_pk')
 			);
 		}
-		else if ($this->ormProperty->isUnique()) {
+		else if ($property->isUnique()) {
 			$this->dbTable->addConstraint(
-				new DBUniqueConstraint($fields, $this->ormProperty->getName() . '_uq')
+				new DBUniqueConstraint($fields, $property->getName() . '_uq')
 			);
 		}
 
-		if ($this->ormProperty->getType() instanceof AssociationPropertyType) {
+		$type = $property->getType();
+		if ($type instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
 					$fields,
-					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getTable()),
-					$this->ormProperty->getType()->getAssociationBreakAction(),
-					$this->ormProperty->getName() . '_fk'
+					$this->dbSchema->getTable($property->getType()->getContainer()->getTable()),
+					$property->getType()->getAssociationBreakAction(),
+					$property->getName() . '_fk'
 				)
 			);
 		}
+		else if ($type instanceof CompositePropertyType) {
+			foreach ($type->getProperties($property) as $_property) {
+				$this->importConstraints($_property);
+			}
+		}
 		
-		if ($this->ormProperty->isQueryable()) {
+		if ($property->isQueryable()) {
 			$this->dbTable->addIndex(
-				new DBIndex($fields, $this->ormProperty->getName() . '_idx')
+				new DBIndex($fields, $property->getName() . '_idx')
 			);
 		}
 	}

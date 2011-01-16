@@ -100,7 +100,7 @@ class PgSqlDialect extends Dialect
 	function getExtraTableQueries(DBTable $table)
 	{
 		$queries = array();
-
+		
 		foreach ($table->getColumns() as $column) {
 			$type = $column->getType();
 			if ($type instanceof DBType && $type->isGenerated()) {

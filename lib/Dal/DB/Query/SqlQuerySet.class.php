@@ -31,7 +31,7 @@ class SqlQuerySet implements ISqlQuery
 	/**
 	 * @param array $queries set of ISqlQuery
 	 */
-	function __construct(array $queries)
+	function __construct(array $queries = array())
 	{
 		$this->addQueries($queries);
 	}
@@ -59,7 +59,7 @@ class SqlQuerySet implements ISqlQuery
 	
 	function merge(SqlQuerySet $set) 
 	{
-		$this->queries += $set->queries;
+		$this->queries = array_merge($this->queries, $set->queries);
 		
 		return $this;
 	}
@@ -72,7 +72,10 @@ class SqlQuerySet implements ISqlQuery
 			$sql[] = $query->toDialectString($dialect);
 		}
 		
-		return join(StringUtils::DELIM_STANDART, $sql);
+		return join(
+			StringUtils::DELIM_STANDART . StringUtils::DELIM_STANDART, 
+			$sql
+		);
 	}
 
 	function getPlaceholderValues(IDialect $dialect)

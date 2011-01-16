@@ -136,6 +136,17 @@ final class CompositePropertyType extends OrmPropertyType
 			$property->isIdentifier()
 		);
 	}
+	
+	function getProperties(OrmProperty $owner)
+	{
+		$yield = array();
+		
+		foreach ($this->entity->getLogicalSchema()->getProperties() as $property) {
+			$yield[] = $this->getVirtualProperty($property->getName(), $owner);
+		}
+		
+		return $yield;
+	}
 
 	function getImplClass()
 	{

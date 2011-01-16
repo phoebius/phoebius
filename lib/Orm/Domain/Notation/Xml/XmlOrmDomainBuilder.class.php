@@ -325,6 +325,7 @@ class XmlOrmDomainBuilder
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			new AssociationMultiplicity((string) $xmlProperty['multiplicity']),
 			$xmlProperty['unique'] == 'true',
+			false,
 			$xmlProperty['queryable'] == 'true'
 		);
 

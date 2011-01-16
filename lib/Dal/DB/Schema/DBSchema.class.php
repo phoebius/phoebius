@@ -121,13 +121,13 @@ final class DBSchema implements ISqlCastable
 			->merge($constraintDDLs)
 			->merge($indexDDLs)
 			->merge($extraDDLs);
-			
+
 		return $DDLs;
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
-		return $this->toQueries()->toDialectString($dialect);
+		return $this->toQueries($dialect)->toDialectString($dialect);
 	}
 }
 

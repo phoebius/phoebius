@@ -53,7 +53,7 @@ class DBIndex implements ISqlCastable
 			$this->setName($name);
 		}
 		
-		$this->type = type;
+		$this->type = $type;
 	}
 	
 	/**
@@ -103,10 +103,10 @@ class DBIndex implements ISqlCastable
 	function toDialectString(IDialect $dialect)
 	{
 		return 
-			' INDEX ' 
-			. $dialect->quoteIdentifier($this->getName()) 
-			. ($this->type ? ' ' . $this->type . ' ' : '')
-			. ' (' . $this->getFieldsAsString($dialect) . ')';
+			'INDEX ' 
+			. ($this->name ? $dialect->quoteIdentifier($this->getName()) . ' ' : '')
+			. ($this->type ? $this->type . ' ' : '')
+			. '(' . $this->getFieldsAsString($dialect) . ')';
 	}
 	
 	/**
