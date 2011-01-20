@@ -28,18 +28,18 @@
 				<property name="ip" type="String"/>
 			</properties>
 		</entity>
-		<entity name="TestUser" has-dao="true">
-			<properties>
-				<identifier/>
-				<property name="name" type="String"/>
-				<property name="remoteAddr" type="TestRemoteAddr" unique="true"/>
-			</properties>
-		</entity>
 		<entity name="TestEntry" has-dao="true">
 			<properties>
 				<identifier/>
 				<property name="title" type="String"/>
 				<property name="author" type="TestUser"/>
+			</properties>
+		</entity>
+		<entity name="TestUser" has-dao="true">
+			<properties>
+				<identifier/>
+				<property name="name" type="String"/>
+				<property name="remoteAddr" type="TestRemoteAddr" unique="true"/>
 			</properties>
 		</entity>
 		<entity name="TestComment" has-dao="true">
