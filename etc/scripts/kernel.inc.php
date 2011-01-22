@@ -16,7 +16,7 @@
  *
  ************************************************************************************************/
 
-define('PHOEBIUS_VERSION', '1.2.0');
+define('PHOEBIUS_VERSION', '1.4.0-dev');
 
 $initializeRootDirectory = str_replace(array('/','\\'), DIRECTORY_SEPARATOR, dirname(__FILE__));
 $initializeRootDirectory = explode(DIRECTORY_SEPARATOR, $initializeRootDirectory);
@@ -34,8 +34,8 @@ define('PHOEBIUS_BASE_ROOT', $baseRootDirectory);
  */
 define('PHOEBIUS_INITIALIZED', true);
 
-define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v.'.PHOEBIUS_VERSION);
-define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius Framework v.'.PHOEBIUS_VERSION);
+define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v'.PHOEBIUS_VERSION);
+define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius Framework v'.PHOEBIUS_VERSION);
 
 if (!defined('APP_AREA')) {
 	/**
