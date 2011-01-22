@@ -39,6 +39,11 @@ class DBTable
 	private $constraints = array();
 	
 	/**
+	 * @var DBPrimaryKeyConstraint
+	 */
+	private $pk;
+	
+	/**
 	 * @var array of DBIndex
 	 */
 	private $indexes = array();
@@ -168,6 +173,14 @@ class DBTable
 		}
 
 		$this->constraints[$name] = $constraint;
+		
+		if ($constraint instanceof DBPrimaryKeyConstraint) {
+			if ($this->pk) {
+				throw new DuplicationException('constraint', $name);
+			}
+			
+			$this->pk = $constraint;
+		}
 
 		return $this;
 	}
@@ -221,9 +234,17 @@ class DBTable
 		return $this->indexes;
 	}
 	
-	function getQuery()
+	function getQueries()
 	{
-		return new CreateTableQuery($this, true);
+		$yield = array(
+			new CreateTableQuery($this, true),
+		);
+		
+		if ($this->pk) {
+			$yield[] = new CreateConstraintQuery($this, $this->pk);
+		}
+		
+		return $yield;
 	}
 	
 	function getConstraintQueries()
@@ -231,7 +252,9 @@ class DBTable
 		$queries = array();
 		
 		foreach ($this->constraints as $constraint) {
-			$queries[] = new CreateConstraintQuery($this, $constraint);
+			if ($constraint !== $this->pk) {
+				$queries[] = new CreateConstraintQuery($this, $constraint);
+			}
 		}
 		
 		return $queries;

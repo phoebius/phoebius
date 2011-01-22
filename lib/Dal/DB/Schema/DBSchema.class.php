@@ -106,7 +106,7 @@ final class DBSchema implements ISqlCastable
 		$extraDDLs = new SqlQuerySet;
 		
 		foreach ($this->tables as $table) {
-			$DDLs->addQuery($table->getQuery());
+			$DDLs->addQueries($table->getQueries());
 			
 			$constraintDDLs->addQueries($table->getConstraintQueries());
 			

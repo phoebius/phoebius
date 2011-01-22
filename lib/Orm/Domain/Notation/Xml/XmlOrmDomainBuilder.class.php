@@ -125,6 +125,7 @@ class XmlOrmDomainBuilder
 	}
 	
 	private $entitiesNodes = array();
+	private $currentClass = null;
 
 	/**
 	 * @return void
@@ -157,7 +158,8 @@ class XmlOrmDomainBuilder
 		}
 		
 		$entity = $this->entitiesNodes[$name];
-		$this->processingStack[$name] = $class = $this->generateEntity($entity);
+		$prevClass = $this->currentClass;
+		$this->processingStack[$name] = $class = $this->currentClass = $this->generateEntity($entity);
 		
 		$this->ormDomain->addClass($class);
 	
@@ -167,32 +169,19 @@ class XmlOrmDomainBuilder
 			$class->setIdentifier($id);
 		}
 		
-		$this->obtainClassProperties($class, $this->getChildNodeSet($entity->properties, 'property'));
-		$this->obtainClassContainers($class, $this->getChildNodeSet($entity->properties, 'container'));
-		
-		return $class;
-	}
-
-	/**
-	 * @return void
-	 */
-	private function obtainClassProperties(OrmClass $class, array $properties)
-	{
-		foreach ($properties as $property) {
+		foreach ($this->getChildNodeSet($entity->properties, 'property') as $property) {
 			$property = $this->generateProperty($property);
 			$class->addProperty($property);
 		}
-	}
-
-	/**
-	 * @return void
-	 */
-	private function obtainClassContainers(OrmClass $class, array $containers)
-	{
-		foreach ($containers as $container) {
+		
+		foreach ($this->getChildNodeSet($entity->properties, 'container') as $container) {
 			$container = $this->generateContainer($class, $container);
 			$class->addProperty($container);
 		}
+		
+		$this->currentClass = $prevClass;
+		
+		return $class;
 	}
 
 	/**
