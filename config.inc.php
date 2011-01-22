@@ -33,7 +33,7 @@ if (!defined('PHOEBIUS_TMP_ROOT')) {
 	);
 	
 	if (!is_dir(PHOBEBIUS_TMP_ROOT)) {
-		mkdir(PHOEBIUS_TMP_ROOT, 700, true);
+		mkdir(PHOEBIUS_TMP_ROOT, 600, true);
 	}
 }
 
