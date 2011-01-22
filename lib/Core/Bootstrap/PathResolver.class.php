@@ -43,7 +43,7 @@ final class PathResolver extends LazySingleton
 	 */
 	function getTmpDir($class, $internalDirectory = null)
 	{
-		return $this->getDir($class, APP_TMP_ROOT, $internalDirectory);
+		return $this->getDir($class, PHOEBIUS_TMP_ROOT, $internalDirectory);
 	}
 
 	/**

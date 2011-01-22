@@ -70,7 +70,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 	/**
 	 * @var string
 	 */
-	private $slotId = APP_GUID;
+	private $slotId = PHOEBIUS_APP_ID;
 
 	/**
 	 * @return Autoloader

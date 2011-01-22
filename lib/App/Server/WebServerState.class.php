@@ -82,7 +82,7 @@ class WebServerState extends CliServerState implements IWebServerState
 		}
 
 		// fasten to the current server to avoid key haching over different apps built on the framework
-		$items[] = APP_GUID;
+		$items[] = PHOEBIUS_APP_ID;
 
 		$string = join('', $items);
 

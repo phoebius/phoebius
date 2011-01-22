@@ -183,12 +183,7 @@ class PgSqlDB extends DB
 
 	function sendQuery(ISqlQuery $query, $isAsync = false)
 	{
-		$resource = $this->performQuery(
-			$query,
-			(APP_SLOT_CONFIGURATION & SLOT_CONFIGURATION_SEVERITY_VERBOSE) == 0
-				? $isAsync
-				: false
-		);
+		$resource = $this->performQuery($query, $isAsync);
 
 		$result = new DBQueryResult($this, $resource);
 

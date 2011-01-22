@@ -169,7 +169,7 @@ abstract class ClassResolver extends InternalSegmentCache implements IClassResol
 		sort($paths);
 
 		return sha1(
-			   APP_GUID
+			   PHOEBIUS_APP_ID
 			 . get_class($this)
 			 . $this->extension
 			 . join(PATH_SEPARATOR, $paths)
