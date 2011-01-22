@@ -97,24 +97,23 @@ class PgSqlDialect extends Dialect
 		return "'" . pg_escape_string($value)  . "'";
 	}
 
-	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
+	function getExtraTableQueries(DBTable $table)
 	{
-		$preQueries = array();
-		$postQueries = array();
-
+		$queries = array();
+		
 		foreach ($table->getColumns() as $column) {
 			$type = $column->getType();
 			if ($type instanceof DBType && $type->isGenerated()) {
 				$sqName = $this->getSequenceName($table->getName(), $column->getName());
 
-				$preQueries[] = new RawSqlQuery(
+				$queries[] = new RawSqlQuery(
 					'CREATE SEQUENCE %s;',
 					array(
 						new SqlIdentifier($sqName)
 					)
 				);
 
-				$postQueries[] = new RawSqlQuery(
+				$queries[] = new RawSqlQuery(
 					'ALTER SEQUENCE %s OWNED BY %s;',
 					array(
 						new SqlIdentifier($sqName),
@@ -122,7 +121,7 @@ class PgSqlDialect extends Dialect
 					)
 				);
 
-				$postQueries[] = new RawSqlQuery(
+				$queries[] = new RawSqlQuery(
 					'ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;',
 					array(
 						new SqlIdentifier($table->getName()),
@@ -134,34 +133,13 @@ class PgSqlDialect extends Dialect
 		}
 
 		foreach ($table->getConstraints() as $constraint) {
-			$postQueries[] = new CreateConstraintQuery($table, $constraint);
-
-			$columns = array();
-
-			// create indexes
-			foreach ($constraint->getIndexableFields() as $field) {
-				$columns[] = $this->quoteIdentifier($field);
-			}
-
-			if (!empty($columns)) {
-				$postQueries[] = new RawSqlQuery(
-					'CREATE INDEX %s ON %s (' . join($columns) . ');',
-					array(
-						new SqlIdentifier($constraint->getName() . '_idx'),
-						new SqlIdentifier($table->getName())
-					)
-				);
+			if ($constraint instanceof DBOneToOneConstraint) {
+				// create an explicit index for that
+				$queries[] = new CreateIndexQuery($table, new DBIndex($constraint->getFields()));
 			}
 		}
-
-		if ($includeCreateTable) {
-			$preQueries[] = new CreateTableQuery($table);
-		}
-
-		return array_merge(
-			$preQueries,
-			$postQueries
-		);
+		
+		return $queries;
 	}
 
 	/**

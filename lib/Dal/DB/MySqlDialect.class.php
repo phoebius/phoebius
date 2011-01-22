@@ -147,46 +147,15 @@ class MySqlDialect extends Dialect
 		$type = parent::getTypeRepresentation($dbType);
 
 		if ($dbType->isGenerated()) {
-			$type .= ' AUTO_INCREMENT PRIMARY KEY';
+			$type .= ' AUTO_INCREMENT';
 		}
 
 		return $type;
 	}
 
-	function getTableQuerySet(DBTable $table, $includeCreateTable = true)
+	function getExtraTableQueries(DBTable $table)
 	{
-		$table = clone $table;
-
-		$queries = array();
-
-		if ($includeCreateTable) {
-			$queries[] = new CreateTableQuery($table, true);
-		}
-
-		foreach ($table->getConstraints() as $constraint) {
-			if (!$constraint instanceof DBPrimaryKeyConstraint) {
-				$queries[] = new CreateConstraintQuery($table, $constraint);
-			}
-
-			$columns = array();
-
-			// create indexes
-			foreach ($constraint->getIndexableFields() as $field) {
-				$columns[] = $this->quoteIdentifier($field);
-			}
-
-			if (!empty($columns)) {
-				$queries[] = new RawSqlQuery(
-					'CREATE INDEX %s ON %s (' . join($columns) . ');',
-					array(
-						new SqlIdentifier($constraint->getName() . '_idx'),
-						new SqlIdentifier($table->getName())
-					)
-				);
-			}
-		}
-
-		return $queries;
+		return array();
 	}
 
 	function getSqlBooleanValue($value)

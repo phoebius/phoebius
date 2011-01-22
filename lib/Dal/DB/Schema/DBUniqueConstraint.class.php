@@ -24,37 +24,9 @@
  */
 class DBUniqueConstraint extends DBConstraint
 {
-	/**
-	 * @var SqlFieldArray
-	 */
-	private $fields;
-
-	/**
-	 * @param array $fields array of field names affected by the constaint
-	 */
-	function __construct(array $fields)
-	{
-		$this->fields = new SqlFieldArray($fields);
-	}
-
-	/**
-	 * Get the fields affected by the constraint
-	 *
-	 * @return array of string
-	 */
-	function getFields()
-	{
-		return $this->fields->toArray();
-	}
-
-	function getIndexableFields()
-	{
-		return array();
-	}
-
 	function toDialectString(IDialect $dialect)
 	{
-		return $this->getHead($dialect) . ' (' . $this->fields->toDialectString($dialect) . ')';
+		return $this->getHead($dialect) . ' (' . $this->getFieldsAsString($dialect) . ')';
 	}
 
 	protected function getHead(IDialect $dialect)

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * ***********************************************************************************************
+ *
+ * Phoebius Framework
+ *
+ * **********************************************************************************************
+ *
+ * Copyright (c) 2011 Scand Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation;
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
+ *
+ *************************************************************************************************
+-->
+
+<!DOCTYPE domain SYSTEM "../../share/Orm/Domain/Meta/Xml/abstract.dtd">
+
+<domain>
+	<entities>
+		<entity name="TestRemoteAddr" has-dao="false">
+			<properties>
+				<property name="mac" type="String" unique="true"/>
+				<property name="ip" type="String"/>
+			</properties>
+		</entity>
+		<entity name="TestEntry" has-dao="true">
+			<properties>
+				<identifier/>
+				<property name="title" type="String"/>
+				<property name="author" type="TestUser"/>
+			</properties>
+		</entity>
+		<entity name="TestUser" has-dao="true">
+			<properties>
+				<identifier/>
+				<property name="name" type="String"/>
+				<property name="remoteAddr" type="TestRemoteAddr" unique="true"/>
+			</properties>
+		</entity>
+		<entity name="TestComment" has-dao="true">
+			<properties>
+				<identifier />
+				<property name="entry" type="TestEntry" />
+				<property name="comment" type="String" />
+				<property name="time" type="Timestamp" queryable="true" />
+			</properties>
+		</entity>
+	</entities>
+</domain>

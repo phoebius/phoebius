@@ -29,11 +29,6 @@ final class CreateTableQuery implements ISqlQuery
 	private $table;
 
 	/**
-	 * @var boolean
-	 */
-	private $skipConstraints;
-
-	/**
 	 * @var array
 	 */
 	private $commaSeparatedQueryParts = array();
@@ -41,10 +36,9 @@ final class CreateTableQuery implements ISqlQuery
 	/**
 	 * @param DBTable $table a table object that represent an expected database table
 	 */
-	function __construct(DBTable $table, $skipConstraints = true)
+	function __construct(DBTable $table)
 	{
 		$this->table = $table;
-		$this->skipConstraints = $skipConstraints;
 	}
 
 	function toDialectString(IDialect $dialect)
@@ -57,10 +51,6 @@ final class CreateTableQuery implements ISqlQuery
 		$queryParts[] = '(';
 
 		$this->makeColumns($dialect);
-
-		if (!$this->skipConstraints) {
-			$this->makeConstraints($dialect);
-		}
 
 		$queryParts[] = join(',', $this->commaSeparatedQueryParts);
 
@@ -94,18 +84,6 @@ final class CreateTableQuery implements ISqlQuery
 			StringUtils::DELIM_STANDART
 			. "\t"
 			. $column->toDialectString($dialect);
-	}
-
-	/**
-	 * @return void
-	 */
-	private function makeConstraints(IDialect $dialect)
-	{
-		foreach ($this->table->getConstraints() as $constraint) {
-			$queryParts = array(StringUtils::DELIM_STANDART, "\t");
-			$queryParts[] = $constraint->toDialectString($dialect);
-			$this->commaSeparatedQueryParts[] = join('', $queryParts);
-		}
 	}
 }
 

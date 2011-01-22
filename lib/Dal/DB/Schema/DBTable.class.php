@@ -37,6 +37,16 @@ class DBTable
 	 * @var array of DBConstraint
 	 */
 	private $constraints = array();
+	
+	/**
+	 * @var DBPrimaryKeyConstraint
+	 */
+	private $pk;
+	
+	/**
+	 * @var array of DBIndex
+	 */
+	private $indexes = array();
 
 	/**
 	 * @param string $name name of the table
@@ -155,26 +165,21 @@ class DBTable
 			}
 		}
 		else {
-			$name = 'constraint_' . $this->name . '_' . (sizeof($this->constraints) + 1);
+			$name = 
+				'constraint_' .
+				join('_', $constraint->getFields()) 
+				. (sizeof($this->constraints) + 1);
 			$constraint->setName($name);
 		}
 
 		$this->constraints[$name] = $constraint;
-
-		return $this;
-	}
-
-	/**
-	 * Adds a table constraint
-	 *
-	 * @param array $constraints a list of constraints to add to the table
-	 * @throws DuplicationException thrown when another constaint with the same name already added
-	 * @return DBTable itself
-	 */
-	function addConstraints(array $constraints)
-	{
-		foreach ($constraints as $constraint) {
-			$this->addConstraint($constraint);
+		
+		if ($constraint instanceof DBPrimaryKeyConstraint) {
+			if ($this->pk) {
+				throw new DuplicationException('constraint', $name);
+			}
+			
+			$this->pk = $constraint;
 		}
 
 		return $this;
@@ -191,14 +196,79 @@ class DBTable
 	}
 
 	/**
-	 * Creates a list of ISqlQuery objects that represent a DDL for the table
+	 * Adds a table index
 	 *
-	 * @param IDialect $dialect database dialect to use
-	 * @return array of ISqlQuery
+	 * @param DBIndex $index index to add
+	 * @throws DuplicationException thrown when another index with the same name already added
+	 * @return DBTable itself
 	 */
-	function toQueries(IDialect $dialect)
+	function addIndex(DBIndex $index)
 	{
-		return $dialect->getTableQuerySet($this, true);
+		$name = $index->getName();
+
+		if ($name) {
+			if (isset($this->indexes[$name])) {
+				throw new DuplicationException('index', $name);
+			}
+		}
+		else {
+			$name = 
+				'index_' .
+				join('_', $index->getFields()) 
+				. (sizeof($this->indexes) + 1);
+			$index->setName($name);
+		}
+
+		$this->indexes[$name] = $index;
+
+		return $this;
+	}
+
+	/**
+	 * Gets the DBIndex objects added to the table
+	 *
+	 * @return array of DBIndex
+	 */
+	function getIndexes()
+	{
+		return $this->indexes;
+	}
+	
+	function getQueries()
+	{
+		$yield = array(
+			new CreateTableQuery($this, true),
+		);
+		
+		if ($this->pk) {
+			$yield[] = new CreateConstraintQuery($this, $this->pk);
+		}
+		
+		return $yield;
+	}
+	
+	function getConstraintQueries()
+	{
+		$queries = array();
+		
+		foreach ($this->constraints as $constraint) {
+			if ($constraint !== $this->pk) {
+				$queries[] = new CreateConstraintQuery($this, $constraint);
+			}
+		}
+		
+		return $queries;
+	}
+	
+	function getIndexQueries()
+	{
+		$queries = array();
+		
+		foreach ($this->indexes as $index) {
+			$queries[] = new CreateIndexQuery($this, $index);
+		}
+		
+		return $queries;
 	}
 }
 

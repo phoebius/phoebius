@@ -16,6 +16,24 @@
  *
  ************************************************************************************************/
 
-require dirname(__FILE__) . '/appless.init.php';
+/**
+ * @ingroup Test
+ */
+final class AllTests
+{
+	static function main()
+	{
+		//Exceptionizer::getInstance()->register(E_ALL | E_STRICT, false, 'InternalOperationException');
+		require_once '../etc/phpunit.init.php';
+		PHPUnit_TextUI_TestRunner::run(self::suite());
+	}
+
+	static function suite()
+	{
+		$suite = new PhoebiusTestSuite();
+		
+		return $suite;
+	}
+}
 
 ?>

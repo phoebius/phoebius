@@ -20,6 +20,7 @@
 <!ELEMENT domain (entities*)>
 <!ATTLIST domain
 	db-schema		CDATA #IMPLIED
+	version			(1.4) "1.4"
 >
 
 <!ELEMENT entities (entity*)>
@@ -87,6 +88,8 @@ Extended example with the same result:
 	unique			(true|false) "false"
 	multiplicity	(zeroOrOne|exactlyOne) "exactlyOne"
 	db-columns		NMTOKENS #IMPLIED
+	
+	queryable		(true|false) "false"
 >
 
 <!--

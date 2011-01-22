@@ -123,77 +123,65 @@ class XmlOrmDomainBuilder
 
 		return $nodes;
 	}
+	
+	private $entitiesNodes = array();
+	private $currentClass = null;
 
 	/**
 	 * @return void
 	 */
 	private function generateDomain()
 	{
-		$classEntities = array();
-		$classProperties = array();
-		$classContainers = array();
-
 		if (isset($this->xmlElement['db-schema'])) {
 			$this->ormDomain->setDbSchema((string) $this->xmlElement['db-schema']);
 		}
-
-		foreach ($this->xmlElement->entities->entity as $entity) {
-			$class = $this->generateEntity($entity);
-
-			$this->ormDomain->addClass($class);
-
-			// process an identifier (if specified). However, entity CAN BE identifierless
-			if (isset($entity->properties->identifier)) {
-				$id = $this->generateIdentifier($entity->properties->identifier);
-				// we should generate an identifier (if any) before properties
-				// because type juggling depends on the identifier availabilty
-				$class->setIdentifier($id);
-			}
-			else if ($class->hasDao()) {
-//				throw new OrmModelIntegrityException(
-//					$class->getName() . 'marked as dao-related and thus should be identifiable'
-//				);
-			}
-
-			// collect props and containers for further processing
-			$name = $class->getName();
-
-			$classEntities[$name] = $class;
-			$classProperties[$name] = $this->getChildNodeSet($entity->properties, 'property');
-			$classContainers[$name] = $this->getChildNodeSet($entity->properties, 'container');
+		
+		// scan entity nodes (expanding inclusions) 
+		// and put them into internal hashmap
+		foreach ($this->getChildNodeSet($this->xmlElement->entities, 'entity') as $entity) {
+			$this->entitiesNodes[(string) $entity['name']] = $entity;
 		}
-
-		// firsly, we process props as they can have one-to-one associations only
-		foreach ($classProperties as $name => $properties) {
-			$this->obtainClassProperties($classEntities[$name], $properties);
-		}
-
-		// for now we can process containers
-		foreach ($classContainers as $name => $containers) {
-			$this->obtainClassContainers($classEntities[$name], $containers);
+		
+		// then traverse over them, and build each recursively
+		foreach (array_keys($this->entitiesNodes) as $name) {
+			$this->importEntity($name);
 		}
 	}
-
-	/**
-	 * @return void
-	 */
-	private function obtainClassProperties(OrmClass $class, array $properties)
-	{
-		foreach ($properties as $property) {
+	
+	private function importEntity($name) {
+		if (!isset($this->entitiesNodes[$name])) {
+			return null;
+		}
+		
+		if ($this->ormDomain->classExists($name)) {
+			return $this->ormDomain->getClass($name);
+		}
+		
+		$entity = $this->entitiesNodes[$name];
+		$prevClass = $this->currentClass;
+		$this->processingStack[$name] = $class = $this->currentClass = $this->generateEntity($entity);
+		
+		$this->ormDomain->addClass($class);
+	
+		// process an identifier (if specified). However, entity CAN BE identifierless
+		if (isset($entity->properties->identifier)) {
+			$id = $this->generateIdentifier($entity->properties->identifier);
+			$class->setIdentifier($id);
+		}
+		
+		foreach ($this->getChildNodeSet($entity->properties, 'property') as $property) {
 			$property = $this->generateProperty($property);
 			$class->addProperty($property);
 		}
-	}
-
-	/**
-	 * @return void
-	 */
-	private function obtainClassContainers(OrmClass $class, array $containers)
-	{
-		foreach ($containers as $container) {
+		
+		foreach ($this->getChildNodeSet($entity->properties, 'container') as $container) {
 			$container = $this->generateContainer($class, $container);
 			$class->addProperty($container);
 		}
+		
+		$this->currentClass = $prevClass;
+		
+		return $class;
 	}
 
 	/**
@@ -324,7 +312,9 @@ class XmlOrmDomainBuilder
 			$type,
 			new OrmPropertyVisibility((string) $xmlProperty['visibility']),
 			new AssociationMultiplicity((string) $xmlProperty['multiplicity']),
-			$xmlProperty['unique'] == 'true'
+			$xmlProperty['unique'] == 'true',
+			false,
+			$xmlProperty['queryable'] == 'true'
 		);
 
 		return $property;
@@ -455,9 +445,7 @@ class XmlOrmDomainBuilder
 	 */
 	private function getPropertyType($name, AssociationMultiplicity $multiplicity, array $parameters = array())
 	{
-		if ($this->ormDomain->classExists($name)) {
-			$class = $this->ormDomain->getClass($name);
-
+		if (($class = $this->importEntity($name))) { // force recursion
 			if ($class->hasDao() && $class->getIdentifier()) {
 				return new AssociationPropertyType(
 					$class,

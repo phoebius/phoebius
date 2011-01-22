@@ -17,32 +17,44 @@
  ************************************************************************************************/
 
 /**
- * @ingroup Test
+ * Represents a query for altering tables for creating indexes
+ *
+ * @ingroup Dal_DB_Query
  */
-final class AllTests
+final class CreateIndexQuery implements ISqlQuery
 {
-	const GLOBALS_TEST_PATHS_INDEX = 'testPaths';
+	/**
+	 * @var DBTable
+	 */
+	private $table;
 
-	public static $testPaths = array();
+	/**
+	 * @var DBIndex
+	 */
+	private $index;
 
-	static function main()
+	/**
+	 * @param DBTable $table a table object that represent an expected database table
+	 * @param DBIndex $index index to be created
+	 */
+	function __construct(DBTable $table, DBIndex $index)
 	{
-		PHPUnit_TextUI_TestRunner::run(self::suite());
+		$this->table = $table;
+		$this->index = $index;
 	}
 
-	static function suite()
+	function toDialectString(IDialect $dialect)
 	{
-		if (isset($GLOBALS[self::GLOBALS_TEST_PATHS_INDEX])) {
-			self::$testPaths = $GLOBALS[self::GLOBALS_TEST_PATHS_INDEX];
-		}
-
-		Exceptionizer::getInstance()->register(E_ALL | E_STRICT, false, 'InternalOperationException');
-		return new PhoebiusTestSuite(self::$testPaths);
+		return
+			'ALTER TABLE ' . $dialect->quoteIdentifier($this->table->getName())
+			. ' ADD ' . $this->index->toDialectString($dialect)
+			. ';';
 	}
-}
 
-if (!defined('PHOEBIUS_CONFIG_LOADED')) {
-	require_once '../../etc/appless.init.php';
+	function getPlaceholderValues(IDialect $dialect)
+	{
+		return array();
+	}
 }
 
 ?>

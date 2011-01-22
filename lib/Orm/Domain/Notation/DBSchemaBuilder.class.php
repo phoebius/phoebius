@@ -141,25 +141,47 @@ class DBSchemaBuilder
 		$fields = array_keys($dbColumns);
 
 		$this->dbTable->addColumns($dbColumns);
+		
+		// now add constraints and indexes
+		
+		$this->importConstraints($this->ormProperty);
+	}
+	
+	private function importConstraints(OrmProperty $property)
+	{
+		$fields = $property->getFields();
+		
+		if ($property->isIdentifier()) {
+			$this->dbTable->addConstraint(
+				new DBPrimaryKeyConstraint($fields, $property->getName() . '_pk')
+			);
+		}
+		else if ($property->isUnique()) {
+			$this->dbTable->addConstraint(
+				new DBUniqueConstraint($fields, $property->getName() . '_uq')
+			);
+		}
 
-		if ($this->ormProperty->getType() instanceof AssociationPropertyType) {
+		$type = $property->getType();
+		if ($type instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
 					$fields,
-					$this->dbSchema->getTable($this->ormProperty->getType()->getContainer()->getTable()),
-					$this->ormProperty->getType()->getAssociationBreakAction()
+					$this->dbSchema->getTable($property->getType()->getContainer()->getTable()),
+					$property->getType()->getAssociationBreakAction(),
+					$property->getName() . '_fk'
 				)
 			);
 		}
-
-		if ($this->ormProperty->isIdentifier()) {
-			$this->dbTable->addConstraint(
-				new DBPrimaryKeyConstraint($fields)
-			);
+		else if ($type instanceof CompositePropertyType) {
+			foreach ($type->getProperties($property) as $_property) {
+				$this->importConstraints($_property);
+			}
 		}
-		else if ($this->ormProperty->isUnique()) {
-			$this->dbTable->addConstraint(
-				new DBUniqueConstraint($fields)
+		
+		if ($property->isQueryable()) {
+			$this->dbTable->addIndex(
+				new DBIndex($fields, $property->getName() . '_idx')
 			);
 		}
 	}

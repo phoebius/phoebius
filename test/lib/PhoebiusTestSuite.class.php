@@ -16,6 +16,26 @@
  *
  ************************************************************************************************/
 
-require dirname(__FILE__) . '/appless.init.php';
+/**
+ * @ingroup Test
+ */
+class PhoebiusTestSuite extends PHPUnit_Framework_TestSuite
+{
+	function __construct($suitsRoot)
+	{
+		parent::__construct();
+
+		$this->setName(__CLASS__);
+
+		$Directory = new RecursiveDirectoryIterator('suits');
+		$Iterator = new RecursiveIteratorIterator($Directory);
+		$Regex = new RegexIterator($Iterator, '/^.+\.test\.php$/i', RecursiveRegexIterator::GET_MATCH);
+		
+		foreach ($Regex as $Path) {
+			$this->addTestFile($Path);
+		}
+	}
+}
+
 
 ?>
