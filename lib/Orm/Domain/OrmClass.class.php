@@ -319,6 +319,11 @@ class OrmClass implements IPhysicallySchematic, ILogicallySchematic, IQueryable
 
 		return $this->map;
 	}
+	
+	function getEntityProperty(EntityPropertyPath $path)
+	{
+		return $this->getProperty($path->getCurrentChunk())->getEntityProperty($path);
+	}
 }
 
 ?>

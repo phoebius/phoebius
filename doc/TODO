@@ -16,6 +16,7 @@ Phoebius v1.4
  + less greedy schema generator, verbose compiler
  + schema diff tool, db diff tool
  + MVC (controller -> view bridge) simplification
+ + schema with indexes
 
 
 ORM/CodeGen

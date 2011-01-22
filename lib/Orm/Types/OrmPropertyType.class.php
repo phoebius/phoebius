@@ -193,6 +193,23 @@ EOT;
 	protected \${$property->getName()};
 EOT;
 	}
+	
+	/**
+	 * Returns the entity property for the specified path
+	 * 
+	 * @return EntityProperty
+	 */
+	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
+	{
+		Assert::isTrue(
+			$path->isEmpty(),
+			'dont know how to link PropertyPath %s: %s is the tail',
+			$path->getFullPath(),
+			$path->getCurrentPath()
+		);
+		
+		return new EntityProperty($path->eqb, $owner);
+	}
 
 	/**
 	 * A list of PHP code that is passed as the arguments to the constructor when

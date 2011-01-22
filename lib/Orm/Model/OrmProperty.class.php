@@ -226,6 +226,11 @@ final class OrmProperty
 			')'
 		));
 	}
+	
+	function getEntityProperty(EntityPropertyPath $path) 
+	{
+		return $this->getType()->getEntityProperty($path, $this);
+	}
 }
 
 ?>

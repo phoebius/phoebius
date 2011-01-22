@@ -109,7 +109,7 @@ final class CompositePropertyType extends OrmPropertyType
 	 * @param OrmProperty $owner a property which owns the CompositePropertyType
 	 * @return OrmProperty
 	 */
-	function getVirtualProperty($name, OrmProperty $owner)
+	private function getVirtualProperty($name, OrmProperty $owner)
 	{
 		$idx = 0;
 		$found = false;
@@ -177,6 +177,20 @@ final class CompositePropertyType extends OrmPropertyType
 	function getColumnCount()
 	{
 		return count($this->getSqlTypes());
+	}
+	
+	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
+	{
+		Assert::isFalse(
+			$path->isEmpty(),
+			'incomplete PropertyPath %s: %s is Composite and cannot be the tail',
+			$path->getFullPath(),
+			$path->getCurrentPath()
+		);
+		
+		$vOwner = $this->getVirtualProperty($path->getNextChunk(), $owner);
+		
+		return $vOwner->getEntityProperty($path->peek());
 	}
 
 	protected function getCtorArgumentsPhpCode()
