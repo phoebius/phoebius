@@ -16,6 +16,8 @@
  *
  ************************************************************************************************/
 
+define('PHOEBIUS_VERSION', '1.4.0-dev');
+
 if (!defined('PHOEBIUS_APP_ID')) {
 	define('PHOEBIUS_APP_ID', 'default');
 }
@@ -25,21 +27,18 @@ if (!defined('PHOEBIUS_TMP_ROOT')) {
 		'PHOEBIUS_TMP_ROOT', 
 		sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'Phoebius-v' . PHOEBIUS_VERSION . '-' . PHOEBIUS_APP_ID
 	);
-	
-	if (!is_dir(PHOBEBIUS_TMP_ROOT)) {
-		mkdir(PHOEBIUS_TMP_ROOT, 0600, true);
-	}
 }
 		
 if (!defined('PHOEBIUS_LOADER')) {
 	define('PHOEBIUS_LOADER', 'ondemand');
 }
 
-define('PHOEBIUS_VERSION', '1.4.0-dev');
 define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v'.PHOEBIUS_VERSION);
 define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v'.PHOEBIUS_VERSION);
 
 define('PHOEBIUS_BASE_ROOT', dirname(__FILE__));
+
+date_default_timezone_set('Europe/London');
 
 /**
  * Should be appended with a dot
@@ -118,3 +117,14 @@ Exceptionizer::getInstance()
 	->setException(E_USER_ERROR, 'CompilationContextException')
 	->setException(E_RECOVERABLE_ERROR, 'RecoverableErrorFactory');
 
+
+try {
+	$result = is_dir(PHOEBIUS_TMP_ROOT);
+	
+	if (!$result) {
+		mkdir(PHOEBIUS_TMP_ROOT, 0777, true);
+	}
+}
+catch (InternalOperationException $e) {
+	die('Insufficient privileges to a temporary root (' . PHOEBIUS_TMP_ROOT . '): ' . $e->getMessage());
+}

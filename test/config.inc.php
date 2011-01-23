@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -16,24 +16,12 @@
  *
  ************************************************************************************************/
 
-require 'config.inc.php';
+set_include_path(
+	dirname(__FILE__) . DIRECTORY_SEPARATOR . 'lib'
+	. PATH_SEPARATOR . get_include_path()
+);
 
-/**
- * @ingroup Test
- */
-final class AllTests
-{
-	static function main()
-	{
-		PHPUnit_TextUI_TestRunner::run(self::suite());
-	}
+define('PHOEBIUS_APP_ID', 'phoebius-tests');
+define('PHOEBIUS_LOADER', 'ondemand');
 
-	static function suite()
-	{
-		$suite = new PhoebiusTestSuite();
-		
-		return $suite;
-	}
-}
-
-?>
+require '../config.inc.php';

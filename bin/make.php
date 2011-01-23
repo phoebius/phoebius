@@ -17,10 +17,6 @@
  *
  ************************************************************************************************/
 
-require dirname(__FILE__).'/../etc/app.init.php';
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
 function message($message)
 {
 	echo $message, PHP_EOL;
@@ -34,19 +30,12 @@ Usage:
 
   $ make.php [options] [domain-schema.xml]
 
-If domain-schema.xml is not specified then make.php uses \$app/var/domain.xml.
-\$app is treated as the current directory, if --app-dir option is not set.
+If domain-schema.xml is not specified then make.php uses var/domain.xml.
 
 
 General options:
 
-  --app-dir=<dir>        an \$app, a path to the directory where an application resides. Can be
-                         either an absolute path or a path relative to the current directory.
-
-                         Application directory should contain at least \$app/etc/config.php.
-                         If not specified, the current directory is used.
-
-  --host-config=<name>   name of the host configuration resides at \$app/cfg/<name>/config.php.
+  --config=<path>        path to the configuration. By default make.php tries ./config.inc.php.
 
   --dry-run              modify nothing, show the results only. Currently not implemented.
 
@@ -110,8 +99,7 @@ EOT;
 	exit(1);
 }
 
-$appDir = getcwd();
-$hostConfig = null;
+$config = null;
 $dryRun = false;
 
 $code = false;
@@ -144,13 +132,8 @@ foreach ($args as $arg) {
 			// general
 			//
 
-			case '--app-dir': {
-				$appDir = realpath($v);
-				break;
-			}
-
-			case '--host-config': {
-				$hostConfig = $v;
+			case '--config': {
+				$config = $v;
 				break;
 			}
 
@@ -227,62 +210,42 @@ if (!$code && !$schema) {
 	stop('Nothing to do: neither --code nor --schema is set');
 }
 
-if (!is_dir($appDir)) {
-	stop ("Unknown path to the application: {$appDir}");
+if (sizeof($args) && $args[sizeof($args)-1]{0} != '-') {
+	$xmlSchema = end($args);
+}
+else {
+	message('Domain schema is not specified, trying to pick var/domain.xml');
+	$xmlSchema = 'var/domain.xml';
 }
 
-chdir($appDir);
+$xmlSchema = realpath($xmlSchema);
 
-$xmlSchema = end($args);
-if ($argv > 1 && $xmlSchema && $xmlSchema{0} != '-') {
-	$prefixes = array(
-		'',
-		$appDir . '/',
-	);
+if (!$xmlSchema) {
+	stop ('Domain schema not found');
+}
 
-	foreach ($prefixes as $prefix) {
-		if (file_exists($prefix . $xmlSchema) && is_file($prefix . $xmlSchema)) {
-			$xmlSchema = realpath($prefix . $xmlSchema);
-			break;
-		}
+// loading config
+if ($config) {
+	$config = realpath($config);
+	
+	if (!$config) {
+		stop ('Config not found');
 	}
 }
 else {
-	$xmlSchema = $appDir . '/var/domain.xml';
-}
-
-if (!file_exists($xmlSchema)) {
-	stop ('Domain schema not found (' . $xmlSchema . ' does not exist)');
-}
-
-define('APP_ROOT', $appDir);
-
-$applicationConfig = APP_ROOT . DIRECTORY_SEPARATOR . 'etc' . DIRECTORY_SEPARATOR . 'config.php';
-if (file_exists($applicationConfig)) {
-	include $applicationConfig;
-}
-
-if ($hostConfig) {
-	if (!is_file($hostConfig)) {
-		$hostConfigFile = APP_ROOT . DIRECTORY_SEPARATOR . 'cfg' . DIRECTORY_SEPARATOR . $hostConfig . DIRECTORY_SEPARATOR . 'config.php';
+	message('Config is not specified...');
+	message('Trying to pick config.inc.php...');
+	$config = getcwd() . DIRECTORY_SEPARATOR . 'config.inc.php';
+	if (file_exists($config)) {
+		message('Done.');
 	}
 	else {
-		$hostConfigFile = $hostConfig;
-	}
-
-	if (file_exists($hostConfigFile)) {
-		include $hostConfigFile;
-	}
-	else {
-		stop ("`{$hostConfig}` host config does not exist");
+		message('Failed, using the default config.');
+		$config = realpath(dirname(__FILE__) . '/../config.inc.php');
 	}
 }
 
-if (!defined('APP_SLOT_CONFIGURATION')) {
-	define ('APP_SLOT_CONFIGURATION', SLOT_PRESET_PRODUCTION);
-}
-
-Autoloader::getInstance()->clearCache();
+require $config;
 
 $domainBuilder = new XmlOrmDomainBuilder($xmlSchema);
 
@@ -292,9 +255,9 @@ try {
 
 	if ($code) {
 		foreach (array('publicDir', 'autoDir') as $dir) {
-			$$dir = $appDir . '/' . $$dir;
+			$$dir = getcwd() . '/' . $$dir;
 			if (!is_dir($$dir)) {
-				mkdir($$dir, 0755, true);
+				mkdir($$dir, 0700, true);
 			}
 		}
 
@@ -321,12 +284,9 @@ try {
 			}
 		}
 
-		if ($schemaFile) {
-			$schemaFile = $appDir . DIRECTORY_SEPARATOR . $schemaFile;
-		}
-		else {
+		if (!$schemaFile) {
 			$schemaFile =
-				$appDir
+				getcwd()
 				. DIRECTORY_SEPARATOR . 'var'
 				. DIRECTORY_SEPARATOR . 'db'
 				. DIRECTORY_SEPARATOR
@@ -335,7 +295,7 @@ try {
 
 			$dir = dirname($schemaFile);
 			if (!is_dir($dir)) {
-				mkdir($dir, 0755, true);
+				mkdir($dir, 0700, true);
 			}
 		}
 
