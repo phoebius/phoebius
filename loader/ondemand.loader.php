@@ -16,11 +16,6 @@
  *
  ************************************************************************************************/
 
-if (defined('PHOEBIUS_LOADER'))
-	die('Loader already initiated: ' . PHOEBIUS_LOADER);
-
-define('PHOEBIUS_LOADER', 'ondemand');
-
 function __autoload($class) 
 {
 	require $class . PHOEBIUS_TYPE_EXTENSION;

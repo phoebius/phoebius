@@ -16,12 +16,6 @@
  *
  ************************************************************************************************/
 
-define('PHOEBIUS_VERSION', '1.4.0-dev');
-define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v'.PHOEBIUS_VERSION);
-define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v'.PHOEBIUS_VERSION);
-
-define('PHOEBIUS_BASE_ROOT', dirname(__FILE__));
-
 if (!defined('PHOEBIUS_APP_ID')) {
 	define('PHOEBIUS_APP_ID', 'default');
 }
@@ -33,26 +27,91 @@ if (!defined('PHOEBIUS_TMP_ROOT')) {
 	);
 	
 	if (!is_dir(PHOBEBIUS_TMP_ROOT)) {
-		mkdir(PHOEBIUS_TMP_ROOT, 600, true);
+		mkdir(PHOEBIUS_TMP_ROOT, 0600, true);
 	}
 }
+		
+if (!defined('PHOEBIUS_LOADER')) {
+	define('PHOEBIUS_LOADER', 'ondemand');
+}
+
+define('PHOEBIUS_VERSION', '1.4.0-dev');
+define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v'.PHOEBIUS_VERSION);
+define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v'.PHOEBIUS_VERSION);
+
+define('PHOEBIUS_BASE_ROOT', dirname(__FILE__));
 
 /**
  * Should be appended with a dot
  */
 define('PHOEBIUS_TYPE_EXTENSION', '.class.php');
 
-set_include_path(PHOEBIUS_BASE_ROOT . PATH_SEPARATOR . 'lib' . PATH_SEPARATOR . get_include_path());
+$phoebiusNamespaces = array(
+	'Core',
+	'Core/Bootstrap',
+	'Core/Exceptions',
+	'Core/FS',
+	'Core/Patterns',
+	'Core/Types',
+	'Core/Types/Complex',
 
-$Iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PHOEBIUS_BASE_ROOT . DIRECTORY_SEPARATOR . 'lib'));
+	'Mvc',
+	'Mvc/ActionResults',
 
-foreach ($Iterator as $Path) {
-	set_include_path($Iterator->getRealPath() . PATH_SEPARATOR . get_include_path());
+	'UI',
+	'UI/Mvc',
+	'UI/Mvc/Presentation',
+	'UI/Presentation',
+
+	'Orm',
+	'Orm/Dao',
+	'Orm/Dao/Relationship',
+	'Orm/Domain',
+	'Orm/Domain/CodeGenerator',
+	'Orm/Domain/Notation',
+	'Orm/Domain/Notation/Xml',
+	'Orm/Exceptions',
+	'Orm/Model',
+	'Orm/Query',
+	'Orm/Query/Projections',
+	'Orm/Types',
+
+	'Utils',
+	'Utils/Cipher',
+	'Utils/Log',
+	'Utils/Net',
+	'Utils/Stream',
+	'Utils/Xml',
+
+	'App',
+	'App/Server',
+	'App/Web',
+	'App/Web/Routing',
+
+	'Dal',
+	'Dal/DB',
+	'Dal/DB/Exceptions',
+	'Dal/DB/Generator',
+	'Dal/DB/Query',
+	'Dal/DB/Schema',
+	'Dal/DB/Sql',
+	'Dal/DB/Transaction',
+	'Dal/DB/Type',
+	'Dal/Expression',
+	'Dal/Expression/LogicalOperators',
+	
+	'Dal/Cache',
+	'Dal/Cache/Peers'
+);
+
+foreach ($phoebiusNamespaces as $namespace) {
+	set_include_path(
+		PHOEBIUS_BASE_ROOT . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . $namespace 
+		. PATH_SEPARATOR . get_include_path()
+	);	
 }
-		
-if (defined('PHOEBIUS_LOADER')) {
-	require 'loader/ondemand.loader.php';
-}
+
+require PHOEBIUS_BASE_ROOT . '/loader/' . PHOEBIUS_LOADER . '.loader.php';
 
 Exceptionizer::getInstance()
 	->register(E_ALL | E_STRICT, false, 'InternalOperationException')
