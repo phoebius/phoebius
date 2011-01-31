@@ -17,11 +17,14 @@
  ************************************************************************************************/
 
 //
-// Overridden constants:
+// Overriddable constants:
+//
 // * PHOEBIUS_APP_ID - should be set in case when different application
 //						use the same Phoebius framework distribtuib
 // * PHOEBIUS_TMP_ROOT - path to the tmp directory
 // * PHOEBIUS_LOADER - id of the Phoebius loader to use: ondemand, pathcache, classcache.
+//						See the loader/ directory, and consider overridable constants of
+//						desireable loader.
 //
 
 define('PHOEBIUS_VERSION', '1.4.0-dev');
