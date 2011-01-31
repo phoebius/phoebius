@@ -16,6 +16,14 @@
  *
  ************************************************************************************************/
 
+//
+// Overridden constants:
+// * PHOEBIUS_APP_ID - should be set in case when different application
+//						use the same Phoebius framework distribtuib
+// * PHOEBIUS_TMP_ROOT - path to the tmp directory
+// * PHOEBIUS_LOADER - id of the Phoebius loader to use: ondemand, pathcache, classcache.
+//
+
 define('PHOEBIUS_VERSION', '1.4.0-dev');
 
 if (!defined('PHOEBIUS_APP_ID')) {
