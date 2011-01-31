@@ -23,7 +23,7 @@
  * @ingroup Core_Exceptions
  * @see Exceptionizer
  */
-class ExecutionContextException extends ErrorException implements IErrorExceptionFactory
+final class ExecutionContextException extends ErrorException implements IErrorExceptionFactory
 {
 	/**
 	 * @return ExecutionContextException

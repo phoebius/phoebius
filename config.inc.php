@@ -124,9 +124,8 @@ foreach ($phoebiusNamespaces as $namespace) {
 require PHOEBIUS_BASE_ROOT . '/loader/' . PHOEBIUS_LOADER . '.loader.php';
 
 Exceptionizer::getInstance()
-	->register(E_ALL | E_STRICT, false, 'InternalOperationException')
-	->setException(E_USER_ERROR, 'CompilationContextException')
-	->setException(E_RECOVERABLE_ERROR, 'RecoverableErrorFactory');
+	->register(E_ALL | E_STRICT, false, 'ExecutionContextException')
+	->setException(E_USER_ERROR, 'CompilationContextException');
 
 
 try {
@@ -136,6 +135,6 @@ try {
 		mkdir(PHOEBIUS_TMP_ROOT, 0777, true);
 	}
 }
-catch (InternalOperationException $e) {
+catch (ExecutionContextException $e) {
 	die('Insufficient privileges to a temporary root (' . PHOEBIUS_TMP_ROOT . '): ' . $e->getMessage());
 }

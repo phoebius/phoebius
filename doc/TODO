@@ -16,7 +16,7 @@ Phoebius v1.4
  + less greedy schema generator, verbose compiler
  + db diff tool
  + MVC (controller -> view bridge) simplification
- + simplify configs, relace class autoloaders with basic one
+
 
 DAL/DB
 ======
