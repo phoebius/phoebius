@@ -19,28 +19,11 @@
 /**
  * @ingroup App_Web_Routing_Exceptions
  */
-class RewriteException extends StateException
+class RouteException extends StateException
 {
-	/**
-	 * @var IRewriteRule
-	 */
-	private $rewriteRule;
-
-	/**
-	 * @var IWebContext
-	 */
-	private $webContext;
-
-	function __construct(
-			$message = 'rule does not match',
-			IRewriteRule $rewriteRule,
-			IWebContext $webContext
-		)
+	function __construct($url)
 	{
-		$this->rewriteRule = $rewriteRule;
-		$this->webContext = $webContext;
-
-		parent::__construct($message);
+		parent::__construct('No route found to handle '.$url);
 	}
 }
 

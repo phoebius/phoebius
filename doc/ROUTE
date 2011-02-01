@@ -1,21 +1,64 @@
+Route {
+	UrlPattern urlPattern,
+	Regex[] qsPattern,
+	String? httpMethod,
+	Array routeData,
+	
+	array|null match()
+}
+
+
+IRouter {
+	RouteData route(WebRequest request) : throws RouteException
+}
+
+
+Router {
+	Array routes,
+	
+	RouteData route(WebRequest request) : throws RouteException
+}
+
+
+
+
+IDispatcher {
+	void dispatch(RouteData routeData, IWebContext webContext)
+}
+
+
+
+
 IControllerContext {
 	IWebContext webContext,
-	ArrayObject routeData
+	RouteData routeData
 }
+
 
 IController {
-	handle(IControllerContext controllerContext)
+	void handle(IControllerContext controllerContext)
 }
 
 
-ActionResult {
-	void render(IWebResponse webResponse)
+
+
+
+IView {
+	string render()
+}
+
+View {
+	_construct(ViewData viewData)
+}
+
+
+
+
+
+IActionResult {
+	void process(IWebResponse webResponse)
 }
 
 ViewActionResult {
 	_construct(View view)
-}
-
-View {
-	_construct(ArrayPbject viewData)
 }

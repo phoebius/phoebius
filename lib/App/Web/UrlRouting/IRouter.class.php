@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,21 +17,18 @@
  ************************************************************************************************/
 
 /**
- * Interface for handling a Trace object.
+ * Router interface.
  *
  * @ingroup App_Web_Routing
  */
-interface IRouteDispatcher
+interface IRouter
 {
 	/**
-	 * Obtains the controller object and invokes it to handle the incoming context
-	 *
-	 * @param Trace $trace to handle
-	 * @throws TraceException when Trace is missing valid parameters
-	 * @throws Exception unhandled application fault
-	 * @return void
+	 * Processes the request and produces the route data
+	 * 
+	 * @return RouteData
 	 */
-	function handle(Trace $trace);
+	function process(WebRequest $request);
 }
 
 ?>

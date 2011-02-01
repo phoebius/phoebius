@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -16,15 +16,7 @@
  *
  ************************************************************************************************/
 
-/**
- * @ingroup App_Web_Routing_Exceptions
- */
-class TraceException extends RouteException
+class RouteData extends Collection
 {
-	function __construct($message, Trace $trace)
-	{
-		parent::__construct($message, $trace->getRoute(), $trace->getWebContext());
-	}
+	// nothing here
 }
-
-?>
