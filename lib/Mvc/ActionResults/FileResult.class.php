@@ -69,10 +69,8 @@ class FileResult implements IActionResult
 		$this->unlinkOnFileFlush = $unlinkOnFinish;
 	}
 
-	function handleResult(IViewContext $context)
+	function handleResult(IWebResponse $response)
 	{
-		$response = $context->getResponse();
-
 		if ($this->contentType) {
 			$response->addHeader('Content-Type', $this->contentType);
 		}

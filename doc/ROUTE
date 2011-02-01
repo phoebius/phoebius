@@ -57,7 +57,7 @@ View {
 
 
 IActionResult {
-	void process(IWebResponse webResponse)
+	void handle(IWebContext webContext)
 }
 
 ViewActionResult {

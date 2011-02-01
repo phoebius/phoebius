@@ -38,10 +38,8 @@ class ContentResult implements IActionResult
 		$this->content = $content;
 	}
 
-	function handleResult(IViewContext $context)
+	function handleResult(IWebResponse $response)
 	{
-		$response = $context->getResponse();
-
 		$response
 			->write($this->content)
 			->finish();

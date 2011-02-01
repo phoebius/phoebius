@@ -27,20 +27,24 @@ class RedirectResult implements IActionResult
 	 * @var HttpUrl
 	 */
 	private $url;
+	
+	/**
+	 * @var HttpStatus
+	 */
+	private $status;
 
 	/**
 	 * @param HttpUrl $url url the request should be redirected to
 	 */
-	function __construct(HttpUrl $url)
+	function __construct(HttpUrl $url, HttpStatus $status = null)
 	{
 		$this->url = $url;
+		$this->status = $status;
 	}
 
-	function handleResult(IViewContext $context)
+	function handleResult(IWebResponse $response)
 	{
-		$response = $context->getResponse();
-
-		$response->redirect($this->url);
+		$response->redirect($this->url, $this->status);
 	}
 }
 

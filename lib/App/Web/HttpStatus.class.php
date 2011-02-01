@@ -26,18 +26,42 @@
 final class HttpStatus extends Enumeration
 {
 	/**
-	 * "Not Found" status
+	 * Moved Permanently
+	 */
+	const CODE_301 = 301;
+	
+	/**
+	 * Found
+	 */
+	const CODE_302 = 302;
+	
+	/**
+	 * See Other
+	 */
+	const CODE_303 = 303;
+	
+	/**
+	 * Not Found
 	 */
 	const CODE_404 = 404;
-
+	
 	/**
-	 * "Internal Server Error" status
+	 * Internal Server Error
 	 */
 	const CODE_500 = 500;
+	
+	/**
+	 * Service Unavailable
+	 */
+	const CODE_503 = 503;
 
 	private static $statusMessages = array(
+		self::CODE_301 => 'Moved Permanently',
+		self::CODE_302 => 'Found',
+		self::CODE_303 => 'See Other',
 		self::CODE_404 => 'Not Found',
 		self::CODE_500 => 'Internal Server Error',
+		self::CODE_503 => 'Service Unavailable'
 	);
 
 	/**

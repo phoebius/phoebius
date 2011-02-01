@@ -33,10 +33,8 @@ class ViewResult implements IActionResult
 		$this->view = $view;
 	}
 
-	function handleResult(IViewContext $context)
+	function handleResult(IWebResponse $response)
 	{
-		$response = $context->getResponse();
-
 		$this->view->render($response);
 
 		$response->finish();

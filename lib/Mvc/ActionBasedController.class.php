@@ -232,7 +232,7 @@ abstract class ActionBasedController implements IController
 	 *
 	 * @param string|null $action name of an action that was used when looking up the action method
 	 *
-	 * @throws TraceException
+	 * @throws DispatchActionException
 	 * @return IActionResult
 	 */
 	protected function handleUnknownAction($action)

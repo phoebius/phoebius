@@ -101,31 +101,38 @@ class WebResponse implements IWebResponse
 		return $this;
 	}
 
-	function redirect(HttpUrl $url)
+	function redirect(HttpUrl $url, HttpStatus $status = null)
 	{
-		if ($this->request) {
-			$protocol = $this->request->getProtocol();
+		if ($status) {
+			$this->setStatus($status);
 		}
-
-		if (isset($protocol) && $protocol == 'HTTP/1.1') {
-			$status = 303;
-			header('HTTP/1.1 303 See Other', true);
-		}
-		else {
-			$status = 302;
-			header('HTTP/1.0 302 Found', true);
+		else if (!$this->setStatus) {
+			if ($this->request) {
+				$protocol = $this->request->getProtocol();
+			}
+	
+			if (isset($protocol) && $protocol == 'HTTP/1.1') {
+				$this->setStatus(new HttpStatus(HttpStatus::CODE_303));
+			}
+			else {
+				$this->setStatus(new HttpStatus(HttpStatus::CODE_302));
+			}
 		}
 
 		//header('Content-Length: 0');
 		// FIXME 1. Allow explicit set of Content-Length (by default it should be 0)
 		// FIXME 2. Introduct HttpStatus for 302 and 303 status codes and use setStatus() wrt overridden behaviour
-		header('Location: ' . ((string) $url), true, $status);
+		header('Location: ' . ((string) $url), true);
 
 		$this->finish();
 	}
+	
+	private $setStatus;
 
 	function setStatus(HttpStatus $status)
 	{
+		$this->setStatus = $status;
+		
 		$protocol =
 			$this->request
 			? $this->request->getProtocol()

@@ -26,11 +26,9 @@ interface IActionResult
 	/**
 	 * Handles the produced result
 	 *
-	 * @param IViewContext $context
-	 *
 	 * @return void
 	 */
-	function handleResult(IViewContext $context);
+	function handleResult(IWebResponse $response);
 }
 
 ?>
