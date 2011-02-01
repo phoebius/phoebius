@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -23,27 +23,20 @@
  * Helper methods return strings, that are not appended to the output!
  *
  * See:
- * - UIViewPresentation::__get() for shorthand access to model variables came from the Controller
- * - UIViewPresentation::getSelfHref() for getting the requested URL
- * - UIViewPresentation::getHref() for generating URL via the route defined by the IRouteTable
- * - UIViewPresentation::getHtmlLink() for rendering <a href> container
+ * - UIViewPresentation::__get() for shorthand access to view data variables came from the Controller
  *
  * Hints:
- * - use "@" operator to set whether view expects a specific model variable or not:
+ * - use "@" operator to set whether view expects a specific view data variable or not:
  * 		@code
  * 		<?=@$this->var?>
  * 		@endcode
  * 		shows that a view can omit the situation when controller does not provide a "var" variable
- * 		within a passed model.
+ * 		within a passed view data.
  *
  * 		@code
  * 		<?=$this->var?>
  * 		@endcode
  * 		will raise a compilation error if the variable is missing
- * - use getHref() to generate URL defined by the routing system:
- * 		@code
- * 		<?=$this->getHref("blog_entry", array("id" => $entry->getId()))?>
- * 		@endcode
  *
  *
  * @ingroup UI_Mvc_Presentation
@@ -52,27 +45,10 @@ class UIViewPresentation
 		extends UIPhpLayoutPresentation
 		implements IUIControlBindedPresentation
 {
-	const VIEW_EXTENSION = '.view.php';
-
 	/**
 	 * @var UIControl|null
 	 */
 	protected $control;
-
-	/**
-	 * @var Model|null
-	 */
-	protected $model;
-
-	/**
-	 * @var Trace|null
-	 */
-	protected $trace;
-
-	/**
-	 * @var IRouteTable|null
-	 */
-	protected $routeTable;
 
 	/**
 	 * @var array of IOutput
@@ -85,25 +61,30 @@ class UIViewPresentation
 	private $output;
 
 	private $viewName;
+	
+	/**
+	 * @var ViewData
+	 */
+	protected $viewData;
 
 	/**
-	 * @param string $viewName name of the view located at $app_dir/views/<viewName>.view.php
+	 * @param string $viewName name of the view located at PHOEBIUS_APP_VIEWS_ROOT/<viewName>.view.php
 	 */
-	function __construct($viewName)
+	function __construct($viewName, ViewData $viewData = null)
 	{
 		Assert::isScalar($viewName);
 
 		$this->viewName = $viewName;
+		$this->viewData = $viewData;
 
 		parent::__construct(
-			APP_ROOT . DIRECTORY_SEPARATOR
-			. 'views' . DIRECTORY_SEPARATOR
-			. $viewName . self::VIEW_EXTENSION
+			PHOEBIUS_APP_VIEWS_ROOT . DIRECTORY_SEPARATOR
+			. $viewName . PHOEBIUS_VIEW_EXTENSION
 		);
 	}
 
 	/**
-	 * A shorthand setter of the model variable
+	 * A shorthand setter of view data variable
 	 *
 	 * @return void
 	 */
@@ -111,11 +92,11 @@ class UIViewPresentation
 	{
 		Assert::isScalar($name);
 
-		$this->model[$name] = $value;
+		$this->viewData[$name] = $value;
 	}
 
 	/**
-	 * A shorthand getter of the model variables.
+	 * A shorthand getter of the view data.
 	 *
 	 * If the variable is missing, and error_reporting is turned off (by prepending the call
 	 * with the "@" operator) then the variable is treated as NULL. Otherwise a compilation
@@ -127,24 +108,24 @@ class UIViewPresentation
 	{
 		Assert::isScalar($name);
 
-		if (array_key_exists($name, $this->model->toArray())) {
-			return $this->model[$name];
+		if (array_key_exists($name, $this->viewData->toArray())) {
+			return $this->viewData[$name];
 		}
 		else if (!error_reporting()) {
-			$this->model[$name] = null;
+			$this->viewData[$name] = null;
 
 			return null;
 		}
 		else {
 			Assert::isUnreachable(
-				'unknown model variable %s expected within %s view',
+				'unknown view data `%s` expected within %s view',
 				$name, $this->viewName
 			);
 		}
 	}
 
 	/**
-	 * A shorthand check whether the variable is defined within the model
+	 * A shorthand check whether the variable is defined within the view data
 	 *
 	 * @return boolean
 	 */
@@ -152,7 +133,7 @@ class UIViewPresentation
 	{
 		Assert::isScalar($name);
 
-		return isset($this->model[$name]);
+		return isset($this->viewData[$name]);
 	}
 
 	/**
@@ -177,78 +158,6 @@ class UIViewPresentation
 	}
 
 	/**
-	 * Gets the string representation of the URL constructed via the named Route that
-	 * is defined within IRouteTable.
-	 *
-	 * Table is hold by the Trace.
-	 *
-	 * @param string $routeName name of the route
-	 * @param array $parameters parameters to pass to Route's rules
-	 *
-	 * @return string
-	 */
-	function getHref($routeName, array $parameters = array())
-	{
-		// TODO: Trace can be not set when used in MVCless environments => force setting
-		// the base SiteUrl explicitly like Trace and IRouteTable are set
-
-		if ($this->trace) {
-			$url = $this->trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
-
-			$this->trace
-				->getRouteTable()
-				->getRoute($routeName)
-				->compose($url, $parameters);
-		}
-		else {
-			Assert::isNotEmpty($this->routeTable, 'routeTable is not set');
-
-			$url = new SiteUrl;
-
-			$this
-				->routeTable
-				->getRoute($routeName)
-				->compose($url, $parameters);
-
-			// TODO: check whether formed url has the same schema, host and port as the requested
-			// and strip those unused chunks leaving the URI only
-		}
-
-		return (string) $url;
-	}
-
-	/**
-	 * Gets the text representation of the <A HREF> HTML tag.
-	 * URL is constructed via the named Route that is defined within IRouteTable.
-	 *
-	 * @param string $href the contents of the tag
-	 * @param string $routeName name of the route
-	 * @param array $parameters parameters to pass to Route's rules
-	 * @return string
-	 */
-	function getHtmlLink($href, $routeName, array $parameters = array())
-	{
-		return
-			'<a href="'
-				. $this->getHref($routeName, $parameters)
-			. '">'
-			. $href
-			. '</a>';
-	}
-
-	/**
-	 * Gets the text representastion of the requested URL
-	 *
-	 * @return string
-	 */
-	function getSelfHref()
-	{
-		Assert::isNotEmpty($this->trace, 'trace is not set');
-
-		return $this->trace->getWebContext()->getRequest()->getHttpUrl()->getUri();
-	}
-
-	/**
 	 * @return object
 	 */
 	private function findMethod(UIControl $control, $name)
@@ -265,83 +174,7 @@ class UIViewPresentation
 	}
 
 	/**
-	 * Gets the model passed by the controller
-	 *
-	 * @return Model|null
-	 */
-	function getModel()
-	{
-		return $this->model;
-	}
-
-	/**
-	 * Gets the trace used to invoke the MVC stack
-	 *
-	 * @return Trace|null
-	 */
-	function getTrace()
-	{
-		return $this->trace;
-	}
-
-	/**
-	 * Gets the route table used to find the trace to the MVC controller
-	 *
-	 * @return IRouteTable|null
-	 */
-	function getRouteTable()
-	{
-		return $this->routeTable;
-	}
-
-	/**
-	 * Sets the controller's model
-	 *
-	 * @param Model $model
-	 *
-	 * @return UIViewPresentation
-	 */
-	function setModel(Model $model)
-	{
-		$this->model = $model;
-
-		return $this;
-	}
-
-	/**
-	 * Sets the trace used to invoke the MVC stack
-	 *
-	 * @param Trace $trace
-	 *
-	 * @return UIViewPresentation
-	 */
-	function setTrace(Trace $trace)
-	{
-		$this->trace = $trace;
-
-		if (!$this->routeTable) {
-			$this->routeTable = $trace->getRouteTable();
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Sets the route table used to find the trace to the MVC controller
-	 *
-	 * @param IRouteTable $routeTable
-	 *
-	 * @return UIViewPresentation
-	 */
-	function setRouteTable(IRouteTable $routeTable)
-	{
-		$this->routeTable = $routeTable;
-
-		return $this;
-	}
-
-	/**
-	 * Forces the view to check whether the specified variables are presented in a Model
+	 * Forces the view to check whether the specified variables are presented in a view data
 	 * passed by the controller
 	 *
 	 * @warning obsoleted wrt UIViewPresentation::__get()
@@ -354,15 +187,15 @@ class UIViewPresentation
 
 		foreach ($vars as $var) {
 			Assert::isTrue(
-				isset($this->model[$var]),
-				'%s expected but not found a model of %s',
+				isset($this->viewData[$var]),
+				'%s expected but not found a view data of %s',
 				$var, $this->viewName
 			);
 		}
 	}
 
 	/**
-	 * Tells the view to watch for variables that MAY come from the controller within the model
+	 * Tells the view to watch for variables that MAY come from the controller within the view data
 	 *
 	 * @warning obsoleted wrt UIViewPresentation::__get()
 	 *
@@ -373,8 +206,8 @@ class UIViewPresentation
 		$vars = func_get_args();
 
 		foreach ($vars as $var) {
-			if (!isset($this->model[$var])) {
-				$this->model[$var] = null;
+			if (!isset($this->viewData[$var])) {
+				$this->viewData[$var] = null;
 			}
 		}
 	}
@@ -403,16 +236,13 @@ class UIViewPresentation
 	/**
 	 * In-place render of a separate UIControl
 	 *
-	 * @param string $view name of the view to render
-	 * @param Model $model optional custom model to pass; if not set, the current model will be passed
-	 *
 	 * @return void
 	 */
-	protected function renderPartial($view, Model $model = null)
+	protected function renderPartial($view, ViewData $viewData = null)
 	{
 		$this->assertInsideRenderingContext();
 
-		$presentation = $this->spawn($view, $model);
+		$presentation = $this->spawn($view, $viewData);
 		$control = $this->getUserControl($presentation);
 
 		if ($this->control) {
@@ -438,11 +268,11 @@ class UIViewPresentation
 	 *
 	 * @return void
 	 */
-	protected function setMaster($view, Model $model = null)
+	protected function setMaster($view, ViewData $viewData = null)
 	{
 		$this->assertInsideRenderingContext();
 
-		$presentation = $this->spawn($view, $model);
+		$presentation = $this->spawn($view, $viewData);
 		$masterPage = $this->getMasterPage($presentation);
 
 		if ($this->control) {
@@ -510,18 +340,9 @@ class UIViewPresentation
 	/**
 	 * @return UIViewPresentation
 	 */
-	private function spawn($view, Model $model = null)
+	private function spawn($view, ViewData $viewData = null)
 	{
-		$presentation = new self ($view);
-
-		$presentation->trace = $this->trace;
-		$this->routeTable = $this->routeTable;
-		$presentation->model =
-			$model
-				? $model
-				: $this->model;
-
-		return $presentation;
+		return new self ($view, $viewData ? $viewData : $this->viewData);
 	}
 }
 

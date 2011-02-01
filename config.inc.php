@@ -25,9 +25,13 @@
 // * PHOEBIUS_LOADER - id of the Phoebius loader to use: ondemand, pathcache, classcache.
 //						See the loader/ directory, and consider overridable constants of
 //						desireable loader.
+// * PHOEBIUS_APP_ROOT - directory where the application resides; by default is the same as the
+//							the directory where Phoebius framework distribution resides
+// * PHOEBIUS_APP_VIEWS_ROOT - views' directory; PHOEBIUS_APP_ROOT/views by default.
 //
 
 define('PHOEBIUS_VERSION', '1.4.0-dev');
+define('PHOEBIUS_BASE_ROOT', dirname(__FILE__));
 
 if (!defined('PHOEBIUS_APP_ID')) {
 	define('PHOEBIUS_APP_ID', 'default');
@@ -44,17 +48,22 @@ if (!defined('PHOEBIUS_LOADER')) {
 	define('PHOEBIUS_LOADER', 'ondemand');
 }
 
+if (!defined('PHOEBIUS_APP_ROOT')) {
+	define('PHOEBIUS_APP_ROOT', PHOEBIUS_BASE_ROOT);
+}
+
+if (!defined('PHOEBIUS_APP_VIEWS_ROOT')) {
+	define('PHOEBIUS_APP_VIEWS_ROOT', PHOEBIUS_APP_ROOT . DIRECTORY_SEPARATOR . 'views');
+}
+
 define('PHOEBIUS_SHORT_PRODUCT_NAME', 'Phoebius v'.PHOEBIUS_VERSION);
 define('PHOEBIUS_FULL_PRODUCT_NAME', 'Phoebius framework v'.PHOEBIUS_VERSION);
 
-define('PHOEBIUS_BASE_ROOT', dirname(__FILE__));
 
 date_default_timezone_set('Europe/London');
 
-/**
- * Should be appended with a dot
- */
 define('PHOEBIUS_TYPE_EXTENSION', '.class.php');
+define('PHOEBIUS_VIEW_EXTENSION', '.view.php');
 
 $phoebiusNamespaces = array(
 	'Core',
@@ -67,6 +76,7 @@ $phoebiusNamespaces = array(
 
 	'Mvc',
 	'Mvc/ActionResults',
+	'Mvc/Exceptions',
 
 	'UI',
 	'UI/Mvc',
@@ -97,6 +107,7 @@ $phoebiusNamespaces = array(
 	'App/Server',
 	'App/Web',
 	'App/Web/UrlRouting',
+	'App/Web/UrlRouting/Exceptions',
 
 	'Dal',
 	'Dal/DB',

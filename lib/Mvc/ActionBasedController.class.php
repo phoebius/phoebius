@@ -44,7 +44,10 @@ abstract class ActionBasedController implements IController
 	private $routeData;
 	private $request;
 	
-	private $viewData;
+	/**
+	 * @var ViewData
+	 */
+	protected $viewData;
 
 	function handle(IControllerContext $controllerContext)
 	{
@@ -75,16 +78,6 @@ abstract class ActionBasedController implements IController
 	}
 
 	/**
-	 * Gets the current view data to be passed to presentation layer
-	 *
-	 * @return ViewData
-	 */
-	function getViewData()
-	{
-		return $this->viewData;
-	}
-
-	/**
 	 * Gets the actual parameter value to be used when invoking action method
 	 *
 	 * @param ReflectionParameter $argument
@@ -95,13 +88,13 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function filterArgumentValue(ReflectionParameter $argument)
 	{
-		$request = $this->trace->getWebContext()->getRequest();
+		$request = $this->request;
 
 		if (isset($request[$argument->name])) {
 			$value = $this->getActualParameterValue($argument, $request[$argument->name]);
 		}
-		else if (isset($this->trace[$argument->name])) {
-			$value = $this->getActualParameterValue($argument, $this->trace[$argument->name]);
+		else if (isset($this->routeData[$argument->name])) {
+			$value = $this->getActualParameterValue($argument, $this->routeData[$argument->name]);
 		}
 		else {
 			$value = null;
@@ -215,12 +208,7 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function processResult(IActionResult $actionResult)
 	{
-		$actionResult->handleResult(
-			new ViewContext(
-				$this->getModel(),
-				$this->trace
-			)
-		);
+		$actionResult->handleResult($this->context->getWebContext()->getResponse());
 	}
 
 	/**
@@ -237,7 +225,7 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function handleUnknownAction($action)
 	{
-		throw new DispatchActionException($this->routeData, $this->context->getWebContext()->getRequest());
+		throw new DispatchActionException($this->routeData, $this->request);
 	}
 
 	/**
@@ -292,39 +280,32 @@ abstract class ActionBasedController implements IController
 	 * Helper method that creates an action method result encapsulating presentation object
 	 *
 	 * @param string $viewName relative path to a view
-	 * @param array $data business logic resulting data to be passed to presentation
+	 * @param array $viewData business logic resulting data to be passed to presentation
 	 *
 	 * @return ViewResult
 	 */
-	protected function view($viewName, array $data = array())
+	protected function view($viewName, array $viewData = array())
 	{
-		$this->getModel()->append($data);
+		$this->viewData->append($viewData);
 
-		$presentation = new UIViewPresentation($viewName);
-		$presentation->setModel($this->getViewData());
-		$presentation->setTrace($this->trace);
-
-		return new ViewResult(new UIPage($presentation));
+		return 
+			new ViewResult(
+				new UIPage(
+					new UIViewPresentation($viewName, $this->viewData)
+				)
+			);
 	}
 
 	/**
 	 * Helper method that creates an action method result encapsulating redirection
 	 *
-	 * @param string $routeName name of the route to use when building an address.
-	 * 					Route must be presented in IRouteTable
-	 * @param array $parameters parameters to pass to Route for building an address
-	 *
 	 * @return RedirectToRouteResult
 	 */
-	protected function redirect($routeName, array $parameters = array())
+	protected function redirect($url)
 	{
-		$url = $this->trace->getWebContext()->getRequest()->getHttpUrl()->spawnBase();
-
-		$this->trace
-			->getRouteTable()
-			->getRoute($routeName)
-			->compose($url, $parameters);
-
+		if (is_scalar($url)) 
+			$url = new HttpUrl($url);
+			
 		return new RedirectResult($url);
 	}
 
