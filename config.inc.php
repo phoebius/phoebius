@@ -96,7 +96,7 @@ $phoebiusNamespaces = array(
 	'App',
 	'App/Server',
 	'App/Web',
-	'App/Web/Routing',
+	'App/Web/UrlRouting',
 
 	'Dal',
 	'Dal/DB',

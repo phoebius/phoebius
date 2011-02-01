@@ -17,18 +17,14 @@
  ************************************************************************************************/
 
 /**
- * Represents a contract for controller object
- *
- * @ingroup Mvc
+ * @ingroup Mvc_Exceptions
  */
-interface IController
+abstract class DispatchException extends StateException
 {
-	/**
-	 * Runs the controller object to handle the incoming context
-	 *
-	 * @return void
-	 */
-	function handle(IControllerContext $controllerContext);
+	function __construct(RouteData $routeData, WebRequest $webRequest)
+	{
+		parent::__construct('Cannot dispatch '.$webRequest->getHttpUrl()->getVirtualPath().' using route data: '.print_r($routeData, true));
+	}
 }
 
 ?>

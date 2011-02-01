@@ -17,15 +17,13 @@
  ************************************************************************************************/
 
 /**
- * Represents an controller that maps an "action" parameter from the Trace to the corresponding
- * method of the object, and invokes it to handle the Trace.
+ * Represents a controller that maps an "action" parameter from the route data to the corresponding
+ * method of the object, and invokes it.
  *
- * A method name consists of an "action_" prefix and the value of "action" parameter taken from
- * the Trace.
+ * A method name consists of an "action_" prefix and the value of "action" parameter.
  *
  * If method is not defined, controller invokes ActionBasedController::handleUnknownAction()
- * which is by default throws TraceException telling that trace is wrong. This method can be
- * reimplemented in descendants and thus gracefully handle failed Trace handling process.
+ * which is by default throws RouteException.
  *
  * Each action method encapsulates business logic and should produce a result - an object that
  * implements IActionResult. The controller provides some useful helper methods for doing this:
@@ -40,37 +38,31 @@
  */
 abstract class ActionBasedController implements IController
 {
-	const PARAMETER_ACTION = 'action';
+	const ROUTE_DATA_ACTION = 'action';
+	
+	private $context;
+	private $routeData;
+	private $request;
+	
+	private $viewData;
 
-	/**
-	 * @var Trace|null
-	 */
-	private $trace;
-
-	/**
-	 * @var Model|null
-	 */
-	private $model;
-
-	/**
-	 * @var string|null
-	 */
-	private $action;
-
-	function handle(Trace $trace)
+	function handle(IControllerContext $controllerContext)
 	{
-		$this->trace = $trace;
+		$this->viewData = new ViewData();
+		
+		$this->context = $controllerContext;
+		$this->routeData = $controllerContext->getRouteData();
+		$this->request = $controllerContext->getWebContext()->getRequest();
 
 		$action = 
-			isset($trace[self::PARAMETER_ACTION])
-				? $trace[self::PARAMETER_ACTION]
+			isset($this->routeData[self::ROUTE_DATA_ACTION])
+				? $this->routeData[self::ROUTE_DATA_ACTION]
 				: null;
 
 		$actionMethod = $this->getMethodName($action);
 		$reflectedController = new ReflectionObject($this);
 
 		if ($action && $reflectedController->hasMethod($actionMethod)) {
-			$this->action = $action;
 			$result = $this->processAction($action, $reflectedController->getMethod($actionMethod));
 		}
 		else {
@@ -80,32 +72,16 @@ abstract class ActionBasedController implements IController
 		$result = $this->makeActionResult($result);
 
 		$this->processResult($result);
-
-		$this->trace = null;
 	}
 
 	/**
-	 * Gets the current trace
+	 * Gets the current view data to be passed to presentation layer
 	 *
-	 * @return Trace
+	 * @return ViewData
 	 */
-	function getTrace()
+	function getViewData()
 	{
-		return $this->trace;
-	}
-
-	/**
-	 * Gets the current Model to be passed to presentation layer
-	 *
-	 * @return Model
-	 */
-	function getModel()
-	{
-		if (!$this->model) {
-			$this->model = new Model();
-		}
-
-		return $this->model;
+		return $this->viewData;
 	}
 
 	/**
@@ -146,9 +122,8 @@ abstract class ActionBasedController implements IController
 			return array();
 		}
 		else {
-			throw new TraceException(
-				sprintf('nothing to pass to %s argument', $argument->name),
-				$this->trace
+			Assert::isUnreachable(
+				'nothing to pass to %s argument', $argument->name
 			);
 		}
 	}
@@ -262,10 +237,7 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function handleUnknownAction($action)
 	{
-		throw new TraceException(
-			sprintf('unknown action `%s`', (string) $action),
-			$this->trace
-		);
+		throw new DispatchActionException($this->routeData, $this->context->getWebContext()->getRequest());
 	}
 
 	/**
@@ -329,7 +301,7 @@ abstract class ActionBasedController implements IController
 		$this->getModel()->append($data);
 
 		$presentation = new UIViewPresentation($viewName);
-		$presentation->setModel($this->getModel());
+		$presentation->setModel($this->getViewData());
 		$presentation->setTrace($this->trace);
 
 		return new ViewResult(new UIPage($presentation));

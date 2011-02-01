@@ -17,18 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents a contract for controller object
- *
- * @ingroup Mvc
+ * @ingroup Mvc_Exceptions
  */
-interface IController
+class DispatchControllerException extends DispatchException
 {
-	/**
-	 * Runs the controller object to handle the incoming context
-	 *
-	 * @return void
-	 */
-	function handle(IControllerContext $controllerContext);
+	// nothing
 }
 
 ?>

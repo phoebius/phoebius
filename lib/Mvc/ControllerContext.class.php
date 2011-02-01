@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,18 +17,27 @@
  ************************************************************************************************/
 
 /**
- * Represents a contract for controller object
+ * Represents a controller context
  *
  * @ingroup Mvc
  */
-interface IController
+final class ControllerContext implements IControllerContext
 {
-	/**
-	 * Runs the controller object to handle the incoming context
-	 *
-	 * @return void
-	 */
-	function handle(IControllerContext $controllerContext);
+	function __construct(RouteData $routeData, IWebContext $webContext)
+	{
+		$this->routeData = $routeData;
+		$this->webContext = $webContext;
+	}
+	
+	function getRouteData()
+	{
+		return $this->routeData;
+	}
+	
+	function getWebContext()
+	{
+		return $this->webContext;
+	}
 }
 
 ?>

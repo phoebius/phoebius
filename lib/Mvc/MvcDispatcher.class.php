@@ -17,56 +17,36 @@
  ************************************************************************************************/
 
 /**
- * Represents a class that obtains a Trace handler - an IController object - according to
- * the Trace and invokes the object to handle the trace
- *
- * A name of a controller class consists of the value taken of "controller" parameter taken from
- * Trace and "Controller" postfix.
- *
- * A controller MUST implement IController interface.
- *
+ * Invokes a Controller class (that implements IController) with the provided route data
+ * 
  * @ingroup Mvc
  */
-class MvcDispatcher implements IRouteDispatcher
+class MvcDispatcher
 {
-	const PARAMETER_CONTROLLER_NAME = 'controller';
-
-	function handle(Trace $trace)
+	function handle(RouteData $routeData, IWebContext $webContext)
 	{
-		$controllerName = $trace->getRequiredParameter(self::PARAMETER_CONTROLLER_NAME);
+		if (!isset($routeData['controller']))
+			return $this->handleError($routeData, $webContext);
+		
+		$controllerName = $routeData['controller'];
+		$controllerClassName = $this->getControllerClassName($controllerName, $routeData);
+		
+		if (!class_exists($controllerClassName))
+			return $this->handleError($routeData, $webContext);
 
-		$controllerClassName = $this->getControllerClassName($controllerName);
+		$controllerObject = $this->getControllerInstance($controllerClassName, $routeData);
 
-		if (!class_exists($controllerClassName, true)) {
-			throw new TraceException(
-				sprintf('unknown controller %s', $controllerClassName),
-				$trace
-			);
-		}
-
-		if (
-				!in_array('IController', class_implements($controllerClassName, true))
-		) {
-			throw new TraceException(
-				sprintf('%s is not a controller due it does not implement IController', $controllerClassName),
-				$trace
-			);
-		}
-
-		$controllerObject = $this->getControllerInstance($controllerClassName, $trace);
-
-		$controllerObject->handle($trace);
-	}
+		$controllerObject->handle(new ControllerContext($routeData, $webContext));
+	}	
 
 	/**
 	 * Gets a new instance of the requested controller
 	 *
 	 * @param string $controllerClassName name of the class that represents a requested controller
-	 * @param Trace $trace trace to handle
 	 *
 	 * @return IController
 	 */
-	protected function getControllerInstance($controllerClassName, Trace $trace)
+	protected function getControllerInstance($controllerClassName, RouteData $routeData)
 	{
 		return new $controllerClassName;
 	}
@@ -81,9 +61,28 @@ class MvcDispatcher implements IRouteDispatcher
 	 *
 	 * @return string
 	 */
-	protected function getControllerClassName($controllerName)
+	protected function getControllerClassName($controllerName, RouteData $routeData)
 	{
 		return ucfirst($controllerName) . 'Controller';
+	}
+	
+	private function handleError(RouteData $routeData, IWebContext $webContext)
+	{
+		if (!isset($routeData['defaultController']))
+			throw new DispatchControllerException($routeData, $webContext->getRequest());
+		
+		$controllerName = $routeData['defaultController'];
+		$controllerClassName = $this->getControllerClassName($controllerName, $routeData);
+		
+		Assert::isTrue(
+			class_exists($controllerClassName, true),
+			'missing %s as defaultController',
+			$controllerClassName
+		);
+
+		$controllerObject = $this->getControllerInstance($controllerClassName, $routeData);
+
+		$controllerObject->handle(new ControllerContext($routeData, $webContext));
 	}
 }
 

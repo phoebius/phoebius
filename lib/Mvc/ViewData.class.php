@@ -17,18 +17,13 @@
  ************************************************************************************************/
 
 /**
- * Represents a contract for controller object
+ * Represents an object containing controller results passed to presentation object
  *
  * @ingroup Mvc
  */
-interface IController
+class ViewData extends Collection
 {
-	/**
-	 * Runs the controller object to handle the incoming context
-	 *
-	 * @return void
-	 */
-	function handle(IControllerContext $controllerContext);
+	// nothing here
 }
 
 ?>

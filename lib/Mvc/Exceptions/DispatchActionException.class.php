@@ -17,13 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents an object containing controller results passed to presentation object
- *
- * @ingroup Mvc
+ * @ingroup Mvc_Exceptions
  */
-class Model extends Collection
+class DispatchActionException extends DispatchException
 {
-	// nothing here
+	// nothing
 }
 
 ?>

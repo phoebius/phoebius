@@ -28,8 +28,14 @@
  */
 class Router implements IRouter
 {
+	private $routeData = array();
 	private $httpMethodRoutes = array();
 	private $anyRoutes = array();
+	
+	function __construct(array $defaultRouteData = array())
+	{
+		$this->routeData = $defaultRouteData;
+	}
 	
 	function process(WebRequest $request)
 	{
@@ -42,6 +48,11 @@ class Router implements IRouter
 			catch (RouteException $e) {};
 			
 		return $this->lookup($this->anyRoutes, $request);
+	}
+	
+	function getDefaultRouteData()
+	{
+		return $this->routeData;
 	}
 	
 	function get($uri, array $routeData = array())
@@ -69,7 +80,7 @@ class Router implements IRouter
 	
 	function all(array $routeData)
 	{
-		$this->anyRoutes[] = new Route(null, array(), $routeData);
+		$this->anyRoutes[] = new Route(null, $routeData);
 	}
 	
 	private function lookup(array $routes, WebRequest $request)
@@ -80,7 +91,11 @@ class Router implements IRouter
 			$result = $route->match($httpUrl);
 			
 			if ($result)
-				return $result;
+				return 
+					array_merge(
+						$this->routeData, 
+						$result
+					);
 		}
 		
 		throw new RouteException($httpUrl);

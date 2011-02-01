@@ -96,15 +96,17 @@ class Route
 			array $data = array()
 		)
 	{
-		$path = parse_url($pattern, PHP_URL_PATH);
-		$query = parse_url($pattern, PHP_URL_QUERY);		
-		
-		if ($path) {
-			$this->pathMatcher = new _PathPattern($path);
-		}
-		
-		if ($query) {
-			parse_str($query, $this->queryStringRegs);
+		if ($pattern) {
+			$path = parse_url($pattern, PHP_URL_PATH);
+			$query = parse_url($pattern, PHP_URL_QUERY);		
+			
+			if ($path) {
+				$this->pathMatcher = new _PathPattern($path);
+			}
+			
+			if ($query) {
+				parse_str($query, $this->queryStringRegs);
+			}
 		}
 		
 		$this->routeData = $data;

@@ -15,6 +15,7 @@ IRouter {
 
 Router {
 	Array routes,
+	RouteData defaultRouteData,
 	
 	RouteData route(WebRequest request) : throws RouteException
 }
