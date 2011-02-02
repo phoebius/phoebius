@@ -24,4 +24,4 @@ set_include_path(
 define('PHOEBIUS_APP_ID', 'phoebius-tests');
 define('PHOEBIUS_LOADER', 'ondemand');
 
-require '../config.inc.php';
+require_once '../config.inc.php';
