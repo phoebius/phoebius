@@ -12,10 +12,8 @@
 
 Phoebius v1.4
 =================================
- + new routing system (like in fjick)
  + less greedy schema generator, verbose compiler
  + db diff tool
- + MVC (controller -> view bridge) simplification
  + review Autoloaders
 
 

@@ -82,8 +82,6 @@ abstract class ActionBasedController implements IController
 	 *
 	 * @param ReflectionParameter $argument
 	 *
-	 * @throws TraceException thrown in case when value cannot being obtained
-	 *
 	 * @return mixed
 	 */
 	protected function filterArgumentValue(ReflectionParameter $argument)
@@ -213,10 +211,10 @@ abstract class ActionBasedController implements IController
 
 	/**
 	 * Represents an action method invoked in case when no other action method can be invoked
-	 * to handle the Trace.
+	 * to handle request
 	 *
-	 * By default this method throws TraceException to notify a calling code that no action
-	 * method found to handle the Trace
+	 * By default this method throws DispatchActionException to notify a calling code that no action
+	 * method found to handle request
 	 *
 	 * @param string|null $action name of an action that was used when looking up the action method
 	 *

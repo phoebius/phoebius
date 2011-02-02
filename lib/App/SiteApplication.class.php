@@ -38,6 +38,11 @@ class SiteApplication
 	 * @var IRouter
 	 */
 	private $router;
+	
+	/**
+	 * @var MvcDispatcher
+	 */
+	private $dispatcher;
 
 	/**
 	 * @var WebContext
@@ -45,11 +50,12 @@ class SiteApplication
 	private $webContext;
 
 	/**
-	 * @param IRouter router to use when handling the request. See ChainedRouter as basic impl.
+	 * @param IRouter router to use when handling the request. See Router as basic impl.
 	 */
 	function __construct(IRouter $router)
 	{
 		$this->router = $router;
+		$this->dispatcher = new MvcDispatcher();
 
 		$request = new WebRequest(
 			new WebRequestDictionary($_SERVER), $_GET, $_POST, $_COOKIE, $_FILES
@@ -82,6 +88,16 @@ class SiteApplication
 	}
 
 	/**
+	 * Gets the application dispatcher
+	 *
+	 * @return MvcDispatcher
+	 */
+	function getDispatcher()
+	{
+		return $this->router;
+	}
+
+	/**
 	 * Runs the application.
 	 *
 	 * @return void
@@ -90,23 +106,19 @@ class SiteApplication
 	{
 		try {
 			try {
-				$trace = $this->router->getTrace($this->webContext);
-				if (!$trace) {
-					throw new Exception("No fallback route is set inside " . get_class($this));
-				}
-
-				$trace->handle();
+				$routeData = $this->router->process($this->webContext->getRequest());
+				
+				$this->dispatcher->handle($routeData, $this->webContext);
+			}
+			catch (DispatchException $e) {
+				$this->handle404($e);
 			}
 			catch (RouteException $e) {
-				$trace = $this->router->getFallbackTrace($trace);
-				if ($trace)
-					$trace->handle();
-				else
-					throw $e;
+				$this->handle404($e);
 			}
 		}
 		catch (Exception $e) {
-			$this->handle500($e, isset($trace) ? $trace : null);
+			$this->handle500($e);
 		}
 	}
 
@@ -114,24 +126,34 @@ class SiteApplication
 	 * Handles the situation when the application failed to found the corresponding route
 	 *
 	 * @throws Exception in case of application fault
-	 * @param Trace $trace trace failed to be handled
 	 * @return void
 	 */
-	protected function handle404(Trace $trace)
+	protected function handle404(Exception $e)
 	{
-		$this->webContext->getResponse()->setStatus(new HttpStatus(HttpStatus::CODE_404));
+		$response = $this->webContext->getResponse();
+		
+		$response->setStatus(new HttpStatus(HttpStatus::CODE_404));
 
-		$this->router->getFallbackTrace($trace);
+		$clname = get_class($e);
+
+		$out = <<<EOT
+	<h1>Not Found</h1>
+	{$clname} : {$e->getMessage()}
+	<hr />
+	<h2>Call Stack</h2>
+	<pre>{$e->getTraceAsString()}</pre>
+EOT;
+
+		$response->write($out)->finish();
 	}
 
 	/**
 	 * The failover stub. Handles the application fault
 	 *
 	 * @param Exception $e uncaught exception that caused fault
-	 * @param Trace $trace handled trace that caused an exception, if built.
 	 * @return void
 	 */
-	protected function handle500(Exception $e, Trace $trace = null)
+	protected function handle500(Exception $e)
 	{
 		$response = $this->webContext->getResponse();
 

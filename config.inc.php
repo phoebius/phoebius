@@ -28,6 +28,7 @@
 // * PHOEBIUS_APP_ROOT - directory where the application resides; by default is the same as the
 //							the directory where Phoebius framework distribution resides
 // * PHOEBIUS_APP_VIEWS_ROOT - views' directory; PHOEBIUS_APP_ROOT/views by default.
+// * BUGS_EMAIL - email bugs to be send to.
 //
 
 define('PHOEBIUS_VERSION', '1.4.0-dev');
