@@ -123,7 +123,7 @@ final class Autoloader extends LazySingleton implements IAutoloader
 
 		$this->isInitialized = true;
 
-		$cacheDirectory = PathResolver::getInstance()->getTmpDir($this);
+		$cacheDirectory = PHOEBIUS_TMP_ROOT;
 		$this->mutexFilename =
 			$cacheDirectory . DIRECTORY_SEPARATOR .
 			$this->getMutexId() . '.mutex';

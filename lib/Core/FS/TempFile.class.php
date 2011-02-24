@@ -38,7 +38,14 @@ class TempFile implements IOutput
 	 */
 	function __construct($keepAfterShutdown = false)
 	{
-		$this->path = FSUtils::getTempFilename(__CLASS__);
+		$where = PHOEBIUS_TMP_ROOT;
+		$filepath = tempnam($where, microtime(true));
+
+		if (!$filepath) {
+			throw new StateException("Failed to create tempnam in {$where}");
+		}
+		
+		$this->path = $filepath;
 		$this->keepAfterShutdown = $keepAfterShutdown;
 
 		if (!$keepAfterShutdown) {

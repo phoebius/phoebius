@@ -234,7 +234,7 @@ abstract class InternalSegmentCache
 	 */
 	private function getCacheFilename()
 	{
-		return PathResolver::getInstance()->getTmpDir($this)
+		return PHOEBIUS_TMP_ROOT
 			. DIRECTORY_SEPARATOR
 			. $this->getCacheId();
 	}
