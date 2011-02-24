@@ -18,5 +18,15 @@
 
 function __autoload($class) 
 {
-	require $class . PHOEBIUS_TYPE_EXTENSION;
+	try {
+		require $class . PHOEBIUS_TYPE_EXTENSION;
+	}
+	catch (Exception $e) {
+		$message = sprintf(
+			'Exception thrown when autoloading %s from %s:%s',
+			$class, $e->getFile(), $e->getLine()
+		);
+		
+		trigger_error($message, E_USER_ERROR);
+	}
 }
