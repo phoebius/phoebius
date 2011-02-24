@@ -69,7 +69,6 @@ define('PHOEBIUS_VIEW_EXTENSION', '.view.php');
 $phoebiusNamespaces = array(
 	'Core',
 	'Core/Exceptions',
-	'Core/FS',
 	'Core/Patterns',
 	'Core/Types',
 	'Core/Types/Complex',
