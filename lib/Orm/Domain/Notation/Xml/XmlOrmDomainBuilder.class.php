@@ -25,7 +25,7 @@
  */
 class XmlOrmDomainBuilder
 {
-	const DTD_BASE_PATH = '/share/Orm/Domain/Meta/Xml/abstract.dtd';
+	const DTD_BASE_PATH = '/share/domain.dtd';
 	const DTD_ROOT_ELEMENT_NAME = 'domain';
 
 	private $xmlFilename;
