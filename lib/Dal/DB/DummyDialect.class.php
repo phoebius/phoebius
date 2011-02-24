@@ -89,6 +89,60 @@ final class DummyDialect extends LazySingleton implements IDialect
 			CreateTableQuery::create($table)
 		);
 	}
+	
+	function getSqlBooleanValue($value)
+	{
+		Assert::isBoolean($value);
+
+		return $value
+			? 't'
+			: 'f';
+	}
+
+	function getExtraTableQueries(DBTable $table)
+	{
+		$queries = array();
+		
+		foreach ($table->getColumns() as $column) {
+			$type = $column->getType();
+			if ($type instanceof DBType && $type->isGenerated()) {
+				$sqName = $this->getSequenceName($table->getName(), $column->getName());
+
+				$queries[] = new RawSqlQuery(
+					'CREATE SEQUENCE %s;',
+					array(
+						new SqlIdentifier($sqName)
+					)
+				);
+
+				$queries[] = new RawSqlQuery(
+					'ALTER SEQUENCE %s OWNED BY %s;',
+					array(
+						new SqlIdentifier($sqName),
+						new SqlPath($table->getName(), $column->getName())
+					)
+				);
+
+				$queries[] = new RawSqlQuery(
+					'ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;',
+					array(
+						new SqlIdentifier($table->getName()),
+						new SqlIdentifier($column->getName()),
+						new SqlFunction('nextval', new SqlValue($sqName))
+					)
+				);
+			}
+		}
+
+		foreach ($table->getConstraints() as $constraint) {
+			if ($constraint instanceof DBOneToOneConstraint) {
+				// create an explicit index for that
+				$queries[] = new CreateIndexQuery($table, new DBIndex($constraint->getFields()));
+			}
+		}
+		
+		return $queries;
+	}
 }
 
 ?>
