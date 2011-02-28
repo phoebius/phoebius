@@ -12,7 +12,6 @@
 
 Phoebius v1.4
 =================================
- + less greedy schema generator, verbose compiler
  + db diff tool
 
 
