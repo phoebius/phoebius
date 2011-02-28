@@ -65,18 +65,11 @@ class XmlOrmDomainBuilder
 	 */
 	function build()
 	{
-		try {
-			$this->ormDomain = new OrmDomain;
-			$this->load();
-			$this->generateDomain();
-		}
-		catch (Exception $e) {
-			$this->dispose();
-
-			throw $e;
-		}
-
-		$this->dispose();
+		$this->ormDomain = new OrmDomain;
+		$this->load();
+		$this->generateDomain();
+		
+		$this->xmlElement = null;
 
 		return $this->ormDomain;
 	}
@@ -214,11 +207,7 @@ class XmlOrmDomainBuilder
 	 */
 	private function generateIdentifier(SimpleXMLElement $xmlIdentifier)
 	{
-		$type = $this->getPropertyType(
-			(string) $xmlIdentifier['type'],
-			AssociationMultiplicity::exactlyOne(),
-			$this->getTypeParameters($xmlIdentifier)
-		);
+		$type = $this->getPropertyType($xmlIdentifier);
 
 		$identifier = new OrmProperty(
 			(string) $xmlIdentifier['name'],
@@ -298,11 +287,7 @@ class XmlOrmDomainBuilder
 	 */
 	private function generateProperty(SimpleXMLElement $xmlProperty)
 	{
-		$type = $this->getPropertyType(
-			(string) $xmlProperty['type'],
-			new AssociationMultiplicity((string) $xmlProperty['multiplicity']),
-			$this->getTypeParameters($xmlProperty)
-		);
+		$type = $this->getPropertyType($xmlProperty);
 
 		$property = new OrmProperty(
 			(string) $xmlProperty['name'],
@@ -335,7 +320,8 @@ class XmlOrmDomainBuilder
 				$referredType = call_user_func(array($referredTypeName, 'orm'));
 			}
 			else {
-				throw new OrmModelIntegrityException('Reference to unknown entity ' . $referredTypeName);
+				$referrer = $type->getName() .'.'. ((string) $xmlContainer['name']);
+				throw new OrmModelIntegrityException($referrer . ' refers to unknown entity ' . $referredTypeName);
 			}
 		}
 
@@ -443,8 +429,11 @@ class XmlOrmDomainBuilder
 	 *  - any type with public ctor
 	 * @return OrmPropertyType
 	 */
-	private function getPropertyType($name, AssociationMultiplicity $multiplicity, array $parameters = array())
+	private function getPropertyType(XmlElement $element, AssociationMultiplicity $multiplicity)
 	{
+		$name = (string) $element['type'];
+		$parameters = $this->getTypeParameters($element);
+		
 		if (($class = $this->importEntity($name))) { // force recursion
 			if ($class->hasDao() && $class->getIdentifier()) {
 				return new AssociationPropertyType(
@@ -514,7 +503,7 @@ class XmlOrmDomainBuilder
 		}
 
 		throw new OrmModelIntegrityException(
-			'do not know how to map ' . $name
+			'Unknown type of ' . ((string) $element['name']) . ' property:  ' . $name
 		);
 	}
 
@@ -561,19 +550,11 @@ class XmlOrmDomainBuilder
 			return $rp->getDefaultValue();
 		}
 		else if ($rp->isArray()) {
-			return array ();
+			return array();
 		}
 		else if ($rp->allowsNull()) {
 			return null;
 		}
-	}
-
-	/**
-	 * @return void
-	 */
-	private function dispose()
-	{
-		$this->xmlElement = null;
 	}
 
 	/**

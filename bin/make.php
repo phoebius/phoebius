@@ -236,21 +236,21 @@ else {
 	message('Config is not specified...');
 	message('Trying to pick config.inc.php...');
 	$config = getcwd() . DIRECTORY_SEPARATOR . 'config.inc.php';
-	if (file_exists($config)) {
-		message('Done.');
-	}
-	else {
+	if (!file_exists($config)) {
 		message('Failed, using the default config.');
 		$config = realpath(dirname(__FILE__) . '/../config.inc.php');
 	}
 }
 
+message ('Loading config: ' . $config);
 require $config;
 
+message ('Loading schema: ' . $xmlSchema);
 $domainBuilder = new XmlOrmDomainBuilder($xmlSchema);
 
 try {
 
+	message ('Building domain...');
 	$ormDomain = $domainBuilder->build();
 
 	if ($code) {
@@ -261,6 +261,7 @@ try {
 			}
 		}
 
+		message ('Generating classes...');
 		$generator = new OrmGenerator($autoDir, $publicDir);
 
 		if ($regeneratePublic) {
@@ -299,10 +300,12 @@ try {
 			}
 		}
 
+		message('Building SQL schema...');
 		$schemaBuilder = new DBSchemaBuilder($ormDomain);
 
 		$schemaConstructor = new SqlSchemaConstructor($schemaBuilder->build());
 
+		message('Writing SQL schema to '. $schemaFile);
 		$schemaConstructor
 			->make(
 				new FileWriteStream($schemaFile),
@@ -315,5 +318,3 @@ catch (Exception $e) {
 }
 
 echo 'Done', PHP_EOL;
-
-?>
