@@ -27,6 +27,11 @@ class DBTable
 	 * @var string
 	 */
 	private $name;
+	
+	/**
+	 * @var DBPrimaryKeyConstraint
+	 */
+	private $pk;
 
 	/**
 	 * @var array of DBColumn
@@ -37,11 +42,6 @@ class DBTable
 	 * @var array of DBConstraint
 	 */
 	private $constraints = array();
-	
-	/**
-	 * @var DBPrimaryKeyConstraint
-	 */
-	private $pk;
 	
 	/**
 	 * @var array of DBIndex
@@ -61,8 +61,17 @@ class DBTable
 	function __sleep()
 	{
 		return array (
-			'name', 'columns', 'constraints'
+			'name', 'columns', 'constraints', 'indexes'
 		);
+	}
+	
+	function __wakeup()
+	{
+		foreach ($this->constraints as $constraint) {
+			if ($constraint instanceof DBPrimaryKeyConstraint) {
+				$this->pk = $constraint;
+			}
+		}
 	}
 
 	/**
@@ -96,17 +105,39 @@ class DBTable
 	}
 
 	/**
-	 * Adds a named DBColumn objects to the table
+	 * Gets a named DBColumn object to the table
 	 *
-	 * @param array $columns a list of DBColumn objects to add to the table
-	 * @throws DuplicationException thrown when another column with the same name already added
+	 * @param string $name
+	 * @throws ArgumentException thrown when no DBColumn object identified by name found
+	 * @return DBColumn
+	 */
+	function getColumn($name)
+	{
+		Assert::isScalar($name);
+
+		if (!isset($this->columns[$name])) {
+			throw new ArgumentException('name', 'not found');
+		}
+
+		return $this->columns[$name];
+	}
+
+	/**
+	 * Drops a named DBColumn object to the table
+	 *
+	 * @param string $name
+	 * @throws ArgumentException thrown when no DBColumn object identified by name found
 	 * @return DBTable itself
 	 */
-	function addColumns(array $columns)
+	function dropColumn($name)
 	{
-		foreach ($columns as $column) {
-			$this->addColumn($column);
+		Assert::isScalar($name);
+
+		if (!isset($this->columns[$name])) {
+			throw new ArgumentException('name', 'not found');
 		}
+		
+		unset ($this->columns[$name]);
 
 		return $this;
 	}
@@ -129,23 +160,6 @@ class DBTable
 	function getFields()
 	{
 		return array_keys($this->columns);
-	}
-
-	/**
-	 * Gets the named DBColumn object
-	 *
-	 * @param string $name name of the column to look up
-	 * @return DBColumn
-	 */
-	function getColumn($name)
-	{
-		Assert::isScalar($name);
-
-		if (!isset($this->columns[$name])) {
-			throw new ArgumentException('name', 'column not found');
-		}
-
-		return $this->columns[$name];
 	}
 
 	/**
@@ -186,6 +200,30 @@ class DBTable
 	}
 
 	/**
+	 * Drops a named DBConstraint object to the table
+	 *
+	 * @param string $name
+	 * @throws ArgumentException thrown when no DBConstraint object identified by name found
+	 * @return DBTable itself
+	 */
+	function dropConstraint($name)
+	{
+		Assert::isScalar($name);
+
+		if (!isset($this->constraints[$name])) {
+			throw new ArgumentException('name', 'not found');
+		}
+		
+		if ($this->constraints[$name] === $this->pk) {
+			$this->pk = null;
+		}
+		
+		unset ($this->constraints[$name]);
+
+		return $this;
+	}
+
+	/**
 	 * Gets the DBConstraint objects added to the table
 	 *
 	 * @return array of DBConstraint
@@ -220,6 +258,26 @@ class DBTable
 		}
 
 		$this->indexes[$name] = $index;
+
+		return $this;
+	}
+
+	/**
+	 * Drops a named DBIndex object to the table
+	 *
+	 * @param string $name
+	 * @throws ArgumentException thrown when no DBIndex object identified by name found
+	 * @return DBTable itself
+	 */
+	function dropIndex($name)
+	{
+		Assert::isScalar($name);
+
+		if (!isset($this->indexes[$name])) {
+			throw new ArgumentException('name', 'not found');
+		}
+		
+		unset ($this->indexes[$name]);
 
 		return $this;
 	}

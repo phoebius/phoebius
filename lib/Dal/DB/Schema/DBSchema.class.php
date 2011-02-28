@@ -49,22 +49,6 @@ final class DBSchema implements ISqlCastable
 	}
 
 	/**
-	 * Adds the DBTable objects to the schema
-	 *
-	 * @param array $table set of table to be added
-	 * @throws DuplicationException thrown when another DBTable with the same name already added
-	 * @return DBSchema itself
-	 */
-	function addTables(array $tables)
-	{
-		foreach ($tables as $table) {
-			$this->addTable($table);
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Gets the DBTable object by its name
 	 *
 	 * @param string $name name of the table to look up
@@ -90,6 +74,25 @@ final class DBSchema implements ISqlCastable
 	function getTables()
 	{
 		return $this->tables;
+	}
+	
+	/**
+	 * Drops the table from the schema
+	 * @param string $name
+	 * 
+	 * @return DBSchema an object itself
+	 */
+	function dropTable($name) 
+	{
+		Assert::isScalar($name);
+
+		if (!isset($this->tables[$name])) {
+			throw new ArgumentException('name', 'not found');
+		}
+		
+		unset ($this->tables[$name]);
+
+		return $this;
 	}
 
 	/**

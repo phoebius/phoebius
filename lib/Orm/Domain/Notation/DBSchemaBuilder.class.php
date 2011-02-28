@@ -134,13 +134,9 @@ class DBSchemaBuilder
 			$this->ormProperty->getType()->getSqlTypes()
 		);
 
-		$dbColumns = array();
 		foreach ($columns as $name => $dbType) {
-			$dbColumns[$name] = new DBColumn($name, $dbType);
+			$this->dbTable->addColumn(new DBColumn($name, $dbType));
 		}
-		$fields = array_keys($dbColumns);
-
-		$this->dbTable->addColumns($dbColumns);
 		
 		// now add constraints and indexes
 		
