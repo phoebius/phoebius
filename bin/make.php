@@ -313,8 +313,8 @@ try {
 			);
 	}
 }
-catch (Exception $e) {
-	stop ($e->getMessage() .' at ' . $e->getFile() . ':' . $e->getLine());
+catch (OrmModelIntegrityException $e) {
+	stop ($e->getMessage());
 }
 
 echo 'Done', PHP_EOL;
