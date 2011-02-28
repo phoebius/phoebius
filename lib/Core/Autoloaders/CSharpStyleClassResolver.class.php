@@ -46,7 +46,8 @@ final class CSharpStyleClassResolver extends ClassResolver
 
 	/**
 	 * @param boolean whether to use include path or not
-	 * @param boolean whether to allow pre-scanning technique or not. PreScan is important for huge and distributed class locations
+	 * @param boolean whether to allow pre-scanning technique or not. PreScan is important for 
+	 * huge and distributed class locations
 	 */
 	function __construct($useIncludePath = true, $allowPreScan = false)
 	{
@@ -115,7 +116,7 @@ final class CSharpStyleClassResolver extends ClassResolver
 				$filepath = $currentIterationPath;
 			}
 			else {
-				if ($this->isSkippable($currentIterationPath)) {
+				if (in_array($path, $this->scannedPaths)) {
 					$this->scannedPaths[] = $currentIterationPath;
 
 					continue;
@@ -148,16 +149,6 @@ final class CSharpStyleClassResolver extends ClassResolver
 		}
 
 		return $existingFilepath;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	protected function isSkippable($path)
-	{
-		return
-			   (in_array($path, $this->scannedPaths))
-			|| (parent::isSkippable($path));
 	}
 }
 

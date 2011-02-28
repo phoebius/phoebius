@@ -22,55 +22,15 @@
  *
  * @ingroup Core_Bootstrap
  */
-final class Autoloader extends LazySingleton implements IAutoloader
+final class Autoloader extends LazySingleton
 {
-	/**
-	 * @var boolean
-	 */
-	private $isInitialized = false;
-
-	/**
-	 * @var string
-	 */
-	private $mutexFilename;
-
-	/**
-	 * @var string
-	 */
-	private $cacheFilename;
-
-	/**
-	 * @var boolean
-	 */
-	private $cacheFileIsLoaded = false;
+	private $pathCacher;
+	private $isRegistered = false;
 
 	/**
 	 * @var array of {@link IClassResolver}
 	 */
 	private $resolvers = array();
-
-	/**
-	 * Already found class paths
-	 * @var array
-	 */
-	private $classPaths = array();
-
-	/**
-	 * Used to supress cached in destructor if any class is resolved after cleaning the cache.
-	 * This hint is needed to prevent inconsistent caching order
-	 * @var boolean
-	 */
-	private $supressFlush = false;
-
-	/**
-	 * @var boolean
-	 */
-	private $cacheFileModification = false;
-
-	/**
-	 * @var string
-	 */
-	private $slotId = PHOEBIUS_APP_ID;
 
 	/**
 	 * @return Autoloader
@@ -83,76 +43,14 @@ final class Autoloader extends LazySingleton implements IAutoloader
 	/**
 	 * @return Autoloader
 	 */
-	function setSlotId($slotId)
-	{
-		Assert::isScalar($slotId);
-		Assert::isFalse($this->isInitialized, 'too late to set slotId: already initialized');
-
-		$this->slotId = $slotId;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	function getSlotId()
-	{
-		return $this->slotId;
-	}
-
-	/**
-	 * @return Autoloader
-	 */
 	function addResolver(IClassResolver $classResolver)
 	{
+		if (!$this->isRegistered)
+			$this->register();
+		
 		$this->resolvers[] = $classResolver;
 
 		return $this;
-	}
-
-	/**
-	 * Initializes the autoloader
-	 * @return void
-	 */
-	private function initialize()
-	{
-		if ($this->isInitialized) {
-			return;
-		}
-
-		$this->isInitialized = true;
-
-		$cacheDirectory = PHOEBIUS_TMP_ROOT;
-		$this->mutexFilename =
-			$cacheDirectory . DIRECTORY_SEPARATOR .
-			$this->getMutexId() . '.mutex';
-
-		if (!file_exists($this->mutexFilename)) {
-			file_put_contents($this->mutexFilename, null);
-		}
-
-		$this->cacheFilename =
-			$cacheDirectory . DIRECTORY_SEPARATOR .
-			'merged_' . sha1($this->slotId) . '_' . filemtime($this->mutexFilename) . '.php';
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function getMutexId()
-	{
-		$ids = array();
-
-		foreach ($this->resolvers as $resolver) {
-			$ids[] = $resolver->getId();
-		}
-
-		$hash = join("", $ids);
-
-		return sha1($hash);
 	}
 
 	function register()
@@ -170,33 +68,6 @@ final class Autoloader extends LazySingleton implements IAutoloader
 	}
 
 	/**
-	 * Drops the persistent class cache
-	 * @return Autoloader
-	 */
-	function clearCache()
-	{
-		$this->initialize();
-
-		try {
-			touch($this->mutexFilename);
-
-			//clear the cache
-			if ($this->cacheFileIsLoaded) {
-				unlink($this->cacheFilename);
-			}
-		}
-		catch (ExecutionContextException $e) {
-			//doesn't matter what happened
-		}
-
-		$this->cacheFileIsLoaded = true;
-		$this->classPaths = array();
-		$this->supressFlush = true;
-
-		return $this;
-	}
-
-	/**
 	 * Searchs for the class by it's name using the added resolvers, loads it in scope of itself
 	 * and adds it to class cache
 	 * @param string $classname
@@ -204,121 +75,29 @@ final class Autoloader extends LazySingleton implements IAutoloader
 	 */
 	function loadClass($classname)
 	{
-		$this->initialize();
-
 		Assert::isScalar($classname);
 
 		if (TypeUtils::isDefined($classname)) {
 			return true;
 		}
 
-		if (false === $this->cacheFileIsLoaded) {
-			try {
-				include $this->cacheFilename;
-
-				$this->cacheFileIsLoaded = true;
-
-				//are you happy? we've got it
-				if (TypeUtils::isDefined($classname)) {
+		foreach ($this->resolvers as $resolver) {
+			$result = $resolver->getClassPath($classname);
+			if ($result) {
+				try {
+					require $result;
+					
 					return true;
 				}
-			}
-			catch (ExecutionContextException $e) {
-				file_put_contents($this->cacheFilename, '<?php ');
-			}
-		}
-
-		//only try, nevermind if it fails
-		$this->lockCacheFile();
-
-		$found = false;
-		$found = $this->invokeResolvers($classname, true);
-
-		if (!$found) {
-			$found = $this->invokeResolvers($classname, false);
-		}
-
-		return $found;
-	}
-
-	private function invokeResolvers($classname, $useCacheOnly)
-	{
-		Assert::isBoolean($useCacheOnly);
-
-		foreach ($this->resolvers as $resolver) {
-			$result = $resolver->loadClassFile($classname, $useCacheOnly);
-			if ($result && ($classpath = $resolver->getClassPath($classname, true))) {
-				$this->classPaths[] = $classpath;
-				break;
-			}
-		}
-
-		return TypeUtils::isDefined($classname);
-	}
-
-	/**
-	 * Flushes cached data if modified
-	 */
-	function __destruct()
-	{
-		if (!$this->supressFlush && !empty($this->classPaths)) {
-			$this->flushCache();
-		}
-	}
-
-	/**
-	 * Locks the cache file so it will be used to flush the cache at the end of script execution.
-	 * If another script will lock the cache between the time of the first lock and the time of
-	 * script execution end, the cache wouldn't be flushed here
-	 * @return void
-	 */
-	private function lockCacheFile()
-	{
-		if (!$this->cacheFileModification && !$this->supressFlush) {
-			clearstatcache();
-			$this->cacheFileModification = filemtime($this->cacheFilename);
-		}
-	}
-
-	/**
-	 * Flushes the cache to a locked cache file
-	 * @return void
-	 */
-	private function flushCache()
-	{
-		//if the file has been modified, do not touch it
-		clearstatcache();
-		if ($this->cacheFileModification === filemtime($this->cacheFilename)) {
-			$prependingContents = '';
-			$stripPrefix = false;
-			foreach ($this->classPaths as $classpath) {
-				//possibly speed ups the file inclusion
-				$fileContents = php_strip_whitespace($classpath);
-				if ($this->cacheFileIsLoaded || $stripPrefix) { // means that file exists
-					$fileContents = preg_replace('/^\<\?(php)?/', '', $fileContents);
+				catch (Exception $e) {
+					$message = sprintf(
+						'Exception thrown when autoloading %s from %s:%s',
+						$result, $e->getFile(), $e->getLine()
+					);
+					
+					trigger_error($message, E_USER_ERROR);
 				}
-				else {
-					$stripPrefix = true;
-				}
-
-				$prependingContents .= preg_replace('/\?\>\s*$/', '', $fileContents);
-
 			}
-
-			try {
-				touch($this->cacheFilename);
-			}
-			catch (Exception $e) {
-				// nothing
-			}
-
-			file_put_contents(
-				$this->cacheFilename,
-				$prependingContents,
-				FILE_APPEND	| LOCK_EX
-			);
 		}
 	}
 }
-
-?>

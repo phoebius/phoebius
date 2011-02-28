@@ -25,21 +25,8 @@ interface IClassResolver
 	 * Gets the path to a file containing the specified class
 	 *
 	 * @param string name of the class
-	 * @param boolean whether to use internal cache or not
 	 *
 	 * @return string|null path to file or null if file not found
 	 */
-	function getClassPath($classname, $hitCacheOnly = false);
-
-	/**
-	 * Loads the file containing the specified class
-	 *
-	 * @param string name of the class
-	 * @param boolean whether to use internal cache or not
-	 *
-	 * @return boolean whether the file was loaded or not
-	 */
-	function loadClassFile($classname, $hitCacheOnly = false);
+	function getClassPath($classname);
 }
-
-?>
