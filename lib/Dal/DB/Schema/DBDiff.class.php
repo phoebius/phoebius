@@ -23,41 +23,214 @@
  */
 final class DBDiff implements ISqlCastable
 {
-	private $newTables = array();
-	private $missingTables = array();
+	private $createTables = array();
+	private $dropTables = array();
 	
-	private $newColumns = array();
-	private $missingColumns = array();
+	private $createColumns = array();
+	private $dropColumns = array();
 	
-	private $newConstraints = array();
-	private $missingConstraints = array();
+	private $createConstraints = array();
+	private $dropConstraints = array();
 	
-	private $newIndexes = array();
-	private $missingIndexes = array();
+	private $createIndexes = array();
+	private $dropIndexes = array();
 	
+	/**
+	 * Creates a diff between two scemas
+	 * @param DBSchema $from
+	 * @param DBSchema $to
+	 * 
+	 * @return DBDiff itself
+	 */
 	function make(DBSchema $from, DBSchema $to)
 	{
 		// Firstly, process tables
 		// Then, for each table process columns, constraints, indexes
+		
+		$fromTables = $from->getTables();
+		$toTables   = $to->getTables();
+		
+		$this->compare(&$this->createTables, &$this->dropTables, $fromTables, $toTables);
+		
+		$sameTables = array_intersect_key(array_keys($fromTables), array_keys($toTables));
+		foreach ($sameTables as $name) {
+			$fromTable = $from->getTable($name);
+			$toTable   = $to->getTable($name);
+			
+			foreach (array("Columns", "Constraints", "Indexes") as $_) {
+				if (!isset($this->{"create$_"}))
+					$this->{"create$_"}[$name] = array();
+					
+				if (!isset($this->{"drop$_"}))
+					$this->{"drop$_"}[$name] = array();
+					
+				$this->compare(
+					&$this->{"create$_"}[$name], 
+					&$this->{"drop$_"}[$name],
+					$fromTable->{"get$_"}(), 
+					$toTable->{"get$_"}()
+				);
+			}
+		}
+		
+		return $this;
 	}
 	
+	/**
+	 * Applies a diff to the specified schema
+	 * @param DBSchema $schema
+	 * @return DBDiff itself
+	 */
 	function apply(DBSchema $schema)
 	{
-		Assert::notImplemented("missing DBTable.drop{Column,Constraint,Index}");
+		foreach ($this->createTables as $table) {
+			$schema->addTable($table);
+		}
+		
+		foreach ($this->createColumns as $tableName => $tableColumns) {
+			foreach ($tableColumns as $column) {
+				$schema->getTable($tableName)->addColumn($column);
+			}
+		}
+		
+		foreach ($this->createConstraints as $tableName => $tableConstraints) {
+			foreach ($tableConstraints as $constaint) {
+				$schema->getTable($tableName)->addConstraint($constaint);
+			}
+		}
+		
+		foreach ($this->createIndexes as $tableName => $tableIndexes) {
+			foreach ($tableIndexes as $index) {
+				$schema->getTable($tableName)->addIndex($index);
+			}
+		}
+		
+		return $this;
 	}
 	
+	/**
+	 * Clears the diff
+	 * @return DBDiff
+	 */
 	function clear()
 	{
-		Assert::notImplemented("clean all internal arrays");
+		$this->createColumns = $this->createConstraints = 
+			$this->createIndexes = $this->createTables =
+			$this->dropColumns = $this->dropConstraints = 
+			$this->dropIndexes = $this->dropTables = array();
+			
+		return $this;
 	}
 	
+	/**
+	 * Reverses the diff direction
+	 * @return DBDiff itself
+	 */
 	function swap()
 	{
-		Assert::notImplemented("reverse diff direction");
+		list ($this->createTables, $this->dropTables) = array ($this->dropTables, $this->createTables);
+		list ($this->createColumns, $this->dropColumns) = array ($this->dropColumns, $this->createColumns);
+		list ($this->createConstraints, $this->dropConstraints) = array ($this->dropConstraints, $this->createConstraints);
+		list ($this->createIndexes, $this->dropIndexes) = array ($this->dropIndexes, $this->createIndexes);
+		
+		return $this;
 	}
 	
 	function toDialectString(IDialect $dialect)
 	{
-		Assert::notImplemented("generate alter queries according to diff");
+		// tables
+		// columns
+		// constraints
+		// indexes
+		
+		$yield = array();
+
+		foreach ($this->dropIndexes as $table => $tabledropIndexes) {
+			foreach ($tabledropIndexes as $index) {
+				$yield[] = new DropIndexQuery(new DBTable($table), $index);
+			}
+		}
+
+		foreach ($this->dropConstraints as $table => $tabledropConstraints) {
+			foreach ($tabledropConstraints as $constraint) {
+				$yield[] = new DropConstraintQuery(new DBTable($table), $constraint);
+			}
+		}
+
+		foreach ($this->dropColumns as $table => $tabledropColumns) {
+			foreach ($tabledropColumns as $column) {
+				$yield[] = new DropColumnQuery(new DBTable($table), $column);
+			}
+		}
+		
+		foreach ($this->dropTables as $table) {
+			$yield[] = new DropTableQuery($table);
+		}
+		
+		
+		foreach ($this->createTables as $table) {
+			$yield[] = new CreateTableQuery($table);
+		}
+		
+		foreach ($this->createColumns as $table => $tableNewColumns) {
+			foreach ($tableNewColumns as $column) {
+				$yield[] = new CreateColumnQuery(new DBTable($table), $column);
+			}
+		}
+		
+		foreach ($this->createColumns as $table => $tableNewColumns) {
+			foreach ($tableNewColumns as $column) {
+				$yield[] = new CreateColumnQuery(new DBTable($table), $column);
+			}
+		}
+		
+		foreach ($this->createConstraints as $table => $tableNewConstraints) {
+			foreach ($tableNewConstraints as $constraint) {
+				$yield[] = new CreateConstraintQuery(new DBTable($table), $constraint);
+			}
+			
+			foreach ($this->createTables as $table) {
+				foreach ($table->getConstraintQueries() as $query) {
+					$yield[] = $query;
+				}
+			}
+		}
+		
+		foreach ($this->createIndexes as $table => $tableNewIndexes) {
+			foreach ($tableNewIndexes as $index) {
+				$yield[] = new CreateConstraintQuery(new DBTable($table), $index);
+			}
+			
+			foreach ($this->createTables as $table) {
+				foreach ($table->getIndexQueries() as $query) {
+					$yield[] = $query;
+				}
+			}
+		}
+			
+		foreach ($this->createTables as $table) {
+			foreach ($dialect->getExtraTableQueries($table) as $query) {
+				$yield[] = $query;
+			}
+		}
+		
+		$set = new SqlQuerySet($yield);
+		return $set->toDialectString($dialect);
+	}
+	
+	private function compare(&$new, &$drop, array $from, array $to)
+	{
+		// track dropped: array_diff_key(from, to)
+		// track added:   array_diff_key(to, from)
+		
+		$dropped = array_diff_key($from, $to);
+		foreach ($dropped as $item) {
+			$drop[] = $from[$item];
+		}
+		
+		$added = array_diff_key($to, $from);
+		foreach ($added as  $item) {
+			$new[] = $to[$item];
+		}
 	}
 }
