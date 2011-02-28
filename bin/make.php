@@ -257,7 +257,7 @@ try {
 		foreach (array('publicDir', 'autoDir') as $dir) {
 			$$dir = getcwd() . '/' . $$dir;
 			if (!is_dir($$dir)) {
-				mkdir($$dir, 0700, true);
+				mkdir($$dir, 0755, true);
 			}
 		}
 
@@ -296,7 +296,7 @@ try {
 
 			$dir = dirname($schemaFile);
 			if (!is_dir($dir)) {
-				mkdir($dir, 0700, true);
+				mkdir($dir, 0755, true);
 			}
 		}
 
