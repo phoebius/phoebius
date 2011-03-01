@@ -74,6 +74,18 @@ Database schema generator options:
                          Path is treated as relative to the application directory (\$app).
                          This forces a --schema option to be switched on automatically.
 
+Database schema difference generator options:
+
+  --diff                 generate database schema difference. You must specify an XML file
+                         with the domain to compare to (--compare) and file to write
+                         SQL instructions to (--diff-file).
+
+  --compare=<schema>     domain XML to compare against.
+                         This forces a --diff option to be switched on automatically.
+  
+  --diff-file=<file>     write SQL difference script to <file>.
+                         This forces a --diff option to be switched on automatically.
+
 EOT;
 }
 
@@ -112,6 +124,10 @@ $db = null;
 $import = false;
 $schemaFile = null;
 $dbObject = null;
+
+$diff = false;
+$diffDomainFile = null;
+$diffSqlFile = null;
 
 
 $args = $argv;
@@ -196,6 +212,27 @@ foreach ($args as $arg) {
 			case '--schema-file': {
 				$schema = true;
 				$schemaFile = $v;
+				break;
+			}
+			
+			//
+			// diff
+			//
+			
+			case '--diff': {
+				$diff = true;
+				break;
+			}
+			
+			case '--compare': {
+				$diff = true;
+				$diffDomainFile = $v;
+				break;
+			}
+			
+			case '--diff-file': {
+				$diff = true;
+				$diffSqlFile = $v;
 				break;
 			}
 
@@ -284,6 +321,9 @@ try {
 				stop ("Unknown database reference: $db");
 			}
 		}
+		else {
+			stop ('You should specify db to use');
+		}
 
 		if (!$schemaFile) {
 			$schemaFile =
@@ -311,6 +351,53 @@ try {
 				new FileWriteStream($schemaFile),
 				$dbObject->getDialect()
 			);
+	}
+	
+	if ($diff) {
+		message('Making diff...');
+		
+		$diffDomainFile = realpath($diffDomainFile);
+		if (!$diffDomainFile) {
+			stop ("Diff domain file is not specified");
+		}
+		
+		if (!$diffSqlFile) {
+			stop ("Diff schema file is not specified");
+		}
+		$dir = dirname($diffSqlFile);
+		if (!is_dir($dir))
+			mkdir ($dir, 0755, true);
+		
+		if (!$db && $ormDomain->getDbSchema()) {
+			$db = $ormDomain->getDbSchema();
+		}
+
+		if ($db) {
+			try {
+				$dbObject = DBPool::get($db);
+			}
+			catch (ArgumentException $e) {
+				stop ("Unknown database reference: $db");
+			}
+		}
+		else {
+			stop ('You should specify db to use');
+		}
+
+		message ('Loading diff schema: ' . $diffDomainFile);
+		$domainBuilder = new XmlOrmDomainBuilder($diffDomainFile);
+		$diffOrmDomain = $domainBuilder->build();
+		
+		message ('Writing diff to ' . $diffSqlFile);
+		$dbDiff = new DBDiff();
+		
+		$schemaBuilderOld = new DBSchemaBuilder($diffOrmDomain);
+		$schemaOld = $schemaBuilderOld->build();
+		$schemaBuilderNew = new DBSchemaBuilder($ormDomain);
+		$schemaNew = $schemaBuilderNew->build();
+		
+		$dbDiff->make($schemaOld, $schemaNew);
+		file_put_contents($diffSqlFile, $dbDiff->toDialectString($dbObject->getDialect()));
 	}
 }
 catch (OrmModelIntegrityException $e) {

@@ -53,6 +53,7 @@ final class DBDiff implements ISqlCastable
 		$this->compare(&$this->createTables, &$this->dropTables, $fromTables, $toTables);
 		
 		$sameTables = array_intersect_key(array_keys($fromTables), array_keys($toTables));
+
 		foreach ($sameTables as $name) {
 			$fromTable = $from->getTable($name);
 			$toTable   = $to->getTable($name);
@@ -190,12 +191,12 @@ final class DBDiff implements ISqlCastable
 		
 		$dropped = array_diff_key($from, $to);
 		foreach ($dropped as $item) {
-			$drop[] = $from[$item];
+			$drop[] = $item;
 		}
 		
 		$added = array_diff_key($to, $from);
-		foreach ($added as  $item) {
-			$new[] = $to[$item];
+		foreach ($added as $item) {
+			$new[] = $item;
 		}
 	}
 }
