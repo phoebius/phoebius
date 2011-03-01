@@ -49,10 +49,11 @@ class DBOneToOneConstraint extends DBConstraint
 	 * @param AssociationBreakAction $associationBreakAction action which is performed on reference break
 	 */
 	function __construct(
+			$name,
+			DBTable $table,
 			array $fields,
 			DBTable $referencedTable,
-			AssociationBreakAction $associationBreakAction,
-			$name = null
+			AssociationBreakAction $associationBreakAction
 		)
 	{
 		foreach ($referencedTable->getConstraints() as $constraint) {
@@ -73,7 +74,7 @@ class DBOneToOneConstraint extends DBConstraint
 				$this->referencedTable = $referencedTable;
 				$this->associationBreakAction = $associationBreakAction;
 				
-				parent::__construct($fields, $name);
+				parent::__construct($name, $table, $fields);
 
 				return;
 			}

@@ -19,8 +19,6 @@
 /**
  * Represents an abstract database constraint.
  *
- * Constraint can be optinally named.
- *
  * @ingroup Dal_DB_Schema
  */
 abstract class DBConstraint implements ISqlCastable
@@ -36,17 +34,21 @@ abstract class DBConstraint implements ISqlCastable
 	private $fields;
 	
 	/**
+	 * @var DBTable
+	 */
+	private $table;
+	
+	/**
 	 * @param array of string $fields
 	 */
-	function __construct(array $fields, $name = null)
+	function __construct($name, DBTable $table, array $fields)
 	{
+		Assert::isScalar($name);
 		Assert::isNotEmpty($fields, 'constraint cannot be across zero fields');
 		
+		$this->name = $name;
+		$this->table = $table;
 		$this->fields = $fields;
-		
-		if ($name) {
-			$this->setName($name);
-		}
 	}
 	
 	function getFields()
@@ -65,19 +67,13 @@ abstract class DBConstraint implements ISqlCastable
 	}
 
 	/**
-	 * Sets the new name of the constraint
+	 * Gets the table
 	 *
-	 * @param string $name name of the constraint
-	 *
-	 * @return DBConstraint itself
+	 * @return DBTable
 	 */
-	function setName($name)
+	function getTable()
 	{
-		Assert::isScalar($name);
-
-		$this->name = $name;
-
-		return $this;
+		return $this->table;
 	}
 
 	/**

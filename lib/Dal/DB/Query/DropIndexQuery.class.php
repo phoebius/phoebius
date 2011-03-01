@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,11 +17,11 @@
  ************************************************************************************************/
 
 /**
- * Represents a query for altering tables for creating indexes
+ * Represents a query for altering tables for dropping indexes
  *
  * @ingroup Dal_DB_Query
  */
-final class CreateIndexQuery implements ISqlQuery
+final class DropIndexQuery implements ISqlQuery
 {
 	/**
 	 * @var DBIndex
@@ -30,7 +30,7 @@ final class CreateIndexQuery implements ISqlQuery
 
 	/**
 	 * @param DBTable $table a table object that represent an expected database table
-	 * @param DBIndex $index index to be created
+	 * @param DBIndex $index index to be dropped
 	 */
 	function __construct(DBIndex $index)
 	{
@@ -39,8 +39,14 @@ final class CreateIndexQuery implements ISqlQuery
 
 	function toDialectString(IDialect $dialect)
 	{
+		//
+		// FIXME move to IDialect
+		// 
+		
 		return
-			'CREATE ' . $this->index->toDialectString($dialect)
+			'DROP INDEX ' . $dialect->quoteIdentifier($this->index->getName())
+			. ( $dialect->getDBDriver()->is(DBDriver::MYSQL) ? ' ON ' . $dialect->quoteIdentifier($this->index->getTable()->getName()) : '' )
+			. ( $dialect->getDBDriver()->is(DBDriver::PGSQL) ? ' CASCADE ' : '' )
 			. ';';
 	}
 

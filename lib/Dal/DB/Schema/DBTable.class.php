@@ -299,7 +299,7 @@ class DBTable
 		);
 		
 		if ($this->pk) {
-			$yield[] = new CreateConstraintQuery($this, $this->pk);
+			$yield[] = new CreateConstraintQuery($this->pk);
 		}
 		
 		return $yield;
@@ -311,7 +311,7 @@ class DBTable
 		
 		foreach ($this->constraints as $constraint) {
 			if ($constraint !== $this->pk) {
-				$queries[] = new CreateConstraintQuery($this, $constraint);
+				$queries[] = new CreateConstraintQuery($constraint);
 			}
 		}
 		
@@ -323,7 +323,7 @@ class DBTable
 		$queries = array();
 		
 		foreach ($this->indexes as $index) {
-			$queries[] = new CreateIndexQuery($this, $index);
+			$queries[] = new CreateIndexQuery($index);
 		}
 		
 		return $queries;

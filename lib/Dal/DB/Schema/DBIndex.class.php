@@ -31,9 +31,9 @@ class DBIndex implements ISqlCastable
 	private $name;
 	
 	/**
-	 * @var string
+	 * @var DBTable
 	 */
-	private $type;
+	private $table;
 	
 	/**
 	 * @var array
@@ -43,17 +43,14 @@ class DBIndex implements ISqlCastable
 	/**
 	 * @param array of string $fields
 	 */
-	function __construct(array $fields, $name = null, $type = null)
+	function __construct($name, DBTable $table, array $fields)
 	{
+		Assert::isScalar($name);
 		Assert::isNotEmpty($fields, 'index cannot be across zero fields');
-		
+	
+		$this->name = $name;
+		$this->table = $table;
 		$this->fields = $fields;
-		
-		if ($name) {
-			$this->setName($name);
-		}
-		
-		$this->type = $type;
 	}
 	
 	/**
@@ -65,6 +62,16 @@ class DBIndex implements ISqlCastable
 	}
 
 	/**
+	 * Gets the table
+	 *
+	 * @return DBTable
+	 */
+	function getTable()
+	{
+		return $this->table;
+	}
+
+	/**
 	 * Gets the name of the index
 	 *
 	 * @return string
@@ -73,40 +80,14 @@ class DBIndex implements ISqlCastable
 	{
 		return $this->name;
 	}
-
-	/**
-	 * Gets the type of index
-	 *
-	 * @return string
-	 */
-	function getType()
-	{
-		return $this->type;
-	}
-
-	/**
-	 * Sets the new name of the index
-	 *
-	 * @param string $name name of the index
-	 *
-	 * @return DBIndex itself
-	 */
-	function setName($name)
-	{
-		Assert::isScalar($name);
-
-		$this->name = $name;
-
-		return $this;
-	}
 	
 	function toDialectString(IDialect $dialect)
 	{
 		return 
 			'INDEX ' 
-			. ($this->name ? $dialect->quoteIdentifier($this->getName()) . ' ' : '')
-			. ($this->type ? $this->type . ' ' : '')
-			. '(' . $this->getFieldsAsString($dialect) . ')';
+			. $dialect->quoteIdentifier($this->name)
+			. ' ON ' . $dialect->quoteIdentifier($this->table->getName())
+			. ' (' . $this->getFieldsAsString($dialect) . ')';
 	}
 	
 	/**

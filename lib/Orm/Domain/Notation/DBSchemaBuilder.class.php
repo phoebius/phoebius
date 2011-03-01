@@ -135,7 +135,7 @@ class DBSchemaBuilder
 		);
 
 		foreach ($columns as $name => $dbType) {
-			$this->dbTable->addColumn(new DBColumn($name, $dbType));
+			$this->dbTable->addColumn(new DBColumn($name, $this->dbTable, $dbType));
 		}
 		
 		// now add constraints and indexes
@@ -145,16 +145,17 @@ class DBSchemaBuilder
 	
 	private function importConstraints(OrmProperty $property)
 	{
+		$name = $this->dbTable->getName() . '_' . $property->getName();
 		$fields = $property->getFields();
 		
 		if ($property->isIdentifier()) {
 			$this->dbTable->addConstraint(
-				new DBPrimaryKeyConstraint($fields, $property->getName() . '_pk')
+				new DBPrimaryKeyConstraint($name . '_pk', $this->dbTable, $fields)
 			);
 		}
 		else if ($property->isUnique()) {
 			$this->dbTable->addConstraint(
-				new DBUniqueConstraint($fields, $property->getName() . '_uq')
+				new DBUniqueConstraint($name . '_uq', $this->dbTable, $fields)
 			);
 		}
 
@@ -162,10 +163,11 @@ class DBSchemaBuilder
 		if ($type instanceof AssociationPropertyType) {
 			$this->dbTable->addConstraint(
 				new DBOneToOneConstraint(
+					$name . '_fk',
+					$this->dbTable,
 					$fields,
 					$this->dbSchema->getTable($property->getType()->getContainer()->getTable()),
-					$property->getType()->getAssociationBreakAction(),
-					$property->getName() . '_fk'
+					$property->getType()->getAssociationBreakAction()
 				)
 			);
 		}
@@ -177,7 +179,11 @@ class DBSchemaBuilder
 		
 		if ($property->isQueryable()) {
 			$this->dbTable->addIndex(
-				new DBIndex($fields, $property->getName() . '_idx')
+				new DBIndex(
+					$name . '_idx',
+					$this->dbTable,
+					$fields
+				)
 			);
 		}
 	}

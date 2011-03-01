@@ -57,20 +57,9 @@ final class DBDiff implements ISqlCastable
 			$fromTable = $from->getTable($name);
 			$toTable   = $to->getTable($name);
 			
-			foreach (array("Columns", "Constraints", "Indexes") as $_) {
-				if (!isset($this->{"create$_"}))
-					$this->{"create$_"}[$name] = array();
-					
-				if (!isset($this->{"drop$_"}))
-					$this->{"drop$_"}[$name] = array();
-					
-				$this->compare(
-					&$this->{"create$_"}[$name], 
-					&$this->{"drop$_"}[$name],
-					$fromTable->{"get$_"}(), 
-					$toTable->{"get$_"}()
-				);
-			}
+			$this->compare(&$this->createColumns, &$this->dropColumns, $fromTable->getColumns(), $toTable->getColumns());
+			$this->compare(&$this->createConstraints, &$this->dropConstraints, $fromTable->getConstraints(), $toTable->getConstraints());
+			$this->compare(&$this->createIndexes, &$this->dropIndexes, $fromTable->getIndexes(), $toTable->getIndexes());
 		}
 		
 		return $this;
@@ -87,22 +76,16 @@ final class DBDiff implements ISqlCastable
 			$schema->addTable($table);
 		}
 		
-		foreach ($this->createColumns as $tableName => $tableColumns) {
-			foreach ($tableColumns as $column) {
-				$schema->getTable($tableName)->addColumn($column);
-			}
+		foreach ($this->createColumns as $column) {
+			$schema->getTable($tableName)->addColumn($column);
 		}
 		
-		foreach ($this->createConstraints as $tableName => $tableConstraints) {
-			foreach ($tableConstraints as $constaint) {
-				$schema->getTable($tableName)->addConstraint($constaint);
-			}
+		foreach ($this->createConstraints as $constaint) {
+			$schema->getTable($tableName)->addConstraint($constaint);
 		}
 		
-		foreach ($this->createIndexes as $tableName => $tableIndexes) {
-			foreach ($tableIndexes as $index) {
-				$schema->getTable($tableName)->addIndex($index);
-			}
+		foreach ($this->createIndexes as $index) {
+			$schema->getTable($tableName)->addIndex($index);
 		}
 		
 		return $this;
@@ -145,22 +128,16 @@ final class DBDiff implements ISqlCastable
 		
 		$yield = array();
 
-		foreach ($this->dropIndexes as $table => $tabledropIndexes) {
-			foreach ($tabledropIndexes as $index) {
-				$yield[] = new DropIndexQuery(new DBTable($table), $index);
-			}
+		foreach ($this->dropIndexes as $index) {
+			$yield[] = new DropIndexQuery($index);
 		}
 
-		foreach ($this->dropConstraints as $table => $tabledropConstraints) {
-			foreach ($tabledropConstraints as $constraint) {
-				$yield[] = new DropConstraintQuery(new DBTable($table), $constraint);
-			}
+		foreach ($this->dropConstraints as $constraint) {
+			$yield[] = new DropConstraintQuery($constraint);
 		}
 
-		foreach ($this->dropColumns as $table => $tabledropColumns) {
-			foreach ($tabledropColumns as $column) {
-				$yield[] = new DropColumnQuery(new DBTable($table), $column);
-			}
+		foreach ($this->dropColumns as $column) {
+			$yield[] = new DropColumnQuery($column);
 		}
 		
 		foreach ($this->dropTables as $table) {
@@ -172,22 +149,12 @@ final class DBDiff implements ISqlCastable
 			$yield[] = new CreateTableQuery($table);
 		}
 		
-		foreach ($this->createColumns as $table => $tableNewColumns) {
-			foreach ($tableNewColumns as $column) {
-				$yield[] = new CreateColumnQuery(new DBTable($table), $column);
-			}
+		foreach ($this->createColumns as $column) {
+			$yield[] = new CreateColumnQuery($column);
 		}
 		
-		foreach ($this->createColumns as $table => $tableNewColumns) {
-			foreach ($tableNewColumns as $column) {
-				$yield[] = new CreateColumnQuery(new DBTable($table), $column);
-			}
-		}
-		
-		foreach ($this->createConstraints as $table => $tableNewConstraints) {
-			foreach ($tableNewConstraints as $constraint) {
-				$yield[] = new CreateConstraintQuery(new DBTable($table), $constraint);
-			}
+		foreach ($this->createConstraints as $constraint) {
+			$yield[] = new CreateConstraintQuery($constraint);
 			
 			foreach ($this->createTables as $table) {
 				foreach ($table->getConstraintQueries() as $query) {
@@ -196,10 +163,8 @@ final class DBDiff implements ISqlCastable
 			}
 		}
 		
-		foreach ($this->createIndexes as $table => $tableNewIndexes) {
-			foreach ($tableNewIndexes as $index) {
-				$yield[] = new CreateConstraintQuery(new DBTable($table), $index);
-			}
+		foreach ($this->createIndexes as $index) {
+			$yield[] = new CreateIndexQuery($index);
 			
 			foreach ($this->createTables as $table) {
 				foreach ($table->getIndexQueries() as $query) {

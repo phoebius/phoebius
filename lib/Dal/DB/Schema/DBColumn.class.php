@@ -46,14 +46,20 @@ class DBColumn implements ISqlCastable
 	private $type;
 
 	/**
+	 * @var DBTable
+	 */
+	private $table;
+
+	/**
 	 * @param string $name name of the column
 	 * @param ISqlType $type SQL type of the column
 	 */
-	function __construct($name, ISqlType $type)
+	function __construct($name, DBTable $table, ISqlType $type)
 	{
 		Assert::isScalar($name);
 
 		$this->name = $name;
+		$this->table = $table;
 		$this->type = $type;
 	}
 
@@ -75,6 +81,16 @@ class DBColumn implements ISqlCastable
 	function getType()
 	{
 		return $this->type;
+	}
+
+	/**
+	 * Gets the table
+	 *
+	 * @return DBTable
+	 */
+	function getTable()
+	{
+		return $this->table;
 	}
 
 	/**

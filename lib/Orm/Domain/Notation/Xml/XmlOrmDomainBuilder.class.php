@@ -207,7 +207,7 @@ class XmlOrmDomainBuilder
 	 */
 	private function generateIdentifier(SimpleXMLElement $xmlIdentifier)
 	{
-		$type = $this->getPropertyType($xmlIdentifier);
+		$type = $this->getPropertyType($xmlIdentifier, AssociationMultiplicity::exactlyOne());
 
 		$identifier = new OrmProperty(
 			(string) $xmlIdentifier['name'],
@@ -287,7 +287,7 @@ class XmlOrmDomainBuilder
 	 */
 	private function generateProperty(SimpleXMLElement $xmlProperty)
 	{
-		$type = $this->getPropertyType($xmlProperty);
+		$type = $this->getPropertyType($xmlProperty, new AssociationMultiplicity((string) $xmlProperty['multiplicity']));
 
 		$property = new OrmProperty(
 			(string) $xmlProperty['name'],
@@ -429,7 +429,7 @@ class XmlOrmDomainBuilder
 	 *  - any type with public ctor
 	 * @return OrmPropertyType
 	 */
-	private function getPropertyType(XmlElement $element, AssociationMultiplicity $multiplicity)
+	private function getPropertyType(SimpleXMLElement $element, AssociationMultiplicity $multiplicity)
 	{
 		$name = (string) $element['type'];
 		$parameters = $this->getTypeParameters($element);

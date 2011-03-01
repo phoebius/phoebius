@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,31 +17,28 @@
  ************************************************************************************************/
 
 /**
- * Represents a query for altering tables for creating indexes
+ * Represents a query for altering tables for dropping columns
  *
  * @ingroup Dal_DB_Query
  */
-final class CreateIndexQuery implements ISqlQuery
+final class DropColumnQuery implements ISqlQuery
 {
 	/**
-	 * @var DBIndex
+	 * @var DBColumn
 	 */
-	private $index;
+	private $column;
 
-	/**
-	 * @param DBTable $table a table object that represent an expected database table
-	 * @param DBIndex $index index to be created
-	 */
-	function __construct(DBIndex $index)
+	function __construct(DBColumn $column)
 	{
-		$this->index = $index;
+		$this->column = $column;
 	}
 
 	function toDialectString(IDialect $dialect)
 	{
 		return
-			'CREATE ' . $this->index->toDialectString($dialect)
-			. ';';
+			'ALTER TABLE ' . $dialect->quoteIdentifier($this->column->getTable()->getName())
+			. ' DROP COLUMN ' . $this->column->toDialectString($dialect)
+			. ' CASCADE;';
 	}
 
 	function getPlaceholderValues(IDialect $dialect)

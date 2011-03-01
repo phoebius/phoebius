@@ -10,18 +10,6 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
-Phoebius v1.4
-=================================
- + db diff tool
-
-
-DAL/DB
-======
-Use postgresql RETURNING_ID instead of invoking the sequence
-INSERT INTO tbl1 (id, ...) VALUES (1, ...) RETURNING id
-
-
-
 Orm
 ===
 add isMutated=false flag to OrmEntity, and reset it within setters

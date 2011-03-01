@@ -135,7 +135,13 @@ class PgSqlDialect extends Dialect
 		foreach ($table->getConstraints() as $constraint) {
 			if ($constraint instanceof DBOneToOneConstraint) {
 				// create an explicit index for that
-				$queries[] = new CreateIndexQuery($table, new DBIndex($constraint->getFields()));
+				$queries[] = new CreateIndexQuery(
+					new DBIndex(
+						$constraint->getName() . '_idx', 
+						$constraint->getTable(),
+						$constraint->getFields()
+					)
+				);
 			}
 		}
 		
