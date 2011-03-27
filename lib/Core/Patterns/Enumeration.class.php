@@ -189,7 +189,7 @@ abstract class Enumeration implements IStringCastable
 
 	function __toString()
 	{
-		return get_class($this) . '::' .$this->value;
+		return $this->value;
 	}
 
 	/**
