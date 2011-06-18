@@ -78,15 +78,15 @@ final class DBDiff implements ISqlCastable
 		}
 		
 		foreach ($this->createColumns as $column) {
-			$schema->getTable($tableName)->addColumn($column);
+			$schema->getTable($column->getTable()->getName())->addColumn($column);
 		}
 		
 		foreach ($this->createConstraints as $constaint) {
-			$schema->getTable($tableName)->addConstraint($constaint);
+			$schema->getTable($constaint->getTable()->getName())->addConstraint($constaint);
 		}
 		
 		foreach ($this->createIndexes as $index) {
-			$schema->getTable($tableName)->addIndex($index);
+			$schema->getTable($index->getTable()->getName())->addIndex($index);
 		}
 		
 		return $this;

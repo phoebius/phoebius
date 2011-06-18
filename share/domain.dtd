@@ -73,6 +73,10 @@ Extended example with the same result:
 	<param name="size" value="255">
 	<param name="nullable" value="true">
 </property>
+
+
+"default" attribute may specify the default value for the
+property of DBType type.
 -->
 <!ELEMENT property (param*)>
 <!ATTLIST property
@@ -90,6 +94,8 @@ Extended example with the same result:
 	db-columns		NMTOKENS #IMPLIED
 	
 	queryable		(true|false) "false"
+	
+	default			CDATA #IMPLIED
 >
 
 <!--
