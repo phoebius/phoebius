@@ -92,9 +92,11 @@ class Router implements IRouter
 			
 			if ($result)
 				return 
-					array_merge(
-						$this->routeData, 
-						$result
+					new RouteData(
+						array_merge(
+							$this->routeData, 
+							$result
+						)
 					);
 		}
 		
