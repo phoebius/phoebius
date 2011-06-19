@@ -36,11 +36,11 @@ class OrmLogicalSchemaClassCodeConstructor extends OrmRelatedClassCodeConstructo
 	protected function getClassType()
 	{
 		return 'final';
-	}
-
-	protected function getImplementsInterfaceNames()
+	}	
+	
+	protected function getExtendsClassName()
 	{
-		return array('ILogicallySchematic');
+		return 'LogicalSchema';
 	}
 
 	protected function findMembers()
