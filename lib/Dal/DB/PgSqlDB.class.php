@@ -295,6 +295,12 @@ class PgSqlDB extends DB
 
 					throw new UniqueViolationException($query, $errorMessage);
 				}
+				else if (PgSqlError::RAISE_EXCEPTION == $errorCode) {
+
+					LoggerPool::log(parent::LOG_VERBOSE, 'query raised exception: %s', $errorMessage);
+
+					throw new DBProcedureException($query, $errorMessage);
+				}
 				else {
 
 					LoggerPool::log(parent::LOG_VERBOSE, 'query caused an error #%s: %s', $errorCode, $errorMessage);
