@@ -180,18 +180,6 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	{
 		return $this->filesVars;
 	}
-	
-	private $sessions = array();
-	
-	function getSession($id)
-	{
-		if (!$this->sessions[$id]) {
-			$this->sessions[$id] = $s = new Session($id);
-			$s->import($this->getCookieVars());
-		}
-		
-		return $this->sessions[$id];
-	}
 
 	/**
 	 * Determines whether variable is set in any of the request part

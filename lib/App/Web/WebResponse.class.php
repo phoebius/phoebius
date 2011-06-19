@@ -62,10 +62,11 @@ class WebResponse implements IWebResponse
 		$this->finish();
 	}
 	
-	function setSession(Session $session, $ttl)
+	function setCookie($name, $value, $ttl)
 	{
-		foreach ($session->split() as $key => $value)
-			setcookie($key, $value, $ttl? time() + $ttl : 0, "/");
+		setcookie($name, $value, $ttl? time() + $ttl : 0, "/");
+		
+		return $this;
 	}
 
 	function finish()
@@ -105,6 +106,27 @@ class WebResponse implements IWebResponse
 		}
 
 		return $this;
+	}
+	
+	/**
+	 * @var array of Session
+	 */
+	private $sessions = array();
+	
+	/**
+	 * Gets the response session
+	 * @return Session
+	 */
+	function getSession($id)
+	{
+		if (!isset($this->sessions[$id])) {
+			$this->sessions[$id] = $s = new Session($id, $this);
+			
+			if ($this->request)
+				$s->import($this->request->getCookieVars());
+		}
+		
+		return $this->sessions[$id];
 	}
 
 	function redirect(HttpUrl $url, HttpStatus $status = null)

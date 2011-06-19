@@ -26,11 +26,13 @@ class Session
 	const CHUNK_SIZE = 4096;
 	
 	private $sessionId;
+	private $response;
 	private $data = array();
 	
-	function __construct($sessionId)
+	function __construct($sessionId, WebResponse $response)
 	{
 		$this->sessionId = $sessionId;
+		$this->response = $response;
 		$this->chunkId = $this->getChunkId(0, 0);
 	}
 	
@@ -72,7 +74,13 @@ class Session
 		$this->data = $data;
 	}
 	
-	function split()
+	function save($ttl = null)
+	{
+		foreach ($this->split() as $key => $value)
+			$this->response->setCookie($key, $value, $ttl, "/");
+	}
+	
+	private function split()
 	{
 		$chunks = str_split($this->encrypt(), self::CHUNK_SIZE);
 		$dataChunks = array();
