@@ -74,7 +74,8 @@ abstract class ActionBasedController implements IController
 
 		$result = $this->makeActionResult($result);
 
-		$this->processResult($result);
+		if ($result)
+			$this->processResult($result);
 	}
 
 	/**
@@ -267,11 +268,11 @@ abstract class ActionBasedController implements IController
 			return $this->view($actionResult);
 		}
 
-		Assert::isUnreachable(
-			'unknown actionResult `%s`: %s',
-			TypeUtils::getName($actionResult),
-			$actionResult
-		);
+//		Assert::isUnreachable(
+//			'unknown actionResult `%s`: %s',
+//			TypeUtils::getName($actionResult),
+//			$actionResult
+//		);
 	}
 
 	/**
