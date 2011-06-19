@@ -43,11 +43,28 @@ abstract class ActionBasedController implements IController
 	private $context;
 	private $routeData;
 	private $request;
+	private $response;
 	
 	/**
 	 * @var ViewData
 	 */
 	protected $viewData;
+	
+	/**
+	 * @return IControllerContext
+	 */
+	protected function getContext()
+	{
+		return $this->context;
+	}
+	
+	/**
+	 * @return Session
+	 */
+	protected function getSession($id)
+	{
+		return $this->getContext()->getWebContext()->getResponse()->getSession($id);
+	}
 
 	function handle(IControllerContext $controllerContext)
 	{
