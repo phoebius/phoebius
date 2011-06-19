@@ -10,17 +10,6 @@
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
 
-Views
-=====
-
-add helpers:
- - Html (for generating HTML)
-   - encode (aka htmlspecialchars)
-   - textBox
-   - password
-
-
-
 Session
 =======
 
