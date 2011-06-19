@@ -61,6 +61,12 @@ class WebResponse implements IWebResponse
 
 		$this->finish();
 	}
+	
+	function setSession(Session $session, $ttl)
+	{
+		foreach ($session->split() as $key => $value)
+			setcookie($key, $value, $ttl? time() + $ttl : 0, "/");
+	}
 
 	function finish()
 	{

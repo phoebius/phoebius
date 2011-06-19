@@ -9,9 +9,3 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program; if not, see <http://www.gnu.org/licenses/>.
  ================================================================================================
-
-Session
-=======
-
-Implement SessionArea class; SessionArea ctor accepts a key, that defines the $_SESSION element
-
