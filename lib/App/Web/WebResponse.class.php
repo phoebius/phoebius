@@ -119,6 +119,8 @@ class WebResponse implements IWebResponse
 	 */
 	function getSession($id)
 	{
+		$id .= sha1(PHOEBIUS_APP_ID);
+		
 		if (!isset($this->sessions[$id])) {
 			$this->sessions[$id] = $s = new Session($id, $this);
 			
