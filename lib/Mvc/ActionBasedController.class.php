@@ -40,39 +40,20 @@ abstract class ActionBasedController implements IController
 {
 	const ROUTE_DATA_ACTION = 'action';
 	
-	private $context;
 	private $routeData;
 	private $request;
-	private $response;
 	
 	/**
 	 * @var ViewData
 	 */
 	protected $viewData;
-	
-	/**
-	 * @return IControllerContext
-	 */
-	protected function getContext()
-	{
-		return $this->context;
-	}
-	
-	/**
-	 * @return Session
-	 */
-	protected function getSession($id)
-	{
-		return $this->getContext()->getWebContext()->getResponse()->getSession($id);
-	}
 
-	function handle(IControllerContext $controllerContext)
+	function handle(RouteData $routeData, WebRequest $request)
 	{
 		$this->viewData = new ViewData();
 		
-		$this->context = $controllerContext;
-		$this->routeData = $controllerContext->getRouteData();
-		$this->request = $controllerContext->getWebContext()->getRequest();
+		$this->routeData = $routeData;
+		$this->request = $request;
 
 		$action = 
 			isset($this->routeData[self::ROUTE_DATA_ACTION])
@@ -104,10 +85,8 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function filterArgumentValue(ReflectionParameter $argument)
 	{
-		$request = $this->request;
-
-		if (isset($request[$argument->name])) {
-			$value = $this->getActualParameterValue($argument, $request[$argument->name]);
+		if (isset($this->request[$argument->name])) {
+			$value = $this->getActualParameterValue($argument, $this->request[$argument->name]);
 		}
 		else if (isset($this->routeData[$argument->name])) {
 			$value = $this->getActualParameterValue($argument, $this->routeData[$argument->name]);
@@ -224,7 +203,7 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function processResult(IActionResult $actionResult)
 	{
-		$actionResult->handleResult($this->context->getWebContext()->getResponse());
+		$actionResult->handleResult($this->request->getResponse());
 	}
 
 	/**

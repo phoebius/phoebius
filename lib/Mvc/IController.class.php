@@ -28,7 +28,7 @@ interface IController
 	 *
 	 * @return void
 	 */
-	function handle(IControllerContext $controllerContext);
+	function handle(RouteData $routeData, WebRequest $request);
 }
 
 ?>

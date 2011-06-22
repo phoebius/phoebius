@@ -45,9 +45,9 @@ class SiteApplication
 	private $dispatcher;
 
 	/**
-	 * @var WebContext
+	 * @var WebRequest
 	 */
-	private $webContext;
+	private $request;
 
 	/**
 	 * @param IRouter router to use when handling the request. See Router as basic impl.
@@ -56,25 +56,7 @@ class SiteApplication
 	{
 		$this->router = $router;
 		$this->dispatcher = new MvcDispatcher();
-
-		$request = new WebRequest(
-			new WebRequestDictionary($_SERVER), $_GET, $_POST, $_COOKIE, $_FILES
-		);
-		$this->webContext = new WebContext(
-			$request,
-			new WebResponse($request),
-			new WebServerState(new WebServerStateDictionary($_SERVER))
-		);
-	}
-
-	/**
-	 * Gets the WebContext
-	 *
-	 * @return WebContext
-	 */
-	function getWebContext()
-	{
-		return $this->webContext;
+		$this->request = new WebRequest($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, $_ENV);
 	}
 
 	/**
@@ -106,9 +88,8 @@ class SiteApplication
 	{
 		try {
 			try {
-				$routeData = $this->router->process($this->webContext->getRequest());
-				
-				$this->dispatcher->handle($routeData, $this->webContext);
+				$routeData = $this->router->process($this->request);
+				$this->dispatcher->handle($routeData, $this->request);
 			}
 			catch (DispatchException $e) {
 				$this->handle404($e);
@@ -130,7 +111,7 @@ class SiteApplication
 	 */
 	protected function handle404(Exception $e)
 	{
-		$response = $this->webContext->getResponse();
+		$response = $this->request->getResponse();
 		
 		$response->setStatus(new HttpStatus(HttpStatus::CODE_404));
 
@@ -155,7 +136,7 @@ EOT;
 	 */
 	protected function handle500(Exception $e)
 	{
-		$response = $this->webContext->getResponse();
+		$response = $this->request->getResponse();
 
 		$response->setStatus(new HttpStatus(HttpStatus::CODE_500));
 
@@ -189,21 +170,19 @@ EOT;
 		// TODO log this
 		//
 
-		$request = $this->webContext->getRequest();
-
 		$message = <<<EOT
-Crash at {$request->getHttpUrl()->getHost()}:
+Crash at {$this->request->getHttpUrl()->getHost()}:
 {$e->getMessage()}
 
-The request: {$request->getHttpUrl()}
-Request method: {$request->getRequestMethod()}
+The request: {$this->request->getHttpUrl()}
+Request method: {$this->request->getRequestMethod()}
 
 {$e->getTraceAsString()}
 EOT;
 
 		mail(
 			$email,
-			PHOEBIUS_SHORT_PRODUCT_NAME. "crash at {$request->getHttpUrl()->getHost()} (" . get_class($e) . ")",
+			PHOEBIUS_SHORT_PRODUCT_NAME. "crash at {$this->request->getHttpUrl()->getHost()} (" . get_class($e) . ")",
 			$message
 		);
 	}

@@ -21,8 +21,14 @@
  *
  * @ingroup App_Web
  */
-final class WebRequest extends AppRequest implements ArrayAccess
+class WebRequest implements ArrayAccess
 {
+	private static $row = array
+	(
+		'HTTP_X_FORWARDED_FOR', 'CLIENT_IP', 'HTTP_FROM', 'HTTP_CLIENT_IP', 'HTTP_CLIENTIP',
+		'HTTP_CLIENT', 'HTTP_X_FORWARDED', 'HTTP_X_DELEGATE_REMOTE_HOST', 'HTTP_SP_HOST',
+	);
+	
 	private $vars = array(
 		WebRequestPart::GET => array(),
 		WebRequestPart::POST => array(),
@@ -40,31 +46,21 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	/**
 	 * @var array
 	 */
-	private $dictionary = array();
+	private $serverVars;
+	private $envVars;
 
-	/**
-	 * @param WebRequestDictionary $dictonary
-	 * @param array $getVars request's $_GET
-	 * @param array $postVars request's $_POST
-	 * @param array $cookieVars request's $_COOKIE
-	 * @param array $filesVars request's $_FILES
-	 * @param string|null $baseHost optional base host for request's request url (SiteUrl)
-	 * @param string $baseUri optional base uri
-	 */
 	function __construct(
-				WebRequestDictionary $dictonary,
 				array $getVars,
 				array $postVars,
 				array $cookieVars,
 				array $filesVars,
-				$baseHost = null, $baseUri = '/'
+				array $serverVars,
+				array $envVars,
+				$baseHost = null, 
+				$baseUri = '/'
 		)
 	{
 		Assert::isScalar($baseUri);
-
-		$this->dictionary = $dictonary->getFields();
-
-		$this->httpUrl = SiteUrl::import($dictonary, $baseHost, $baseUri);
 
 		$this->vars = array(
 			WebRequestPart::GET => $getVars,
@@ -73,12 +69,30 @@ final class WebRequest extends AppRequest implements ArrayAccess
 			WebRequestPart::FILES => $filesVars,
 		);
 
-		$this->allVars = call_user_func_array(
-			'array_merge',
-			array(
-				$filesVars, $cookieVars, $postVars, $getVars
-			)
+		// GPCF
+		$this->allVars = array_replace_recursive($cookieVars, $getVars, $postVars, $filesVars);
+
+		$this->serverVars = $serverVars;
+		$this->envVars = $envVars;
+		
+		$this->httpUrl = SiteUrl::import(
+			$this->isSecured() ? 'https' : 'http',
+			$this->serverVars['HTTP_HOST'],
+			$this->serverVars['SERVER_PORT'],
+			$this->serverVars['REQUEST_URI'],
+			$baseHost, $baseUri
 		);
+	}
+	
+	/**
+	 * @return IWebResponse
+	 */
+	function getResponse()
+	{
+		if (!$this->response)
+			$this->response = new WebResponse($this);
+
+		return $this->response;
 	}
 
 	function __clone()
@@ -93,7 +107,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function getRequestMethod()
 	{
-		return new RequestMethod($this->dictionary[WebRequestDictionary::REQUEST_METHOD]);
+		return new RequestMethod($this->serverVars['REQUEST_METHOD']);
 	}
 
 	/**
@@ -103,7 +117,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function getProtocol()
 	{
-		return $this->dictionary[WebRequestDictionary::PROTOCOL];
+		return $this->serverVars['SERVER_PROTOCOL'];
 	}
 
 	/**
@@ -113,11 +127,11 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function getHttpReferer()
 	{
-		if ($this->dictionary[WebRequestDictionary::HTTP_REFERER]) {
-			return new HttpUrl($this->dictionary[WebRequestDictionary::HTTP_REFERER]);
-		}
-		else {
-			return null;
+		if ($this->serverVars['HTTP_REFERER']) {
+			try {
+				return new HttpUrl($this->serverVars['HTTP_REFERER']);
+			}
+			catch (Exception $e){}
 		}
 	}
 
@@ -128,7 +142,7 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	 */
 	function isSecured()
 	{
-		return !!$this->dictionary[WebRequestDictionary::HTTPS];
+		return isset($this->serverVars['HTTPS']) && !!$this->serverVars['HTTPS'];
 	}
 
 	/**
@@ -263,6 +277,163 @@ final class WebRequest extends AppRequest implements ArrayAccess
 	function offsetUnset($offset)
 	{
 		Assert::isUnreachable('request arguments are read-only');
+	}
+
+	/**
+	 * Gets the unique hash for the current client who invoked the request.
+	 *
+	 * @param boolean whether to fasten the resulting hash to IP-address of the client of not. Default is true.
+	 *
+	 * @todo add ability to define custom values that affect the uniqueness of the resulting hash
+	 *
+	 * @return string
+	 */
+	function getClientHash($useIps = true)
+	{
+		$items = array();
+
+		if ($useIps) {
+			$items = $this->getAllClientIPs();
+		}
+
+		$uniqEnvFields = array (
+	        'HTTP_USER_AGENT', 'HTTP_ACCEPT_LANGUAGE', 'HTTP_ACCEPT_CHARSET',
+	        'HTTP_ACCEPT_ENCODING', 'HTTP_TE', 'HTTP_UA_CPU', 'HTTP_UA_OS', 'HTTP_UA_COLOR',
+	        'HTTP_UA_PIXELS', 'HTTP_UA_VOICE',
+		);
+
+		foreach ($uniqEnvFields as $uq_field) {
+			if (isset($this->serverVars[$uq_field])) {
+				// use strtolower because of an IE issue: it sends
+				// HTTP_ACCEPT_LANGUAGE=en_US via GET and HTTP_ACCEPT_LANGUAGE=en_us via POST
+				// (different case causes wrong checksum)
+				$items[] = strtolower($_SERVER[$uq_field]);
+			}
+			else if (isset($this->envVars[$uq_field])) {
+				$items[] = strtolower($_SERVER[$uq_field]);
+			}
+		}
+
+		// fasten to the current server to avoid key haching over different apps built on the framework
+		$items[] = PHOEBIUS_APP_ID;
+
+		$string = join('', $items);
+
+		return sha1($string);
+	}
+
+	/**
+	 * Tries to resolve the actual client IP.
+	 *
+	 * @return IP
+	 */
+	function getActualClientIP()
+	{
+		foreach (self::$row as $field) {
+			if (isset($this->envVars[$field])) {
+				try {
+					return new IP($this->envVars[$field]);
+				}
+				catch (ArgumentException $e) {
+					//nothing, just skip due the passed IP is not an IP
+				}
+			}
+		}
+
+		return $this->getRemoteAddress();
+	}
+
+	/**
+	 * Gets the set of all possible client's IP-addresses used for dispatching the request.
+	 *
+	 * @return array of IP
+	 */
+	function getAllClientIPs()
+	{
+		$ips = array();
+
+		$ips[] = $this->getRemoteAddress();
+		foreach (self::$row as $field) {
+			if (isset($this->envVars[$field])) {
+				try {
+					$ips[] = new IP($this->envVars[$field]);
+				}
+				catch (ArgumentException $e) {
+					//nothing
+				}
+			}
+		}
+
+		return $ips;
+	}
+
+	/**
+	 * Gets the list of request headers.
+	 *
+	 * @return array
+	 */
+	function getHeaders()
+	{
+		return getallheaders();
+	}
+
+	/**
+	 * Gets the request header identified by header name.
+	 *
+	 * @param string $header header name
+	 * @throws ArgumentException thrown when no header found by the specified name
+	 * @return string
+	 */
+	function getHeader($header)
+	{
+		Assert::isScalar($header);
+
+		$headers = $this->getHeaders();
+		if (isset($headers[$header])) {
+			return $headers[$header];
+		}
+
+		throw new ArgumentException('header', 'header not recognized');
+	}
+	
+	/**
+	 * Aka SERVER_ADDR
+	 *
+	 * @return IP
+	 */
+	function getServerAddress()
+	{
+		return $this->serverVars['SERVER_ADDR'];
+	}
+
+	/**
+	 * Aka SERVER_PORT
+	 *
+	 * @return integer
+	 */
+	function getServerPort()
+	{
+		return $this->serverVars['SERVER_PORT'];
+	}
+
+	/**
+	 * Gets the remote address that made the request.
+	 *
+	 * @return IP
+	 */
+	function getRemoteAddress()
+	{
+		return new IP($this->serverVars['REMOTE_ADDR']);
+	}
+
+	/**
+	 * Gets the remote address that made the request.
+	 *
+	 * @return IP
+	 */
+	function getRemotePort()
+	{
+		return $this->serverVars['REMOTE_PORT'];
 	}
 }
 

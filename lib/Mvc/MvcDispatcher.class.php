@@ -23,20 +23,20 @@
  */
 class MvcDispatcher
 {
-	function handle(RouteData $routeData, IWebContext $webContext)
+	function handle(RouteData $routeData, WebRequest $request)
 	{
 		if (!isset($routeData['controller']))
-			return $this->handleError($routeData, $webContext);
+			return $this->handleError($routeData, $request);
 		
 		$controllerName = $routeData['controller'];
 		$controllerClassName = $this->getControllerClassName($controllerName, $routeData);
 		
 		if (!class_exists($controllerClassName))
-			return $this->handleError($routeData, $webContext);
+			return $this->handleError($routeData, $request);
 
 		$controllerObject = $this->getControllerInstance($controllerClassName, $routeData);
 
-		$controllerObject->handle(new ControllerContext($routeData, $webContext));
+		$controllerObject->handle($routeData, $request);
 	}	
 
 	/**
@@ -66,10 +66,10 @@ class MvcDispatcher
 		return ucfirst($controllerName) . 'Controller';
 	}
 	
-	private function handleError(RouteData $routeData, IWebContext $webContext)
+	private function handleError(RouteData $routeData, WebRequest $request)
 	{
 		if (!isset($routeData['defaultController']))
-			throw new DispatchControllerException($routeData, $webContext->getRequest());
+			throw new DispatchControllerException($routeData, $request);
 		
 		$controllerName = $routeData['defaultController'];
 		$controllerClassName = $this->getControllerClassName($controllerName, $routeData);
@@ -82,7 +82,7 @@ class MvcDispatcher
 
 		$controllerObject = $this->getControllerInstance($controllerClassName, $routeData);
 
-		$controllerObject->handle(new ControllerContext($routeData, $webContext));
+		$controllerObject->handle($routeData, $request);
 	}
 }
 

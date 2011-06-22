@@ -23,12 +23,19 @@
  *
  * @ingroup App_Web
  */
-class WebResponse implements IWebResponse
+class WebResponse
 {
 	/**
 	 * @var WebRequest
 	 */
 	private $request;
+	
+	/**
+	 * @var array of Session
+	 */
+	private $sessions = array();
+	
+	private $status;
 
 	/**
 	 * @var boolean
@@ -38,7 +45,7 @@ class WebResponse implements IWebResponse
 	/**
 	 * @param WebRequest $request WebResponse *MAY* now about the request to provide accure results
 	 */
-	function __construct(WebRequest $request = null)
+	function __construct(WebRequest $request)
 	{
 		$this->request = $request;
 	}
@@ -58,8 +65,6 @@ class WebResponse implements IWebResponse
 	function writeFile($filepath)
 	{
 		readfile($filepath);
-
-		$this->finish();
 	}
 	
 	function setCookie($name, $value, $ttl)
@@ -78,7 +83,7 @@ class WebResponse implements IWebResponse
 		// http://php-fpm.anight.org/extra_features.html
 		// TODO: cut out this functionality to the outer class descendant (e.g., PhpFpmResponse)
 		if (function_exists('fastcgi_finish_request')) {
-			fastcgi_finish_request();
+			call_user_func('fastcgi_finish_request');
 		}
 	}
 
@@ -98,20 +103,6 @@ class WebResponse implements IWebResponse
 
 		return $this;
 	}
-
-	function addHeaders(array $headers)
-	{
-		foreach ($headers as $header => $value) {
-			$this->addHeader($header, $value);
-		}
-
-		return $this;
-	}
-	
-	/**
-	 * @var array of Session
-	 */
-	private $sessions = array();
 	
 	/**
 	 * Gets the response session
@@ -156,12 +147,10 @@ class WebResponse implements IWebResponse
 
 		$this->finish();
 	}
-	
-	private $setStatus;
 
 	function setStatus(HttpStatus $status)
 	{
-		$this->setStatus = $status;
+		$this->status = $status;
 		
 		$protocol =
 			$this->request

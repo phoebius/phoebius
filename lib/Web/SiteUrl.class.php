@@ -40,13 +40,9 @@ class SiteUrl extends HttpUrl
 	/**
 	 * Constructs a SiteUrl object from request variables
 	 *
-	 * @param HttpUrlDictionary $dictionary dictionary of values to be used in building the SiteUrl
-	 * @param string $baseHost optional host to be treated as base host
-	 * @param string $baseUri optional uri to be treated as base uri
-	 *
 	 * @return SiteUrl
 	 */
-	static function import(HttpUrlDictionary $dictionary, $baseHost = null, $baseUri = '/')
+	static function import($scheme, $host, $port, $uri, $baseHost = null, $baseUri = '/')
 	{
 		$url = new self;
 
@@ -57,16 +53,11 @@ class SiteUrl extends HttpUrl
 		$url->setBasePath($baseUri);
 
 		$url
-			->setScheme(
-				$dictionary->getField(HttpUrlDictionary::HTTPS)
-					? 'https'
-					: 'http'
-			)
-			->setHost($dictionary->getField(HttpUrlDictionary::HOST))
-			->setPort($dictionary->getField(HttpUrlDictionary::PORT));
+			->setScheme($scheme)
+			->setHost($host)
+			->setPort($port);
 
 		//get the URI itself
-		$uri = $dictionary->getField(HttpUrlDictionary::URI);
 		if (!preg_match('/^https?:\/\//', $uri)) {
 			$uri = '/' . ltrim($uri, '/');
 		}
