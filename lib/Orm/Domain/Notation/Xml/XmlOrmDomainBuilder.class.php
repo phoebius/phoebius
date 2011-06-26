@@ -311,12 +311,9 @@ class XmlOrmDomainBuilder
 	private function generateContainer(OrmClass $type, SimpleXMLElement $xmlContainer)
 	{
 		$referredTypeName = (string)$xmlContainer['type'];
-
-		try {
-			$referredType = $this->ormDomain->getClass($referredTypeName);
-		}
-		catch (OrmModelIntegrityException $e) {
-			if (class_exists($referredTypeName, true) && TypeUtils::isChild($referredTypeName, 'IDaoRelated')) {
+		
+		if (!$referredType = $this->importEntity($referredTypeName)) {
+			if (@class_exists($referredTypeName, true) && TypeUtils::isChild($referredTypeName, 'IDaoRelated')) {
 				$referredType = call_user_func(array($referredTypeName, 'orm'));
 			}
 			else {
@@ -459,7 +456,7 @@ class XmlOrmDomainBuilder
 			$dbType = $this->makeObject('DBType', $parameters);
 			return $dbType->getOrmPropertyType();
 		}
-		else if (class_exists($name, true)) {
+		else if (@class_exists($name, true)) {
 			if (TypeUtils::isChild($name, 'IDaoRelated')) {
 				return new AssociationPropertyType(
 					call_user_func(array($name, 'orm')),

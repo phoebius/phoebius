@@ -19,7 +19,7 @@
 function __autoload($class) 
 {
 	try {
-		require $class . PHOEBIUS_TYPE_EXTENSION;
+		include $class . PHOEBIUS_TYPE_EXTENSION;
 	}
 	catch (Exception $e) {
 		$message = sprintf(
