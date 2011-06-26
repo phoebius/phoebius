@@ -243,7 +243,7 @@ final class Exceptionizer extends LazySingleton
 	function errorHandler($errno, $errstr, $errfile, $errline)
 	{
 		if (!error_reporting()) {
-			//return false;
+			return false;
 		}
 
 		if (!( $errno & $this->mask)) {
