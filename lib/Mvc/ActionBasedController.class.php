@@ -100,6 +100,10 @@ abstract class ActionBasedController implements IController
 		if (!is_null($value)) {
 			return $value;
 		}
+		
+		if ($argument->getClass() == 'WebRequest') {
+			return $this->request;
+		}
 
 		// check whether it is optional or have the default value
 		if ($argument->allowsNull()) {

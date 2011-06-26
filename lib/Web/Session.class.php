@@ -76,8 +76,9 @@ class Session
 	
 	function save($ttl = null)
 	{
-		foreach ($this->split() as $key => $value)
-			$this->response->setCookie($key, $value, $ttl, "/");
+		foreach ($this->split() as $key => $value) {
+			$this->response->setCookie(new Cookie($key, $value, $ttl));
+		}
 	}
 	
 	private function split()
