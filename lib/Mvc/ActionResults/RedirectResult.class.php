@@ -36,8 +36,11 @@ class RedirectResult implements IActionResult
 	/**
 	 * @param HttpUrl $url url the request should be redirected to
 	 */
-	function __construct(HttpUrl $url, HttpStatus $status = null)
+	function __construct($url, HttpStatus $status = null)
 	{
+		if (is_scalar($url)) 
+			$url = new HttpUrl($url);
+
 		$this->url = $url;
 		$this->status = $status;
 	}

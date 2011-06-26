@@ -48,6 +48,11 @@ class WebRequest implements ArrayAccess
 	 */
 	private $serverVars;
 	private $envVars;
+	
+	/**
+	 * @var WebResponse
+	 */
+	private $response;
 
 	function __construct(
 				array $getVars,
@@ -127,7 +132,7 @@ class WebRequest implements ArrayAccess
 	 */
 	function getHttpReferer()
 	{
-		if ($this->serverVars['HTTP_REFERER']) {
+		if (isset($this->serverVars['HTTP_REFERER'])) {
 			try {
 				return new HttpUrl($this->serverVars['HTTP_REFERER']);
 			}

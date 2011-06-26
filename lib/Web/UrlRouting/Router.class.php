@@ -100,6 +100,10 @@ class Router implements IRouter
 					);
 		}
 		
+		if (!empty($this->routeData)) {
+			return new RouteData($this->routeData);
+		}
+		
 		throw new RouteException($httpUrl);
 	}
 }

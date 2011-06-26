@@ -40,18 +40,26 @@ abstract class ActionBasedController implements IController
 {
 	const ROUTE_DATA_ACTION = 'action';
 	
+	/**
+	 * @var RouteData
+	 */
 	private $routeData;
+	
+	/**
+	 * @var WebRequest
+	 */
 	private $request;
 	
 	/**
-	 * @var ViewData
+	 * @return WebRequest
 	 */
-	protected $viewData;
+	protected function getRequest()
+	{
+		$this->request;
+	}
 
 	function handle(RouteData $routeData, WebRequest $request)
 	{
-		$this->viewData = new ViewData();
-		
 		$this->routeData = $routeData;
 		$this->request = $request;
 
@@ -256,52 +264,13 @@ abstract class ActionBasedController implements IController
 	 */
 	protected function makeActionResult($actionResult)
 	{
-		if (is_object($actionResult) && $actionResult instanceof IActionResult) {
+		if ($actionResult instanceof IActionResult) {
 			return $actionResult;
 		}
-
-		if (is_string($actionResult)) {
-			return $this->view($actionResult);
+		
+		if ($actionResult instanceof View) {
+			return new ViewResult($actionResult);
 		}
-
-//		Assert::isUnreachable(
-//			'unknown actionResult `%s`: %s',
-//			TypeUtils::getName($actionResult),
-//			$actionResult
-//		);
-	}
-
-	/**
-	 * Helper method that creates an action method result encapsulating presentation object
-	 *
-	 * @param string $viewName relative path to a view
-	 * @param array $viewData business logic resulting data to be passed to presentation
-	 *
-	 * @return ViewResult
-	 */
-	protected function view($viewName, array $viewData = array())
-	{
-		$this->viewData->append($viewData);
-
-		return 
-			new ViewResult(
-				new UIPage(
-					new UIViewPresentation($viewName, $this->viewData)
-				)
-			);
-	}
-
-	/**
-	 * Helper method that creates an action method result encapsulating redirection
-	 *
-	 * @return RedirectToRouteResult
-	 */
-	protected function redirect($url)
-	{
-		if (is_scalar($url)) 
-			$url = new HttpUrl($url);
-			
-		return new RedirectResult($url);
 	}
 
 	/**
