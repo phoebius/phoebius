@@ -29,8 +29,7 @@
 class Router implements IRouter
 {
 	private $routeData = array();
-	private $httpMethodRoutes = array();
-	private $anyRoutes = array();
+	private $routes = array();
 	
 	function __construct(array $defaultRouteData = array())
 	{
@@ -39,15 +38,7 @@ class Router implements IRouter
 	
 	function process(WebRequest $request)
 	{
-		$method = $request->getRequestMethod()->getValue();
-		
-		if (isset($this->httpMethodRoutes[$method]))
-			try {
-				return $this->lookup($this->httpMethodRoutes[$method], $request);
-			}
-			catch (RouteException $e) {};
-			
-		return $this->lookup($this->anyRoutes, $request);
+		return $this->lookup($this->routes, $request);
 	}
 	
 	function getDefaultRouteData()
@@ -57,38 +48,28 @@ class Router implements IRouter
 	
 	function get($uri, array $routeData = array())
 	{
-		$this->method('GET', $uri, $routeData);
+		$this->routes[] = new Route($uri, $routeData, WebRequestPart::get());
 	}
 	
 	function post($uri, array $routeData = array())
 	{
-		$this->method('POST', $uri, $routeData);
-	}
-	
-	function method($method, $uri, array $routeData = array())
-	{
-		if (!isset($this->httpMethodRoutes[$method]))
-			$this->httpMethodRoutes[$method] = array();
-			
-		$this->httpMethodRoutes[$method][] = new Route($uri, $routeData);
+		$this->routes[] = new Route($uri, $routeData, WebRequestPart::post());
 	}
 	
 	function any($uri, array $routeData = array())
 	{
-		$this->anyRoutes[] = new Route($uri, $routeData);
+		$this->routes[] = new Route($uri, $routeData);
 	}
 	
 	function all(array $routeData)
 	{
-		$this->anyRoutes[] = new Route(null, $routeData);
+		$this->routes[] = new Route(null, $routeData);
 	}
 	
 	private function lookup(array $routes, WebRequest $request)
 	{
-		$httpUrl = $request->getHttpUrl();
-		
 		foreach ($routes as $route) {
-			$result = $route->match($httpUrl);
+			$result = $route->match($request);
 			
 			if ($result)
 				return 
@@ -104,6 +85,6 @@ class Router implements IRouter
 			return new RouteData($this->routeData);
 		}
 		
-		throw new RouteException($httpUrl);
+		throw new RouteException($request->getHttpUrl());
 	}
 }

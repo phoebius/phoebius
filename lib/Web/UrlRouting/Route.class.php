@@ -90,10 +90,12 @@ class Route
 	private $pathMatcher;
 	private $queryStringRegs = array();
 	private $routeData = array();
+	private $method;
 	
 	function __construct(
 			$pattern = null,
-			array $data = array()
+			array $data = array(),
+			WebRequestPart $method = null
 		)
 	{
 		if ($pattern) {
@@ -110,17 +112,25 @@ class Route
 		}
 		
 		$this->routeData = $data;
+		$this->method = $method;
 	}
 	
-	function match(SiteUrl $url)
+	function match(WebRequest $request)
 	{
-		$data = $this->routeData;
+		if ($this->method) {
+			if ($this->method != $request->getRequestMethod()) {
+				return;
+			}	
+		}
 		
+		$url = $request->getHttpUrl();
+		$data = $this->routeData;
+
 		if ($this->pathMatcher) {
 			$pathData = $this->pathMatcher->match($url->getVirtualPath());
-			if (!$pathData) 
+			if (!is_array($pathData))
 				return;
-				
+
 			$data = array_merge($data, $pathData);
 		}
 		
@@ -167,7 +177,7 @@ final class _PathPattern
 			return false;
 		}
 		
-		$data = true;
+		$data = array();
 		
 		foreach ($this->particles as $idx => $partRegex) {				
 			$part = $path_parts[$idx];
