@@ -68,6 +68,12 @@ class WebResponse
 	{
 		$this->request = $request;
 	}
+	
+	function __destruct()
+	{
+		if (!$this->isFinished)
+			$this->finish();
+	}
 
 	/**
 	 * Sets the status of response

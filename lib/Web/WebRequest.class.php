@@ -29,12 +29,10 @@ class WebRequest implements ArrayAccess
 		'HTTP_CLIENT', 'HTTP_X_FORWARDED', 'HTTP_X_DELEGATE_REMOTE_HOST', 'HTTP_SP_HOST',
 	);
 	
-	private $vars = array(
-		WebRequestPart::GET => array(),
-		WebRequestPart::POST => array(),
-		WebRequestPart::COOKIE => array(),
-		WebRequestPart::FILES => array(),
-	);
+	private $getVars;
+	private $postVars;
+	private $cookieVars;
+	private $filesVars;
 
 	private $allVars = array();
 
@@ -67,18 +65,15 @@ class WebRequest implements ArrayAccess
 	{
 		Assert::isScalar($baseUri);
 
-		$this->vars = array(
-			WebRequestPart::GET => $getVars,
-			WebRequestPart::POST => $postVars,
-			WebRequestPart::COOKIE => $cookieVars,
-			WebRequestPart::FILES => $filesVars,
-		);
-
-		// GPCF
-		$this->allVars = array_replace_recursive($cookieVars, $getVars, $postVars, $filesVars);
-
+		$this->getVars = $getVars;
+		$this->postVars = $postVars;
+		$this->cookieVars = $cookieVars;
+		$this->filesVars = $filesVars;
 		$this->serverVars = $serverVars;
 		$this->envVars = $envVars;
+		
+		// GPCF
+		$this->allVars = array_replace_recursive($cookieVars, $getVars, $postVars, $filesVars);
 		
 		$this->httpUrl = SiteUrl::import(
 			$this->isSecured() ? 'https' : 'http',
@@ -198,48 +193,6 @@ class WebRequest implements ArrayAccess
 	function getFilesVars()
 	{
 		return $this->filesVars;
-	}
-
-	/**
-	 * Determines whether variable is set in any of the request part
-	 *
-	 * @param string $variableName name of the variable to be retreived from the request
-	 * @param WebRequestPart $part optional specification of request scope where variable should
-	 * 			be looked up
-	 *
-	 * @return boolean
-	 */
-	function hasVar($variableName, WebRequestPart $part = null)
-	{
-		$vars =
-			$part
-				? $this->vars[$part->getValue()]
-				: $this->allVars;
-
-		return isset($vars[$variableName]);
-	}
-
-	/**
-	 * Gets the variable from the specified request part
-	 *
-	 * @throws ArgumentException if such variable does not exist
-	 * @param string $variableName name of the variable to be retreived from the request
-	 * @param WebRequestPart $part optional specification of request scope where variable should
-	 * 			be looked up
-	 * @return scalar
-	 */
-	function getVar($variableName, WebRequestPart $part = null)
-	{
-		$vars =
-			$part
-				? $this->vars[$part->getValue()]
-				: $this->allVars;
-
-		if (isset($variableName, $vars)) {
-			return $vars[$variableName];
-		}
-
-		throw new ArgumentException('variableName', 'argument is not defined');
 	}
 
 	/**

@@ -77,11 +77,6 @@ $phoebiusNamespaces = array(
 	'Mvc/ActionResults',
 	'Mvc/Exceptions',
 
-	'UI',
-	'UI/Mvc',
-	'UI/Mvc/Presentation',
-	'UI/Presentation',
-
 	'Orm',
 	'Orm/Dao',
 	'Orm/Dao/Relationship',
@@ -102,12 +97,6 @@ $phoebiusNamespaces = array(
 	'Utils/Stream',
 	'Utils/Xml',
 
-	'App',
-	'App/Server',
-	'App/Web',
-	'App/Web/UrlRouting',
-	'App/Web/UrlRouting/Exceptions',
-
 	'Dal',
 	'Dal/DB',
 	'Dal/DB/Exceptions',
@@ -121,7 +110,11 @@ $phoebiusNamespaces = array(
 	'Dal/Expression/LogicalOperators',
 	
 	'Dal/Cache',
-	'Dal/Cache/Peers'
+	'Dal/Cache/Peers',
+
+	'Web',
+	'Web/UrlRouting',
+	'Web/Exceptions',
 );
 
 foreach ($phoebiusNamespaces as $namespace) {

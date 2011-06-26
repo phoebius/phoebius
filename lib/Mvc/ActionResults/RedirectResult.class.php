@@ -45,9 +45,11 @@ class RedirectResult implements IActionResult
 		$this->status = $status;
 	}
 
-	function handleResult(IWebResponse $response)
+	function handleResult(WebResponse $response)
 	{
-		$response->redirect($this->url, $this->status);
+		$response
+			->redirect($this->url, $this->status)
+			->finish();
 	}
 }
 

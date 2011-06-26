@@ -28,7 +28,7 @@ interface IActionResult
 	 *
 	 * @return void
 	 */
-	function handleResult(IWebResponse $response);
+	function handleResult(WebResponse $response);
 }
 
 ?>

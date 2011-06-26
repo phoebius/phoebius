@@ -115,7 +115,7 @@ class View
 	function render()
 	{
 		ob_start();
-		include ($this->name);
+		$this->import($this->name);
 		$content = ob_get_clean();
 		
 		if ($this->master) {
@@ -124,6 +124,14 @@ class View
 		}
 		
 		return $content;
+	}
+	
+	/**
+	 * Imports a view file by its name
+	 */
+	protected function import($name)
+	{
+		include ($name);
 	}
 
 	/**

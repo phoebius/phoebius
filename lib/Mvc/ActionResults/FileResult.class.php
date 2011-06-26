@@ -69,7 +69,7 @@ class FileResult implements IActionResult
 		$this->unlinkOnFileFlush = $unlinkOnFinish;
 	}
 
-	function handleResult(IWebResponse $response)
+	function handleResult(WebResponse $response)
 	{
 		if ($this->contentType) {
 			$response->addHeader('Content-Type', $this->contentType);
@@ -84,7 +84,9 @@ class FileResult implements IActionResult
 			"attachment; filename=\"{$this->filename}\"; size={$fileSize}; creation-date={$creation}; modification-date={$modif}"
 		);
 
-		$response->writeFile($this->filepath);
+		$response
+			->writeFile($this->filepath)
+			->finish();
 	}
 
 	function __destruct()

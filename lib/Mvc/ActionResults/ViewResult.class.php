@@ -28,16 +28,18 @@ class ViewResult implements IActionResult
 	 */
 	private $view;
 
-	function __construct(UITemplateControl $view)
+	function __construct(View $view)
 	{
 		$this->view = $view;
 	}
 
-	function handleResult(IWebResponse $response)
+	function handleResult(WebResponse $response)
 	{
-		$this->view->render($response);
+		$result = $this->view->render();
 
-		$response->finish();
+		$response
+			->write($result)
+			->finish();
 	}
 
 }
