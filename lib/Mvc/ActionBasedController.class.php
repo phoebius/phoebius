@@ -25,12 +25,6 @@
  * If method is not defined, controller invokes ActionBasedController::handleUnknownAction()
  * which is by default throws RouteException.
  *
- * Each action method encapsulates business logic and should produce a result - an object that
- * implements IActionResult. The controller provides some useful helper methods for doing this:
- * - ActionBasedController::view() for producing a ViewResult which encapsulates presentation
- * - ActionBasedController::redirect() for producing external redirects; destination is assembled
- * 			automatically according to the Route which is defined in IRouteTable
- *
  * To overload a basic logic of executing a method that corresponds an action, just overload
  * ActionBasedController::processAction() which actually invokes the found method.
  *
