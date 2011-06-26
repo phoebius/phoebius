@@ -118,7 +118,7 @@ class Route
 	function match(WebRequest $request)
 	{
 		if ($this->method) {
-			if ($this->method != $request->getRequestMethod()) {
+			if ($this->method->getValue() != $request->getRequestMethod()) {
 				return;
 			}	
 		}
