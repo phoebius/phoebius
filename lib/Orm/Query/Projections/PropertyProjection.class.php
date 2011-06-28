@@ -73,6 +73,19 @@ class PropertyProjection implements IProjection
 			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);
 	}
+
+	/**
+	 * Converts value expression to be appended to SELECT list
+	 * @param EntityQueryBuilder $builder
+	 * @return ISqlValueExpression
+	 */
+	protected function getValueExpression(EntityQueryBuilder $builder)
+	{
+		return
+			new AliasedSqlValueExpression(
+				$builder->subject($this->property)
+			);
+	}
 }
 
 ?>

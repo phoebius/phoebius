@@ -41,7 +41,7 @@ class BoxablePropertyType extends PrimitivePropertyType
 	function __construct($boxableType, DBType $dbType)
 	{
 		Assert::isTrue(
-			TypeUtils::isChild($boxableType, 'IBoxable')
+			TypeUtils::isInherits($boxableType, 'IBoxable')
 		);
 
 		$this->boxableType = $boxableType;

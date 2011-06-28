@@ -41,6 +41,11 @@ class SqlValue implements ISqlValueExpression
 	{
 		$this->value = $value;
 	}
+	
+	function __toString()
+	{
+		return 'value:' . $this->toDialectString(DummyDialect::getInstance());
+	}
 
 	function toDialectString(IDialect $dialect)
 	{

@@ -64,7 +64,7 @@ final class AssociationPropertyType extends OrmPropertyType
 		$this->container = $container;
 
 		Assert::isTrue(
-			TypeUtils::isChild(
+			TypeUtils::isInherits(
 				$identifier->getType(),
 				'IOrmPropertyReferencable'
 			)

@@ -65,9 +65,19 @@ final class TypeUtils extends StaticClass
 	{
 		$name = self::resolveName($object);
 
-		return
-			class_exists($name, true)
-			|| interface_exists($name, true);
+		try {
+			$class = class_exists($name, true);
+		}
+		catch (Exception $e) {}
+		
+		if (!$class) {
+			try {
+				$interface = interface_exists($name, true);
+			}
+			catch (Exception $e) {}
+		}
+		
+		return $class || $interface;
 	}
 
 	/**
@@ -92,26 +102,26 @@ final class TypeUtils extends StaticClass
 	 * @param string|object $parent
 	 * @return boolean
 	 */
-	static function isChild($child, $parent)
+	static function isInherits($object, $type)
 	{
-		$child = self::resolveName($child);
-		$parent = self::resolveName($parent);
+		$object = self::resolveName($object);
+		$type = self::resolveName($type);
 
 		Assert::isTrue(
-			self::isExists($child),
+			self::isExists($object),
 			'unknown type %s',
-			$child
+			$object
 		);
 
 		Assert::isTrue(
-			self::isExists($parent),
+			self::isExists($type),
 			'unknown type %s',
-			$parent
+			$type
 		);
 
 		return (
-			   in_array($parent, class_implements($child))
-			|| in_array($parent, class_parents($child))
+			   in_array($type, class_implements($object))
+			|| in_array($type, class_parents($object))
 		);
 	}
 

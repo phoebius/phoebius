@@ -42,6 +42,15 @@ class AggrProjection implements IProjection
 		$this->expression = $expression;
 		$this->alias = $alias;
 	}
+	
+	/**
+	 * Gets the alias for projection
+	 * @return string|null
+	 */
+	function getAlias()
+	{
+		return $this->alias;
+	}
 
 	/**
 	 * Gets the name of the aggregates

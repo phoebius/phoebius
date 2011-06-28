@@ -313,7 +313,7 @@ class XmlOrmDomainBuilder
 		$referredTypeName = (string)$xmlContainer['type'];
 		
 		if (!$referredType = $this->importEntity($referredTypeName)) {
-			if (@class_exists($referredTypeName, true) && TypeUtils::isChild($referredTypeName, 'IDaoRelated')) {
+			if (TypeUtils::isExists($referredTypeName) && TypeUtils::isInherits($referredTypeName, 'IDaoRelated')) {
 				$referredType = call_user_func(array($referredTypeName, 'orm'));
 			}
 			else {
@@ -457,25 +457,25 @@ class XmlOrmDomainBuilder
 			return $dbType->getOrmPropertyType();
 		}
 		else if (@class_exists($name, true)) {
-			if (TypeUtils::isChild($name, 'IDaoRelated')) {
+			if (TypeUtils::isInherits($name, 'IDaoRelated')) {
 				return new AssociationPropertyType(
 					call_user_func(array($name, 'orm')),
 					$multiplicity,
 					AssociationBreakAction::cascade()
 				);
 			}
-			else if (TypeUtils::isChild($name, 'IOrmRelated')) {
+			else if (TypeUtils::isInherits($name, 'IOrmRelated')) {
 				$orm = call_user_func(array($name, 'orm'));
 				return new CompositePropertyType($orm);
 			}
-			else if (TypeUtils::isChild($name, 'IOrmPropertyAssignable')) {
+			else if (TypeUtils::isInherits($name, 'IOrmPropertyAssignable')) {
 				return
 					call_user_func(
 						array($name, 'getOrmPropertyType'),
 						$multiplicity
 					);
 			}
-			else if (TypeUtils::isChild($name, 'IBoxable')) {
+			else if (TypeUtils::isInherits($name, 'IBoxable')) {
 				$parameters['id'] = DBType::VARCHAR;
 				if (!isset($parameters['nullable'])) {
 					$parameters['nullable'] =
@@ -489,12 +489,12 @@ class XmlOrmDomainBuilder
 						$name,  $this->makeObject('DBType', $parameters)
 					);
 			}
-			else if (TypeUtils::isChild($name, 'ISqlType')) { // for RawSqlType
+			else if (TypeUtils::isInherits($name, 'ISqlType')) { // for RawSqlType
 				return new PrimitivePropertyType(
 					$this->makeObject($name, $parameters)
 				);
 			}
-			else if (TypeUtils::isChild($name, 'OrmPropertyType')) { // OrmPropertyType with public ctor
+			else if (TypeUtils::isInherits($name, 'OrmPropertyType')) { // OrmPropertyType with public ctor
 				return $this->makeObject($name, $parameters);
 			}
 		}

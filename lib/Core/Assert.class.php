@@ -340,6 +340,52 @@ final class Assert extends StaticClass
 	}
 
 	/**
+	 * Checks if assertion is scalar. Alias for Assert::isScalar().
+	 * @param mixed $assertion
+	 * @param string $message optional string to be printed when assertion check fails
+	 * @return void
+	 */
+	static function isString($variable, $message = null)
+	{
+		if (!is_scalar($variable)) {
+			if (!$message) {
+				$args = array(
+					'variable is expected to be scalar, [%s] given',
+					$variable
+				);
+			}
+			else {
+				$args = func_get_args();
+				$args = array_slice($args, 1);
+			}
+
+			self::triggerError($args);
+		}
+	}
+
+	/**
+	 * Checks if object is instance of type
+	 * @return void
+	 */
+	static function isInstance($object, $type, $message = null)
+	{
+		if (!($object instanceof $type)) {
+			if (!$message) {
+				$args = array(
+					'object is expected to be instance of %s, %s given',
+					$type, TypeUtils::getName($object)
+				);
+			}
+			else {
+				$args = func_get_args();
+				$args = array_slice($args, 1);
+			}
+
+			self::triggerError($args);
+		}
+	}
+
+	/**
 	 * Checks if assertion is scalar
 	 * @param mixed $assertion
 	 * @param string $message optional string to be printed when assertion check fails
@@ -425,16 +471,9 @@ final class Assert extends StaticClass
 		if (empty($args) || empty($args[0])) {
 			$args[0] = 'assertion failed';
 		}
-
-		// TODO: throw an execption directly out here (?)
-
-		trigger_error(
-			call_user_func_array(
-				array ('DebugUtils', 'sprintf'),
-				$args
-			),
-			E_USER_ERROR
-		);
+		
+		$string = call_user_func_array(array ('DebugUtils', 'sprintf'), $args);
+		throw new Exception($string);
 	}
 }
 

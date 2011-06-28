@@ -34,6 +34,7 @@ final class DebugUtils extends StaticClass
 			$params = func_get_args();
 			foreach ($params as &$param) {
 				if (!is_scalar($param)) {
+					// FIXME call __toString here
 					$param = print_r($param, true);
 				}
 			}

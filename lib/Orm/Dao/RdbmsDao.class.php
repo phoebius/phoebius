@@ -79,6 +79,14 @@ class RdbmsDao implements IOrmEntityAccessor
 			$this->identityMap = new OrmIdentityMap($this->logicalSchema);
 		}
 	}
+	
+	/**
+	 * @return IQueryable
+	 */
+	function getOrmEntity()
+	{
+		return $this->entity;
+	}
 
 	/**
 	 * Gets the database used to obtain entity data.

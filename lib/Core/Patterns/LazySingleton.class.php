@@ -24,7 +24,7 @@ abstract class LazySingleton
 {
 	private static $objectInstances = array();
 
-	final protected function __construct()
+	protected function __construct()
 	{
 		//nothing
 	}

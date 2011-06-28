@@ -23,10 +23,10 @@ function __autoload($class)
 	}
 	catch (Exception $e) {
 		$message = sprintf(
-			'Exception thrown when autoloading %s from %s:%s',
-			$class, $e->getFile(), $e->getLine()
+			'Exception thrown when autoloading %s from %s:%s: %s',
+			$class, $e->getFile(), $e->getLine(), $e->getMessage()
 		);
 		
-		trigger_error($message, E_USER_ERROR);
+		throw new Exception($message);
 	}
 }

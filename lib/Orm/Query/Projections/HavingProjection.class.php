@@ -36,10 +36,10 @@ final class HavingProjection implements IProjection
 		$this->expression = $expression;
 	}
 
-	function fill(SelectQuery $selectQuery, EntityQuery $entityQuery)
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $builder)
 	{
 		$selectQuery->having(
-			$this->expression->toSubjected($entityQuery)
+			$this->expression->toSubjected($builder)
 		);
 	}
 }
