@@ -199,7 +199,7 @@ final class EntityQueryBuilder implements ISubjectivity
 			);
 		}
 
-		return new SqlValue((string) $subject);
+		return new SqlValue($subject);
 	}
 
 	private function hasId($subject)
