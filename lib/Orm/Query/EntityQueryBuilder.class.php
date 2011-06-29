@@ -192,9 +192,9 @@ final class EntityQueryBuilder implements ISubjectivity
 				return new SqlIdentifier($subject);
 			}
 		}
-		else {
+		else if (!is_null($subject)) {
 			Assert::isUnreachable(
-				'do not know how to preset %s',
+				'do not know how to subject %s',
 				TypeUtils::getName($subject)
 			);
 		}
