@@ -230,12 +230,15 @@ EOT;
 	
 	function getEntityProperty(EntityPropertyPath $path, OrmProperty $owner) 
 	{
-		Assert::isFalse(
-			$path->isEmpty(),
-			'incomplete PropertyPath %s: %s is Association and cannot be the tail',
-			$path->getFullPath(),
-			$path->getCurrentPath()
-		);
+//		Assert::isFalse(
+//			$path->isEmpty(),
+//			'incomplete PropertyPath %s: %s is Association and cannot be the tail',
+//			$path->getFullPath(),
+//			$path->getCurrentPath()
+//		);
+
+		if ($path->isEmpty())
+			return new EntityProperty($path->getEntityQueryBuilder(), $owner);
 		
 		$eqb = $path->getEntityQueryBuilder()->joinEncapsulant($path->getCurrentChunk());
 		
