@@ -307,7 +307,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 
 	function setLimit($limit)
 	{
-		Assert::isPositiveInteger($limit);
+		if ($limit)
+			Assert::isPositiveInteger($limit);
 
 		$this->limit = $limit;
 
@@ -321,7 +322,8 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 
 	function setOffset($offset)
 	{
-		Assert::isPositiveInteger($offset);
+		if ($offset)
+			Assert::isPositiveInteger($offset);
 
 		$this->offset = $offset;
 
