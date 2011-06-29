@@ -67,7 +67,7 @@ class EntityProjection implements IProjection
 	{
 		$entityQueryBuilder->registerIdentifier($field);
 
-		$selectQuery->get(
+		$selectQuery->addSelectExpression(
 			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);
 	}

@@ -61,7 +61,7 @@ class RawProjection implements IProjection
 
 	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
-		$selectQuery->get($this->getValueExpression($entityQueryBuilder));
+		$selectQuery->addSelectExpression($this->getValueExpression($entityQueryBuilder));
 	}
 
 	/**

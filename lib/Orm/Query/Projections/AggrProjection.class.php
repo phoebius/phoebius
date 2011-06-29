@@ -63,7 +63,7 @@ class AggrProjection implements IProjection
 
 	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
-		$selectQuery->get($this->getSqlFunction($entityQueryBuilder));
+		$selectQuery->addSelectExpression($this->getSqlFunction($entityQueryBuilder));
 	}
 
 	/**

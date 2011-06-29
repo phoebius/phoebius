@@ -74,13 +74,13 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 * LIMIT ...
 	 * @var integer
 	 */
-	private $limit = 0;
+	private $limit;
 
 	/**
 	 * OFFSET ...
 	 * @var offset
 	 */
-	private $offset = 0;
+	private $offset;
 
 	/**
 	 * SelectQuery static constructor
@@ -116,11 +116,22 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return SelectQuery
 	 */
-	function setDistinct()
+	function setDistinct($flag = true)
 	{
-		$this->distinct = true;
+		Assert::isBoolean($flag);
+		
+		$this->distinct = $flag;
 
 		return $this;
+	}
+	
+	/**
+	 * If query is distinct
+	 * @return Boolean
+	 */
+	function isDistinct()
+	{
+		return $this->distinct;
 	}
 
 	/**
@@ -134,55 +145,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return SelectQuery itself
 	 */
-	function where(IExpression $condition)
+	function setWhere(IExpression $condition)
 	{
 		$this->condition = $condition;
-
-		return $this;
-	}
-
-	/**
-	 * Appends the condition for rows that should be selected using conjunction
-	 *
-	 * Only rows for which this expression returns true will be selected.
-	 *
-	 * @param IExpression $condition condition to be applied when selected rows
-	 *
-	 * @see SelectQuery::setCondition()
-	 *
-	 * @return SelectQuery itself
-	 */
-	function andWhere(IExpression $condition)
-	{
-		if ($this->condition) {
-			$this->condition = Expression::conjunction($this->condition, $condition);
-		}
-		else {
-			$this->condition = $condition;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Appends the condition for rows that should be selected using disjunction
-	 *
-	 * Only rows for which this expression returns true will be selected.
-	 *
-	 * @param IExpression $condition condition to be applied when selected rows
-	 *
-	 * @see SelectQuery::setCondition()
-	 *
-	 * @return SelectQuery itself
-	 */
-	function orWhere(IExpression $condition)
-	{
-		if ($this->condition) {
-			$this->condition = Expression::disjunction($this->condition, $condition);
-		}
-		else {
-			$this->condition = $condition;
-		}
 
 		return $this;
 	}
@@ -192,7 +157,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return IExpression|null
 	 */
-	function getCondition()
+	function getWhere()
 	{
 		return $this->condition;
 	}
@@ -225,29 +190,9 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return SelectQuery itself
 	 */
-	function get(ISqlValueExpression $expression)
+	function addSelectExpression(ISqlValueExpression $expression)
 	{
-		$args = func_get_args();
-
-		foreach ($args as $arg) {
-			$this->get->append($arg);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Appends the list of expressions to a SELECT list that form the output rows of the statement
-	 *
-	 * @see SelectQuery::get()
-	 * @param array $fields array of ISqlValueExpression
-	 * @return SelectQuery itself
-	 */
-	function arrayGet(array $expressions)
-	{
-		foreach ($expressions as $expression) {
-			$this->get($expression);
-		}
+		$this->get->append($expression);
 
 		return $this;
 	}
@@ -269,7 +214,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return SelectQuery itself
 	 */
-	function from($table, $alias = null)
+	function addTableSource($table, $alias = null)
 	{
 		$this->addSource(
 			new SelectQuerySource(
@@ -317,23 +262,18 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Appends the expression(s) that will condense into a single row all selected rows that share
+	 * Appends the expression that will condense into a single row all selected rows that share
 	 * the same values for the grouped expressions.
-	 *
-	 * Multiple arguments implementing ISqlValueExpression are accepted.
 	 *
 	 * Expression can be an input column name, or the name or ordinal number of an output column
 	 * (SELECT list item), or an arbitrary expression formed from input-column value.
 	 *
-	 * @param ISqlValueExpression ...
+	 * @param ISqlValueExpression
 	 * @return SelectQuery itself
 	 */
-	function groupBy(ISqlValueExpression $expression)
+	function addGroupBy(ISqlValueExpression $expression)
 	{
-		$expressions = func_get_args();
-		foreach ($expressions as $expression) {
-			$this->groups->append($expression);
-		}
+		$this->groups->append($expression);
 
 		return $this;
 	}
@@ -345,7 +285,7 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	 *
 	 * @return SelectQuery itself
 	 */
-	function having(IExpression $expression = null)
+	function setHaving(IExpression $expression = null)
 	{
 		$this->having = $expression;
 
@@ -353,19 +293,14 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 	}
 
 	/**
-	 * Appends the list of expressions that will be used when sorting the resulting rows.
+	 * Appends the expression that will be used when sorting the resulting rows.
 	 *
-	 * Multiple arguments implementing OrderBy are accepted.
-	 *
-	 * @param OrderBy ...
+	 * @param OrderBy
 	 * @return SelectQuery itself
 	 */
-	function orderBy(OrderBy $expression)
+	function addOrderBy(OrderBy $expression)
 	{
-		$expressions = func_get_args();
-		foreach ($expressions as $expression) {
-			$this->order->append($expression);
-		}
+		$this->order->append($expression);
 
 		return $this;
 	}
@@ -378,6 +313,11 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 
 		return $this;
 	}
+	
+	function getLimit()
+	{
+		return $this->limit;
+	}
 
 	function setOffset($offset)
 	{
@@ -386,6 +326,11 @@ class SelectQuery implements ISqlSelectQuery, ISqlValueExpression
 		$this->offset = $offset;
 
 		return $this;
+	}
+	
+	function getOffset()
+	{
+		return $this->offset;
 	}
 
 	function toDialectString(IDialect $dialect)

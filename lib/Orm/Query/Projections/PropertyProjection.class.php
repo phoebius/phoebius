@@ -50,8 +50,6 @@ class PropertyProjection implements IProjection
 		foreach ($property->getFields() as $field) {
 			$this->fillPropertyField($field, $selectQuery, $entityQueryBuilder);
 		}
-
-		$selectQuery->get($this->getValueExpression($entityQueryBuilder));
 	}
 
 	/**
@@ -69,22 +67,9 @@ class PropertyProjection implements IProjection
 	{
 		$entityQueryBuilder->registerIdentifier($field);
 
-		$selectQuery->get(
+		$selectQuery->addSelectExpression(
 			new SqlColumn($field, $entityQueryBuilder->getAlias())
 		);
-	}
-
-	/**
-	 * Converts value expression to be appended to SELECT list
-	 * @param EntityQueryBuilder $builder
-	 * @return ISqlValueExpression
-	 */
-	protected function getValueExpression(EntityQueryBuilder $builder)
-	{
-		return
-			new AliasedSqlValueExpression(
-				$builder->subject($this->property)
-			);
 	}
 }
 

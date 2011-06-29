@@ -5,7 +5,7 @@
  *
  * **********************************************************************************************
  *
- * Copyright (c) 2009 Scand Ltd.
+ * Copyright (c) 2011 Scand Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation;
@@ -17,32 +17,15 @@
  ************************************************************************************************/
 
 /**
- * Projection that will condense into a single row all selected rows that share
- * the same values for the grouped expressions.
- *
- * Example:
- * @code
- * // SELECT product_name
- * // FROM product
- * // WHERE product_id = 1
- * // GROUP BY name, in_stock
- * $query =
- * 	EntityQuery::create(Product::orm())
- * 		->get(Projection::groupBy("name"))
- * 		->get(Projection::groupBy("inStock"));
- * @endcode
+ * Represents a distinct projection
  *
  * @ingroup Orm_Query_Projections
  */
-final class GroupByPropertyProjection extends PropertyProjection
+final class DistinctProjection implements IProjection
 {
-	protected function fillPropertyField($field, SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
+	function fill(SelectQuery $selectQuery, EntityQueryBuilder $entityQueryBuilder)
 	{
-		$entityQueryBuilder->registerIdentifier($field);
-
-		$selectQuery->addGroupBy(
-			new SqlColumn($field, $entityQueryBuilder->getAlias())
-		);
+		$selectQuery->setDistinct();
 	}
 }
 

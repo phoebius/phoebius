@@ -64,11 +64,6 @@ final class EntityQuery implements ISqlSelectQuery
 	private $projection;
 
 	/**
-	 * @var boolean
-	 */
-	private $distinct;
-
-	/**
 	 * @var IExpression|null
 	 */
 	private $condition;
@@ -81,12 +76,12 @@ final class EntityQuery implements ISqlSelectQuery
 	/**
 	 * @var integer
 	 */
-	private $limit = 0;
+	private $limit;
 
 	/**
 	 * @var offset
 	 */
-	private $offset = 0;
+	private $offset;
 
 	/**
 	 * EntityQuery static constructor
@@ -124,83 +119,6 @@ final class EntityQuery implements ISqlSelectQuery
 	function getQueryRoot()
 	{
 		return $this->entity;
-	}
-
-	/**
-	 * Sets the query to eliminate duplicate rows from the result
-	 * @return EntityQuery itself
-	 */
-	function setDistinct()
-	{
-		$this->distinct = true;
-
-		return $this;
-	}
-
-	/**
-	 * Appends the list of expressions that will be used when sorting the resulting rows.
-	 *
-	 * Multiple arguments implementing OrderBy are accepted.
-	 *
-	 * We don't know why OrderBY is not a part of a separate projection, so we follow
-	 * the default behaviour of nhibernate
-	 *
-	 * @param OrderBy ...
-	 * @return EntityQuery itself
-	 */
-	function orderBy()
-	{
-		$expressions = func_get_args();
-		foreach ($expressions as $expression) {
-			$this->order->append($expression);
-		}
-
-		return $this;
-	}
-
-	function setLimit($limit)
-	{
-		Assert::isPositiveInteger($limit);
-
-		$this->limit = $limit;
-
-		return $this;
-	}
-
-	function setOffset($offset)
-	{
-		Assert::isPositiveInteger($offset);
-
-		$this->offset = $offset;
-
-		return $this;
-	}
-
-	/**
-	 * Appends an IProjection object to the projection chain that actually makes a selection
-	 * expression that form the output rows of the statement.
-	 *
-	 * Example:
-	 * @code
-	 * // gets the number of entities within the database
-	 * $count =
-	 * 	EntityQuery::create(MyEntry::orm())
-	 * 		->get(Projection::rowCount())
-	 * 		->getCell();
-	 * @endcode
-	 *
-	 * @param IProjection ...
-	 *
-	 * @return EntityQuery itlsef
-	 */
-	function get(IProjection $projection/*, ... */)
-	{
-		$args = func_get_args();
-		foreach ($args as $arg) {
-			$this->projection->append($arg);
-		}
-
-		return $this;
 	}
 
 	/**
@@ -271,7 +189,7 @@ final class EntityQuery implements ISqlSelectQuery
 	 *
 	 * @return EntityQuery
 	 */
-	function where(IExpression $condition)
+	function setCondition(IExpression $condition = null)
 	{
 		$this->condition = $condition;
 
@@ -279,45 +197,53 @@ final class EntityQuery implements ISqlSelectQuery
 	}
 
 	/**
-	 * Joins the condition for rows that should be selected using conjunction
+	 * Gets the condition for rows that should be deleted, if set.
 	 *
-	 * Only rows for which this expression returns true will be selected.
-	 *
-	 * @param IExpression $condition condition to be applied when selected rows
-	 *
-	 * @return EntityQuery
+	 * @return IExpression|null
 	 */
-	function andWhere(IExpression $condition)
+	function getCondition()
 	{
-		if ($this->condition) {
-			$this->condition = Expression::conjunction($this->condition, $condition);
-		}
-		else {
-			$this->condition = $condition;
-		}
+		return $this->condition;
+	}
+
+	/**
+	 * Appends the expression that will be used when sorting the resulting rows.
+	 *
+	 * We don't know why OrderBY is not a part of a separate projection, so we follow
+	 * the default behaviour of nhibernate
+	 *
+	 * @param OrderBy ...
+	 * @return EntityQuery itself
+	 */
+	function addOrderBy(OrderBy $expression)
+	{
+		$this->order->append($expression);
 
 		return $this;
 	}
 
-	/**
-	 * Joins the condition for rows that should be selected using disjunction
-	 *
-	 * Only rows for which this expression returns true will be selected.
-	 *
-	 * @param IExpression $condition condition to be applied when selected rows
-	 *
-	 * @return EntityQuery
-	 */
-	function orWhere(IExpression $condition)
+	function setLimit($limit)
 	{
-		if ($this->condition) {
-			$this->condition = Expression::disjunction($this->condition, $condition);
-		}
-		else {
-			$this->condition = $condition;
-		}
+		$this->limit = $limit;
 
 		return $this;
+	}
+	
+	function getLimit()
+	{
+		return $this->limit;
+	}
+
+	function setOffset($offset)
+	{
+		$this->offset = $offset;
+
+		return $this;
+	}
+	
+	function getOffset()
+	{
+		return $this->offset;
 	}
 
 	/**
@@ -344,13 +270,13 @@ final class EntityQuery implements ISqlSelectQuery
 		$projection->fill($selectQuery, $queryBuilder);
 
 		if ($this->condition) {
-			$selectQuery->where(
+			$selectQuery->setWhere(
 				$this->condition->toSubjected($queryBuilder)
 			);
 		}
 
 		foreach ($this->order as $orderBy) {
-			$selectQuery->orderBy(
+			$selectQuery->addOrderBy(
 				$orderBy->toSubjected($queryBuilder)
 			);
 		}
